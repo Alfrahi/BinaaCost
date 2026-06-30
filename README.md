@@ -30,8 +30,6 @@ A web application for estimating construction project costs. Built with React an
 
 ## Demo
 
-Check out the live demo: [Construction Cost Estimator](https://estimate.toolboxapps.online).
-
 RTL Screenshots:
 
 ![Dashboard](screenshots/AR-Dashboard.png)
