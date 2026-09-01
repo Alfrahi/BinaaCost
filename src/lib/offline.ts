@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { supabase } from "@/integrations/supabase/client";
+import { executePbMutation } from "@/lib/pb-executor";
 import { QueryClient, QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 import i18n from "@/i18n";
@@ -175,62 +175,11 @@ class OfflineManager {
       }
 
       try {
-        let request;
-        const recordId = actualPayload.id;
-
-        switch (mutation.type) {
-          case "INSERT":
-            request = supabase
-              .from(mutation.table)
-              .insert(actualPayload)
-              .select();
-            break;
-          case "UPDATE":
-            if (!recordId) throw new Error("Update requires ID");
-            request = supabase
-              .from(mutation.table)
-              .update(actualPayload)
-              .eq("id", recordId)
-              .select();
-            break;
-          case "DELETE":
-            if (!recordId) throw new Error("Delete requires ID");
-            request = supabase
-              .from(mutation.table)
-              .delete()
-              .eq("id", recordId)
-              .select();
-            break;
-          case "RPC":
-            request = supabase.rpc(mutation.table, actualPayload);
-            break;
-          case "BULK_DELETE":
-            request = supabase
-              .from(mutation.table)
-              .delete()
-              .in("id", actualPayload as unknown as string[]);
-            break;
-          case "BULK_UPDATE": {
-            const { ids, data } = actualPayload;
-            request = supabase
-              .from(mutation.table)
-              .update(data)
-              .in("id", ids)
-              .select();
-            break;
-          }
-          case "UPSERT":
-            request = supabase
-              .from(mutation.table)
-              .upsert(actualPayload, { onConflict: mutation.onConflict })
-              .select();
-            break;
-          default:
-            throw new Error(`Unknown operation: ${mutation.type}`);
-        }
-
-        const { error } = await request;
-        if (error) throw error;
+        await executePbMutation({
+          table: mutation.table,
+          operation: mutation.type,
+          payload: actualPayload,
+        });
 
         successfulMutations++;
         console.log("Successfully synced mutation:", mutation.id);

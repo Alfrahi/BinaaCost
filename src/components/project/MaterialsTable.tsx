@@ -78,24 +78,24 @@ export function MaterialsTable({
     isBulkMovingMaterials,
   } = useProjectMaterials(projectId);
 
-  const onSubmit = useCallback(
-    async (data: MaterialFormValues) => {
-      await handleAddOrUpdateMaterial(data, currency, editingItem?.id);
-      closeForm();
-      selection.clear();
-    },
-    [handleAddOrUpdateMaterial, currency, editingItem, selection],
-  );
+  const closeForm = useCallback(() => {
+    setIsFormOpen(false);
+    setEditingItem(null);
+  }, []);
 
   const openForm = useCallback((item: MaterialItem | null) => {
     setEditingItem(item);
     setIsFormOpen(true);
   }, []);
 
-  const closeForm = useCallback(() => {
-    setIsFormOpen(false);
-    setEditingItem(null);
-  }, []);
+  const onSubmit = useCallback(
+    async (data: MaterialFormValues) => {
+      await handleAddOrUpdateMaterial(data, currency, editingItem?.id);
+      closeForm();
+      selection.clear();
+    },
+    [handleAddOrUpdateMaterial, currency, editingItem, selection, closeForm],
+  );
 
   const grandTotal = useMemo(
     () =>

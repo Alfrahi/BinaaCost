@@ -70,24 +70,24 @@ export function LaborTable({
     isBulkMovingLabor,
   } = useProjectLabor(projectId);
 
-  const onSubmit = useCallback(
-    async (data: LaborFormValues) => {
-      await handleAddOrUpdateLabor(data, currency, editingItem?.id);
-      closeForm();
-      selection.clear();
-    },
-    [handleAddOrUpdateLabor, currency, editingItem, selection],
-  );
+  const closeForm = useCallback(() => {
+    setIsFormOpen(false);
+    setEditingItem(null);
+  }, []);
 
   const openForm = useCallback((item: LaborItem | null) => {
     setEditingItem(item);
     setIsFormOpen(true);
   }, []);
 
-  const closeForm = useCallback(() => {
-    setIsFormOpen(false);
-    setEditingItem(null);
-  }, []);
+  const onSubmit = useCallback(
+    async (data: LaborFormValues) => {
+      await handleAddOrUpdateLabor(data, currency, editingItem?.id);
+      closeForm();
+      selection.clear();
+    },
+    [handleAddOrUpdateLabor, currency, editingItem, selection, closeForm],
+  );
 
   const grandTotal = useMemo(
     () => labor.reduce((sum, item) => safeAdd(sum, item.total_cost), 0),

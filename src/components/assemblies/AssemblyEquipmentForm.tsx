@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,10 @@ export function AssemblyEquipmentForm({
       return data || [];
     },
   });
-  const libraryItems = Array.isArray(libraryItemsData) ? libraryItemsData : [];
+  const libraryItems = useMemo(
+    () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),
+    [libraryItemsData],
+  );
 
   const form = useForm<AssemblyEquipmentFormValues>({
     resolver: zodResolver(assemblyEquipmentSchema),

@@ -1,0 +1,134 @@
+# ============================================================
+# Dependencies
+# ============================================================
+
+node_modules/
+.pnpm-store/
+
+
+# ============================================================
+# Environment / Secrets
+# ============================================================
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep example environment files
+!.env.example
+!.env.template
+
+
+# ============================================================
+# Build / Vite
+# ============================================================
+
+dist/
+build/
+.vite/
+
+
+# ============================================================
+# Test / Coverage
+# ============================================================
+
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Vitest
+.vitest/
+
+
+# ============================================================
+# PocketBase
+# ============================================================
+
+# PocketBase generated/local database data
+pocketbase/pb_data/
+
+# Local PocketBase executable
+pocketbase/pocketbase
+
+# PocketBase temporary/runtime files
+pocketbase/pb_data/**/*.db-shm
+pocketbase/pb_data/**/*.db-wal
+
+
+# ============================================================
+# Supabase
+# ============================================================
+
+# Local Supabase runtime/config generated files
+.supabase/
+
+
+# ============================================================
+# Logs
+# ============================================================
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+# ============================================================
+# OS / Editor
+# ============================================================
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+
+# ============================================================
+# Temporary files
+# ============================================================
+
+.tmp/
+temp/
+tmp/
+
+*.tmp
+*.temp
+
+
+# ============================================================
+# Generated files
+# ============================================================
+
+*.tsbuildinfo
+
+# Vite/PWA generated files
+dev-dist/
+
+# Visualizer output
+stats.html
+
+
+# ============================================================
+# Optional: local screenshots
+# ============================================================
+
+# Uncomment if screenshots are only local artifacts
+# screenshots/
+
+
+# ============================================================
+# Optional: local migration/debug artifacts
+# ============================================================
+
+*.bak
+*.backup
