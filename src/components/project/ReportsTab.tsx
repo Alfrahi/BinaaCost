@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/components/AuthProvider";
+import { pb } from "@/integrations/pocketbase/client";
 import { calculateProjectFinancials } from "@/logic/financials";
 import { Loader2, FileText, Users, DollarSign } from "lucide-react";
 import { cn, getIconMarginClass } from "@/lib/utils";
@@ -124,9 +125,9 @@ export default function ReportsTab({
   ]);
 
   const companyInfo = {
-    name: user?.user_metadata?.company_name || "",
-    website: user?.user_metadata?.company_website || "",
-    logoUrl: user?.user_metadata?.company_logo_url || "",
+    name: (user?.company_name as string) || "",
+    website: (user?.company_website as string) || "",
+    logoUrl: user ? pb.files.getURL(user, user.avatar) || "" : "",
     email: user?.email || "",
   };
 
