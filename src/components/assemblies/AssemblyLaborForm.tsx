@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { toast } from "sonner";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 interface AssemblyLaborFormProps {
   initialData?: Partial<AssemblyLaborFormValues>;
@@ -44,7 +44,10 @@ export function AssemblyLaborForm({
       return data || [];
     },
   });
-  const libraryItems = Array.isArray(libraryItemsData) ? libraryItemsData : [];
+  const libraryItems = useMemo(
+    () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),
+    [libraryItemsData],
+  );
 
   const form = useForm<AssemblyLaborFormValues>({
     resolver: zodResolver(assemblyLaborSchema),

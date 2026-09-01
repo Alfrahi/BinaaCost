@@ -82,24 +82,24 @@ export default function EquipmentTable({
     isBulkMovingEquipment,
   } = useProjectEquipment(projectId);
 
-  const onSubmit = useCallback(
-    async (data: EquipmentFormValues) => {
-      await handleAddOrUpdateEquipment(data, currency, editingItem?.id);
-      closeForm();
-      selection.clear();
-    },
-    [handleAddOrUpdateEquipment, currency, editingItem, selection],
-  );
+  const closeForm = useCallback(() => {
+    setIsFormOpen(false);
+    setEditingItem(null);
+  }, []);
 
   const openForm = useCallback((item: EquipmentItem | null) => {
     setEditingItem(item);
     setIsFormOpen(true);
   }, []);
 
-  const closeForm = useCallback(() => {
-    setIsFormOpen(false);
-    setEditingItem(null);
-  }, []);
+  const onSubmit = useCallback(
+    async (data: EquipmentFormValues) => {
+      await handleAddOrUpdateEquipment(data, currency, editingItem?.id);
+      closeForm();
+      selection.clear();
+    },
+    [handleAddOrUpdateEquipment, currency, editingItem, selection, closeForm],
+  );
 
   const grandTotal = useMemo(
     () =>

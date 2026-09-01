@@ -194,24 +194,24 @@ export function AdditionalCostsTable({
     isBulkMovingAdditionalCosts,
   } = useProjectAdditionalCosts(projectId);
 
-  const onSubmit = useCallback(
-    async (data: AdditionalCostFormValues) => {
-      await handleAddOrUpdateAdditionalCost(data, editingItem?.id);
-      closeForm();
-      selection.clear();
-    },
-    [handleAddOrUpdateAdditionalCost, editingItem, selection],
-  );
+  const closeForm = useCallback(() => {
+    setIsFormOpen(false);
+    setEditingItem(null);
+  }, []);
 
   const openForm = useCallback((item: AdditionalCostItem | null) => {
     setEditingItem(item);
     setIsFormOpen(true);
   }, []);
 
-  const closeForm = useCallback(() => {
-    setIsFormOpen(false);
-    setEditingItem(null);
-  }, []);
+  const onSubmit = useCallback(
+    async (data: AdditionalCostFormValues) => {
+      await handleAddOrUpdateAdditionalCost(data, editingItem?.id);
+      closeForm();
+      selection.clear();
+    },
+    [handleAddOrUpdateAdditionalCost, editingItem, selection, closeForm],
+  );
 
   const grandTotal = additionalCosts.reduce(
     (sum, item) => safeAdd(sum, item.amount),

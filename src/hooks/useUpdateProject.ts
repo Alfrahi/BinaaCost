@@ -219,7 +219,6 @@ export function useUpdateProject() {
       id,
       updateProjectMutation,
       openConversionDialog,
-      form,
     ],
   );
 

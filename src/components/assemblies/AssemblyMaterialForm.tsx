@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import {
   AssemblyMaterialFormValues,
   assemblyMaterialSchema,
@@ -49,7 +49,10 @@ export function AssemblyMaterialForm({
       return data || [];
     },
   });
-  const libraryItems = Array.isArray(libraryItemsData) ? libraryItemsData : [];
+  const libraryItems = useMemo(
+    () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),
+    [libraryItemsData],
+  );
 
   const form = useForm<AssemblyMaterialFormValues>({
     resolver: zodResolver(assemblyMaterialSchema),
