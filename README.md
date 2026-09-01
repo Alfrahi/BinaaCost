@@ -3,9 +3,9 @@
 [![License: GPL](https://img.shields.io/badge/License-GPL-yellow.svg)](https://opensource.org/licenses/GPL)
 [![Vite](https://img.shields.io/badge/Built%20with-Vite-646CFF.svg)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB.svg?logo=react)](https://reactjs.org/)
-[![Supabase](https://img.shields.io/badge/Powered%20by-Supabase-3ECF8E.svg)](https://supabase.com/)
+[![PocketBase](https://img.shields.io/badge/Backend-PocketBase-4285F4.svg)](https://pocketbase.io/)
 
-A web application for estimating construction project costs. Built with React and Supabase, it allows users to manage projects, calculate costs for materials, labor, equipment, and risks, and generate financial summaries. Supports multilingual interfaces, offline capabilities via PWA, and secure sharing.
+A web application for estimating construction project costs. Built with React and PocketBase, it allows users to manage projects, calculate costs for materials, labor, equipment, and risks, and generate financial summaries. Supports multilingual interfaces, offline capabilities via PWA, and secure sharing.
 
 ## Features
 
@@ -23,7 +23,7 @@ A web application for estimating construction project costs. Built with React an
 - **Internationalization (i18n)**: Support for multiple languages (e.g., English, Arabic) with RTL/LTR handling.
 - **PWA Support**: Installable as a Progressive Web App for offline access.
 - **Analytics & Charts**: Visualize costs with ECharts (bar/pie charts).
-- **Authentication**: Secure user auth via Supabase, with role-based access.
+- **Authentication**: Secure user auth via PocketBase, with role-based access.
 - **Admin Tools**: Manage users, subscriptions, and dropdown options.
 - **Import/Export**: CSV import for cost items; Currency conversion.
 - **Responsive Design**: Mobile-friendly with Tailwind CSS and Radix UI components.
@@ -45,3 +45,39 @@ LTR Screenshots:
 ![Resource Library](screenshots/EN-Resources.png)
 ![Cost Database](screenshots/EN-Cost-Database.png)
 ![Analytics](screenshots/EN-Analytics.png)
+
+## Getting Started (Development)
+
+### 1. Install dependencies
+```bash
+pnpm install
+```
+
+### 2. Start PocketBase backend
+```bash
+cd pocketbase
+./pocketbase serve --dev
+```
+- Migrations in `pocketbase/pb_migrations/` apply automatically on first run.
+- Admin UI: http://127.0.0.1:8090/_/
+- API base: http://127.0.0.1:8090
+
+### 3. Configure environment
+Copy `.env.example` to `.env` and set:
+```bash
+VITE_POCKETBASE_URL=http://127.0.0.1:8090
+```
+(Optional) Create an initial super_admin via:
+```bash
+PB_ADMIN_EMAIL=admin@example.com PB_ADMIN_PASSWORD=secret ./pocketbase serve
+```
+
+### 4. Start frontend dev server
+```bash
+pnpm dev
+```
+
+### 5. Run tests
+```bash
+pnpm typecheck && pnpm lint && pnpm test
+```
