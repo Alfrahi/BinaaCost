@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/utils/toast";
@@ -10,15 +10,16 @@ export function useUserEmailUpdate() {
 
   const updateEmailMutation = useMutation({
     mutationFn: async (newEmail: string) => {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-      if (error) {
-        throw error;
-      }
+      // PocketBase sends a confirmation link to the new address; the change
+      // only applied after the user confirms. Surface that to the caller.
+      await pb.collection("users").requestEmailChange(newEmail);
+      return { pendingConfirmation: true };
     },
     onSuccess: () => {
+      // Reset to re-check email after confirmation
+      pb.authStore.clear();
       toast.success(t("settings:profile.info_email_update"));
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["supabase.auth.session"] });
     },
     onError: (error: any) => {
       handleError(error);

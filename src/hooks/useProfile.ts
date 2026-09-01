@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflineSupabase } from "./useOfflineSupabase";
 import { CrudOperation } from "@/lib/supabase-utils";
+import { mapRecord } from "@/lib/pb-mapper";
 
 export interface Profile {
   id: string;
@@ -14,12 +15,10 @@ export interface Profile {
   role: string | null;
   company_name: string | null;
   company_website: string | null;
-  onboarding_complete: boolean;
-  project_count: number;
-  plan: string;
+  notification_prefs: Record<string, boolean> | null;
+  subscription_plan: string | null;
   subscription_expires_at: string | null;
-  max_active_projects: number | null;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export function useProfile() {
@@ -34,13 +33,8 @@ export function useProfile() {
     queryKey,
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      if (error && error.code !== "PGRST116") throw error;
-      return data || null;
+      const record = await pb.collection("users").getOne(user.id);
+      return mapRecord<Profile>(record);
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5,
@@ -56,7 +50,7 @@ export function useProfile() {
         ...old,
         ...variables,
         updated_at: new Date().toISOString(),
-      } as Profile;
+      } as Profile | null | undefined;
     }
     return old;
   };
@@ -66,13 +60,13 @@ export function useProfile() {
     Profile | null
   >({
     queryKey,
-    table: "profiles",
+    table: "users",
     operation: "UPDATE",
     optimisticUpdater: optimisticUpdater,
     disableOfflineQueue: true,
     onSuccess: () => {
       toast.success(t("success"));
-      queryClient.invalidateQueries({ queryKey: ["supabase.auth.session"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (error: any) => {
       toast.error(t("error") + ": " + error.message);

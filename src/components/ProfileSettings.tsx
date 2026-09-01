@@ -38,6 +38,7 @@ export default function ProfileSettings() {
   const updatePasswordMutation = useUserPasswordUpdate();
 
   const [email, setEmail] = useState(user?.email ?? "");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -91,7 +92,11 @@ export default function ProfileSettings() {
       return;
     }
 
-    await updatePasswordMutation.mutateAsync(newPassword);
+    await updatePasswordMutation.mutateAsync({
+      oldPassword: currentPassword,
+      newPassword,
+    });
+    setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
   };
@@ -177,6 +182,20 @@ export default function ProfileSettings() {
 
       <div className="space-y-4 max-w-md">
         <Label className="text-sm">{t("settings:profile.passwordTitle")}</Label>
+
+        <div className="space-y-2">
+          <Label htmlFor="currentPassword" className="text-sm">
+            {t("settings:profile.currentPassword")}
+          </Label>
+          <Input
+            id="currentPassword"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            aria-label={t("settings:profile.currentPassword")}
+            className="text-sm"
+          />
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="newPassword" className="text-sm">
