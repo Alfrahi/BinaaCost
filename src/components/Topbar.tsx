@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { pb } from "@/integrations/pocketbase/client";
 import { useTranslation } from "react-i18next";
 import { Menu, Bell, UserCircle } from "lucide-react";
 import { Button } from "./ui/button";
@@ -82,7 +83,9 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             <Button variant="ghost" className="relative h-12 w-12 rounded-full">
               <Avatar className="h-10 w-10">
                 <AvatarImage
-                  src={user?.user_metadata?.avatar_url || ""}
+                  src={
+                    user?.avatar ? pb.files.getURL(user, user.avatar) : ""
+                  }
                   alt={userDisplayName || "User"}
                 />
                 <AvatarFallback>

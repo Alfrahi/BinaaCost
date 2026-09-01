@@ -91,8 +91,8 @@ export function useProjectComments(projectId: string) {
           created_at: new Date().toISOString(),
           profiles: {
             email: user?.email,
-            first_name: user?.user_metadata?.first_name,
-            last_name: user?.user_metadata?.last_name,
+            first_name: user?.first_name,
+            last_name: user?.last_name,
           },
         },
       ];

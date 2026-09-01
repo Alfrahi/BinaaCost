@@ -14,7 +14,7 @@
     "error_email_update": "Failed to update email: {{message}}",
     "info_email_update": "Email updated. Please check your inbox to confirm the new email.",
     "passwordTitle": "Change Password",
-    "currentPassword": "Current Password",
+    "currentPassword": "Current password",
     "newPassword": "New Password",
     "confirmNewPassword": "Confirm New Password",
     "updatePasswordButton": "Update Password",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -17,32 +17,27 @@ export default function NotificationsSection() {
   const [systemMessages, setSystemMessages] = useState(true);
 
   useEffect(() => {
-    if (user?.user_metadata) {
-      setEmailNotifications(user.user_metadata.emailNotifications !== false);
-      setProjectUpdates(user.user_metadata.projectUpdates !== false);
-      setSharedProjects(user.user_metadata.sharedProjects !== false);
-      setSystemMessages(user.user_metadata.systemMessages !== false);
+    const prefs = user?.notification_prefs as Record<string, boolean> | null;
+    if (prefs) {
+      setEmailNotifications(prefs.emailNotifications !== false);
+      setProjectUpdates(prefs.projectUpdates !== false);
+      setSharedProjects(prefs.sharedProjects !== false);
+      setSystemMessages(prefs.systemMessages !== false);
     }
   }, [user]);
 
   const saveNotificationSettings = async () => {
+    if (!user?.id) return;
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
+      await pb.collection("users").update(user.id, {
+        notification_prefs: {
           emailNotifications,
           projectUpdates,
           sharedProjects,
           systemMessages,
         },
       });
-
-      if (error) {
-        toast.error(
-          t("settings:notifications.error_save", { message: error.message }),
-        );
-      } else {
-        toast.success(t("settings:notifications.success_saved"));
-      }
+      toast.success(t("settings:notifications.success_saved"));
     } catch (error: any) {
       toast.error(
         t("settings:notifications.error_save", { message: error.message }),
