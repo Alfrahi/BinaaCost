@@ -199,7 +199,7 @@ export default function ProfileSettings() {
                 passwordSchema.safeParse({
                   newPassword,
                   confirmNewPassword: newPassword,
-                }).error?.errors[0]?.message!,
+                }).error?.errors[0]?.message ?? "",
               )}
             </p>
           )}
@@ -226,7 +226,7 @@ export default function ProfileSettings() {
                 passwordSchema.safeParse({
                   newPassword,
                   confirmNewPassword: confirmPassword,
-                }).error?.errors[0]?.message!,
+                }).error?.errors[0]?.message ?? "",
               )}
             </p>
           )}

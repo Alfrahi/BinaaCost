@@ -73,7 +73,7 @@ export default function CostsTab({
       { value: "equipment", labelKey: "project_tabs:equipment" },
       { value: "additional", labelKey: "project_tabs:additional" },
     ],
-    [t],
+    [],
   );
 
   return (

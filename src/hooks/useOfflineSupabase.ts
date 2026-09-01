@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { offlineManager } from "@/lib/offline";
+import { executePbMutation } from "@/lib/pb-executor";
 import { PostgrestError } from "@supabase/supabase-js";
 import { useAuth } from "@/components/AuthProvider";
 import i18n from "@/i18n";
@@ -41,69 +41,7 @@ export function useOfflineSupabase() {
     useMutation<TData, Error | PostgrestError, TVariables>({
       mutationFn: async (payload: TVariables) => {
         if (offlineManager.getIsOnline()) {
-          let request;
-          const recordId = (payload as any).id;
-
-          switch (operation) {
-            case "INSERT":
-              request = supabase.from(table).insert(payload).select();
-              break;
-            case "UPDATE":
-              if (!recordId) throw new Error("Update requires ID");
-              request = supabase
-                .from(table)
-                .update(payload)
-                .eq("id", recordId)
-                .select();
-              break;
-            case "DELETE":
-              if (!recordId) throw new Error("Delete requires ID");
-              request = supabase
-                .from(table)
-                .delete()
-                .eq("id", recordId)
-                .select();
-              break;
-            case "BULK_DELETE":
-              request = supabase
-                .from(table)
-                .delete()
-                .in("id", payload as unknown as string[]);
-              break;
-            case "BULK_UPDATE": {
-              const { ids, data } = payload as any;
-              request = supabase
-                .from(table)
-                .update(data)
-                .in("id", ids)
-                .select();
-              break;
-            }
-            case "UPSERT":
-              request = supabase
-                .from(table)
-                .upsert(payload, { onConflict })
-                .select();
-              break;
-            case "RPC":
-              request = supabase.rpc(table, payload);
-              break;
-            default:
-              throw new Error(`Unknown operation: ${operation}`);
-          }
-
-          const { data, error } = await request;
-          if (error) throw error;
-
-          if (
-            operation === "INSERT" ||
-            operation === "UPDATE" ||
-            operation === "DELETE" ||
-            operation === "UPSERT"
-          ) {
-            return data && data.length > 0 ? data[0] : null;
-          }
-          return data;
+          return executePbMutation<TData>({ table, operation, payload });
         } else {
           if (disableOfflineQueue) {
             throw new Error(i18n.t("common:offlineOperationNotAllowed"));
@@ -121,7 +59,7 @@ export function useOfflineSupabase() {
             userId: user.id,
             onConflict,
           });
-          return payload;
+          return payload as unknown as TData;
         }
       },
       onMutate: async (variables) => {

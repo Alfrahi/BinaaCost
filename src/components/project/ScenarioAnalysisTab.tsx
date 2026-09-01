@@ -900,7 +900,7 @@ export function ScenarioAnalysisTab({
                         <p className="text-red-500 text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
-                              ?.item_type?.message!,
+                              ?.item_type?.message ?? "",
                           )}
                         </p>
                       )}
@@ -942,7 +942,7 @@ export function ScenarioAnalysisTab({
                         <p className="text-red-500 text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
-                              ?.field?.message!,
+                              ?.field?.message ?? "",
                           )}
                         </p>
                       )}
@@ -983,7 +983,7 @@ export function ScenarioAnalysisTab({
                         <p className="text-red-500 text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
-                              ?.adjustment_type?.message!,
+                              ?.adjustment_type?.message ?? "",
                           )}
                         </p>
                       )}
@@ -1020,7 +1020,7 @@ export function ScenarioAnalysisTab({
                         <p className="text-red-500 text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
-                              ?.value?.message!,
+                              ?.value?.message ?? "",
                           )}
                         </p>
                       )}
