@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflineSupabase } from "./useOfflineSupabase";
@@ -25,13 +25,16 @@ export function useProjectVersions(projectId: string) {
     queryKey,
     queryFn: async () => {
       if (!projectId) return [];
-      const { data, error } = await supabase
-        .from("project_versions")
-        .select("id, name, created_at")
-        .eq("project_id", projectId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
+      const records = await pb.collection("project_versions").getFullList({
+        filter: `project_id="${projectId}"`,
+        sort: "-created",
+        fields: "id,name,created",
+      });
+      return records.map((r) => ({
+        id: r.id,
+        name: r.name,
+        created_at: r.created,
+      }));
     },
     enabled: !!projectId,
     staleTime: 1000 * 60 * 5,
@@ -41,13 +44,8 @@ export function useProjectVersions(projectId: string) {
     versionId: string,
   ): Promise<any | null> => {
     if (!versionId) return null;
-    const { data, error } = await supabase
-      .from("project_versions")
-      .select("data")
-      .eq("id", versionId)
-      .single();
-    if (error) throw error;
-    return data.data;
+    const record = await pb.collection("project_versions").getOne(versionId);
+    return record.data;
   };
 
   const optimisticDeleteUpdater = (
@@ -67,7 +65,7 @@ export function useProjectVersions(projectId: string) {
     void
   >({
     queryKey,
-    table: "create_project_version",
+    table: "project_versions", // queued replays hit the custom route below
     operation: "RPC",
     onSuccess: () => {
       toast.success(t("success_created"));
@@ -76,10 +74,7 @@ export function useProjectVersions(projectId: string) {
     onError: (err: any) => handleError(err),
   });
 
-  const deleteVersionMutation = useOfflineMutation<
-    { id: string },
-    ProjectVersion[]
-  >({
+  const deleteVersionMutation = useOfflineMutation<{ id: string }, ProjectVersion[]>({
     queryKey,
     table: "project_versions",
     operation: "DELETE",

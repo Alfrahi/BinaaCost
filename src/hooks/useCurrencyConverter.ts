@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { Decimal } from "@/utils/math";
 import { useCallback } from "react";
 
@@ -12,11 +13,10 @@ export interface CurrencyRate {
 export function useCurrencyConverter() {
   const { data: rates = [], isLoading } = useQuery({
     queryKey: ["currency_rates"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("currency_rates").select("*");
-      if (error) throw error;
-      return data as CurrencyRate[];
-    },
+    queryFn: async () =>
+      mapRecords<CurrencyRate>(
+        await pb.collection("currency_rates").getFullList(),
+      ),
     staleTime: 1000 * 60 * 60,
   });
 

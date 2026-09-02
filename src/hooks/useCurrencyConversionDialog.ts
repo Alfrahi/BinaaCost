@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { ProjectFormValues } from "@/types/project-form";
 
@@ -53,15 +53,14 @@ export function useCurrencyConversionDialog({
     const toastId = toast.loading(t("common:convertingCurrency"));
 
     try {
-      const { error: conversionError } = await supabase.rpc(
-        "convert_project_currency",
+      await callRouteWithParams(
+        "projects/convert-currency",
+        { id: projectId },
         {
-          p_project_id: projectId,
-          p_old_currency: originalCurrency,
-          p_new_currency: pendingNewCurrency,
+          old_currency: originalCurrency,
+          new_currency: pendingNewCurrency,
         },
       );
-      if (conversionError) throw conversionError;
 
       toast.success(t("common:currencyConverted"));
       await onConfirmConversion(pendingNewCurrency, formDataToSubmit);
