@@ -74,7 +74,8 @@
       "linkCopied": "تم نسخ الرابط إلى الحافظة!",
       "expired": "منتهي الصلاحية",
       "successDeleted": "تم حذف الرابط الخارجي بنجاح!",
-      "errorDelete": "فشل حذف الرابط الخارجي: {{message}}"
+      "errorDelete": "فشل حذف الرابط الخارجي: {{message}}",
+      "linkHiddenNote": "يُعرض الرابط مرة واحدة عند الإنشاء (الرمز محفوظ بأمان)"
     }
   },
   "assembly_importer": {

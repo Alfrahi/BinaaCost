@@ -206,15 +206,8 @@ export default function ShareProjectDialog({
                   <tbody className="bg-white divide-y divide-gray-100">
                     {externalLinks.map((link) => (
                       <tr key={link.id}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          <a
-                            href={`${window.location.origin}/public-share/${link.access_token}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline truncate max-w-[min(200px, 80vw)] block"
-                          >
-                            {`${window.location.origin}/public-share/${link.access_token}`}
-                          </a>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 italic">
+                          {t("project_detail:share.external.linkHiddenNote")}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           {format(new Date(link.expires_at), "MMM dd, yyyy")}

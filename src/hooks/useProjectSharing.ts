@@ -1,5 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import {
+  callRoute,
+  callRouteWithParams,
+} from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/utils/toast";
@@ -13,7 +17,6 @@ export interface ProjectShare {
 
 export interface ExternalShareLink {
   id: string;
-  access_token: string;
   expires_at: string;
   created_by_user_id: string;
 }
@@ -29,14 +32,19 @@ export function useProjectSharing(projectId: string) {
     useQuery<ProjectShare[]>({
       queryKey: internalShareQueryKey,
       queryFn: async () => {
-        const { data, error } = await supabase.rpc(
-          "get_project_shares_for_owner",
-          {
-            p_project_id: projectId,
-          },
-        );
-        if (error) throw error;
-        return data || [];
+        const records = await pb.collection("project_shares").getFullList({
+          filter: `project_id="${projectId}"`,
+          expand: "shared_with_user_id",
+        });
+        return records.map((r) => ({
+          share_id: r.id,
+          shared_with_user_id: r.shared_with_user_id,
+          role: r.role as "viewer" | "editor",
+          email:
+            r.expand?.shared_with_user_id?.email ??
+            r.shared_with_email ??
+            "",
+        }));
       },
       enabled: !!projectId,
     });
@@ -45,12 +53,16 @@ export function useProjectSharing(projectId: string) {
     useQuery<ExternalShareLink[]>({
       queryKey: externalShareQueryKey,
       queryFn: async () => {
-        const { data, error } = await supabase
-          .from("shared_project_links")
-          .select("id, access_token, expires_at, created_by_user_id")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data || [];
+        // tokens are hashed — listing cannot expose them; metadata only
+        const records = await pb.collection("shared_project_links").getFullList({
+          filter: `project_id="${projectId}"`,
+          fields: "id,expires_at,created_by_user_id,created",
+        });
+        return records.map((r) => ({
+          id: r.id,
+          expires_at: r.expires_at,
+          created_by_user_id: r.created_by_user_id,
+        }));
       },
       enabled: !!projectId,
     });
@@ -60,12 +72,18 @@ export function useProjectSharing(projectId: string) {
       email: string;
       role: "viewer" | "editor";
     }) => {
-      const { error } = await supabase.rpc("add_project_share", {
-        p_project_id: projectId,
-        p_shared_with_email: variables.email,
-        p_role: variables.role,
+      const { id } = await callRoute<{ id: string }>("users/resolve", {
+        email: variables.email,
       });
-      if (error) throw error;
+      if (id === pb.authStore.record?.id) {
+        throw new Error("Cannot share own project with yourself");
+      }
+      await pb.collection("project_shares").create({
+        project_id: projectId,
+        shared_with_user_id: id,
+        shared_with_email: variables.email,
+        role: variables.role,
+      });
     },
     onSuccess: () => {
       toast.success(t("project_detail:share.successAdded"));
@@ -82,11 +100,9 @@ export function useProjectSharing(projectId: string) {
       shareId: string;
       newRole: "viewer" | "editor";
     }) => {
-      const { error } = await supabase.rpc("update_project_share_role", {
-        p_share_id: variables.shareId,
-        p_new_role: variables.newRole,
-      });
-      if (error) throw error;
+      await pb
+        .collection("project_shares")
+        .update(variables.shareId, { role: variables.newRole });
     },
     onSuccess: () => {
       toast.success(t("project_detail:share.successUpdated"));
@@ -100,10 +116,7 @@ export function useProjectSharing(projectId: string) {
 
   const deleteInternalShareMutation = useMutation({
     mutationFn: async (shareId: string) => {
-      const { error } = await supabase.rpc("delete_project_share", {
-        p_share_id: shareId,
-      });
-      if (error) throw error;
+      await pb.collection("project_shares").delete(shareId);
     },
     onSuccess: () => {
       toast.success(t("project_detail:share.successDeleted"));
@@ -117,18 +130,11 @@ export function useProjectSharing(projectId: string) {
 
   const generateExternalLinkMutation = useMutation({
     mutationFn: async (variables: { expiresAt: string; password?: string }) => {
-      const { data, error } = await supabase.functions.invoke(
-        "generate-share-link",
-        {
-          body: {
-            project_id: projectId,
-            expires_at: variables.expiresAt,
-            password: variables.password,
-          },
-        },
+      const data = await callRouteWithParams<{ access_token: string }>(
+        "projects/share-links",
+        { id: projectId },
+        { expires_at: variables.expiresAt, password: variables.password },
       );
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
       return data.access_token;
     },
     onSuccess: () => {
@@ -142,11 +148,7 @@ export function useProjectSharing(projectId: string) {
 
   const deleteExternalLinkMutation = useMutation({
     mutationFn: async (linkId: string) => {
-      const { error } = await supabase
-        .from("shared_project_links")
-        .delete()
-        .eq("id", linkId);
-      if (error) throw error;
+      await pb.collection("shared_project_links").delete(linkId);
     },
     onSuccess: () => {
       toast.success(t("project_detail:share.external.successDeleted"));
