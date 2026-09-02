@@ -12,7 +12,8 @@ import { Plus, Folder, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecord, mapRecords } from "@/lib/pb-mapper";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { useMyProjects } from "@/hooks/useMyProjects";
 import { useSharedProjects } from "@/hooks/useSharedProjects";
@@ -47,101 +48,30 @@ export default function Dashboard() {
   const prefetchProjectData = (projectId: string) => {
     queryClient.prefetchQuery({
       queryKey: ["project", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("projects")
-          .select("*")
-          .eq("id", projectId)
-          .single();
-        if (error) throw error;
-        return data;
-      },
+      queryFn: async () =>
+        mapRecord(await pb.collection("projects").getOne(projectId)),
       staleTime: 1000 * 60 * 2,
     });
-    queryClient.prefetchQuery({
-      queryKey: ["materials", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("materials")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["labor_items", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("labor_items")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["equipment_items", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("equipment_items")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["additional_costs", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("additional_costs")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["risks", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("risks")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["project_groups", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("project_groups")
-          .select("*")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["comments", projectId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("comments")
-          .select("*, profiles:user_id(email, first_name, last_name)")
-          .eq("project_id", projectId);
-        if (error) throw error;
-        return data ?? [];
-      },
-      staleTime: 1000 * 60 * 2,
-    });
+    for (const table of [
+      "materials",
+      "labor_items",
+      "equipment_items",
+      "additional_costs",
+      "risks",
+      "project_groups",
+      "comments",
+    ]) {
+      queryClient.prefetchQuery({
+        queryKey: [table, projectId],
+        queryFn: async () =>
+          mapRecords(
+            await pb
+              .collection(table)
+              .getFullList({ filter: `project_id="${projectId}"` }),
+          ),
+        staleTime: 1000 * 60 * 2,
+      });
+    }
   };
 
   useEffect(() => {

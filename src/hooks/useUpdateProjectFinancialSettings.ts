@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { FinancialSettings } from "@/logic/financials";
@@ -17,11 +17,9 @@ export function useUpdateProjectFinancialSettings() {
       projectId: string;
       newSettings: FinancialSettings;
     }) => {
-      const { error } = await supabase
-        .from("projects")
-        .update({ financial_settings: newSettings })
-        .eq("id", projectId);
-      if (error) throw error;
+      await pb.collection("projects").update(projectId, {
+        financial_settings: newSettings,
+      });
     },
     onSuccess: (_, variables) => {
       toast.success(t("common:success"));

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
@@ -69,13 +69,12 @@ export function useProjectGroupsManager(
 
   const addGroupMutation = useMutation({
     mutationFn: async (name: string) => {
-      const { error } = await supabase.from("project_groups").insert({
+      await pb.collection("project_groups").create({
         project_id: projectId,
         user_id: user?.id,
         name: sanitizeText(name),
         sort_order: groups.length,
       });
-      if (error) throw error;
     },
     onMutate: async (name) => {
       await queryClient.cancelQueries({ queryKey });
@@ -108,14 +107,9 @@ export function useProjectGroupsManager(
 
   const updateGroupMutation = useMutation({
     mutationFn: async (group: ProjectGroup) => {
-      const { error } = await supabase
-        .from("project_groups")
-        .update({
-          name: sanitizeText(group.name),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", group.id);
-      if (error) throw error;
+      await pb.collection("project_groups").update(group.id, {
+        name: sanitizeText(group.name),
+      });
     },
     onMutate: async (group) => {
       await queryClient.cancelQueries({ queryKey });
@@ -143,11 +137,7 @@ export function useProjectGroupsManager(
 
   const deleteGroupMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("project_groups")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
+      await pb.collection("project_groups").delete(id);
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey });
@@ -171,17 +161,11 @@ export function useProjectGroupsManager(
 
   const reorderGroupsMutation = useMutation({
     mutationFn: async (newGroups: ProjectGroup[]) => {
-      const updates = newGroups.map((g, index) => ({
-        id: g.id,
-        sort_order: index,
-        updated_at: new Date().toISOString(),
-      }));
-
-      const { error } = await supabase
-        .from("project_groups")
-        .upsert(updates, { onConflict: "id" });
-
-      if (error) throw error;
+      for (const [index, g] of newGroups.entries()) {
+        await pb
+          .collection("project_groups")
+          .update(g.id, { sort_order: index });
+      }
     },
     onMutate: async (newGroups) => {
       await queryClient.cancelQueries({ queryKey });

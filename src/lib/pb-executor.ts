@@ -17,8 +17,14 @@ export async function executePbMutation<T = any>(args: {
   const recordId = payload?.id;
 
   switch (operation) {
-    case "INSERT":
-      return collection.create(payload);
+    case "INSERT": {
+      // Offline-queued payloads may carry optimistic uuids (crypto.randomUUID
+      // in optimistic updaters). PocketBase ids are 15-char alphanumeric;
+      // strip invalid client ids and let the server assign one.
+      const body = { ...payload };
+      if (!/^[a-zA-Z0-9]{15}$/.test(body.id ?? "")) delete body.id;
+      return collection.create(body);
+    }
 
     case "UPDATE":
       if (!recordId) throw new Error("Update requires ID");

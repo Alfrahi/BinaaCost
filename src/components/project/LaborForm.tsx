@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useEffect, useCallback } from "react";
 import { toast } from "sonner";
@@ -36,10 +37,8 @@ export function LaborForm({
 
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_labor"],
-    queryFn: async () => {
-      const { data } = await supabase.from("library_labor").select("*");
-      return data || [];
-    },
+    queryFn: async () =>
+      mapRecords(await pb.collection("library_labor").getFullList()),
   });
 
   const form = useForm<LaborFormValues>({

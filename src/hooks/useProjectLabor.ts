@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { callRoute } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
@@ -197,10 +197,7 @@ export function useProjectLabor(projectId: string) {
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from("library_labor")
-        .upsert(itemToUpsert, { onConflict: "user_id,worker_type" });
-      if (error) throw error;
+      await callRoute("upsert/library_labor", itemToUpsert);
     },
     [user?.id, t, getMissingRates, convert],
   );
