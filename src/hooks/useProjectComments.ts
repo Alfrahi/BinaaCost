@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { useOfflineSupabase } from "./useOfflineSupabase";
 import {
@@ -53,18 +53,26 @@ export function useProjectComments(projectId: string) {
       queryKey: commentsQueryKey,
       queryFn: async () => {
         if (!projectId) return [];
-        const { data, error } = await supabase
-          .from("comments")
-          .select(
-            `
-          *,
-          profiles(email, first_name, last_name)
-        `,
-          )
-          .eq("project_id", projectId)
-          .order("created_at", { ascending: true });
-        if (error) throw error;
-        return data || [];
+        const records = await pb.collection("comments").getFullList({
+          filter: `project_id="${projectId}"`,
+          sort: "created",
+          expand: "user_id",
+        });
+        return records.map((r) => {
+          const { expand, ...rest } = r as any;
+          return {
+            ...rest,
+            created_at: r.created,
+            updated_at: r.updated,
+            profiles: expand?.user_id
+              ? {
+                  email: expand.user_id.email,
+                  first_name: expand.user_id.first_name,
+                  last_name: expand.user_id.last_name,
+                }
+              : undefined,
+          } as Comment;
+        });
       },
       enabled: !!projectId,
       staleTime: 1000 * 10,

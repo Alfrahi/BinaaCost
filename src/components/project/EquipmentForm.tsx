@@ -9,7 +9,8 @@ import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useEffect, useCallback } from "react";
 import { equipmentSchema } from "@/types/schemas";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { toast } from "sonner";
 
@@ -51,10 +52,8 @@ export function EquipmentForm({
 
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_equipment"],
-    queryFn: async () => {
-      const { data } = await supabase.from("library_equipment").select("*");
-      return data || [];
-    },
+    queryFn: async () =>
+      mapRecords(await pb.collection("library_equipment").getFullList()),
   });
 
   const form = useForm<EquipmentFormValues>({

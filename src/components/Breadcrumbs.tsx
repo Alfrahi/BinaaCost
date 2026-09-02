@@ -1,20 +1,17 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 
 const fetchProjectName = async (projectId: string) => {
   if (!projectId) return null;
-  const { data, error } = await supabase
-    .from("projects")
-    .select("name")
-    .eq("id", projectId)
-    .single();
-  if (error) {
-    if (error.code === "PGRST116") return null;
-    throw error;
+  try {
+    const record = await pb.collection("projects").getOne(projectId);
+    return { name: record.name as string };
+  } catch (err: any) {
+    if (err?.status === 404) return null;
+    throw err;
   }
-  return data;
 };
 
 export default function Breadcrumbs() {

@@ -18,7 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { toast } from "sonner";
 
@@ -48,10 +49,8 @@ export function AssemblyEquipmentForm({
 
   const { data: libraryItemsData } = useQuery({
     queryKey: ["library_equipment"],
-    queryFn: async () => {
-      const { data } = await supabase.from("library_equipment").select("*");
-      return data || [];
-    },
+    queryFn: async () =>
+      mapRecords(await pb.collection("library_equipment").getFullList()),
   });
   const libraryItems = useMemo(
     () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),

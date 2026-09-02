@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecord, mapRecords } from "@/lib/pb-mapper";
 import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import { useAuth } from "@/components/AuthProvider";
 import { calculateCategoryTotal } from "@/logic/shared";
+import type { ProjectGroup } from "@/types/project";
 import {
   MaterialItem,
   LaborItem,
@@ -13,6 +15,15 @@ import {
   AdditionalCostItem,
   Risk,
 } from "@/types/project-items";
+
+const listByProject = (table: string, projectId: string, sort?: string) => () =>
+  pb
+    .collection(table)
+    .getFullList({
+      filter: `project_id="${projectId}"`,
+      ...(sort ? { sort } : {}),
+    })
+    .then((records) => mapRecords(records));
 
 export function useProjectData(projectId?: string) {
   const { user, role: userRole, loading: authLoading } = useAuth();
@@ -35,13 +46,8 @@ export function useProjectData(projectId?: string) {
   } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", projectId)
-        .single();
-      if (error) throw error;
-      return data;
+      const record = await pb.collection("projects").getOne(projectId!);
+      return mapRecord(record);
     },
     ...queryOptions,
   });
@@ -54,14 +60,17 @@ export function useProjectData(projectId?: string) {
     queryKey: ["project_share_role", projectId, user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("project_shares")
-        .select("role")
-        .eq("project_id", projectId)
-        .eq("shared_with_user_id", user.id)
-        .maybeSingle();
-      if (error && error.code !== "PGRST116") throw error;
-      return data || null;
+      try {
+        const record = await pb
+          .collection("project_shares")
+          .getFirstListItem(
+            `project_id="${projectId}" && shared_with_user_id="${user.id}"`,
+          );
+        return { role: record.role as string };
+      } catch (err: any) {
+        if (err?.status === 404) return null;
+        throw err;
+      }
     },
     enabled: !!projectId && !!user?.id && !isOwner,
     staleTime: 1000 * 60 * 2,
@@ -86,99 +95,50 @@ export function useProjectData(projectId?: string) {
 
   const groupsQuery = useQuery({
     queryKey: ["project_groups", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("project_groups")
-        .select("*")
-        .eq("project_id", projectId)
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("project_groups", projectId!, "sort_order,created"),
     ...queryOptions,
   });
 
   const materialsQuery = useQuery({
     queryKey: ["materials", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("materials")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("materials", projectId!),
     ...queryOptions,
   });
 
   const laborQuery = useQuery({
     queryKey: ["labor_items", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("labor_items")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("labor_items", projectId!),
     ...queryOptions,
   });
 
   const equipmentQuery = useQuery({
     queryKey: ["equipment_items", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("equipment_items")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("equipment_items", projectId!),
     ...queryOptions,
   });
 
   const additionalQuery = useQuery({
     queryKey: ["additional_costs", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("additional_costs")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("additional_costs", projectId!),
     ...queryOptions,
   });
 
   const risksQuery = useQuery({
     queryKey: ["risks", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("risks")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("risks", projectId!),
     ...queryOptions,
   });
 
   const commentsQuery = useQuery({
     queryKey: ["comments", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*, profiles:user_id(email, first_name, last_name)")
-        .eq("project_id", projectId)
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listByProject("comments", projectId!, "created"),
     ...queryOptions,
   });
 
-  const groups = useMemo(() => groupsQuery.data ?? [], [groupsQuery.data]);
+  const groups = useMemo(
+    () => (groupsQuery.data ?? []) as unknown as ProjectGroup[],
+    [groupsQuery.data],
+  );
   const materials = useMemo(
     () => materialsQuery.data ?? [],
     [materialsQuery.data],

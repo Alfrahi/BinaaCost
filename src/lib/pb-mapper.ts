@@ -3,7 +3,7 @@ import { RecordModel } from "pocketbase";
 // Maps a PocketBase record to the shape app types expect (Supabase-style):
 // `created`/`updated` become `created_at`/`updated_at`; everything else,
 // including the 15-char string `id`, passes through unchanged.
-export function mapRecord<T = Record<string, unknown>>(
+export function mapRecord<T = Record<string, any>>(
   record: RecordModel,
 ): T & { id: string } {
   const { created, updated, collectionId, collectionName, expand, ...rest } =
@@ -17,7 +17,7 @@ export function mapRecord<T = Record<string, unknown>>(
   } as unknown as T & { id: string };
 }
 
-export function mapRecords<T = Record<string, unknown>>(
+export function mapRecords<T = Record<string, any>>(
   records: RecordModel[],
 ): Array<T & { id: string }> {
   return records.map((r) => mapRecord<T>(r));

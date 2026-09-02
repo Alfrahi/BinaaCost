@@ -10,7 +10,8 @@ import { AssemblyItemsTable } from "./AssemblyItemsTable";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecord } from "@/lib/pb-mapper";
 import { handleError } from "@/utils/toast";
 import { useAuth } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -277,15 +278,10 @@ export function AssemblyDetail({ assemblyId, onBack }: AssemblyDetailProps) {
     error: assemblyError,
   } = useQuery<Assembly>({
     queryKey: ["assembly", assemblyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cost_assemblies")
-        .select("*")
-        .eq("id", assemblyId)
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () =>
+      mapRecord<Assembly>(
+        await pb.collection("cost_assemblies").getOne(assemblyId!),
+      ),
     enabled: !!assemblyId,
   });
 

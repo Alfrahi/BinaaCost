@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecord } from "@/lib/pb-mapper";
 import { CostDatabase } from "@/types/cost-databases";
 import CostItemsTable from "./CostItemsTable";
 import LocationAdjustmentsManager from "./LocationAdjustmentsManager";
@@ -28,15 +29,10 @@ export default function CostDatabaseDetail({
     error,
   } = useQuery<CostDatabase>({
     queryKey: ["cost_database", databaseId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cost_databases")
-        .select("*")
-        .eq("id", databaseId)
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () =>
+      mapRecord<CostDatabase>(
+        await pb.collection("cost_databases").getOne(databaseId!),
+      ),
     enabled: !!databaseId,
   });
 
