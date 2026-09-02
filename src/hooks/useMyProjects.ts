@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
 import { useAuth } from "@/components/AuthProvider";
+import { mapRecords } from "@/lib/pb-mapper";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -35,26 +36,23 @@ export function useMyProjects(globalSearchTerm: string) {
     queryFn: async () => {
       if (!user?.id) return { data: [], count: 0 };
 
-      const from = currentPage * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-
-      let query = supabase
-        .from("projects")
-        .select("*", { count: "exact" })
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
+      let filter = `user_id="${user.id}" && deleted_at=""`;
       if (globalSearchTerm) {
-        query = query.or(
-          `name.ilike.%${globalSearchTerm}%,description.ilike.%${globalSearchTerm}%`,
-        );
+        const term = globalSearchTerm.replace(/"/g, '\\"');
+        filter += ` && (name~"${term}" || description~"${term}")`;
       }
 
-      const { data, error, count } = await query;
-      if (error) throw error;
-      return { data: data || [], count: count || 0 };
+      const result = await pb
+        .collection("projects")
+        .getList(currentPage + 1, ITEMS_PER_PAGE, {
+          filter,
+          sort: "-created",
+        });
+
+      return {
+        data: mapRecords<MyProjectData>(result.items),
+        count: result.totalItems,
+      };
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60,

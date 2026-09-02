@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -9,10 +9,9 @@ export function useSoftDeleteProject() {
 
   const softDeleteMutation = useMutation({
     mutationFn: async (projectId: string) => {
-      const { error } = await supabase.rpc("soft_delete_project", {
-        p_project_id: projectId,
+      await pb.collection("projects").update(projectId, {
+        deleted_at: new Date().toISOString(),
       });
-      if (error) throw error;
     },
     onSuccess: () => {
       toast.success(t("project_detail:successDeleted"));

@@ -9,7 +9,8 @@ import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useEffect } from "react";
 import { materialSchema } from "@/types/schemas";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { toast } from "sonner";
 import { useCallback } from "react";
@@ -48,10 +49,8 @@ export function MaterialForm({
 
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_materials"],
-    queryFn: async () => {
-      const { data } = await supabase.from("library_materials").select("*");
-      return data || [];
-    },
+    queryFn: async () =>
+      mapRecords(await pb.collection("library_materials").getFullList()),
   });
 
   const form = useForm<MaterialFormValues>({

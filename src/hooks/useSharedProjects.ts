@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -37,39 +37,39 @@ export function useSharedProjects(globalSearchTerm: string) {
     queryFn: async () => {
       if (!user?.id) return { data: [], count: 0 };
 
-      const from = currentPage * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-
-      let query = supabase
-        .from("project_shares")
-        .select("*, projects!inner(*, profiles!inner(email))", {
-          count: "exact",
-        })
-        .eq("shared_with_user_id", user.id)
-        .is("projects.deleted_at", null)
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
+      let filter = `shared_with_user_id="${user.id}" && project_id.deleted_at=""`;
       if (globalSearchTerm) {
-        query = query.or(
-          `projects.name.ilike.%${globalSearchTerm}%,projects.description.ilike.%${globalSearchTerm}%`,
-        );
+        const term = globalSearchTerm.replace(/"/g, '\\"');
+        filter += ` && (project_id.name~"${term}" || project_id.description~"${term}")`;
       }
 
-      const { data, error, count } = await query;
-      if (error) throw error;
+      const result = await pb
+        .collection("project_shares")
+        .getList(currentPage + 1, ITEMS_PER_PAGE, {
+          filter,
+          sort: "-created",
+          expand: "project_id,project_id.user_id",
+        });
 
-      const formattedData = (data || []).map((share: any) => ({
-        id: share.projects.id,
-        name: share.projects.name,
-        description: share.projects.description,
-        created_at: share.projects.created_at,
-        user_id: share.projects.user_id,
-        owner_email: share.projects.profiles.email,
-        shared_role: share.role,
-      }));
+      const formattedData: SharedProjectData[] = [];
+      for (const share of result.items as any[]) {
+        const project = share.expand?.project_id;
+        if (!project) continue;
+        formattedData.push({
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          created_at: project.created,
+          user_id: project.user_id,
+          owner_email: project.expand?.user_id?.email,
+          shared_role: share.role,
+        });
+      }
 
-      return { data: formattedData, count: count || 0 };
+      return {
+        data: formattedData,
+        count: result.totalItems,
+      };
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60,

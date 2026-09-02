@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecord } from "@/lib/pb-mapper";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -48,13 +49,8 @@ export function useUpdateProject() {
   } = useQuery<ProjectData>({
     queryKey: ["project", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error) throw error;
-      return data;
+      const record = await pb.collection("projects").getOne(id!);
+      return mapRecord<ProjectData>(record);
     },
     enabled: !!id,
   });
