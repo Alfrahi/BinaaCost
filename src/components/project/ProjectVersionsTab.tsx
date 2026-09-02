@@ -148,6 +148,7 @@ export default function ProjectVersionsTab({
 
         await applyProjectVersion({
           projectId,
+          versionId: selectedVersionId,
           snapshot: finalSnapshot,
           createRollback: true,
         });
@@ -170,6 +171,7 @@ export default function ProjectVersionsTab({
       risks,
       versionSnapshot?.groups,
       projectId,
+      selectedVersionId,
       applyProjectVersion,
       t,
     ],

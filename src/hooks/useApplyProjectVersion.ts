@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/utils/toast";
@@ -11,16 +11,19 @@ export function useApplyProjectVersion() {
   const applyProjectVersionMutation = useMutation({
     mutationFn: async (payload: {
       projectId: string;
+      versionId: string;
       snapshot: any;
       createRollback: boolean;
     }) => {
-      const { projectId, snapshot, createRollback } = payload;
-      const { error } = await supabase.rpc("apply_project_snapshot", {
-        p_project_id: projectId,
-        p_snapshot: snapshot,
-        p_create_rollback: createRollback,
+      const { projectId, versionId, snapshot, createRollback } = payload;
+      if (createRollback) {
+        await callRouteWithParams("projects/versions", { id: projectId }, {
+          name: "Rollback before apply",
+        });
+      }
+      await callRouteWithParams("versions/apply", { id: versionId }, {
+        snapshot,
       });
-      if (error) throw error;
     },
     onSuccess: (_, variables) => {
       toast.success(t("success_restored"));

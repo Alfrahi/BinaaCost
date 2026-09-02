@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Scenario, SimulationResult } from "@/types/scenario-analysis";
@@ -19,18 +19,12 @@ export function useProjectSimulator() {
       projectId: string;
       scenario: Scenario;
     }) => {
-      const { data, error } = await supabase.functions.invoke(
-        "simulate-project-scenario",
-        {
-          body: {
-            project_id: projectId,
-            scenario: scenario,
-          },
-        },
+      const data = await callRouteWithParams<SimulationResult>(
+        "projects/simulate",
+        { id: projectId },
+        { scenario },
       );
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-      return data as SimulationResult;
+      return data;
     },
     onSuccess: (data) => {
       setSimulationResult(data);
