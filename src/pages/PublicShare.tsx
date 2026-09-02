@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Loader2, AlertTriangle } from "lucide-react";
@@ -68,43 +67,36 @@ export default function PublicShare() {
     queryFn: async () => {
       if (!accessToken) throw new Error("Access token is missing.");
 
-      if (!isAuthenticated) {
-        const { data: linkCheck, error: checkError } =
-          await supabase.functions.invoke<PublicShareResponse>(
-            "verify-share-link-and-serve-data",
-            {
-              body: { access_token: accessToken, password: "" },
-            },
-          );
-
-        if (checkError) throw checkError;
-        if (
-          linkCheck &&
-          "error" in linkCheck &&
-          linkCheck.error === "Incorrect password."
-        ) {
-          return { password_protected: true };
-        } else if (linkCheck && "error" in linkCheck && linkCheck.error) {
-          throw new Error(linkCheck.error);
+      const fetchShare = async (pw: string): Promise<QueryResult> => {
+        const base = import.meta.env.VITE_POCKETBASE_URL;
+        const res = await fetch(`${base}/api/share/${accessToken}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pw }),
+        });
+        if (res.ok) return (await res.json()) as PublicShareResponse;
+        if (res.status === 403) {
+          const body = await res.json().catch(() => null);
+          const msg = body?.message as string | undefined;
+          if (msg === "Incorrect password") return { password_protected: true };
+          throw new Error(msg || t("public_share:linkNotFoundOrExpired"));
         }
+        throw new Error(t("public_share:linkNotFoundOrExpired"));
+      };
+
+      if (!isAuthenticated) {
+        const linkCheck = await fetchShare("");
+        if ("password_protected" in linkCheck) return linkCheck;
         setIsAuthenticated(true);
-        return linkCheck!;
+        return linkCheck;
       }
 
-      const { data, error: invokeError } =
-        await supabase.functions.invoke<PublicShareResponse>(
-          "verify-share-link-and-serve-data",
-          {
-            body: { access_token: accessToken, password },
-          },
-        );
-
-      if (invokeError) throw invokeError;
-      if (data && "error" in data && data.error) {
-        throw new Error(data.error);
+      const data = await fetchShare(password);
+      if ("password_protected" in data) {
+        setIsAuthenticated(false);
+        return data;
       }
-
-      return data!;
+      return data;
     },
     enabled: !!accessToken,
     retry: false,

@@ -7,7 +7,30 @@ const ROUTE_PATHS: Record<string, string> = {
   "upsert/library_materials": "/api/upsert/library_materials",
   "upsert/library_labor": "/api/upsert/library_labor",
   "upsert/library_equipment": "/api/upsert/library_equipment",
+  "users/resolve": "/api/users/resolve",
 };
+
+// Dynamic path templates — resolved per call
+export function routePath(name: string, params: Record<string, string>) {
+  if (name === "projects/share-links") {
+    return `/api/projects/${params.id}/share-links`;
+  }
+  if (name === "share") {
+    return `/api/share/${params.token}`;
+  }
+  throw new Error(`Unknown PocketBase route: ${name}`);
+}
+
+export async function callRouteWithParams<T = unknown>(
+  name: string,
+  params: Record<string, string>,
+  payload?: unknown,
+): Promise<T> {
+  return pb.send<T>(routePath(name, params), {
+    method: "POST",
+    body: payload ?? {},
+  });
+}
 
 export function hasRoute(name: string): boolean {
   return name in ROUTE_PATHS;

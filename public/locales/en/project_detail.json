@@ -73,7 +73,8 @@
       "linkCopied": "Link copied to clipboard!",
       "expired": "Expired",
       "successDeleted": "External link deleted successfully!",
-      "errorDelete": "Failed to delete external link: {{message}}"
+      "errorDelete": "Failed to delete external link: {{message}}",
+      "linkHiddenNote": "Link shown once at creation (token stored securely)"
     }
   },
   "assembly_importer": {
