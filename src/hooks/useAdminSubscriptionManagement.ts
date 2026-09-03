@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useRole } from "@/hooks/useRole";
@@ -44,15 +45,17 @@ export function useAdminSubscriptionManagement() {
   const { data: allUsersData = [], isLoading } = useQuery<User[]>({
     queryKey,
     queryFn: async (): Promise<User[]> => {
-      const { data, error } = await supabase
-        .rpc("get_all_users_for_admin")
-        .select(
-          "id, email, first_name, last_name, role, plan, subscription_expires_at, max_active_projects",
-        );
-
-      if (error) throw error;
-
-      return (data ?? []) as User[];
+      const records = await pb.collection("users").getFullList({ sort: "created" });
+      return records.map((r) => ({
+        id: r.id,
+        email: r.email as string,
+        first_name: (r.first_name as string) ?? "",
+        last_name: (r.last_name as string) ?? "",
+        role: (r.role as string) ?? "user",
+        plan: (r.subscription_plan as string) ?? "",
+        subscription_expires_at: (r.subscription_expires_at as string) ?? null,
+        max_active_projects: null,
+      }));
     },
     placeholderData: (previousData) => previousData || [],
   });
@@ -87,12 +90,11 @@ export function useAdminSubscriptionManagement() {
       plan: string;
       expiresAt: string | null;
     }) => {
-      const { error } = await supabase.rpc("update_user_subscription", {
-        p_user_id: userId,
-        p_plan: plan,
-        p_expires_at: expiresAt,
-      });
-      if (error) throw error;
+      await callRouteWithParams(
+        "admin/users/subscription",
+        { id: userId },
+        { plan, expires_at: expiresAt },
+      );
     },
     onSuccess: () => {
       toast.success(t("admin:subscriptionManagement.successUpdated"));

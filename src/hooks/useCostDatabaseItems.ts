@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { pb } from "@/integrations/pocketbase/client";
+import { callRoute } from "@/integrations/pocketbase/routes";
+import { mapRecords } from "@/lib/pb-mapper";
+import { useOfflinePb } from "./useOfflinePb";
 
 export interface CostDatabaseItem {
   id: string;
@@ -21,22 +23,21 @@ export function useCostDatabaseItems(
   const baseQueryKey = ["cost-database-items", databaseId];
   const queryKey = [...baseQueryKey, page, pageSize];
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
-    useOfflineSupabase();
+    useOfflinePb();
 
   const itemsQuery = useOfflineQuery({
     queryKey,
     queryFn: async () => {
       if (!databaseId) return { data: [], count: 0 };
-      const from = page * pageSize;
-      const to = from + pageSize - 1;
-      const { data, error, count } = await supabase
-        .from("cost_database_items")
-        .select("*", { count: "exact" })
-        .eq("database_id", databaseId)
-        .order("csi_code")
-        .range(from, to);
-      if (error) throw error;
-      return { data: data as CostDatabaseItem[], count: count || 0 };
+      const result = await pb.collection("cost_database_items").getList(
+        page + 1, // pb is 1-based
+        pageSize,
+        { filter: `database_id="${databaseId}"`, sort: "csi_code" },
+      );
+      return {
+        data: mapRecords<CostDatabaseItem>(result.items),
+        count: result.totalItems,
+      };
     },
     enabled: !!databaseId,
     staleTime: 1000 * 60 * 5,
@@ -68,21 +69,14 @@ export function useCostDatabaseItems(
       return {
         data: oldData.map((item) =>
           item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                updated_at: new Date().toISOString(),
-              }
+            ? { ...item, ...variables, updated_at: new Date().toISOString() }
             : item,
         ),
         count: oldCount,
       };
     }
     if (operation === "DELETE") {
-      return {
-        data: oldData.filter((item) => item.id !== variables.id),
-        count: oldCount - 1,
-      };
+      return { data: oldData.filter((i) => i.id !== variables.id), count: oldCount - 1 };
     }
     return { data: oldData, count: oldCount };
   };
@@ -158,21 +152,10 @@ export function useCostDatabaseItems(
       strategy: "skip" | "overwrite";
     }) => {
       if (!databaseId) throw new Error("No database selected");
-      const payload = items.map((i) => ({ ...i, database_id: databaseId }));
-      if (strategy === "overwrite") {
-        const { error } = await supabase
-          .from("cost_database_items")
-          .upsert(payload, { onConflict: "database_id,csi_code" });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("cost_database_items")
-          .upsert(payload, {
-            onConflict: "database_id,csi_code",
-            ignoreDuplicates: true,
-          });
-        if (error) throw error;
-      }
+      await callRoute("import/cost_database_items", {
+        items: items.map((i) => ({ ...i, database_id: databaseId })),
+        strategy,
+      });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
   });

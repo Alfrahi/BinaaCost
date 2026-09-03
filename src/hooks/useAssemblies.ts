@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useAuth } from "@/components/AuthProvider";
 import { Assembly } from "@/types/assemblies";
 import { handleError } from "@/utils/toast";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 const DEFAULT_PAGE_SIZE = 10;
@@ -12,7 +13,7 @@ const DEFAULT_PAGE_SIZE = 10;
 export function useAssemblies() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -22,13 +23,11 @@ export function useAssemblies() {
     queryKey: ["all_assemblies", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from("cost_assemblies")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("name");
-      if (error) throw error;
-      return data || [];
+      const records = await pb.collection("cost_assemblies").getFullList({
+        filter: `user_id="${user.id}"`,
+        sort: "name",
+      });
+      return mapRecords<Assembly>(records);
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5,
