@@ -29,7 +29,7 @@ export function routePath(name: string, params: Record<string, string>) {
     case "admin/users/subscription":
       return `/api/admin/users/${params.id}/subscription`;
     case "admin/users/delete":
-      return `/api/admin/users/${params.id}`;
+      return `/api/admin/users/${params.id}/delete`;
     case "share":
       return `/api/share/${params.token}`;
     default:
