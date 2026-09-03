@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -43,32 +44,29 @@ export function useAdminProjectManagement() {
   } = useQuery<Project[]>({
     queryKey,
     queryFn: async () => {
-      let query = supabase
-        .rpc("get_all_projects_for_admin")
-        .select(
-          "id, name, description, created_at, updated_at, size, location, client_requirements, duration_days, deleted_at, user_id, owner_email",
-        )
-        .order("created_at", { ascending: false });
-
+      const parts: string[] = [];
+      if (activeTab === "active") {
+        parts.push('deleted_at = ""');
+      } else {
+        parts.push('deleted_at != ""');
+      }
       if (search.trim()) {
-        const s = search.trim();
-        query = query.or(
-          `name.ilike.%${s}%,description.ilike.%${s}%,location.ilike.%${s}%`,
+        const s = search.trim().replace(/"/g, '\\"');
+        parts.push(
+          `(name ~ "${s}" || description ~ "${s}" || location ~ "${s}")`,
         );
       }
-
-      if (activeTab === "active") {
-        query = query.is("deleted_at", null);
-      } else {
-        query = query.not("deleted_at", "is", null);
-      }
-
-      const from = currentPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-
-      const { data, error } = await query.range(from, to);
-      if (error) throw error;
-      return (data || []) as Project[];
+      const result = await pb.collection("projects").getList(currentPage + 1, PAGE_SIZE, {
+        filter: parts.join(" && "),
+        sort: "-created",
+        expand: "user_id",
+        fields: "*, expand.user_id.email",
+      });
+      const rows = mapRecords(result.items) as any[];
+      return rows.map((r) => ({
+        ...r,
+        owner_email: r.expand?.user_id?.email ?? "",
+      })) as Project[];
     },
     placeholderData: (previousData) => previousData || [],
     staleTime: 1000 * 60,
@@ -76,10 +74,8 @@ export function useAdminProjectManagement() {
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
-      const { error } = await supabase.rpc("permanent_delete_project", {
-        p_project_id: projectId,
-      });
-      if (error) throw error;
+      // super_admin may delete any project via rules; cascades to children
+      await pb.collection("projects").delete(projectId);
     },
     onSuccess: () => {
       void toast.success(t("admin:projects.successDeleted"));

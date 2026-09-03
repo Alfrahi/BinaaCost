@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { useAuth } from "@/components/AuthProvider";
 import { mapRecords } from "@/lib/pb-mapper";
 
@@ -21,7 +21,7 @@ interface MyProjectsResponse {
 
 export function useMyProjects(globalSearchTerm: string) {
   const { user } = useAuth();
-  const { useQuery } = useOfflineSupabase();
+  const { useQuery } = useOfflinePb();
 
   const [currentPage, setCurrentPage] = useState(0);
 

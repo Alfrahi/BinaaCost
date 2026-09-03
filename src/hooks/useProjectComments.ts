@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 import {
   MaterialItem,
   LaborItem,
@@ -37,7 +37,7 @@ type CommentableItem =
 export function useProjectComments(projectId: string) {
   const { user } = useAuth();
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
-    useOfflineSupabase();
+    useOfflinePb();
 
   const [commentsDrawerOpen, setCommentsDrawerOpen] = useState(false);
   const [selectedCommentItem, setSelectedCommentItem] =

@@ -4,7 +4,7 @@ import { callRoute } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { handleError } from "@/utils/toast";
 import { calculateItemCost } from "@/logic/shared";
 import { LaborItem } from "@/types/project-items";
@@ -16,7 +16,7 @@ export function useProjectLabor(projectId: string) {
   const { t } = useTranslation(["project_labor", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
   const { convert, getMissingRates } = useCurrencyConverter();
 
   const queryKey = ["labor_items", projectId];

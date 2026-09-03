@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { toast } from "sonner";
 import { WORLD_CURRENCIES } from "@/utils/world-currencies";
 import { useTranslation } from "react-i18next";
@@ -32,33 +33,23 @@ export function useDropdownOptions(category: string) {
   } = useQuery<Option[]>({
     queryKey,
     queryFn: async () => {
-      let query = supabase
-        .from("dropdown_settings")
-        .select("id, category, value, translations, numeric_value");
+      const records = await pb.collection("dropdown_settings").getList(1, 500, {
+        filter: `category="${category}"`,
+        sort: "value",
+      });
+      let data = mapRecords<Option>(records.items);
 
-      query = query.eq("category", category);
-
-      const { data, error } = await query.order("value", { ascending: true });
-
-      if (error) throw error;
-
-      if (isCurrency && data) {
-        const { data: ratesData, error: ratesError } = await supabase
-          .from("currency_rates")
-          .select("currency_code, rate_to_usd");
-        if (ratesError) {
-          handleError(ratesError);
-        } else if (ratesData) {
-          const ratesMap = new Map(
-            ratesData.map((r) => [r.currency_code, r.rate_to_usd]),
-          );
-          return data.map((option) => ({
-            ...option,
-            rate: ratesMap.get(option.value) || undefined,
-          }));
-        }
+      if (isCurrency && data.length) {
+        const rates = mapRecords<{ currency_code: string; rate_to_usd: number }>(
+          await pb.collection("currency_rates").getFullList(),
+        );
+        const ratesMap = new Map(rates.map((r) => [r.currency_code, r.rate_to_usd]));
+        data = data.map((o) => ({
+          ...o,
+          rate: ratesMap.get(o.value),
+        }));
       }
-      return data || [];
+      return data;
     },
     enabled: !!user,
   });
@@ -72,22 +63,22 @@ export function useDropdownOptions(category: string) {
       numericValue?: number;
     }) => {
       const { category, value, translation, rate, numericValue } = payload;
-      const { error } = await supabase.rpc("add_settings_option", {
-        p_category: category,
-        p_value: value,
-        p_translations: { en: value, ar: translation },
-        p_numeric_value: numericValue,
+      await pb.collection("dropdown_settings").create({
+        category,
+        value,
+        translations: { en: value, ar: translation },
+        numeric_value: numericValue,
       });
-      if (error) throw error;
-
       if (isCurrency && rate !== undefined) {
-        const { error: rateError } = await supabase
-          .from("currency_rates")
-          .upsert(
-            { currency_code: value, rate_to_usd: rate },
-            { onConflict: "currency_code" },
-          );
-        if (rateError) throw rateError;
+        // upsert via getFirstListItem(create/update); admin-gated by rules
+        try {
+          const existing = await pb
+            .collection("currency_rates")
+            .getFirstListItem(`currency_code="${value}"`);
+          await pb.collection("currency_rates").update(existing.id, { rate_to_usd: rate });
+        } catch {
+          await pb.collection("currency_rates").create({ currency_code: value, rate_to_usd: rate });
+        }
       }
     },
     onSuccess: () => {
@@ -107,31 +98,21 @@ export function useDropdownOptions(category: string) {
       rate?: number;
       numericValue?: number;
     }) => {
-      const {
-        category,
-        oldValue,
-        newValue,
-        newTranslation,
-        rate,
-        numericValue,
-      } = payload;
-      const { error } = await supabase.rpc("update_settings_option", {
-        p_category: category,
-        p_old_value: oldValue,
-        p_new_value: newValue,
-        p_translations: { en: newValue, ar: newTranslation },
-        p_numeric_value: numericValue,
+      const { id, newValue, newTranslation, rate, numericValue } = payload;
+      await pb.collection("dropdown_settings").update(id, {
+        value: newValue,
+        translations: { en: newValue, ar: newTranslation },
+        numeric_value: numericValue,
       });
-      if (error) throw error;
-
       if (isCurrency && rate !== undefined) {
-        const { error: rateError } = await supabase
-          .from("currency_rates")
-          .upsert(
-            { currency_code: newValue, rate_to_usd: rate },
-            { onConflict: "currency_code" },
-          );
-        if (rateError) throw rateError;
+        try {
+          const existing = await pb
+            .collection("currency_rates")
+            .getFirstListItem(`currency_code="${newValue}"`);
+          await pb.collection("currency_rates").update(existing.id, { rate_to_usd: rate });
+        } catch {
+          await pb.collection("currency_rates").create({ currency_code: newValue, rate_to_usd: rate });
+        }
       }
     },
     onSuccess: () => {
@@ -142,24 +123,18 @@ export function useDropdownOptions(category: string) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (payload: {
-      id: string;
-      category: string;
-      value: string;
-    }) => {
-      const { category, value } = payload;
-      const { error } = await supabase.rpc("delete_settings_option", {
-        p_category: category,
-        p_value: value,
-      });
-      if (error) throw error;
-
+    mutationFn: async (payload: { id: string; category: string; value: string }) => {
+      const { id, value } = payload;
+      await pb.collection("dropdown_settings").delete(id);
       if (isCurrency) {
-        const { error: rateError } = await supabase
-          .from("currency_rates")
-          .delete()
-          .eq("currency_code", value);
-        if (rateError) handleError(rateError);
+        try {
+          const existing = await pb
+            .collection("currency_rates")
+            .getFirstListItem(`currency_code="${value}"`);
+          await pb.collection("currency_rates").delete(existing.id);
+        } catch {
+          // currency rate may not exist; tolerate
+        }
       }
     },
     onSuccess: () => {

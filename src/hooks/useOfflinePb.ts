@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { offlineManager } from "@/lib/offline";
 import { executePbMutation } from "@/lib/pb-executor";
-import { PostgrestError } from "@supabase/supabase-js";
+import { ClientResponseError } from "pocketbase";
 import { useAuth } from "@/components/AuthProvider";
 import i18n from "@/i18n";
 import {
-  SupabaseQueryConfig,
-  SupabaseMutationConfig,
-} from "@/lib/supabase-utils";
+  PbQueryConfig,
+  PbMutationConfig,
+} from "@/lib/pb-utils";
 
-export function useOfflineSupabase() {
+export function useOfflinePb() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -19,8 +19,8 @@ export function useOfflineSupabase() {
     enabled = true,
     staleTime,
     gcTime,
-  }: SupabaseQueryConfig<T>) =>
-    useQuery<T, Error | PostgrestError>({
+  }: PbQueryConfig<T>) =>
+    useQuery<T, Error | ClientResponseError>({
       queryKey,
       queryFn,
       enabled: enabled && offlineManager.getIsOnline(),
@@ -36,9 +36,8 @@ export function useOfflineSupabase() {
     onSuccess,
     onError,
     disableOfflineQueue,
-    onConflict,
-  }: SupabaseMutationConfig<TVariables, TData>) =>
-    useMutation<TData, Error | PostgrestError, TVariables>({
+  }: PbMutationConfig<TVariables, TData>) =>
+    useMutation<TData, Error | ClientResponseError, TVariables>({
       mutationFn: async (payload: TVariables) => {
         if (offlineManager.getIsOnline()) {
           return executePbMutation<TData>({ table, operation, payload });
@@ -57,7 +56,6 @@ export function useOfflineSupabase() {
             payload: payload,
             queryKey: queryKey,
             userId: user.id,
-            onConflict,
           });
           return payload as unknown as TData;
         }

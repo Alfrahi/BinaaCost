@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { RoleBadge } from "@/components/RoleBadge";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "@/components/PaginationControls";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { sanitizeText } from "@/utils/sanitizeText";
 import { useAdminUserProjects } from "@/hooks/useAdminUserProjects";
 import { useAdminUserAuditLogs } from "@/hooks/useAdminUserAuditLogs";
@@ -37,7 +37,7 @@ const formatJsonForDisplay = (data: any) => {
 export default function UserDetails() {
   const { t } = useTranslation(["admin", "common"]);
   const { userId } = useParams();
-  const { useQuery: useOfflineQuery } = useOfflineSupabase();
+  const { useQuery: useOfflineQuery } = useOfflinePb();
 
   const userDetailsQueryKey = ["admin_user_details", userId];
 
@@ -49,15 +49,21 @@ export default function UserDetails() {
     queryKey: userDetailsQueryKey,
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
-
-      const { data, error } = await supabase
-        .rpc("get_admin_user_details", {
-          target_user_id: userId,
-        })
-        .single();
-
-      if (error) throw error;
-      return data as UserDetails;
+      const record = await pb.collection("users").getOne(userId);
+      return {
+        id: record.id,
+        email: record.email as string,
+        first_name: (record.first_name as string) ?? "",
+        last_name: (record.last_name as string) ?? "",
+        role: (record.role as string) ?? "user",
+        created_at: record.created,
+        last_sign_in_at: null,
+        raw_user_meta_data: {
+          notification_prefs: record.notification_prefs,
+          company_name: record.company_name,
+          company_website: record.company_website,
+        },
+      } as UserDetails;
     },
     enabled: !!userId,
   });

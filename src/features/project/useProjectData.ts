@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord, mapRecords } from "@/lib/pb-mapper";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import { useAuth } from "@/components/AuthProvider";
 import { calculateCategoryTotal } from "@/logic/shared";
@@ -27,7 +27,7 @@ const listByProject = (table: string, projectId: string, sort?: string) => () =>
 
 export function useProjectData(projectId?: string) {
   const { user, role: userRole, loading: authLoading } = useAuth();
-  const { useQuery } = useOfflineSupabase();
+  const { useQuery } = useOfflinePb();
 
   const { options: sizeUnits, isLoading: loadingSizeUnits } =
     useSettingsOptions("project_size_unit");

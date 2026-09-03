@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { useForm } from "react-hook-form";
 import { projectSchema, ProjectFormValues } from "@/types/project-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export function useUpdateProject() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
   const queryClient = useQueryClient();
 
   const {

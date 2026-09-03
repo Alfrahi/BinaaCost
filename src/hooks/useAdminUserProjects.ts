@@ -1,5 +1,6 @@
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
-import { supabase } from "@/integrations/supabase/client";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useState } from "react";
 
 const PAGE_SIZE = 5;
@@ -15,7 +16,7 @@ interface Project {
 }
 
 export function useAdminUserProjects(userId?: string, initialPage = 0) {
-  const { useQuery: useOfflineQuery } = useOfflineSupabase();
+  const { useQuery: useOfflineQuery } = useOfflinePb();
   const [currentPage, setCurrentPage] = useState(initialPage);
 
   const queryKey = ["admin_user_projects", userId, currentPage];
@@ -28,19 +29,12 @@ export function useAdminUserProjects(userId?: string, initialPage = 0) {
     queryKey,
     queryFn: async () => {
       if (!userId) return [];
-
-      const from = currentPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-
-      const { data, error } = await supabase
-        .rpc("get_admin_user_projects", {
-          target_user_id: userId,
-        })
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-      return data || [];
+      const result = await pb.collection("projects").getList(
+        currentPage + 1,
+        PAGE_SIZE,
+        { filter: `user_id="${userId}"`, sort: "-created" },
+      );
+      return mapRecords<Project>(result.items);
     },
     enabled: !!userId,
   });
@@ -49,12 +43,10 @@ export function useAdminUserProjects(userId?: string, initialPage = 0) {
     queryKey: ["admin_user_projects_count", userId],
     queryFn: async () => {
       if (!userId) return 0;
-      const { count, error } = await supabase
-        .from("projects")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId);
-      if (error) throw error;
-      return count || 0;
+      const result = await pb.collection("projects").getList(1, 1, {
+        filter: `user_id="${userId}"`,
+      });
+      return result.totalItems;
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,

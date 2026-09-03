@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -33,7 +34,8 @@ export function useAdminUserManagement() {
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [showFallbackWarning, setShowFallbackWarning] = useState(false);
+  // RPC fallback listing dropped in PB migration — keep flag for consumers
+  const showFallbackWarning = false;
 
   useEffect(() => {
     setCurrentPage(0);
@@ -48,48 +50,19 @@ export function useAdminUserManagement() {
   } = useQuery<UserProfile[]>({
     queryKey,
     queryFn: async (): Promise<UserProfile[]> => {
-      try {
-        try {
-          const { data, error: rpcError } = (await supabase.rpc(
-            "get_all_users_for_admin",
-          )) as { data: UserProfile[] | null; error: any };
-
-          if (rpcError) {
-            handleError(rpcError);
-            throw rpcError;
-          }
-
-          if (data && data.length > 0) {
-            setShowFallbackWarning(false);
-            return data;
-          }
-        } catch (error) {
-          handleError(error);
-        }
-
-        try {
-          const { data, error: rpcError } = (await supabase.rpc(
-            "direct_get_all_users_for_admin",
-          )) as { data: UserProfile[] | null; error: any };
-
-          if (rpcError) {
-            handleError(rpcError);
-            throw rpcError;
-          }
-
-          if (data && data.length > 0) {
-            setShowFallbackWarning(true);
-            return data;
-          }
-        } catch (error) {
-          handleError(error);
-        }
-
-        return [];
-      } catch (err) {
-        handleError(err);
-      }
-      return [];
+      // super_admin list rules allow fetching all users
+      const records = await pb.collection("users").getFullList({ sort: "created" });
+      return records.map((r) => ({
+        id: r.id,
+        email: r.email as string,
+        first_name: (r.first_name as string) ?? null,
+        last_name: (r.last_name as string) ?? null,
+        role: (r.role as string) ?? "user",
+        plan: (r.subscription_plan as string) ?? "",
+        subscription_expires_at: (r.subscription_expires_at as string) ?? null,
+        max_active_projects: null,
+        created_at: r.created,
+      }));
     },
     placeholderData: (previousData) => previousData ?? [],
     staleTime: 1000 * 60,
@@ -126,11 +99,11 @@ export function useAdminUserManagement() {
       user_id_to_update: string;
       new_role: string;
     }) => {
-      const { error } = await supabase.rpc("update_user_role", {
-        user_id_to_update,
-        new_role,
-      });
-      if (error) throw error;
+      await callRouteWithParams(
+        "admin/users/role",
+        { id: user_id_to_update },
+        { role: new_role },
+      );
     },
     onSuccess: () => {
       void toast.success(t("admin:users.successRoleUpdate"));
@@ -144,13 +117,11 @@ export function useAdminUserManagement() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { data, error } = (await supabase.functions.invoke("delete-user", {
-        body: { userIdToDelete: userId },
-      })) as { data: DeleteUserResponse | null; error: any };
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      return data;
+      return callRouteWithParams<DeleteUserResponse>(
+        "admin/users/delete",
+        { id: userId },
+        {},
+      );
     },
     onSuccess: () => {
       void toast.success(t("admin:users.successDeleted"));

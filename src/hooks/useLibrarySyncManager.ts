@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useOfflineSupabase } from "./useOfflineSupabase";
-import { useCallback } from "react";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
+import { useOfflinePb } from "./useOfflinePb";
 
 interface UseLibrarySyncManagerProps {
   tableName: string;
@@ -9,7 +9,8 @@ interface UseLibrarySyncManagerProps {
   userId: string | undefined;
   page: number;
   pageSize: number;
-  select: string;
+  /** Ignored; PocketBase always returns the full record. Kept so callers passing select="*" don't need to change. */
+  select?: string;
   order: string;
   searchTerm?: string;
   searchColumn?: string;
@@ -21,33 +22,28 @@ export function useLibrarySyncManager({
   userId,
   page,
   pageSize,
-  select,
   order,
   searchTerm,
   searchColumn,
 }: UseLibrarySyncManagerProps) {
   const queryClient = useQueryClient();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const itemsQuery = useQuery({
     queryKey: [...queryKey, page, pageSize, searchTerm],
     queryFn: async () => {
       if (!userId) return { data: [], count: 0 };
-      const from = page * pageSize;
-      const to = from + pageSize - 1;
 
-      let query = supabase
-        .from(tableName)
-        .select(select, { count: "exact" })
-        .eq("user_id", userId);
-
+      let filter = `user_id="${userId}"`;
       if (searchTerm && searchColumn) {
-        query = query.ilike(searchColumn, `%${searchTerm}%`);
+        const term = searchTerm.replace(/"/g, '\\"');
+        filter += ` && ${searchColumn}~"${term}"`;
       }
 
-      const { data, error, count } = await query.order(order).range(from, to);
-      if (error) throw error;
-      return { data: data || [], count: count || 0 };
+      const result = await pb
+        .collection(tableName)
+        .getList(page + 1, pageSize, { filter, sort: order });
+      return { data: mapRecords(result.items), count: result.totalItems };
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
@@ -97,27 +93,12 @@ export function useLibrarySyncManager({
     return { data: oldData, count: oldCount };
   };
 
-  const getOnConflictColumns = useCallback((table: string): string => {
-    switch (table) {
-      case "library_materials":
-        return "user_id,name,unit";
-      case "library_labor":
-        return "user_id,worker_type";
-      case "library_equipment":
-        return "user_id,name,type,rental_or_purchase,period_unit";
-      default:
-        console.warn(
-          `[useLibrarySyncManager] No specific onConflict columns defined for table: ${table}. Defaulting to 'id'.`,
-        );
-        return "id";
-    }
-  }, []);
-
+  // UPSERT executor resolves onConflict keys server-side via the
+  // upsert/<table> JSVM routes (library sync routes, registered in Phase 3).
   const createItem = useOfflineMutation<any, any>({
     queryKey: queryKey,
     table: tableName,
     operation: "UPSERT",
-    onConflict: getOnConflictColumns(tableName),
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKey }),
   });
