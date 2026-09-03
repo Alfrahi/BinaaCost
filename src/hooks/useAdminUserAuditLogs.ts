@@ -1,5 +1,6 @@
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
-import { supabase } from "@/integrations/supabase/client";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 
 interface AuditLog {
   id: string;
@@ -14,7 +15,7 @@ interface AuditLog {
 }
 
 export function useAdminUserAuditLogs(userId?: string) {
-  const { useQuery: useOfflineQuery } = useOfflineSupabase();
+  const { useQuery: useOfflineQuery } = useOfflinePb();
 
   const queryKey = ["admin_user_logs", userId];
 
@@ -26,15 +27,15 @@ export function useAdminUserAuditLogs(userId?: string) {
     queryKey,
     queryFn: async () => {
       if (!userId) return [];
-
-      const { data, error } = await supabase
-        .rpc("get_admin_user_logs", {
-          target_user_id: userId,
-        })
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data ?? [];
+      const records = await pb.collection("audit_logs").getFullList({
+        filter: `user_id="${userId}"`,
+        sort: "-created",
+        expand: "user_id",
+      });
+      return mapRecords<any>(records).map((r) => ({
+        ...r,
+        user_email: r.expand?.user_id?.email ?? null,
+      }));
     },
     enabled: !!userId,
   });

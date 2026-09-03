@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { handleError } from "@/utils/toast";
 import { AdditionalCostItem } from "@/types/project-items";
 import { AdditionalCostFormValues } from "@/types/schemas";
@@ -13,7 +13,7 @@ export function useProjectAdditionalCosts(projectId: string) {
   const { t } = useTranslation(["project_additional", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const queryKey = ["additional_costs", projectId];
 

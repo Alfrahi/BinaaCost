@@ -1,6 +1,6 @@
 import { RecordModel } from "pocketbase";
 
-// Maps a PocketBase record to the shape app types expect (Supabase-style):
+// Maps a PocketBase record to the shape app types expect (legacy-style):
 // `created`/`updated` become `created_at`/`updated_at`; everything else,
 // including the 15-char string `id`, passes through unchanged.
 export function mapRecord<T = Record<string, any>>(

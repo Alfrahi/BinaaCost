@@ -1,15 +1,16 @@
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 import { LocationAdjustment } from "@/types/cost-databases";
 
 export function useLocationAdjustments(databaseId?: string) {
   const { t } = useTranslation("pages");
   const { user } = useAuth();
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
-    useOfflineSupabase();
+    useOfflinePb();
 
   const queryKey = ["location-adjustments", databaseId, user?.id];
 
@@ -17,13 +18,10 @@ export function useLocationAdjustments(databaseId?: string) {
     queryKey,
     queryFn: async () => {
       if (!databaseId || !user?.id) return [];
-      const { data, error } = await supabase
-        .from("location_adjustments")
-        .select("*")
-        .eq("database_id", databaseId)
-        .eq("user_id", user.id);
-      if (error) throw error;
-      return data as LocationAdjustment[];
+      const records = await pb.collection("location_adjustments").getFullList({
+        filter: `database_id="${databaseId}" && user_id="${user.id}"`,
+      });
+      return mapRecords<LocationAdjustment>(records);
     },
     enabled: !!databaseId && !!user?.id,
     staleTime: 1000 * 60 * 5,

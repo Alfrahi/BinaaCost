@@ -1,13 +1,14 @@
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useAuth } from "@/components/AuthProvider";
 import { AssemblyItem } from "@/types/assemblies";
 import { handleError } from "@/utils/toast";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 
 export function useAssemblyItems(assemblyId?: string) {
   const { user } = useAuth();
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
-    useOfflineSupabase();
+    useOfflinePb();
 
   const queryKey = ["assembly_items", assemblyId, user?.id];
 
@@ -15,14 +16,11 @@ export function useAssemblyItems(assemblyId?: string) {
     queryKey,
     queryFn: async () => {
       if (!assemblyId || !user?.id) return [];
-      const { data, error } = await supabase
-        .from("cost_assembly_items")
-        .select("*")
-        .eq("assembly_id", assemblyId)
-        .eq("user_id", user.id)
-        .order("description");
-      if (error) throw error;
-      return data || [];
+      const records = await pb.collection("cost_assembly_items").getFullList({
+        filter: `assembly_id="${assemblyId}" && user_id="${user.id}"`,
+        sort: "description",
+      });
+      return mapRecords<AssemblyItem>(records);
     },
     enabled: !!assemblyId && !!user?.id,
     staleTime: 1000 * 60 * 5,

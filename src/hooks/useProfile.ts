@@ -3,8 +3,8 @@ import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useOfflineSupabase } from "./useOfflineSupabase";
-import { CrudOperation } from "@/lib/supabase-utils";
+import { useOfflinePb } from "./useOfflinePb";
+import { CrudOperation } from "@/lib/pb-utils";
 import { mapRecord } from "@/lib/pb-mapper";
 
 export interface Profile {
@@ -25,7 +25,7 @@ export function useProfile() {
   const { t } = useTranslation("common");
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const queryKey = ["profile", user?.id];
 

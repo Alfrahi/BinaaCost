@@ -1,25 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { useAuth } from "@/components/AuthProvider";
 import { CostDatabase } from "@/types/cost-databases";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 
 export function useCostDatabases() {
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const queryKey = ["cost_databases"];
 
   const databasesQuery = useQuery({
     queryKey,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cost_databases")
-        .select("*")
-        .order("is_public", { ascending: false })
-        .order("name");
-      if (error) throw error;
-      return data as CostDatabase[];
+      const records = await pb.collection("cost_databases").getFullList({
+        sort: "-is_public,name",
+      });
+      return mapRecords<CostDatabase>(records) as CostDatabase[];
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -45,11 +43,7 @@ export function useCostDatabases() {
     if (operation === "UPDATE") {
       return oldData.map((db) =>
         db.id === variables.id
-          ? {
-              ...db,
-              ...variables,
-              updated_at: new Date().toISOString(),
-            }
+          ? { ...db, ...variables, updated_at: new Date().toISOString() }
           : db,
       );
     }

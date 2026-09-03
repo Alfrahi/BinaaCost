@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import {
   Table,
@@ -14,7 +15,7 @@ import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X, Loader2 } from "lucide-react";
-import { useOfflineSupabase } from "@/hooks/useOfflineSupabase";
+import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { sanitizeText } from "@/utils/sanitizeText";
 import { cn } from "@/lib/utils";
 import {
@@ -54,7 +55,7 @@ export default function AuditLogs() {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const { useQuery: useOfflineQuery } = useOfflineSupabase();
+  const { useQuery: useOfflineQuery } = useOfflinePb();
 
   const queryKey = ["audit_logs", search, currentPage, pageSize];
 
@@ -65,15 +66,20 @@ export default function AuditLogs() {
   } = useOfflineQuery<AuditLog[]>({
     queryKey,
     queryFn: async () => {
-      const offset = (currentPage - 1) * pageSize;
-      const { data, error } = await supabase.rpc("get_admin_user_logs", {
-        target_user_id: null,
-        p_search_term: search.trim() || null,
-        p_limit: pageSize,
-        p_offset: offset,
-      });
-      if (error) throw error;
-      return data || [];
+      const term = search.trim().replace(/"/g, '\\"');
+      const filter = term
+        ? `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`
+        : "";
+      const result = await pb.collection("audit_logs").getList(
+        currentPage,
+        pageSize,
+        { filter, sort: "-created", expand: "user_id" },
+      );
+      return mapRecords<any>(result.items).map((r) => ({
+        ...r,
+        user_email: r.expand?.user_id?.email ?? "",
+        total_rows: result.totalItems,
+      }));
     },
     staleTime: 1000 * 30,
   });

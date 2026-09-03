@@ -3,7 +3,7 @@ import { callRoute } from "@/integrations/pocketbase/routes";
 import { CrudOperation } from "@/lib/pb-utils";
 
 // Executes a queued or live mutation against PocketBase.
-// Mirrors the old Supabase executor switch:
+// Mirrors the legacy executor switch:
 //   create/update/delete per record, BULK_* as sequential per-id calls
 //   (PocketBase has no `.in([])` bulk ops), RPC via the JSVM route registry.
 // onConflict/UPSERT semantics are implemented by those JSVM routes.

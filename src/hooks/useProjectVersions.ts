@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 import { handleError } from "@/utils/toast";
 
 export interface ProjectVersion {
@@ -15,7 +15,7 @@ export interface ProjectVersion {
 export function useProjectVersions(projectId: string) {
   const { t } = useTranslation(["project_versions", "common"]);
   const queryClient = useQueryClient();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const queryKey = ["project_versions", projectId];
 

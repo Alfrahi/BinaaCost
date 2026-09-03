@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/lib/pb-mapper";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
@@ -23,13 +24,11 @@ export function useScenarioManager() {
     queryKey: scenarioQueryKey,
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from("risk_scenarios")
-        .select("*")
-        .or(`user_id.eq.${user?.id},is_public.eq.true`)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data || [];
+      const records = await pb.collection("risk_scenarios").getFullList({
+        filter: `user_id="${user.id}" || is_public=true`,
+        sort: "-created",
+      });
+      return mapRecords<Scenario>(records);
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5,
@@ -42,11 +41,10 @@ export function useScenarioManager() {
         "id" | "user_id" | "created_at" | "updated_at"
       >,
     ) => {
-      const { error } = await supabase.from("risk_scenarios").insert({
+      await pb.collection("risk_scenarios").create({
         ...newScenario,
         user_id: user?.id,
       });
-      if (error) throw error;
     },
     onSuccess: () => {
       toast.success(t("successCreated"));
@@ -57,11 +55,8 @@ export function useScenarioManager() {
 
   const updateScenarioMutation = useMutation({
     mutationFn: async (updatedScenario: Partial<Scenario> & { id: string }) => {
-      const { error } = await supabase
-        .from("risk_scenarios")
-        .update(updatedScenario)
-        .eq("id", updatedScenario.id);
-      if (error) throw error;
+      const { id, ...rest } = updatedScenario;
+      await pb.collection("risk_scenarios").update(id, rest);
     },
     onSuccess: () => {
       toast.success(t("successUpdated"));
@@ -72,11 +67,7 @@ export function useScenarioManager() {
 
   const deleteScenarioMutation = useMutation({
     mutationFn: async (scenarioId: string) => {
-      const { error } = await supabase
-        .from("risk_scenarios")
-        .delete()
-        .eq("id", scenarioId);
-      if (error) throw error;
+      await pb.collection("risk_scenarios").delete(scenarioId);
     },
     onSuccess: () => {
       toast.success(t("successDeleted"));

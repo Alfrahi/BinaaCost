@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflineSupabase } from "./useOfflineSupabase";
+import { useOfflinePb } from "./useOfflinePb";
 import { handleError } from "@/utils/toast";
 import { calculateRiskContingency } from "@/logic/risk";
 import { Risk } from "@/types/project-items";
@@ -13,7 +13,7 @@ export function useProjectRisks(projectId: string) {
   const { t } = useTranslation(["project_risk", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflineSupabase();
+  const { useMutation: useOfflineMutation } = useOfflinePb();
 
   const queryKey = ["risks", projectId];
 

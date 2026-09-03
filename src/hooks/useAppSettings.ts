@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -21,33 +21,43 @@ export function useAppSettings() {
   } = useQuery<AppSetting | null>({
     queryKey,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("app_settings")
-        .select("*")
-        .eq("key", "user_signup")
-        .single();
-
-      if (error && error.code !== "PGRST116") {
-        throw error;
+      try {
+        const record = await pb
+          .collection("app_settings")
+          .getFirstListItem('key="user_signup"');
+        return {
+          key: record.key as string,
+          value: record.value as { enabled: boolean },
+          updated_at: record.updated,
+        };
+      } catch (e: any) {
+        if (e?.status === 404) return null;
+        throw e;
       }
-      return data || null;
     },
     staleTime: 1000 * 60 * 5,
   });
 
   const updateSettingMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
-      const { error } = await supabase.from("app_settings").upsert(
-        {
+      let record;
+      try {
+        record = await pb
+          .collection("app_settings")
+          .getFirstListItem('key="user_signup"');
+      } catch (e: any) {
+        if (e?.status !== 404) throw e;
+      }
+      if (record) {
+        await pb.collection("app_settings").update(record.id, {
+          value: { enabled },
+        });
+      } else {
+        await pb.collection("app_settings").create({
           key: "user_signup",
           value: { enabled },
-        },
-        {
-          onConflict: "key",
-        },
-      );
-
-      if (error) throw error;
+        });
+      }
     },
     onSuccess: () => {
       toast.success(t("admin:appSettings.successSaved"));
