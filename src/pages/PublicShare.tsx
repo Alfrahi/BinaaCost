@@ -1,6 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,64 +57,69 @@ export default function PublicShare() {
     | { password_protected: true }
     | { error: string };
 
-  const {
-    data: shareData,
-    isLoading,
-    error,
-  } = useQuery<QueryResult, Error>({
-    queryKey: ["publicShare", accessToken, isAuthenticated],
-    queryFn: async () => {
+  const [shareData, setShareData] = useState<QueryResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const doFetch = useCallback(
+    async (pw: string): Promise<QueryResult> => {
       if (!accessToken) throw new Error("Access token is missing.");
-
-      const fetchShare = async (pw: string): Promise<QueryResult> => {
-        const base = import.meta.env.VITE_POCKETBASE_URL;
-        const res = await fetch(`${base}/api/share/${accessToken}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: pw }),
-        });
-        if (res.ok) return (await res.json()) as PublicShareResponse;
-        if (res.status === 403) {
-          const body = await res.json().catch(() => null);
-          const msg = body?.message as string | undefined;
-          if (msg === "Incorrect password") return { password_protected: true };
-          throw new Error(msg || t("public_share:linkNotFoundOrExpired"));
-        }
-        throw new Error(t("public_share:linkNotFoundOrExpired"));
-      };
-
-      if (!isAuthenticated) {
-        const linkCheck = await fetchShare("");
-        if ("password_protected" in linkCheck) return linkCheck;
-        setIsAuthenticated(true);
-        return linkCheck;
+      const base = import.meta.env.VITE_POCKETBASE_URL;
+      const res = await fetch(`${base}/api/share/${accessToken}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (res.ok) return (await res.json()) as PublicShareResponse;
+      if (res.status === 403) {
+        const body = await res.json().catch(() => null);
+        const msg = body?.message as string | undefined;
+        if (msg?.startsWith("Incorrect password"))
+          return { password_protected: true };
+        throw new Error(msg || t("public_share:linkNotFoundOrExpired"));
       }
-
-      const data = await fetchShare(password);
-      if ("password_protected" in data) {
-        setIsAuthenticated(false);
-        return data;
-      }
-      return data;
+      throw new Error(t("public_share:linkNotFoundOrExpired"));
     },
-    enabled: !!accessToken,
-    retry: false,
-  });
+    [accessToken, t],
+  );
 
+  // Probe once: empty password tells us whether this is a gated link.
   useEffect(() => {
-    if (
-      shareData &&
-      "password_protected" in shareData &&
-      shareData.password_protected === false
-    ) {
-      setIsAuthenticated(true);
-    }
-  }, [shareData]);
+    let alive = true;
+    doFetch("")
+      .then((data) => {
+        if (!alive) return;
+        if ("password_protected" in data) {
+          setShareData(data);
+        } else {
+          setShareData(data);
+          setIsAuthenticated(true);
+        }
+      })
+      .catch((e) => alive && setError(e as Error))
+      .finally(() => alive && setIsLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, [doFetch]);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    setIsAuthenticated(true);
+    try {
+      const data = await doFetch(password);
+      if ("password_protected" in data) {
+        setAuthError(t("public_share:incorrectPassword"));
+        setPassword("");
+        return;
+      }
+      setShareData(data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      setAuthError(
+        err instanceof Error ? err.message : t("public_share:invalidLink"),
+      );
+    }
   };
 
   if (isLoading) {
