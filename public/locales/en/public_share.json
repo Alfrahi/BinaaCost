@@ -5,5 +5,7 @@
   "access": "Access",
   "accessFailed": "Failed to access project. Incorrect password or invalid link.",
   "errorLoadingProjectData": "Failed to load project data. Please try again later.",
-  "readOnlyView": "Read-Only View"
+  "readOnlyView": "Read-Only View",
+  "incorrectPassword": "Incorrect password.",
+  "linkNotFoundOrExpired": "Link not found or expired."
 }
