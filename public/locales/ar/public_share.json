@@ -5,5 +5,7 @@
   "access": "وصول",
   "accessFailed": "فشل الوصول إلى المشروع. كلمة مرور غير صحيحة أو رابط غير صالح.",
   "errorLoadingProjectData": "فشل تحميل بيانات المشروع. يرجى المحاولة مرة أخرى لاحقًا.",
-  "readOnlyView": "عرض للقراءة فقط"
+  "readOnlyView": "عرض للقراءة فقط",
+  "incorrectPassword": "كلمة المرور غير صحيحة.",
+  "linkNotFoundOrExpired": "الرابط غير موجود أو منتهي الصلاحية."
 }

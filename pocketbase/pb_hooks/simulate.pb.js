@@ -29,6 +29,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
   const catTotal = (coll, items) => r2(items.reduce((s, it) => safeAdd(s, itemCost(coll, it)), 0));
 
   const runFinancials = (mt, lt, eq, ad, s) => {
+    if (!s) s = {};
     const direct = safeAdd(mt, lt, eq, ad);
     const overhead = safeMult(direct, safeDiv(s.overhead_percent || 0, 100));
     const contingency = safeMult(direct, safeDiv(s.contingency_percent || 0, 100));

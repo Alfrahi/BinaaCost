@@ -80,4 +80,5 @@ pnpm dev
 ### 5. Run tests
 ```bash
 pnpm typecheck && pnpm lint && pnpm test
+pnpm e2e  # needs ./pocketbase serve on :8090 and `pnpm dev` on :8080 already running
 ```
