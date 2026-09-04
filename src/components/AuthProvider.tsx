@@ -33,19 +33,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // local dev, which turns rule-bound queries into 400s. Verify the auth
     // record once on boot and clear if server says auth's user is gone.
     const verify = async () => {
-      if (!pb.authStore.isValid || !pb.authStore.record?.id) return;
-      try {
-        await pb.collection("users").getOne(pb.authStore.record.id);
-      } catch (err) {
-        const status = (err as { status?: number })?.status;
-        if (status === 401 || status === 404) {
-          pb.authStore.clear();
-          setUser(null);
+      if (pb.authStore.isValid && pb.authStore.record?.id) {
+        try {
+          await pb.collection("users").getOne(pb.authStore.record.id);
+        } catch (err) {
+          const status = (err as { status?: number })?.status;
+          if (status === 401 || status === 404) {
+            pb.authStore.clear();
+            setUser(null);
+          }
         }
       }
+      setLoading(false);
     };
     verify();
-    setLoading(false);
     return unsubscribe;
   }, []);
 
