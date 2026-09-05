@@ -20,6 +20,15 @@ routerAdd("POST", "/api/projects/{id}/share-links", (e) => {
     );
   }
 
+  if (String(password).length < 8) {
+    throw new BadRequestError("Password must be at least 8 characters");
+  }
+
+  const expiresDate = new Date(expiresAt);
+  if (isNaN(expiresDate.getTime()) || expiresDate.getTime() <= Date.now()) {
+    throw new BadRequestError("expires_at must be a valid future date");
+  }
+
   let project = null;
   try {
     project = $app.findRecordById("projects", projectId);

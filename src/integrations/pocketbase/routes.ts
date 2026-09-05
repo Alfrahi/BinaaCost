@@ -9,6 +9,7 @@ const ROUTE_PATHS: Record<string, string> = {
   "upsert/library_equipment": "/api/upsert/library_equipment",
   "import/cost_database_items": "/api/import/cost_database_items",
   "users/resolve": "/api/users/resolve",
+  "users/minimal": "/api/users/minimal",
 };
 
 // Dynamic path templates — resolved per call.

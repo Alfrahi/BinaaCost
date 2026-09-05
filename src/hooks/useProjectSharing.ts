@@ -7,6 +7,7 @@ import {
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/utils/toast";
+import { fetchMinimalUsers } from "@/lib/usersMinimal";
 
 export interface ProjectShare {
   share_id: string;
@@ -34,14 +35,16 @@ export function useProjectSharing(projectId: string) {
       queryFn: async () => {
         const records = await pb.collection("project_shares").getFullList({
           filter: `project_id="${projectId}"`,
-          expand: "shared_with_user_id",
         });
+        const users = await fetchMinimalUsers(
+          records.map((r) => r.shared_with_user_id),
+        );
         return records.map((r) => ({
           share_id: r.id,
           shared_with_user_id: r.shared_with_user_id,
           role: r.role as "viewer" | "editor",
           email:
-            r.expand?.shared_with_user_id?.email ??
+            users.get(r.shared_with_user_id)?.email ??
             r.shared_with_email ??
             "",
         }));
