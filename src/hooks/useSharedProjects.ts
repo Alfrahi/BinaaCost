@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { useAuth } from "@/components/AuthProvider";
+import { fetchMinimalUsers } from "@/lib/usersMinimal";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -48,20 +49,25 @@ export function useSharedProjects(globalSearchTerm: string) {
         .getList(currentPage + 1, ITEMS_PER_PAGE, {
           filter,
           sort: "-created",
-          expand: "project_id,project_id.user_id",
+          expand: "project_id",
         });
 
+      const projects = (result.items as any[])
+        .map((share) => ({ share, project: share.expand?.project_id }))
+        .filter((x) => x.project);
+      const owners = await fetchMinimalUsers(
+        projects.map((x) => x.project.user_id),
+      );
+
       const formattedData: SharedProjectData[] = [];
-      for (const share of result.items as any[]) {
-        const project = share.expand?.project_id;
-        if (!project) continue;
+      for (const { share, project } of projects) {
         formattedData.push({
           id: project.id,
           name: project.name,
           description: project.description,
           created_at: project.created,
           user_id: project.user_id,
-          owner_email: project.expand?.user_id?.email,
+          owner_email: owners.get(project.user_id)?.email,
           shared_role: share.role,
         });
       }

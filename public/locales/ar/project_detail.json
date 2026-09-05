@@ -68,6 +68,7 @@
       "generateLink": "إنشاء رابط",
       "noLinks": "لم يتم إنشاء روابط مشاركة عامة بعد.",
       "passwordRequired": "كلمة المرور مطلوبة.",
+      "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
       "expirationRequired": "تاريخ الانتهاء مطلوب.",
       "successGenerated": "تم إنشاء الرابط الخارجي بنجاح!",
       "errorGenerate": "فشل إنشاء الرابط الخارجي: {{message}}",

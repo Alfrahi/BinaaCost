@@ -11,7 +11,7 @@ routerAdd("POST", "/api/share/{token}", (e) => {
 
   const tokenHash = $security.sha256(token);
 
-  // --- basic rate limiting: 20 password attempts / 10min per token ---
+  // --- basic rate limiting: 20 FAILED password attempts / 10min per token ---
   const storeKey = "share_rl_" + tokenHash.slice(0, 24);
   const now = Date.now();
   const windowMs = 10 * 60 * 1000;
@@ -25,9 +25,7 @@ routerAdd("POST", "/api/share/{token}", (e) => {
     state.reset = now + windowMs;
     state.count = 0;
   }
-  state.count += 1;
-  $app.store().set(storeKey, state);
-  if (state.count > 20) {
+  if (state.count >= 20) {
     throw new TooManyRequestsError("Too many attempts, try again later");
   }
 
@@ -60,6 +58,8 @@ routerAdd("POST", "/api/share/{token}", (e) => {
   }
 
   if (!link.validatePassword(password)) {
+    state.count += 1;
+    $app.store().set(storeKey, state);
     throw new ForbiddenError("Incorrect password");
   }
 
