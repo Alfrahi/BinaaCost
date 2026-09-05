@@ -11,6 +11,7 @@ import {
 } from "@/types/project-items";
 import { sanitizeText } from "@/utils/sanitizeText";
 import { handleError } from "@/utils/toast";
+import { fetchMinimalUsers } from "@/lib/usersMinimal";
 
 interface Comment {
   id: string;
@@ -56,19 +57,19 @@ export function useProjectComments(projectId: string) {
         const records = await pb.collection("comments").getFullList({
           filter: `project_id="${projectId}"`,
           sort: "created",
-          expand: "user_id",
         });
+        const users = await fetchMinimalUsers(records.map((r) => r.user_id));
         return records.map((r) => {
-          const { expand, ...rest } = r as any;
+          const author = users.get(r.user_id);
           return {
-            ...rest,
+            ...(r as any),
             created_at: r.created,
             updated_at: r.updated,
-            profiles: expand?.user_id
+            profiles: author
               ? {
-                  email: expand.user_id.email,
-                  first_name: expand.user_id.first_name,
-                  last_name: expand.user_id.last_name,
+                  email: author.email,
+                  first_name: author.first_name,
+                  last_name: author.last_name,
                 }
               : undefined,
           } as Comment;

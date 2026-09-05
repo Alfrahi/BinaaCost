@@ -239,6 +239,174 @@ describe("pocketbase integration", () => {
     });
   });
 
+  describe("H4: child collection ownership binding", () => {
+    let editorId: string;
+    let editorTok: string;
+
+    beforeAll(async () => {
+      if (!REACHABLE) return;
+      const RUN = String(Date.now());
+      const email = `it-h4-${RUN}@local.dev`;
+      const ed = await api("POST", "/api/collections/users/records", {
+        email, password: "testpass123", passwordConfirm: "testpass123", role: "user",
+      }, "Bearer " + su);
+      editorId = ed.json.id;
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: editorId, shared_with_email: email, role: "editor",
+      }, tok);
+      const le = await login(email);
+      editorTok = "Bearer " + le.token;
+    });
+
+    afterAll(async () => {
+      if (!REACHABLE || !editorId) return;
+      const fake = await api("GET",
+        `/api/collections/comments/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      for (const c of fake.json.items || []) {
+        await api("DELETE", `/api/collections/comments/records/${c.id}`, undefined, tok);
+      }
+      await api("DELETE", `/api/collections/users/records/${editorId}`, undefined, "Bearer " + su);
+    });
+
+    itLive("editor cannot create comment spoofing another user's id", async () => {
+      const r = await api("POST", "/api/collections/comments/records", {
+        project_id: pid, user_id: uid, content: "impersonated",
+      }, editorTok);
+      expect([400, 403]).toContain(r.status);
+    });
+
+    itLive("editor creates comment with own id normally", async () => {
+      const r = await api("POST", "/api/collections/comments/records", {
+        project_id: pid, user_id: editorId, content: "real comment",
+      }, editorTok);
+      expect(r.status).toBe(200);
+      expect(r.json.user_id).toBe(editorId);
+    });
+
+    itLive("owner cannot reassign material user_id on update", async () => {
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "H4Mat", quantity: 1, unit: "pc", unit_price: 5,
+      }, tok);
+      const upd = await api("PATCH", `/api/collections/materials/records/${m.json.id}`, {
+        user_id: editorId,
+      }, tok);
+      expect([400, 403, 404]).toContain(upd.status);
+      const sane = await api("PATCH", `/api/collections/materials/records/${m.json.id}`, {
+        unit_price: 7,
+      }, tok);
+      expect(sane.status).toBe(200);
+      await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
+    });
+  });
+
+  describe("H3: users directory restricted", () => {
+    itLive("non-admin listing users sees only own record", async () => {
+      const r = await api("GET", "/api/collections/users/records", undefined, tok);
+      const ids = (r.json.items || []).map((u: any) => u.id);
+      expect(ids).toContain(uid);
+      expect(ids).not.toContain(adminUid);
+      expect(r.json.items.length).toBe(1);
+    });
+
+    itLive("admin can list users", async () => {
+      const r = await api("GET", "/api/collections/users/records?perPage=100", undefined, adminTok);
+      const ids = (r.json.items || []).map((u: any) => u.id);
+      expect(ids).toContain(uid);
+      expect(ids).toContain(adminUid);
+    });
+
+    itLive("/api/users/minimal returns only display fields", async () => {
+      const r = await api("POST", "/api/users/minimal", { ids: [uid, adminUid] }, tok);
+      expect(r.status).toBe(200);
+      expect(Array.isArray(r.json)).toBe(true);
+      expect(r.json).toHaveLength(2);
+      for (const u of r.json) {
+        expect(Object.keys(u).sort()).toEqual(["email", "first_name", "id", "last_name"]);
+      }
+    });
+
+    itLive("/api/users/minimal caps at 100 ids", async () => {
+      const r = await api("POST", "/api/users/minimal",
+        { ids: Array.from({ length: 101 }, (_, i) => `x${i}`) }, tok);
+      expect(r.status).toBe(400);
+    });
+
+    itLive("/api/users/minimal requires auth", async () => {
+      const r = await api("POST", "/api/users/minimal", { ids: [uid] });
+      expect(r.status).toBe(401);
+    });
+  });
+
+  describe("M4/M3: share link hardening", () => {
+    const future = () => new Date(Date.now() + 86400000).toISOString();
+
+    itLive("password shorter than 8 chars is rejected", async () => {
+      const r = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: future(), password: "abc" }, tok);
+      expect(r.status).toBe(400);
+    });
+
+    itLive("past expires_at is rejected", async () => {
+      const r = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: new Date(Date.now() - 1000).toISOString(), password: "goodpass123" }, tok);
+      expect(r.status).toBe(400);
+    });
+
+    itLive("20 wrong passwords allowed, 21st returns 429; success before cap", async () => {
+      const link = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: future(), password: "correct-horse-9" }, tok);
+      expect(link.status).toBe(200);
+      const token = link.json.access_token;
+
+      for (let i = 0; i < 5; i++) {
+        const r = await api("POST", `/api/share/${token}`, { password: "wrong-pass" });
+        expect(r.status).toBe(403);
+      }
+      // successful auth still works mid-window (not counted as failure)
+      const ok = await api("POST", `/api/share/${token}`, { password: "correct-horse-9" });
+      expect(ok.status).toBe(200);
+
+      for (let i = 0; i < 15; i++) {
+        const r = await api("POST", `/api/share/${token}`, { password: "wrong-pass" });
+        expect(r.status).toBe(403);
+      }
+      // 21st failure blocked
+      const over = await api("POST", `/api/share/${token}`, { password: "wrong-pass" });
+      expect(over.status).toBe(429);
+
+      await api("DELETE", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, tok);
+    });
+
+    itLive("deleting an editor share removes editor-created links, owner links survive", async () => {
+      // share project with an editor
+      const RUN = String(Date.now());
+      const email = `it-m3-${RUN}@local.dev`;
+      const ed = await makeUser(email);
+      const share = await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: ed, shared_with_email: email, role: "editor",
+      }, tok);
+      const le = await login(email);
+      const eTok = "Bearer " + le.token;
+
+      // both create links
+      const edLink = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: future(), password: "editorpass1" }, eTok);
+      const ownLink = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: future(), password: "ownerpass1" }, tok);
+
+      // revoke the share
+      await api("DELETE", `/api/collections/project_shares/records/${share.json.id}`, undefined, tok);
+
+      const edCheck = await api("POST", `/api/share/${edLink.json.access_token}`, { password: "editorpass1" });
+      expect(edCheck.status).toBe(404);
+      const ownCheck = await api("POST", `/api/share/${ownLink.json.access_token}`, { password: "ownerpass1" });
+      expect(ownCheck.status).toBe(200);
+
+      await api("DELETE", `/api/collections/shared_project_links/records/${ownLink.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${ed}`, undefined, "Bearer " + su);
+    });
+  });
+
   describe("admin protections on routes", () => {
     itLive("regular user cannot demote/promote", async () => {
       const r = await api("POST", `/api/admin/users/${uid}/role`, { role: "super_admin" }, tok);

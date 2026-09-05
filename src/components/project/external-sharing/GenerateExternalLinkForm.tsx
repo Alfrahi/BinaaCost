@@ -30,11 +30,20 @@ export function GenerateExternalLinkForm({
       toast.error(t("project_detail:share.external.passwordRequired"));
       return;
     }
+    if (password.length < 8) {
+      toast.error(t("project_detail:share.external.passwordTooShort"));
+      return;
+    }
     if (!expiresAt) {
       toast.error(t("project_detail:share.external.expirationRequired"));
       return;
     }
-    const token = await onGenerate(new Date(expiresAt).toISOString(), password);
+    const expiryDate = new Date(expiresAt);
+    if (Number.isNaN(expiryDate.getTime()) || expiryDate.getTime() <= Date.now()) {
+      toast.error(t("project_detail:share.external.expirationRequired"));
+      return;
+    }
+    const token = await onGenerate(expiryDate.toISOString(), password);
     if (token) {
       const baseUrl = window.location.origin;
       setGeneratedLink(`${baseUrl}/public-share/${token}`);

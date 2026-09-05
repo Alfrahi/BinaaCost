@@ -67,6 +67,7 @@
       "generateLink": "Generate Link",
       "noLinks": "No public share links created yet.",
       "passwordRequired": "Password is required.",
+      "passwordTooShort": "Password must be at least 8 characters.",
       "expirationRequired": "Expiration date is required.",
       "successGenerated": "External link generated successfully!",
       "errorGenerate": "Failed to generate external link: {{message}}",
