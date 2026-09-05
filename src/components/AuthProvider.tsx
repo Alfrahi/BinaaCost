@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { RecordModel } from "pocketbase";
+import { offlineManager } from "@/lib/offline";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthContextType {
   user: (RecordModel & { role?: string }) | null;
@@ -23,10 +25,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     pb.authStore.record ?? null,
   );
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const unsubscribe = pb.authStore.onChange(() => {
-      setUser(pb.authStore.isValid ? pb.authStore.record : null);
+      const next = pb.authStore.isValid ? pb.authStore.record : null;
+      setUser(next);
+      // (re)initialize the offline queue for the authenticated account.
+      if (next?.id) {
+        offlineManager.init(next.id);
+      }
     }, true);
 
     // Heal stale session locally: JWT lives past a deleted user in PB during
@@ -58,7 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     pb.authStore.clear();
     setUser(null);
-  }, []);
+    offlineManager.reset();
+    queryClient.clear();
+  }, [queryClient]);
 
   return (
     <AuthContext.Provider value={{ user, role, loading, signOut }}>

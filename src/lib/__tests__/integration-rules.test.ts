@@ -239,6 +239,65 @@ describe("pocketbase integration", () => {
     });
   });
 
+  describe("M6: version apply + concurrency", () => {
+    itLive("apply with create_rollback=true creates a rollback snapshot", async () => {
+      await api("POST", "/api/collections/materials/records",
+        { project_id: pid, user_id: uid, name: "M6Mat", quantity: 1, unit: "pc", unit_price: 5 }, tok);
+
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "m6-v1" }, tok);
+      const vid = v.json.id;
+
+      // count versions before
+      const before = await api("GET", `/api/collections/project_versions/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      const beforeCount = before.json.items.length;
+
+      const r = await api("POST", `/api/versions/${vid}/apply`,
+        { create_rollback: true }, tok);
+      expect(r.status).toBe(200);
+
+      const after = await api("GET", `/api/collections/project_versions/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      expect(after.json.items.length).toBe(beforeCount + 1);
+      const rollback = after.json.items.find((x: any) => x.name === "Rollback before apply");
+      expect(rollback).toBeTruthy();
+
+      // cleanup
+      for (const x of after.json.items) {
+        await api("DELETE", `/api/collections/project_versions/records/${x.id}`, undefined, tok);
+      }
+      const mats = await api("GET", `/api/collections/materials/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      for (const m of mats.json.items) {
+        await api("DELETE", `/api/collections/materials/records/${m.id}`, undefined, tok);
+      }
+    });
+
+    itLive("stale project update (mismatched updated) is rejected with 409", async () => {
+      const p = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
+      const currentUpdated = p.json.updated;
+
+      // first update succeeds (no updated guard sent)
+      const ok = await api("PATCH", `/api/collections/projects/records/${pid}`,
+        { description: "first" }, tok);
+      expect(ok.status).toBe(200);
+
+      // second update with the STALE updated timestamp → 409
+      const stale = await api("PATCH", `/api/collections/projects/records/${pid}`,
+        { description: "second", updated: currentUpdated }, tok);
+      expect(stale.status).toBe(409);
+    });
+
+    itLive("apply ignores forged snapshot with mismatched project_id", async () => {
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "m6-v2" }, tok);
+      const vid = v.json.id;
+
+      const forged = { project_id: "some-other-project", materials: [] };
+      const r = await api("POST", `/api/versions/${vid}/apply`,
+        { snapshot: forged }, tok);
+      expect(r.status).toBe(400);
+
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
+  });
+
   describe("H4: child collection ownership binding", () => {
     let editorId: string;
     let editorTok: string;

@@ -15,14 +15,11 @@ export function useApplyProjectVersion() {
       snapshot: any;
       createRollback: boolean;
     }) => {
-      const { projectId, versionId, snapshot, createRollback } = payload;
-      if (createRollback) {
-        await callRouteWithParams("projects/versions", { id: projectId }, {
-          name: "Rollback before apply",
-        });
-      }
+      const { versionId, snapshot, createRollback } = payload;
+      // M6: rollback snapshot is created atomically server-side.
       await callRouteWithParams("versions/apply", { id: versionId }, {
         snapshot,
+        create_rollback: createRollback,
       });
     },
     onSuccess: (_, variables) => {
