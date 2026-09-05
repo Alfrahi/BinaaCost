@@ -15,6 +15,29 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
   if (!Array.isArray(items) || items.length === 0) {
     throw new BadRequestError("items array required");
   }
+  if (items.length > 5000) {
+    throw new BadRequestError("items must not exceed 5000");
+  }
+
+  const isSuperAdmin = auth.get("role") === "super_admin";
+  const authorizedDbs = {};
+  const authorizeDb = (dbId) => {
+    if (Object.prototype.hasOwnProperty.call(authorizedDbs, dbId)) return;
+    let db = null;
+    try {
+      db = $app.findRecordById("cost_databases", dbId);
+    } catch (_) {
+      db = null;
+    }
+    if (!db) throw new BadRequestError("unknown database_id: " + dbId);
+    const allowed =
+      db.get("user_id") === auth.id ||
+      (isSuperAdmin && db.get("is_public") === true);
+    if (!allowed) {
+      throw new ForbiddenError("not allowed to import into this database");
+    }
+    authorizedDbs[dbId] = true;
+  };
 
   const coll = $app.findCollectionByNameOrId("cost_database_items");
   let inserted = 0;
@@ -26,6 +49,7 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
       const dbId = item.database_id;
       const code = item.csi_code || "";
       if (!dbId) continue;
+      authorizeDb(dbId);
 
       const esc = (s) => String(s).replace(/"/g, '\\"');
       let existing = null;
