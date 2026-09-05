@@ -30,24 +30,28 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
 
   const runFinancials = (mt, lt, eq, ad, s) => {
     if (!s) s = {};
-    const direct = safeAdd(mt, lt, eq, ad);
-    const overhead = safeMult(direct, safeDiv(s.overhead_percent || 0, 100));
-    const contingency = safeMult(direct, safeDiv(s.contingency_percent || 0, 100));
-    const prime = safeAdd(direct, overhead, contingency);
-    const markup = safeMult(prime, safeDiv(s.markup_percent || 0, 100));
-    const bid = safeAdd(prime, markup);
-    const tax = safeMult(bid, safeDiv(s.tax_percent || 0, 100));
-    const total = safeAdd(bid, tax);
+    // integer-cents arithmetic: multiply to cents, operate on integers,
+    // divide once at the end. No intermediate rounding, matching
+    // src/logic/financials.ts (decimal.js) exactly.
+    const toCents = (n) => Math.round((Number(n) || 0) * 100);
+    const directC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+    const overheadC = Math.round(directC * (Number(s.overhead_percent) || 0) / 100);
+    const contingencyC = Math.round(directC * (Number(s.contingency_percent) || 0) / 100);
+    const primeC = directC + overheadC + contingencyC;
+    const markupC = Math.round(primeC * (Number(s.markup_percent) || 0) / 100);
+    const bidC = primeC + markupC;
+    const taxC = Math.round(bidC * (Number(s.tax_percent) || 0) / 100);
+    const totalC = bidC + taxC;
     return {
       materialsTotal: mt, laborTotal: lt, equipmentTotal: eq, additionalTotal: ad,
-      directCosts: direct,
-      overheadAmount: overhead,
-      contingencyAmount: contingency,
-      primeCost: prime,
-      markupAmount: markup,
-      bidPrice: bid,
-      taxAmount: tax,
-      grandTotal: total,
+      directCosts: directC / 100,
+      overheadAmount: overheadC / 100,
+      contingencyAmount: contingencyC / 100,
+      primeCost: primeC / 100,
+      markupAmount: markupC / 100,
+      bidPrice: bidC / 100,
+      taxAmount: taxC / 100,
+      grandTotal: totalC / 100,
     };
   };
 

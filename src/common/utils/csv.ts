@@ -26,6 +26,14 @@ interface ParseAndValidateCsvResult {
   invalidRows: { row: number; errors: string[] }[];
 }
 
+// Formula-injection defense for CSV EXPORT only: prefix cells whose value
+// starts with =,+,-,@ so spreadsheet apps treat them as text, not formulas.
+// Import must store the raw value (no prefix) — see parseAndValidateCostItemsCsv.
+export function escapeCsvCell(value: unknown): string {
+  const s = String(value ?? "");
+  return /^[=+\-@]/.test(s) ? `'${s}` : s;
+}
+
 export async function parseAndValidateCostItemsCsv(
   file: File,
   fieldMapping: Record<string, string | null>,
@@ -59,8 +67,7 @@ export async function parseAndValidateCostItemsCsv(
                   (mappedRow as any)[schemaField.key] = parsedPrice;
                 }
               } else {
-                const sanitizedValue = sanitizeText(value);
-                (mappedRow as any)[schemaField.key] = `'${sanitizedValue}`;
+                (mappedRow as any)[schemaField.key] = sanitizeText(value);
               }
             } else if (schemaField.key !== "description") {
               errors.push(
@@ -75,9 +82,9 @@ export async function parseAndValidateCostItemsCsv(
             errors.push(i18n.t("project_costs:csiDivisionRequired"));
           if (!mappedRow.csi_code)
             errors.push(i18n.t("project_costs:csiCodeRequired"));
-          if (!mappedRow.description || mappedRow.description === "''")
+          if (!mappedRow.description)
             errors.push(i18n.t("common:descriptionRequired"));
-          if (!mappedRow.unit || mappedRow.unit === "''")
+          if (!mappedRow.unit)
             errors.push(i18n.t("common:unitRequired"));
           if (mappedRow.unit_price === undefined || mappedRow.unit_price < 0)
             errors.push(i18n.t("common:priceNonNegative"));

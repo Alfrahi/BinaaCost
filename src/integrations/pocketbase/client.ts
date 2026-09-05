@@ -8,15 +8,26 @@ if (!POCKETBASE_URL) {
 
 export const pb = new PocketBase(POCKETBASE_URL);
 
-// Eagerly kill stale sessions: PB stores auth tokens in localStorage but
-// they survive user deletion, causing every rule-filtered call to bomb with
-// 400 once the user record is gone. Drop the stored token on the first
-// auth-kernel error (401/404 from a rule-bound request).
+// Heal stale sessions precisely: PB stores auth tokens in localStorage but
+// they survive user deletion, turning rule-bound queries into 400s. Only
+// clear the token when the failing request itself proves the auth record is
+// gone — a `users` collection request for the authenticated record — or an
+// explicit 401 from an auth endpoint. Transient 404s on other resources
+// (e.g. a just-deleted project) must NOT log the user out.
 pb.afterSend = (response, data) => {
-  if (response.status === 401 || response.status === 404) {
-    if (pb.authStore.isValid && !pb.authStore.isAdmin && !pb.authStore.isSuperuser) {
-      pb.authStore.clear();
-    }
+  if (!pb.authStore.isValid || pb.authStore.isAdmin || pb.authStore.isSuperuser) {
+    return data;
+  }
+  const url = response.url || "";
+  const isAuthEndpoint = /\/api\/collections\/users\/auth-/.test(url);
+  const isOwnUserRecord =
+    /\/api\/collections\/users\/records\/[^/]+$/.test(url) &&
+    url.includes(pb.authStore.record?.id ?? "__none__");
+
+  if (response.status === 401 && isAuthEndpoint) {
+    pb.authStore.clear();
+  } else if ((response.status === 401 || response.status === 404) && isOwnUserRecord) {
+    pb.authStore.clear();
   }
   return data;
 };
