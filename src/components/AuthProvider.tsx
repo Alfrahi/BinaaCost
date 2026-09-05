@@ -37,24 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }, true);
 
-    // Heal stale session locally: JWT lives past a deleted user in PB during
-    // local dev, which turns rule-bound queries into 400s. Verify the auth
-    // record once on boot and clear if server says auth's user is gone.
-    const verify = async () => {
-      if (pb.authStore.isValid && pb.authStore.record?.id) {
-        try {
-          await pb.collection("users").getOne(pb.authStore.record.id);
-        } catch (err) {
-          const status = (err as { status?: number })?.status;
-          if (status === 401 || status === 404) {
-            pb.authStore.clear();
-            setUser(null);
-          }
-        }
-      }
-      setLoading(false);
-    };
-    verify();
+    // Stale-session healing lives in client.ts (pb.afterSend); the
+    // authStore.onChange handler above reacts to any token clear.
+    setLoading(false);
     return unsubscribe;
   }, []);
 
