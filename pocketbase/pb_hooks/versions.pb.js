@@ -70,10 +70,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
 
   const versionId = e.request.pathValue("id");
   const body = e.requestInfo().body || {};
-  const snapshot = body.snapshot;
-  if (!snapshot) {
-    throw new BadRequestError("snapshot is required");
-  }
+  const createRollback = body.create_rollback === true;
 
   let version = null;
   try {
@@ -93,6 +90,20 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
     throw new ForbiddenError("Only the owner can apply versions");
   }
 
+  // M6: server-side snapshot authority — prefer the stored version.data.
+  // body.snapshot is accepted only as an explicit override for the
+  // conflict-resolver flow, and must belong to the same project.
+  let snapshot = version.get("data");
+  if (body.snapshot) {
+    if (body.snapshot.project_id && body.snapshot.project_id !== projectId) {
+      throw new BadRequestError("snapshot.project_id does not match version");
+    }
+    snapshot = body.snapshot;
+  }
+  if (!snapshot) {
+    throw new BadRequestError("version has no snapshot data");
+  }
+
   const collections = [
     "materials",
     "labor_items",
@@ -102,7 +113,39 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
     "project_groups",
   ];
 
+  const captureSnapshot = (txApp) => {
+    const snap = { project: project.publicExport() };
+    for (const coll of collections) {
+      try {
+        const rows = txApp.findRecordsByFilter(
+          coll,
+          `project_id="${projectId}"`,
+          "",
+          0,
+          0,
+        );
+        snap[coll] = rows.map((r) => r.publicExport());
+      } catch (_) {
+        snap[coll] = [];
+      }
+    }
+    return snap;
+  };
+
   $app.runInTransaction((txApp) => {
+    // M6: create the rollback snapshot atomically with the apply.
+    if (createRollback) {
+      const rollbackSnap = captureSnapshot(txApp);
+      const vColl = txApp.findCollectionByNameOrId("project_versions");
+      const rollback = new Record(vColl);
+      rollback.set("project_id", projectId);
+      rollback.set("name", "Rollback before apply");
+      rollback.set("user_id", auth.id);
+      rollback.set("created_by_user_id", auth.id);
+      rollback.set("data", rollbackSnap);
+      txApp.save(rollback);
+    }
+
     for (const coll of collections) {
       const existing = txApp.findRecordsByFilter(
         coll,

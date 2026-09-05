@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock pb authStore with a controllable change listener
 const hoisted = vi.hoisted(() => {
@@ -51,6 +52,15 @@ function Probe() {
   );
 }
 
+function renderWithProviders(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+}
+
 describe("AuthProvider (PocketBase authStore)", () => {
   beforeEach(() => {
     authStore.record = null;
@@ -59,7 +69,7 @@ describe("AuthProvider (PocketBase authStore)", () => {
   });
 
   it("starts unauthenticated and finishes loading", () => {
-    render(
+    renderWithProviders(
       <AuthProvider>
         <Probe />
       </AuthProvider>,
@@ -73,7 +83,7 @@ describe("AuthProvider (PocketBase authStore)", () => {
     authStore.isValid = true;
     authStore.record = { email: "a@b.c", role: "user" } as any;
 
-    render(
+    renderWithProviders(
       <AuthProvider>
         <Probe />
       </AuthProvider>,
@@ -83,7 +93,7 @@ describe("AuthProvider (PocketBase authStore)", () => {
   });
 
   it("reacts to sign-in via onChange", () => {
-    render(
+    renderWithProviders(
       <AuthProvider>
         <Probe />
       </AuthProvider>,
@@ -105,7 +115,7 @@ describe("AuthProvider (PocketBase authStore)", () => {
     authStore.isValid = true;
     authStore.record = { email: "a@b.c", role: "super_admin" } as any;
 
-    render(
+    renderWithProviders(
       <AuthProvider>
         <Probe />
       </AuthProvider>,

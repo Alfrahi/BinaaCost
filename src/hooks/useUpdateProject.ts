@@ -197,6 +197,7 @@ export function useUpdateProject() {
           id,
           ...validatedData,
           user_id: user?.id,
+          updated: initialData?.updated_at,
         });
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -215,6 +216,7 @@ export function useUpdateProject() {
       id,
       updateProjectMutation,
       openConversionDialog,
+      initialData,
     ],
   );
 
