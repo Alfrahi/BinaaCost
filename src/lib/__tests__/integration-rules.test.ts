@@ -198,6 +198,41 @@ describe("pocketbase integration", () => {
       expect(r.json.original.financials.grandTotal).toBe(expected.grandTotal);
       expect(r.json.original.financials.bidPrice).toBe(expected.bidPrice);
 
+      // items with awkward decimals — exact equality, not approximate
+      await api("POST", "/api/collections/materials/records",
+        { project_id: pid, user_id: uid, name: "AwkM1", quantity: 3, unit: "kg", unit_price: 33.335 }, tok);
+      await api("POST", "/api/collections/materials/records",
+        { project_id: pid, user_id: uid, name: "AwkM2", quantity: 0.1, unit: "kg", unit_price: 0.2 }, tok);
+      await api("POST", "/api/collections/labor_items/records",
+        { project_id: pid, user_id: uid, worker_type: "Welder", number_of_workers: 1, daily_rate: 33.335, total_days: 2 }, tok);
+
+      const r2 = await api("POST", `/api/projects/${pid}/simulate`,
+        { scenario: { impact_rules: [] } }, tok);
+      expect(r2.status).toBe(200);
+
+      // M7: server totals must be EXACTLY equal (not close) to client totals
+      const { calculateProjectFinancials: calc2 } = await import("@/logic/financials");
+      const { calculateCategoryTotal: ct2 } = await import("@/logic/shared");
+      const matItems2 = [
+        { quantity: 3, unit_price: 33.335 },
+        { quantity: 0.1, unit_price: 0.2 },
+      ];
+      const labItems2 = [
+        { number_of_workers: 1, daily_rate: 33.335, total_days: 2 },
+      ];
+      const expected2 = calc2(
+        {
+          materialsTotal: ct2.materials(matItems2),
+          laborTotal: ct2.labor(labItems2),
+          equipmentTotal: 0,
+          additionalTotal: 0,
+        },
+        r2.json.original.financial_settings,
+      );
+      expect(r2.json.original.financials.directCosts).toBe(expected2.directCosts);
+      expect(r2.json.original.financials.grandTotal).toBe(expected2.grandTotal);
+      expect(r2.json.original.financials.taxAmount).toBe(expected2.taxAmount);
+
       // clean-added items for other tests
       const items = await api("GET", `/api/collections/materials/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
       for (const i of items.json.items) {
@@ -295,6 +330,35 @@ describe("pocketbase integration", () => {
       expect(r.status).toBe(400);
 
       await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
+  });
+
+  describe("M7: convert_currency rate guard", () => {
+    itLive("rate_to_usd=0 is rejected with 400 and DB untouched", async () => {
+      // insert a material to verify no side-effects
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "GuardMat", quantity: 1, unit: "pc", unit_price: 42,
+      }, tok);
+      const matId = m.json.id;
+
+      // seed a bogus 0-rate currency as superuser
+      await api("POST", "/api/collections/currency_rates/records",
+        { currency_code: "ZERO", rate_to_usd: 0 }, "Bearer " + su);
+
+      const r = await api("POST", `/api/projects/${pid}/convert-currency`,
+        { old_currency: "USD", new_currency: "ZERO" }, tok);
+      expect(r.status).toBe(400);
+
+      // material row unchanged
+      const after = await api("GET", `/api/collections/materials/records/${matId}`, undefined, tok);
+      expect(after.json.unit_price).toBe(42);
+
+      // cleanup
+      await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+      const zeros = await api("GET", "/api/collections/currency_rates/records?filter=currency_code%3D%22ZERO%22", undefined, "Bearer " + su);
+      for (const z of zeros.json.items || []) {
+        await api("DELETE", `/api/collections/currency_rates/records/${z.id}`, undefined, "Bearer " + su);
+      }
     });
   });
 

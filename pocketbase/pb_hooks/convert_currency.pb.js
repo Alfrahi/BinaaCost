@@ -37,6 +37,16 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
   };
   const rateOld = findRate(oldCurrency);
   const rateNew = findRate(newCurrency);
+  // Guard against missing/zero/non-finite rates: a 0 rate would produce
+  // Infinity and persist corrupted rows.
+  if (
+    !Number.isFinite(rateOld) || !Number.isFinite(rateNew) ||
+    rateOld <= 0 || rateNew <= 0
+  ) {
+    throw new BadRequestError(
+      `Invalid currency rate for ${oldCurrency} or ${newCurrency}`,
+    );
+  }
   const factor = rateNew / rateOld;
 
   const TABLE_FIELDS = {

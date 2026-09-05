@@ -51,7 +51,8 @@ migrate((app) => {
     { currency_code: "INR", rate_to_usd: 83.50 },
     { currency_code: "CNY", rate_to_usd: 7.23 },
     { currency_code: "JPY", rate_to_usd: 155.0 },
-    { currency_code: "KRW", rate_to_usd: 156.0 },
+    // Static snapshot — admins must maintain this rate.
+    { currency_code: "KRW", rate_to_usd: 1350.0 },
     { currency_code: "RUB", rate_to_usd: 91.0 },
     { currency_code: "BRL", rate_to_usd: 5.15 },
     { currency_code: "ZAR", rate_to_usd: 5.10 },
