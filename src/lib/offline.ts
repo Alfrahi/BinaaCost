@@ -22,7 +22,6 @@ interface OfflineMutation {
   createdAt: string;
   lastAttemptedAt?: string;
   error?: string;
-  onConflict?: string;
 }
 
 const MUTATION_QUEUE_KEY = "offline_mutation_queue";
@@ -213,7 +212,7 @@ class OfflineManager {
     mutation: Omit<
       OfflineMutation,
       "id" | "retries" | "createdAt" | "payload"
-    > & { payload: any; onConflict?: string },
+    > & { payload: any },
   ) {
     // M1: store the plain object (structured clone) — no base64, so Unicode
     // (e.g. Arabic) round-trips byte-identically.
@@ -231,7 +230,6 @@ class OfflineManager {
       retries: 0,
       createdAt: new Date().toISOString(),
       payload,
-      onConflict: mutation.onConflict,
     };
     this.queue.push(newMutation);
     await this.saveQueues();

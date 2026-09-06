@@ -77,12 +77,9 @@ export default function ProjectVersionsTab({
 
   const handleCreateVersion = useCallback(async () => {
     if (!newVersionName.trim()) return;
-    await createVersion({
-      p_project_id: projectId,
-      p_name: newVersionName,
-    });
+    await createVersion({ name: newVersionName });
     setNewVersionName("");
-  }, [newVersionName, projectId, createVersion]);
+  }, [newVersionName, createVersion]);
 
   const handleDeleteVersion = useCallback(
     async (id: string) => {

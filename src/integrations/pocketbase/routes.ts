@@ -13,7 +13,7 @@ const ROUTE_PATHS: Record<string, string> = {
 };
 
 // Dynamic path templates — resolved per call.
-export function routePath(name: string, params: Record<string, string>) {
+function routePath(name: string, params: Record<string, string>) {
   switch (name) {
     case "projects/share-links":
       return `/api/projects/${params.id}/share-links`;
@@ -49,24 +49,10 @@ export async function callRouteWithParams<T = unknown>(
   });
 }
 
-export function hasRoute(name: string): boolean {
-  return name in ROUTE_PATHS;
-}
-
 export async function callRoute<T = unknown>(
   name: string,
   payload?: unknown,
 ): Promise<T> {
-  // queued offline mutations arrive under the collection name "project_versions"
-  // carrying the legacy RPC payload { p_project_id, p_name }
-  if (name === "project_versions") {
-    const p = payload as { p_project_id: string; p_name: string };
-    return callRouteWithParams<T>(
-      "projects/versions",
-      { id: p.p_project_id },
-      { name: p.p_name },
-    );
-  }
   const path = ROUTE_PATHS[name];
   if (!path) {
     throw new Error(`Unknown PocketBase route: ${name}`);
