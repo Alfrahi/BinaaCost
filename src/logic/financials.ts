@@ -7,6 +7,13 @@ export interface FinancialSettings {
   contingency_percent: number;
 }
 
+export const DEFAULT_FINANCIAL_SETTINGS: FinancialSettings = {
+  overhead_percent: 10,
+  markup_percent: 20,
+  tax_percent: 0,
+  contingency_percent: 5,
+};
+
 export interface FinancialSummary {
   materialsTotal: number;
   laborTotal: number;

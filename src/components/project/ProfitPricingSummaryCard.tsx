@@ -10,6 +10,7 @@ import { z } from "zod";
 import {
   calculateProjectFinancials,
   FinancialSettings,
+  DEFAULT_FINANCIAL_SETTINGS,
 } from "@/logic/financials";
 import {
   Tooltip,
@@ -97,15 +98,8 @@ export default function ProfitPricingSummaryCard({
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
   const { format } = useCurrencyFormatter();
 
-  const defaults = {
-    overhead_percent: 10,
-    markup_percent: 20,
-    tax_percent: 0,
-    contingency_percent: 5,
-  };
-
   const [settings, setSettings] = useState<FinancialSettings>(
-    initialSettings || defaults,
+    initialSettings || DEFAULT_FINANCIAL_SETTINGS,
   );
 
   const [isDirty, setIsDirty] = useState(false);
