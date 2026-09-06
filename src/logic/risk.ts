@@ -1,6 +1,6 @@
 import { safeMult, Decimal } from "@/utils/math";
 
-const PROBABILITY_WEIGHTS: Record<string, number> = {
+export const PROBABILITY_WEIGHTS: Record<string, number> = {
   low: 0.1,
   medium: 0.3,
   high: 0.5,

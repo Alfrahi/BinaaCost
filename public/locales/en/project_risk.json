@@ -6,13 +6,15 @@
     "probability": "Probability",
     "impactAmount": "Impact Amount",
     "mitigationPlan": "Mitigation Plan",
-    "contingencyAmount": "Contingency Amount",
+    "riskContingency": "Risk Contingency",
     "descriptionRequired": "Description is required",
     "probabilityRequired": "Probability is required",
     "impactAmountError": "Impact amount must be non-negative",
-    "contingencyAmountError": "Contingency amount must be non-negative"
+    "riskContingencyError": "Risk contingency must be non-negative"
   },
-  "totalContingency": "Total Contingency",
+  "totalRiskContingency": "Total Risk Contingency",
+  "formulaHint": "Risk Contingency = Σ impact × probability weight (low ×0.1 · medium ×0.3 · high ×0.5). Separate from the flat General Contingency % in Pricing — they are additive, not interchangeable.",
+  "seeAlsoPricing": "See also: Profit & Pricing",
   "add": "Add risk",
   "edit": "Edit risk",
   "probabilityOptions": {

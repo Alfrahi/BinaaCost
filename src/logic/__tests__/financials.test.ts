@@ -46,4 +46,31 @@ describe("Financial Logic", () => {
     const result = calculateProjectFinancials(zeroTotals, mockSettings);
     expect(result.grandTotal).toBe(0);
   });
+
+  it("keeps the full chain decimal-exact with fractional costs", () => {
+    const result = calculateProjectFinancials(
+      {
+        materialsTotal: 1234.56,
+        laborTotal: 789.01,
+        equipmentTotal: 0.05,
+        additionalTotal: 12.34,
+      },
+      {
+        overhead_percent: 12.5,
+        contingency_percent: 7.5,
+        markup_percent: 15,
+        tax_percent: 8.25,
+      },
+    );
+
+    // direct = 2035.96; overhead = 254.495; contingency = 152.697
+    expect(result.directCosts).toBe(2035.96);
+    expect(result.overheadAmount).toBe(254.495);
+    expect(result.contingencyAmount).toBe(152.697);
+    expect(result.primeCost).toBe(2443.152);
+    expect(result.markupAmount).toBe(366.4728);
+    expect(result.bidPrice).toBe(2809.6248);
+    expect(result.taxAmount).toBe(231.794046);
+    expect(result.grandTotal).toBe(3041.418846);
+  });
 });

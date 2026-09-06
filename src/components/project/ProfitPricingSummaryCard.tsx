@@ -33,7 +33,7 @@ const settingsSchema = z.object({
     .min(0, "project_detail:profit_pricing.taxError"),
   contingency_percent: z.coerce
     .number()
-    .min(0, "project_detail:profit_pricing.contingencyError"),
+    .min(0, "project_detail:profit_pricing.generalContingencyError"),
 });
 
 interface Props {
@@ -44,6 +44,8 @@ interface Props {
   additionalTotal: number;
   currency?: string;
   initialSettings?: FinancialSettings;
+  riskContingency?: number;
+  onNavigateToRisks?: () => void;
 }
 
 const SummaryRow = ({
@@ -94,6 +96,8 @@ export default function ProfitPricingSummaryCard({
   additionalTotal,
   currency = "USD",
   initialSettings,
+  riskContingency,
+  onNavigateToRisks,
 }: Props) {
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
   const { format } = useCurrencyFormatter();
@@ -192,7 +196,7 @@ export default function ProfitPricingSummaryCard({
               htmlFor="contingency"
               className="text-sm text-text-secondary"
             >
-              {t("project_detail:profit_pricing.contingency")}
+              {t("project_detail:profit_pricing.generalContingency")}
             </Label>
             <div className="relative mt-1">
               <Input
@@ -210,7 +214,7 @@ export default function ProfitPricingSummaryCard({
               </span>
             </div>
             <p className="text-xs text-text-secondary mt-1">
-              {t("project_detail:profit_pricing.contingencyDesc")}
+              {t("project_detail:profit_pricing.generalContingencyDesc")}
             </p>
           </div>
 
@@ -326,18 +330,36 @@ export default function ProfitPricingSummaryCard({
                   />
                   <SummaryRow
                     label={t(
-                      "project_detail:profit_pricing.contingencyWithPercent",
+                      "project_detail:profit_pricing.generalContingencyWithPercent",
                       { percent: settings.contingency_percent },
                     )}
                     value={format(financials.contingencyAmount, currency)}
                     className="text-text-primary"
                     valueClassName="text-red-600"
                     tooltip={t(
-                      "project_detail:profit_pricing.tooltips.contingency",
+                      "project_detail:profit_pricing.tooltips.generalContingency",
                     )}
                   />
                 </div>
               </div>
+
+              {riskContingency !== undefined && (
+                <div className="ps-10">
+                  <SummaryRow
+                    label={t(
+                      "project_detail:profit_pricing.riskContingency",
+                    )}
+                    value={format(riskContingency, currency)}
+                    className="text-text-secondary"
+                    tooltip={t(
+                      "project_detail:profit_pricing.riskContingencyCombinedTooltip",
+                    )}
+                  />
+                  <p className="text-xs text-text-secondary -mt-1">
+                    {t("project_detail:profit_pricing.riskContingencyInfo")}
+                  </p>
+                </div>
+              )}
 
               <div className="border-t border-dashed border-border my-2"></div>
 
@@ -422,6 +444,16 @@ export default function ProfitPricingSummaryCard({
               </div>
             </div>
           </div>
+          {onNavigateToRisks && (
+            <Button
+              variant="link"
+              size="sm"
+              onClick={onNavigateToRisks}
+              className="text-sm p-0 h-auto mt-4"
+            >
+              {t("project_detail:profit_pricing.seeAlsoRisks")}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

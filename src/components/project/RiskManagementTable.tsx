@@ -30,7 +30,7 @@ const riskSchema = z.object({
   mitigation_plan: z.string().trim().nullable().optional(),
   contingency_amount: z.coerce
     .number()
-    .min(0, "project_risk:contingencyAmountError"),
+    .min(0, "project_risk:riskContingencyError"),
 });
 
 type FormValues = z.infer<typeof riskSchema>;
@@ -47,6 +47,7 @@ export default function RiskManagementTable({
   canEdit,
   riskProbabilities,
   isLoadingRiskProbabilities,
+  onNavigateToPricing,
 }: {
   projectId: string;
   risks: Risk[];
@@ -54,6 +55,7 @@ export default function RiskManagementTable({
   canEdit: boolean;
   riskProbabilities: { value: string; label: string }[];
   isLoadingRiskProbabilities: boolean;
+  onNavigateToPricing?: () => void;
 }) {
   const { t } = useTranslation(["project_risk", "common"]);
   const { format } = useCurrencyFormatter();
@@ -203,7 +205,7 @@ export default function RiskManagementTable({
             <Input {...form.register("mitigation_plan")} className="text-sm" />
           </div>
           <div>
-            <Label className="text-sm">{t("fields.contingencyAmount")}</Label>
+            <Label className="text-sm">{t("fields.riskContingency")}</Label>
             <Input
               type="number"
               {...form.register("contingency_amount")}
@@ -255,7 +257,7 @@ export default function RiskManagementTable({
                 {t("fields.mitigationPlan")}
               </TableHead>
               <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
-                {t("fields.contingencyAmount")}
+                {t("fields.riskContingency")}
               </TableHead>
               {canEdit && (
                 <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
@@ -332,13 +334,24 @@ export default function RiskManagementTable({
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 bg-accent border-s-4 border-primary p-4 rounded">
+      <div className="mt-4 bg-accent border-s-4 border-primary p-4 rounded space-y-2">
         <div className="font-semibold text-accent-foreground text-base">
-          {t("totalContingency")}:{" "}
+          {t("totalRiskContingency")}:{" "}
           <span className="text-primary">
             {format(totalContingency, currency)}
           </span>
         </div>
+        <p className="text-xs text-text-secondary">{t("formulaHint")}</p>
+        {onNavigateToPricing && (
+          <Button
+            variant="link"
+            size="sm"
+            onClick={onNavigateToPricing}
+            className="text-sm p-0 h-auto"
+          >
+            {t("seeAlsoPricing")}
+          </Button>
+        )}
       </div>
       <DeleteConfirmationDialog
         open={!!deleteTarget}

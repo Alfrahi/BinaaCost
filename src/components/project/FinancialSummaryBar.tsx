@@ -52,7 +52,7 @@ export default function FinancialSummaryBar({
     },
     {
       key: "contingency",
-      label: t("project_detail:profit_pricing.contingency"),
+      label: t("project_detail:profit_pricing.generalContingency"),
       value: financials.contingencyAmount,
     },
     {

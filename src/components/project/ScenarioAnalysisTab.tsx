@@ -231,7 +231,7 @@ export function ScenarioAnalysisTab({
       t("project_tabs:equipment"),
       t("project_tabs:additional"),
       t("project_detail:profit_pricing.overhead"),
-      t("project_detail:profit_pricing.contingency"),
+      t("project_detail:profit_pricing.generalContingency"),
       t("project_detail:profit_pricing.markup"),
       t("project_detail:profit_pricing.taxes"),
     ];
@@ -400,7 +400,7 @@ export function ScenarioAnalysisTab({
             },
             {
               value: "contingency_percent",
-              label: t("project_detail:profit_pricing.contingency"),
+              label: t("project_detail:profit_pricing.generalContingency"),
             },
           ];
         default:
@@ -575,7 +575,9 @@ export function ScenarioAnalysisTab({
                         simulated: simulatedFinancials.overheadAmount,
                       },
                       {
-                        label: t("project_detail:profit_pricing.contingency"),
+                        label: t(
+                          "project_detail:profit_pricing.generalContingency",
+                        ),
                         original: originalFinancials.contingencyAmount,
                         simulated: simulatedFinancials.contingencyAmount,
                       },

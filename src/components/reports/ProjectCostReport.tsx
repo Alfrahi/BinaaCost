@@ -437,7 +437,7 @@ export const ProjectCostReport = React.forwardRef<
                     {t("project_risk:fields.impactAmount")} ({project.currency})
                   </TableHead>
                   <TableHead className="text-end text-xs font-medium text-text-secondary uppercase tracking-wider">
-                    {t("project_risk:fields.contingencyAmount")} (
+                    {t("project_risk:fields.riskContingency")} (
                     {project.currency})
                   </TableHead>
                 </TableRow>
@@ -482,7 +482,7 @@ export const ProjectCostReport = React.forwardRef<
                     colSpan={3}
                     className="text-end font-semibold uppercase text-text-primary"
                   >
-                    {t("project_risk:totalContingency")}
+                    {t("project_risk:totalRiskContingency")}
                   </TableCell>
                   <TableCell className="text-end font-bold text-text-primary">
                     {formatCurrency(
@@ -526,7 +526,7 @@ export const ProjectCostReport = React.forwardRef<
               </TableRow>
               <TableRow className="border-t border-border">
                 <TableCell className="text-text-primary">
-                  {t("project_detail:profit_pricing.contingencyWithPercent", {
+                  {t("project_detail:profit_pricing.generalContingencyWithPercent", {
                     percent: project.financial_settings.contingency_percent,
                   })}
                 </TableCell>
