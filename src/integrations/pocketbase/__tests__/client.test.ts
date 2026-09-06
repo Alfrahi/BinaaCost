@@ -26,6 +26,7 @@ vi.mock("pocketbase", () => {
     default: class {
       authStore = hoisted.authStore;
       afterSend: any = null;
+      autoCancellation = vi.fn();
     },
   };
 });

@@ -8,6 +8,12 @@ if (!POCKETBASE_URL) {
 
 export const pb = new PocketBase(POCKETBASE_URL);
 
+// The SDK's default auto-cancellation keys requests by method+path only, so
+// parallel queries against the same collection (e.g. the six concurrent
+// dropdown_settings reads on the costs tab) cancel each other and the
+// dropdowns never populate. React Query already handles request lifecycle.
+pb.autoCancellation(false);
+
 // Heal stale sessions precisely: PB stores auth tokens in localStorage but
 // they survive user deletion, turning rule-bound queries into 400s. Only
 // clear the token when the failing request itself proves the auth record is

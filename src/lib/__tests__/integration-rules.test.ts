@@ -101,7 +101,6 @@ describe("pocketbase integration", () => {
     adminTok = "Bearer " + la.token;
 
     const p = await api("POST", "/api/collections/projects/records", { name: "IT", currency: "USD", user_id: uid }, tok);
-    console.log("CREATE:", JSON.stringify({uid, pStatus: p.status, pbody: p.json}));
     pid = p.json.id;
   });
 
@@ -134,7 +133,6 @@ describe("pocketbase integration", () => {
 
     itLive("user lists only own projects", async () => {
       const r = await api("GET", "/api/collections/projects/records", undefined, tok);
-      console.log("LIST:", JSON.stringify({status: r.status, items: r.json.items?.length, uid, tok: !!tok}, null, 0));
       expect(r.json.items.some((p: any) => p.name === "IT" && p.user_id === uid)).toBe(true);
     });
 
@@ -197,6 +195,17 @@ describe("pocketbase integration", () => {
       expect(r.status).toBe(200);
       expect(r.json.original.financials.grandTotal).toBe(expected.grandTotal);
       expect(r.json.original.financials.bidPrice).toBe(expected.bidPrice);
+
+      // clean up the simple items so the awkward-decimal assertions below
+      // see ONLY the awkward items (exact-equality check must be isolated)
+      const simpleMats = await api("GET", `/api/collections/materials/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      for (const i of simpleMats.json.items) {
+        await api("DELETE", `/api/collections/materials/records/${i.id}`, undefined, tok);
+      }
+      const simpleLabor = await api("GET", `/api/collections/labor_items/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      for (const i of simpleLabor.json.items) {
+        await api("DELETE", `/api/collections/labor_items/records/${i.id}`, undefined, tok);
+      }
 
       // items with awkward decimals — exact equality, not approximate
       await api("POST", "/api/collections/materials/records",
@@ -334,19 +343,18 @@ describe("pocketbase integration", () => {
   });
 
   describe("M7: convert_currency rate guard", () => {
-    itLive("rate_to_usd=0 is rejected with 400 and DB untouched", async () => {
+    itLive("missing/zero currency rate is rejected with 400 and DB untouched", async () => {
       // insert a material to verify no side-effects
       const m = await api("POST", "/api/collections/materials/records", {
         project_id: pid, user_id: uid, name: "GuardMat", quantity: 1, unit: "pc", unit_price: 42,
       }, tok);
       const matId = m.json.id;
 
-      // seed a bogus 0-rate currency as superuser
-      await api("POST", "/api/collections/currency_rates/records",
-        { currency_code: "ZERO", rate_to_usd: 0 }, "Bearer " + su);
-
+      // a currency code with no rate record (PB rejects rate_to_usd=0 as
+      // "blank" for the required number field, so a missing code is the
+      // realistic trigger for the guard)
       const r = await api("POST", `/api/projects/${pid}/convert-currency`,
-        { old_currency: "USD", new_currency: "ZERO" }, tok);
+        { old_currency: "USD", new_currency: "NOSUCH" }, tok);
       expect(r.status).toBe(400);
 
       // material row unchanged
@@ -355,10 +363,6 @@ describe("pocketbase integration", () => {
 
       // cleanup
       await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
-      const zeros = await api("GET", "/api/collections/currency_rates/records?filter=currency_code%3D%22ZERO%22", undefined, "Bearer " + su);
-      for (const z of zeros.json.items || []) {
-        await api("DELETE", `/api/collections/currency_rates/records/${z.id}`, undefined, "Bearer " + su);
-      }
     });
   });
 
@@ -527,6 +531,103 @@ describe("pocketbase integration", () => {
 
       await api("DELETE", `/api/collections/shared_project_links/records/${ownLink.json.id}`, undefined, tok);
       await api("DELETE", `/api/collections/users/records/${ed}`, undefined, "Bearer " + su);
+    });
+  });
+
+  describe("T1: authz matrix", () => {
+    itLive("user B cannot read/write user A's version snapshots", async () => {
+      // owner creates a version snapshot
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "authz-v1" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      // a second, unrelated user
+      const RUN = String(Date.now());
+      const emailB = `it-authz-b-${RUN}@local.dev`;
+      const bId = await makeUser(emailB);
+      const lb = await login(emailB);
+      const bTok = "Bearer " + lb.token;
+
+      // B cannot read the version (viewRule denies → 404)
+      const read = await api("GET", `/api/collections/project_versions/records/${vid}`, undefined, bTok);
+      expect(read.status).toBe(404);
+
+      // B cannot update the version
+      const write = await api("PATCH", `/api/collections/project_versions/records/${vid}`, { name: "hijacked" }, bTok);
+      expect([400, 403, 404]).toContain(write.status);
+
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${bId}`, undefined, "Bearer " + su);
+    });
+
+    itLive("editor cannot create share links after their share is removed", async () => {
+      const RUN = String(Date.now());
+      const email = `it-authz-ed-${RUN}@local.dev`;
+      const edId = await makeUser(email);
+      const share = await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: edId, shared_with_email: email, role: "editor",
+      }, tok);
+      const le = await login(email);
+      const eTok = "Bearer " + le.token;
+
+      // while shared, editor CAN create a link
+      const before = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: new Date(Date.now() + 86400000).toISOString(), password: "editorpass1" }, eTok);
+      expect(before.status).toBe(200);
+
+      // remove the share
+      await api("DELETE", `/api/collections/project_shares/records/${share.json.id}`, undefined, tok);
+
+      // now editor CANNOT create a link
+      const after = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: new Date(Date.now() + 86400000).toISOString(), password: "editorpass2" }, eTok);
+      expect(after.status).toBe(403);
+
+      await api("DELETE", `/api/collections/shared_project_links/records/${before.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${edId}`, undefined, "Bearer " + su);
+    });
+
+    itLive("viewer share CAN simulate (intended: simulate allowed for shares)", async () => {
+      // DESIGN DECISION: simulate is allowed for any share (viewer or editor),
+      // not just owners. Encode and assert the intended rule.
+      const RUN = String(Date.now());
+      const email = `it-authz-vw-${RUN}@local.dev`;
+      const vwId = await makeUser(email);
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: vwId, shared_with_email: email, role: "viewer",
+      }, tok);
+      const lv = await login(email);
+      const vTok = "Bearer " + lv.token;
+
+      const r = await api("POST", `/api/projects/${pid}/simulate`,
+        { scenario: { impact_rules: [] } }, vTok);
+      expect(r.status).toBe(200);
+
+      await api("DELETE", `/api/collections/users/records/${vwId}`, undefined, "Bearer " + su);
+    });
+
+    itLive("non-owner cannot delete shared_project_links of others", async () => {
+      // owner creates a link
+      const link = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: new Date(Date.now() + 86400000).toISOString(), password: "ownerpass1" }, tok);
+      expect(link.status).toBe(200);
+
+      // a second, unrelated user attempts to delete it
+      const RUN = String(Date.now());
+      const emailB = `it-authz-del-${RUN}@local.dev`;
+      const bId = await makeUser(emailB);
+      const lb = await login(emailB);
+      const bTok = "Bearer " + lb.token;
+
+      const del = await api("DELETE", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, bTok);
+      expect([400, 403, 404]).toContain(del.status);
+
+      // link still exists (owner can still read it)
+      const still = await api("GET", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, tok);
+      expect(still.status).toBe(200);
+
+      await api("DELETE", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${bId}`, undefined, "Bearer " + su);
     });
   });
 
