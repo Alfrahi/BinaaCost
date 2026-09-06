@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
+import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "./useOfflinePb";
@@ -60,13 +61,12 @@ export function useProjectVersions(projectId: string) {
     return oldData;
   };
 
-  const createVersionMutation = useOfflineMutation<
-    { p_project_id: string; p_name: string },
-    void
-  >({
-    queryKey,
-    table: "project_versions", // queued replays hit the custom route below
-    operation: "RPC",
+  // Snapshot creation is server-side (JSVM route), so it runs online-only
+  // against /api/projects/:id/versions directly — no offline queue.
+  const createVersionMutation = useMutation<void, any, { name: string }>({
+    mutationFn: async ({ name }) => {
+      await callRouteWithParams("projects/versions", { id: projectId }, { name });
+    },
     onSuccess: () => {
       toast.success(t("success_created"));
       queryClient.invalidateQueries({ queryKey });
