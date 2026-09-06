@@ -38,6 +38,10 @@ export function useOfflinePb() {
     disableOfflineQueue,
   }: PbMutationConfig<TVariables, TData>) =>
     useMutation<TData, Error | ClientResponseError, TVariables>({
+      // default networkMode "online" pauses the mutation when the browser is
+      // offline — mutationFn would never run and the offline queue below
+      // would never engage. offlineFirst lets mutationFn run so it can queue.
+      networkMode: "offlineFirst",
       mutationFn: async (payload: TVariables) => {
         if (offlineManager.getIsOnline()) {
           return executePbMutation<TData>({ table, operation, payload });

@@ -19,6 +19,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (projects)", "err", String(err));
   }
+  e.next();
 }, "projects");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -35,6 +36,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (projects)", "err", String(err));
   }
+  e.next();
 }, "projects");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -51,6 +53,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (projects)", "err", String(err));
   }
+  e.next();
 }, "projects");
 
 onRecordAfterCreateSuccess((e) => {
@@ -67,6 +70,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_groups)", "err", String(err));
   }
+  e.next();
 }, "project_groups");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -83,6 +87,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_groups)", "err", String(err));
   }
+  e.next();
 }, "project_groups");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -99,6 +104,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_groups)", "err", String(err));
   }
+  e.next();
 }, "project_groups");
 
 onRecordAfterCreateSuccess((e) => {
@@ -115,6 +121,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (materials)", "err", String(err));
   }
+  e.next();
 }, "materials");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -131,6 +138,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (materials)", "err", String(err));
   }
+  e.next();
 }, "materials");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -147,6 +155,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (materials)", "err", String(err));
   }
+  e.next();
 }, "materials");
 
 onRecordAfterCreateSuccess((e) => {
@@ -163,6 +172,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (labor_items)", "err", String(err));
   }
+  e.next();
 }, "labor_items");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -179,6 +189,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (labor_items)", "err", String(err));
   }
+  e.next();
 }, "labor_items");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -195,6 +206,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (labor_items)", "err", String(err));
   }
+  e.next();
 }, "labor_items");
 
 onRecordAfterCreateSuccess((e) => {
@@ -211,6 +223,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (equipment_items)", "err", String(err));
   }
+  e.next();
 }, "equipment_items");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -227,6 +240,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (equipment_items)", "err", String(err));
   }
+  e.next();
 }, "equipment_items");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -243,6 +257,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (equipment_items)", "err", String(err));
   }
+  e.next();
 }, "equipment_items");
 
 onRecordAfterCreateSuccess((e) => {
@@ -259,6 +274,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (additional_costs)", "err", String(err));
   }
+  e.next();
 }, "additional_costs");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -275,6 +291,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (additional_costs)", "err", String(err));
   }
+  e.next();
 }, "additional_costs");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -291,6 +308,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (additional_costs)", "err", String(err));
   }
+  e.next();
 }, "additional_costs");
 
 onRecordAfterCreateSuccess((e) => {
@@ -307,6 +325,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risks)", "err", String(err));
   }
+  e.next();
 }, "risks");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -323,6 +342,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risks)", "err", String(err));
   }
+  e.next();
 }, "risks");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -339,6 +359,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risks)", "err", String(err));
   }
+  e.next();
 }, "risks");
 
 onRecordAfterCreateSuccess((e) => {
@@ -355,6 +376,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (comments)", "err", String(err));
   }
+  e.next();
 }, "comments");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -371,6 +393,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (comments)", "err", String(err));
   }
+  e.next();
 }, "comments");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -387,6 +410,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (comments)", "err", String(err));
   }
+  e.next();
 }, "comments");
 
 onRecordAfterCreateSuccess((e) => {
@@ -403,6 +427,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_versions)", "err", String(err));
   }
+  e.next();
 }, "project_versions");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -419,6 +444,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_versions)", "err", String(err));
   }
+  e.next();
 }, "project_versions");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -435,6 +461,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_versions)", "err", String(err));
   }
+  e.next();
 }, "project_versions");
 
 onRecordAfterCreateSuccess((e) => {
@@ -451,6 +478,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_shares)", "err", String(err));
   }
+  e.next();
 }, "project_shares");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -467,6 +495,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_shares)", "err", String(err));
   }
+  e.next();
 }, "project_shares");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -483,6 +512,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (project_shares)", "err", String(err));
   }
+  e.next();
 }, "project_shares");
 
 onRecordAfterCreateSuccess((e) => {
@@ -499,6 +529,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (shared_project_links)", "err", String(err));
   }
+  e.next();
 }, "shared_project_links");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -515,6 +546,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (shared_project_links)", "err", String(err));
   }
+  e.next();
 }, "shared_project_links");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -531,6 +563,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (shared_project_links)", "err", String(err));
   }
+  e.next();
 }, "shared_project_links");
 
 onRecordAfterCreateSuccess((e) => {
@@ -547,6 +580,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_databases)", "err", String(err));
   }
+  e.next();
 }, "cost_databases");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -563,6 +597,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_databases)", "err", String(err));
   }
+  e.next();
 }, "cost_databases");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -579,6 +614,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_databases)", "err", String(err));
   }
+  e.next();
 }, "cost_databases");
 
 onRecordAfterCreateSuccess((e) => {
@@ -595,6 +631,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_database_items)", "err", String(err));
   }
+  e.next();
 }, "cost_database_items");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -611,6 +648,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_database_items)", "err", String(err));
   }
+  e.next();
 }, "cost_database_items");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -627,6 +665,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_database_items)", "err", String(err));
   }
+  e.next();
 }, "cost_database_items");
 
 onRecordAfterCreateSuccess((e) => {
@@ -643,6 +682,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (location_adjustments)", "err", String(err));
   }
+  e.next();
 }, "location_adjustments");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -659,6 +699,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (location_adjustments)", "err", String(err));
   }
+  e.next();
 }, "location_adjustments");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -675,6 +716,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (location_adjustments)", "err", String(err));
   }
+  e.next();
 }, "location_adjustments");
 
 onRecordAfterCreateSuccess((e) => {
@@ -691,6 +733,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assemblies)", "err", String(err));
   }
+  e.next();
 }, "cost_assemblies");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -707,6 +750,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assemblies)", "err", String(err));
   }
+  e.next();
 }, "cost_assemblies");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -723,6 +767,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assemblies)", "err", String(err));
   }
+  e.next();
 }, "cost_assemblies");
 
 onRecordAfterCreateSuccess((e) => {
@@ -739,6 +784,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assembly_items)", "err", String(err));
   }
+  e.next();
 }, "cost_assembly_items");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -755,6 +801,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assembly_items)", "err", String(err));
   }
+  e.next();
 }, "cost_assembly_items");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -771,6 +818,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (cost_assembly_items)", "err", String(err));
   }
+  e.next();
 }, "cost_assembly_items");
 
 onRecordAfterCreateSuccess((e) => {
@@ -787,6 +835,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_materials)", "err", String(err));
   }
+  e.next();
 }, "library_materials");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -803,6 +852,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_materials)", "err", String(err));
   }
+  e.next();
 }, "library_materials");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -819,6 +869,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_materials)", "err", String(err));
   }
+  e.next();
 }, "library_materials");
 
 onRecordAfterCreateSuccess((e) => {
@@ -835,6 +886,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_labor)", "err", String(err));
   }
+  e.next();
 }, "library_labor");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -851,6 +903,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_labor)", "err", String(err));
   }
+  e.next();
 }, "library_labor");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -867,6 +920,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_labor)", "err", String(err));
   }
+  e.next();
 }, "library_labor");
 
 onRecordAfterCreateSuccess((e) => {
@@ -883,6 +937,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_equipment)", "err", String(err));
   }
+  e.next();
 }, "library_equipment");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -899,6 +954,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_equipment)", "err", String(err));
   }
+  e.next();
 }, "library_equipment");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -915,6 +971,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (library_equipment)", "err", String(err));
   }
+  e.next();
 }, "library_equipment");
 
 onRecordAfterCreateSuccess((e) => {
@@ -931,6 +988,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risk_scenarios)", "err", String(err));
   }
+  e.next();
 }, "risk_scenarios");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -947,6 +1005,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risk_scenarios)", "err", String(err));
   }
+  e.next();
 }, "risk_scenarios");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -963,6 +1022,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (risk_scenarios)", "err", String(err));
   }
+  e.next();
 }, "risk_scenarios");
 
 onRecordAfterCreateSuccess((e) => {
@@ -979,6 +1039,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (dropdown_settings)", "err", String(err));
   }
+  e.next();
 }, "dropdown_settings");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -995,6 +1056,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (dropdown_settings)", "err", String(err));
   }
+  e.next();
 }, "dropdown_settings");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -1011,6 +1073,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (dropdown_settings)", "err", String(err));
   }
+  e.next();
 }, "dropdown_settings");
 
 onRecordAfterCreateSuccess((e) => {
@@ -1027,6 +1090,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (currency_rates)", "err", String(err));
   }
+  e.next();
 }, "currency_rates");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -1043,6 +1107,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (currency_rates)", "err", String(err));
   }
+  e.next();
 }, "currency_rates");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -1059,6 +1124,7 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (currency_rates)", "err", String(err));
   }
+  e.next();
 }, "currency_rates");
 
 onRecordAfterCreateSuccess((e) => {
@@ -1075,6 +1141,7 @@ onRecordAfterCreateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (app_settings)", "err", String(err));
   }
+  e.next();
 }, "app_settings");
 
 onRecordAfterUpdateSuccess((e) => {
@@ -1091,6 +1158,7 @@ onRecordAfterUpdateSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (app_settings)", "err", String(err));
   }
+  e.next();
 }, "app_settings");
 
 onRecordAfterDeleteSuccess((e) => {
@@ -1107,4 +1175,5 @@ onRecordAfterDeleteSuccess((e) => {
   } catch (err) {
     $app.logger().error("audit write failed (app_settings)", "err", String(err));
   }
+  e.next();
 }, "app_settings");
