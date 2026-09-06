@@ -51,7 +51,10 @@ describe("FinancialSummaryBar", () => {
     expect(screen.getByText("USD 2000.00")).toBeTruthy();
     expect(screen.getByText("profit_pricing.overhead")).toBeTruthy();
     expect(screen.getByText("USD 200.00")).toBeTruthy();
-    expect(screen.getByText("profit_pricing.contingency")).toBeTruthy();
+    expect(screen.queryByText("profit_pricing.contingency")).toBeNull();
+    expect(
+      screen.getByText("profit_pricing.generalContingency"),
+    ).toBeTruthy();
     expect(screen.getByText("USD 100.00")).toBeTruthy();
     expect(screen.getByText("profit_pricing.markup")).toBeTruthy();
     expect(screen.getByText("USD 460.00")).toBeTruthy();

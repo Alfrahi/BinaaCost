@@ -6,13 +6,15 @@
     "probability": "الاحتمالية",
     "impactAmount": "مبلغ التأثير",
     "mitigationPlan": "خطة التخفيف",
-    "contingencyAmount": "مبلغ الاحتياطي",
+    "riskContingency": "احتياطي المخاطر",
     "descriptionRequired": "الوصف مطلوب",
     "probabilityRequired": "الاحتمالية مطلوبة",
     "impactAmountError": "يجب أن يكون مبلغ التأثير غير سالب",
-    "contingencyAmountError": "يجب أن يكون مبلغ الاحتياطي غير سالب"
+    "riskContingencyError": "يجب أن يكون احتياطي المخاطر غير سالب"
   },
-  "totalContingency": "إجمالي الاحتياطي",
+  "totalRiskContingency": "إجمالي احتياطي المخاطر",
+  "formulaHint": "احتياطي المخاطر = Σ التأثير × وزن الاحتمالية (منخفض ×0.1 · متوسط ×0.3 · مرتفع ×0.5). منفصل عن الاحتياطي العام كنسبة مئوية في التسعير — هما إضافيان وليس مترادفين.",
+  "seeAlsoPricing": "انظر أيضًا: الربح والتسعير",
   "add": "إضافة مخاطرة",
   "edit": "تعديل مخاطرة",
   "probabilityOptions": {

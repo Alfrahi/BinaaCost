@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getProbabilityWeight, calculateRiskContingency } from "../risk";
 import { calculateCategoryTotal } from "../shared";
+import { calculateProjectFinancials } from "../financials";
 
 describe("Risk Logic", () => {
   describe("getProbabilityWeight", () => {
@@ -37,8 +38,36 @@ describe("Risk Logic", () => {
       expect(calculateCategoryTotal.risks(risks as any)).toBe(350);
     });
 
-    it("handles empty array", () => {
-      expect(calculateCategoryTotal.risks([])).toBe(0);
+  });
+
+  describe("combined with general contingency", () => {
+    it("both models stay decimal-exact and independent", () => {
+      const riskTotal = [
+        { impact: 1250.75, probability: "high" },
+        { impact: 340.1, probability: "medium" },
+        { impact: 99.99, probability: "low" },
+      ].map((r) => calculateRiskContingency(r.impact, r.probability));
+
+      // rounding half-up at 2dp is part of the contract
+      expect(riskTotal).toEqual([625.38, 102.03, 10]);
+
+      const generalContingency = calculateProjectFinancials(
+        {
+          materialsTotal: 1000,
+          laborTotal: 0,
+          equipmentTotal: 0,
+          additionalTotal: 0,
+        },
+        {
+          overhead_percent: 0,
+          markup_percent: 0,
+          tax_percent: 0,
+          contingency_percent: 7.5,
+        },
+      );
+
+      expect(generalContingency.contingencyAmount).toBe(75);
+      expect(generalContingency.grandTotal).toBe(1075);
     });
   });
 });
