@@ -41,21 +41,39 @@ export function useAnalyticsData() {
         ["additional_costs", "additional_cost", (i: any) => i.amount || 0],
       ] as const;
 
-      const out: ProjectCostData[] = [];
-      for (const p of projects as any[]) {
-        const row: any = { id: p.id, name: p.name, currency: p.currency };
-        let total = 0;
-        for (const [coll, key, fn] of tables) {
-          const items = await pb
-            .collection(coll)
-            .getFullList({ filter: `project_id="${p.id}"` });
-          const sum = items.reduce((s: number, i: any) => s + fn(i), 0);
-          row[key] = sum;
-          total += sum;
+      // Fetch each cost table once for the whole user (not once per project)
+      // to avoid an N+1 query storm, then group by project in memory.
+      const byProject: Record<string, Record<string, number>> = {};
+      for (const [coll, key, fn] of tables) {
+        const items = await pb
+          .collection(coll)
+          .getFullList({ filter: `user_id="${user.id}"` });
+        for (const item of items as any[]) {
+          const pid = item.project_id;
+          if (!pid) continue;
+          byProject[pid] ??= {};
+          byProject[pid][key] = (byProject[pid][key] ?? 0) + fn(item);
         }
-        row.total_cost = total;
-        out.push(row);
       }
+
+      const out: ProjectCostData[] = (projects as any[]).map((p) => {
+        const sums = byProject[p.id] ?? {};
+        const total =
+          (sums.materials_cost ?? 0) +
+          (sums.labor_cost ?? 0) +
+          (sums.equipment_cost ?? 0) +
+          (sums.additional_cost ?? 0);
+        return {
+          id: p.id,
+          name: p.name,
+          currency: p.currency,
+          materials_cost: sums.materials_cost ?? 0,
+          labor_cost: sums.labor_cost ?? 0,
+          equipment_cost: sums.equipment_cost ?? 0,
+          additional_cost: sums.additional_cost ?? 0,
+          total_cost: total,
+        };
+      });
       return out;
     },
     enabled: !!user,

@@ -99,7 +99,6 @@
     "editScenario": "تعديل السيناريو",
     "createScenario": "إنشاء سيناريو جديد",
     "name": "اسم السيناريو",
-    "nameRequired": "اسم السيناريو مطلوب",
     "namePlaceholder": "مثال: ارتفاع أسعار المواد",
     "description": "الوصف",
     "descriptionPlaceholder": "وصف تفصيلي للسيناريو",

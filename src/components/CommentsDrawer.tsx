@@ -268,6 +268,7 @@ export default function CommentsDrawer({
                                 className="h-6 w-6 text-text-secondary hover:text-primary"
                                 onClick={() => startEditing(comment)}
                                 title={t("common:edit")}
+                                aria-label={t("common:edit")}
                               >
                                 <Edit2 className="w-3 h-3" />
                               </Button>
@@ -277,6 +278,7 @@ export default function CommentsDrawer({
                                 className="h-6 w-6 text-destructive hover:text-destructive"
                                 onClick={() => setDeleteCommentId(comment.id)}
                                 title={t("common:delete")}
+                                aria-label={t("common:delete")}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
