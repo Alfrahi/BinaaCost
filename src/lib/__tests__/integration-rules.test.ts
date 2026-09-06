@@ -631,6 +631,45 @@ describe("pocketbase integration", () => {
     });
   });
 
+  describe("A1: audit trail field-diff", () => {
+    itLive("update writes an audit_logs row with only the changed field in new_data", async () => {
+      // create a material, then update a single field
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "AuditMat", quantity: 1, unit: "pcs", unit_price: 10,
+      }, tok);
+      expect(m.status).toBe(200);
+      const matId = m.json.id;
+
+      await api("PATCH", `/api/collections/materials/records/${matId}`, { quantity: 5 }, tok);
+
+      // fetch the audit rows for this material (superuser can list audit_logs)
+      const logs = await api(
+        "GET",
+        `/api/collections/audit_logs/records?filter=record_id%3D%22${matId}%22&sort=created`,
+        undefined,
+        "Bearer " + su,
+      );
+      expect(logs.status).toBe(200);
+      const items = logs.json.items || [];
+      const updateRow = items.find((a: any) => a.action === "UPDATE");
+      expect(updateRow).toBeTruthy();
+
+      // new_data carries the changed field only (quantity), not the whole record
+      expect(updateRow.new_data).toHaveProperty("quantity", 5);
+      expect(updateRow.new_data).not.toHaveProperty("name");
+      expect(updateRow.new_data).not.toHaveProperty("unit_price");
+
+      // old_data carries the prior value of the changed field
+      expect(updateRow.old_data).toHaveProperty("quantity", 1);
+
+      // no sensitive fields ever logged
+      const serialized = JSON.stringify(updateRow);
+      expect(serialized).not.toMatch(/password|token|secret|hash/i);
+
+      await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+    });
+  });
+
   describe("admin protections on routes", () => {
     itLive("regular user cannot demote/promote", async () => {
       const r = await api("POST", `/api/admin/users/${uid}/role`, { role: "super_admin" }, tok);
