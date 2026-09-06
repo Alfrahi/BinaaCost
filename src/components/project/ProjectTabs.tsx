@@ -9,6 +9,7 @@ import { useProjectData } from "@/features/project/useProjectData";
 import CommentsDrawer from "@/components/CommentsDrawer";
 import { useProjectComments } from "@/hooks/useProjectComments";
 import FinancialSummaryBar from "./FinancialSummaryBar";
+import { calculateCategoryTotal } from "@/logic/shared";
 import {
   LayoutDashboard,
   Receipt,
@@ -286,6 +287,7 @@ function ProjectTabsComponent({
                   canEdit={canEdit}
                   riskProbabilities={riskProbabilities}
                   isLoadingRiskProbabilities={isLoadingRiskProbabilities}
+                  onNavigateToPricing={() => setActiveTab("profit-pricing")}
                 />
               </TabsContent>
 
@@ -309,6 +311,8 @@ function ProjectTabsComponent({
                   additionalTotal={totals.additionalTotal}
                   currency={project.currency}
                   initialSettings={project.financial_settings}
+                  riskContingency={calculateCategoryTotal.risks(risks)}
+                  onNavigateToRisks={() => setActiveTab("risks")}
                 />
               </TabsContent>
 

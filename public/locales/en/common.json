@@ -88,7 +88,7 @@
   },
   "publicDatabase": "Public Database",
   "privateDatabase": "Private Database",
-  "riskAutoCalc": "Contingency amount is automatically calculated based on probability and impact.",
+  "riskAutoCalc": "Risk contingency is auto-calculated: impact × probability weight (low ×0.1, medium ×0.3, high ×0.5).",
   "amount": "Amount",
   "amountRequired": "Amount is required",
   "amountNonNegative": "Amount must be non-negative",

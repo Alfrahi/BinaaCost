@@ -146,7 +146,7 @@ export const ClientProposalReport = React.forwardRef<
               </tr>
               <tr className="border-t border-border">
                 <td className="text-text-primary">
-                  {t("project_detail:profit_pricing.contingencyWithPercent", {
+                  {t("project_detail:profit_pricing.generalContingencyWithPercent", {
                     percent: project.financial_settings.contingency_percent,
                   })}
                 </td>
