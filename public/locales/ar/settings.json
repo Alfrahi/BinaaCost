@@ -66,7 +66,8 @@
     "systemMessagesDescription": "تلقي إعلانات وتحديثات النظام الهامة.",
     "saveButton": "حفظ إعدادات الإشعارات",
     "success_saved": "تم حفظ إعدادات الإشعارات بنجاح!",
-    "error_save": "فشل حفظ إعدادات الإشعارات: {{message}}"
+    "error_save": "فشل حفظ إعدادات الإشعارات: {{message}}",
+    "description": "إدارة تفضيلات الإشعارات الخاصة بك."
   },
   "preferences": {
     "title": "التفضيلات",

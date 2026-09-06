@@ -1,8 +1,7 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
-import imagemin from "vite-plugin-imagemin";
 import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
@@ -51,25 +50,12 @@ export default defineConfig({
         enabled: true,
       },
     }),
-    imagemin({
-      gifsicle: { optimizationLevel: 7 },
-      optipng: { optimizationLevel: 7 },
-      mozjpeg: { quality: 80 },
-      pngquant: { quality: [0.6, 0.8], speed: 4 },
-      svgo: {
-        plugins: [
-          { removeViewBox: false },
-          { cleanupIDs: false },
-          { removeTitle: true },
-        ],
-      },
-    }),
     visualizer({
       open: false,
       filename: "bundle-analysis.html",
       gzipSize: true,
       brotliSize: true,
-    }),
+    }) as PluginOption,
   ],
   server: {
     host: "127.0.0.1",
