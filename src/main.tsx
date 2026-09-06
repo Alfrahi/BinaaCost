@@ -32,7 +32,9 @@ function AppInitializer() {
   useEffect(() => {
     if (!initializedRef.current) {
       offlineManager.setQueryClient(queryClient);
-      offlineManager.init();
+      // NOTE: do NOT call offlineManager.init() here — it runs with no user
+      // id on boot and would reset the account scoping set by AuthProvider
+      // (effects run child-first), silently un-scoping the mutation queue.
       initializedRef.current = true;
     }
   }, []);

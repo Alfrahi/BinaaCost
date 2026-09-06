@@ -27,26 +27,26 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
     throw new ForbiddenError("Only the owner can convert currency");
   }
 
-  // rate lookup (rate_to_usd)
+  // rate lookup (rate_to_usd) — throw a clean 400 on missing/invalid rates
+  // rather than a raw 404 (missing record) or Infinity (0 rate).
   const findRate = (code) => {
-    const r = $app.findFirstRecordByFilter(
-      "currency_rates",
-      `currency_code="${code.toUpperCase()}"`,
-    );
-    return r.get("rate_to_usd");
+    let r;
+    try {
+      r = $app.findFirstRecordByFilter(
+        "currency_rates",
+        `currency_code="${code.toUpperCase()}"`,
+      );
+    } catch (_) {
+      throw new BadRequestError(`Unknown currency code: ${code}`);
+    }
+    const rate = r.get("rate_to_usd");
+    if (!Number.isFinite(rate) || rate <= 0) {
+      throw new BadRequestError(`Invalid currency rate for ${code}`);
+    }
+    return rate;
   };
   const rateOld = findRate(oldCurrency);
   const rateNew = findRate(newCurrency);
-  // Guard against missing/zero/non-finite rates: a 0 rate would produce
-  // Infinity and persist corrupted rows.
-  if (
-    !Number.isFinite(rateOld) || !Number.isFinite(rateNew) ||
-    rateOld <= 0 || rateNew <= 0
-  ) {
-    throw new BadRequestError(
-      `Invalid currency rate for ${oldCurrency} or ${newCurrency}`,
-    );
-  }
   const factor = rateNew / rateOld;
 
   const TABLE_FIELDS = {
