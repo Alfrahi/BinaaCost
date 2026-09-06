@@ -131,7 +131,10 @@
     "overheadError": "Overhead percentage must be non-negative",
     "markupError": "Markup percentage must be non-negative",
     "taxError": "Tax percentage must be non-negative",
-    "contingencyError": "Contingency percentage must be non-negative"
+    "contingencyError": "Contingency percentage must be non-negative",
+    "viewPricing": "View pricing",
+    "showBreakdown": "Show cost breakdown",
+    "hideBreakdown": "Hide cost breakdown"
   },
   "comments": {
     "title": "Comments for {{item}}",
