@@ -8,6 +8,7 @@ import PageLoader from "@/components/PageLoader";
 import { useProjectData } from "@/features/project/useProjectData";
 import CommentsDrawer from "@/components/CommentsDrawer";
 import { useProjectComments } from "@/hooks/useProjectComments";
+import FinancialSummaryBar from "./FinancialSummaryBar";
 import {
   LayoutDashboard,
   Receipt,
@@ -195,6 +196,12 @@ function ProjectTabsComponent({
 
   return (
     <>
+      <FinancialSummaryBar
+        costs={totals}
+        currency={project.currency}
+        settings={project.financial_settings}
+        onViewPricing={() => setActiveTab("profit-pricing")}
+      />
       <Tabs value={activeTab} onValueChange={setActiveTab} dir={i18n.dir()}>
         {isMobile ? (
           <Select value={activeTab} onValueChange={setActiveTab}>
