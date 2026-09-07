@@ -4,7 +4,6 @@ import {
   Settings,
   Library,
   AreaChart,
-  Database,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -15,8 +14,7 @@ export default function BottomNav() {
   const navItems = [
     { name: t("dashboard"), path: "/", icon: LayoutDashboard },
     { name: t("analytics"), path: "/analytics", icon: AreaChart },
-    { name: t("resources"), path: "/resources", icon: Library },
-    { name: t("costDatabases"), path: "/cost-databases", icon: Database },
+    { name: t("costLibrary"), path: "/cost-library", icon: Library },
     { name: t("settings"), path: "/settings", icon: Settings },
   ];
 

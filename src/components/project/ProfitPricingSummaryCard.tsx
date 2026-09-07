@@ -49,6 +49,7 @@ interface Props {
   currency?: string;
   initialSettings?: FinancialSettings;
   riskContingency?: number;
+  scenarioCount?: number;
   settingsConfirmed?: boolean;
   onNavigateToRisks?: () => void;
 }
@@ -102,6 +103,7 @@ export default function ProfitPricingSummaryCard({
   currency = "USD",
   initialSettings,
   riskContingency,
+  scenarioCount,
   settingsConfirmed,
   onNavigateToRisks,
 }: Props) {
@@ -371,6 +373,16 @@ export default function ProfitPricingSummaryCard({
                   <p className="text-xs text-text-secondary -mt-1">
                     {t("project_detail:profit_pricing.riskContingencyInfo")}
                   </p>
+                </div>
+              )}
+
+              {scenarioCount !== undefined && (
+                <div className="ps-10">
+                  <SummaryRow
+                    label={t("project_detail:profit_pricing.scenarios")}
+                    value={String(scenarioCount)}
+                    className="text-text-secondary"
+                  />
                 </div>
               )}
 

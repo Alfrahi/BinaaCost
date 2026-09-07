@@ -10,6 +10,7 @@
   "materials.unitPrice": "Unit Price",
   "labor": "Labor",
   "equipment": "Equipment",
+  "databases": "Priced Databases",
   "equipment.name": "Name",
   "equipment.type": "Type",
   "equipment.rentalPurchase": "Rental/Purchase",
