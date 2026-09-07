@@ -17,6 +17,7 @@
   "unconfirmedSettings": "Financial settings were never reviewed or saved — default assumptions are in use",
   "lastEdited": "Last edited {{date}}",
   "details": "Project Details",
+  "addCosts": "Add costs",
   "categories": {
     "materials": "Materials",
     "labor": "Labor",

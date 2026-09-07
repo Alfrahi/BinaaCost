@@ -156,19 +156,21 @@ export default function ProjectForm({
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="description" className="text-sm">
-                  {t("project_form:description")}
-                </Label>
-                <Textarea
-                  id="description"
-                  {...form.register("description")}
-                  placeholder={t("project_form:descriptionPlaceholder")}
-                  rows={3}
-                  aria-label={t("project_form:description")}
-                  className="text-sm"
-                />
-              </div>
+              {isEditing && (
+                <div>
+                  <Label htmlFor="description" className="text-sm">
+                    {t("project_form:description")}
+                  </Label>
+                  <Textarea
+                    id="description"
+                    {...form.register("description")}
+                    placeholder={t("project_form:descriptionPlaceholder")}
+                    rows={3}
+                    aria-label={t("project_form:description")}
+                    className="text-sm"
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -240,18 +242,22 @@ export default function ProjectForm({
                 />
               </div>
 
-              <div>
-                <Label className="text-sm">
-                  {t("project_form:clientRequirements")}
-                </Label>
-                <Textarea
-                  {...form.register("client_requirements")}
-                  placeholder={t("project_form:clientRequirementsPlaceholder")}
-                  rows={3}
-                  aria-label={t("project_form:clientRequirements")}
-                  className="text-sm"
-                />
-              </div>
+              {isEditing && (
+                <div>
+                  <Label className="text-sm">
+                    {t("project_form:clientRequirements")}
+                  </Label>
+                  <Textarea
+                    {...form.register("client_requirements")}
+                    placeholder={t(
+                      "project_form:clientRequirementsPlaceholder",
+                    )}
+                    rows={3}
+                    aria-label={t("project_form:clientRequirements")}
+                    className="text-sm"
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

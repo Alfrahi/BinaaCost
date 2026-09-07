@@ -13,6 +13,8 @@ import {
 } from "@/logic/financials";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { StatCard } from "@/components/ui/stat-card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { countIncompleteItems } from "@/logic/overview";
 
 interface OverviewTabProps {
@@ -30,6 +32,7 @@ interface OverviewTabProps {
     equipmentTotal: number;
     additionalTotal: number;
   };
+  onAddCosts?: () => void;
 }
 
 export default React.memo(function OverviewTab(props: OverviewTabProps) {
@@ -39,6 +42,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
     projectTypes,
     durationUnits,
     totals,
+    onAddCosts,
   } = props;
 
   const { t } = useTranslation(["project_overview", "durations", "common"]);
@@ -75,6 +79,12 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
 
   return (
     <div className="space-y-6 text-sm">
+      {onAddCosts && (
+        <Button onClick={onAddCosts} className="text-sm">
+          <Plus className="w-4 h-4 me-1" aria-hidden="true" />
+          {t("project_overview:addCosts")}
+        </Button>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
           label={t("project_overview:grandTotal")}

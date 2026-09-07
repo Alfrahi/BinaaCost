@@ -259,6 +259,7 @@ function ProjectTabsComponent({
                   labor={labor}
                   equipment={equipment}
                   additional={additional}
+                  onAddCosts={() => setActiveTab("costs")}
                 />
               </TabsContent>
 
