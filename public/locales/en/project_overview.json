@@ -6,5 +6,21 @@
   "duration": "Project Duration",
   "clientRequirements": "Client Requirements",
   "description": "Description",
-  "notSpecified": "Not Specified"
+  "notSpecified": "Not Specified",
+  "grandTotal": "Grand Total",
+  "directCosts": "Direct Costs",
+  "costBreakdown": "Cost Breakdown",
+  "attention": "Needs Attention",
+  "allGood": "Nothing needs attention.",
+  "incompleteItems_one": "{{count}} item has missing or zero cost data",
+  "incompleteItems_other": "{{count}} items have missing or zero cost data",
+  "unconfirmedSettings": "Financial settings were never reviewed or saved — default assumptions are in use",
+  "lastEdited": "Last edited {{date}}",
+  "details": "Project Details",
+  "categories": {
+    "materials": "Materials",
+    "labor": "Labor",
+    "equipment": "Equipment",
+    "additional": "Additional Costs"
+  }
 }

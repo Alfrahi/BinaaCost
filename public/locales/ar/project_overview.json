@@ -6,5 +6,24 @@
   "duration": "مدة المشروع",
   "clientRequirements": "متطلبات العميل",
   "description": "الوصف",
-  "notSpecified": "غير محدد"
+  "notSpecified": "غير محدد",
+  "grandTotal": "الإجمالي الكلي",
+  "directCosts": "التكاليف المباشرة",
+  "costBreakdown": "تفصيل التكاليف",
+  "attention": "يحتاج إلى انتباه",
+  "allGood": "لا شيء يحتاج إلى انتباه.",
+  "incompleteItems_one": "عنصر واحد لديه بيانات تكلفة مفقودة أو صفرية",
+  "incompleteItems_two": "عنصران لديهما بيانات تكلفة مفقودة أو صفرية",
+  "incompleteItems_few": "{{count}} عناصر لديها بيانات تكلفة مفقودة أو صفرية",
+  "incompleteItems_many": "{{count}} عنصرًا لديه بيانات تكلفة مفقودة أو صفرية",
+  "incompleteItems_other": "{{count}} عنصر لديه بيانات تكلفة مفقودة أو صفرية",
+  "unconfirmedSettings": "لم تتم مراجعة الإعدادات المالية أو حفظها — الافتراضات الافتراضية قيد الاستخدام",
+  "lastEdited": "آخر تعديل {{date}}",
+  "details": "تفاصيل المشروع",
+  "categories": {
+    "materials": "المواد",
+    "labor": "العمالة",
+    "equipment": "المعدات",
+    "additional": "التكاليف الإضافية"
+  }
 }
