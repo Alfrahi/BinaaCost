@@ -81,7 +81,7 @@ function AdditionalCostRow({
       <TableCell className="text-start text-sm min-w-[200px]">
         {item.description || t("common:notSpecified")}
       </TableCell>
-      <TableCell className="text-start font-medium text-sm min-w-[120px]">
+      <TableCell className="text-end tabular-nums font-medium text-sm min-w-[120px]">
         {format(item.amount, currency)}
       </TableCell>
       <TableCell className="text-end min-w-[100px]">
@@ -311,7 +311,7 @@ export function AdditionalCostsTable({
               <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
                 {t("columns.description")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.amount")}
               </TableHead>
               <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
@@ -375,7 +375,9 @@ export function AdditionalCostsTable({
               >
                 {t("columns.grandTotal")}
               </TableCell>
-              <TableCell className={`text-start ${footerClass} text-sm`}>
+              <TableCell
+                className={`text-end tabular-nums ${footerClass} text-sm`}
+              >
                 {format(grandTotal, currency)}
               </TableCell>
               <TableCell className={footerClass} />

@@ -49,14 +49,16 @@ export const MaterialRow = React.memo(function MaterialRow({
       </TableCell>
       <TableCell className="text-start text-sm">{item.name}</TableCell>
       <TableCell className="text-start text-sm">{item.description}</TableCell>
-      <TableCell className="text-start text-sm">{item.quantity}</TableCell>
+      <TableCell className="text-end tabular-nums text-sm">
+        {item.quantity}
+      </TableCell>
       <TableCell className="text-start text-sm">
         {materialUnits.find((u) => u.value === item.unit)?.label || item.unit}
       </TableCell>
-      <TableCell className="text-start text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
         {format(item.unit_price, currency)}
       </TableCell>
-      <TableCell className="text-start font-medium text-sm">
+      <TableCell className="text-end tabular-nums font-medium text-sm">
         {format(
           calculateItemCost.material(item.quantity, item.unit_price),
           currency,
