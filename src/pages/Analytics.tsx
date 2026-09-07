@@ -1,5 +1,6 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Loader2, AlertTriangle } from "lucide-react";
 import {
   Select,
@@ -9,11 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 import { useAnalyticsData } from "@/features/analytics/useAnalyticsData";
-import TotalCostCard from "@/features/analytics/components/TotalCostCard";
-import CostDistributionChart from "@/features/analytics/components/CostDistributionChart";
 import ProjectComparisonChart from "@/features/analytics/components/ProjectComparisonChart";
 
 export default function Analytics() {
@@ -107,35 +107,38 @@ export default function Analytics() {
       </div>
 
       {filteredData?.missingRates && filteredData.missingRates.length > 0 && (
-        <Alert>
+        <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle className="text-base">{t("common:warning")}</AlertTitle>
-          <AlertDescription className="text-sm">
-            {t("pages:analytics.missingRatesWarning", {
-              currencies: filteredData.missingRates.join(", "),
-            })}
+          <AlertTitle className="text-base">
+            {t("pages:analytics.missingRatesBlockingTitle")}
+          </AlertTitle>
+          <AlertDescription className="text-sm space-y-2">
+            <p>
+              {t("pages:analytics.missingRatesBlockingDescription", {
+                currencies: filteredData.missingRates.join(", "),
+              })}
+            </p>
+            {filteredData.affectedProjects.length > 0 && (
+              <p>
+                {t("pages:analytics.affectedProjects", {
+                  projects: filteredData.affectedProjects.join(", "),
+                })}
+              </p>
+            )}
+            <Button asChild variant="outline" size="sm">
+              <Link to="/settings">
+                {t("pages:analytics.provideRates")}
+              </Link>
+            </Button>
           </AlertDescription>
         </Alert>
       )}
 
       {filteredData && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <TotalCostCard
-            grandTotal={filteredData.grandTotal}
-            currency={filteredData.displayCurrency}
-          />
-          <CostDistributionChart
-            totals={filteredData.totals}
-            currency={filteredData.displayCurrency}
-          />
-          {selectedProjectId === "all" && (
-            <ProjectComparisonChart
-              projects={filteredData.projects}
-              displayCurrency={filteredData.displayCurrency}
-              className="lg:col-span-2"
-            />
-          )}
-        </div>
+        <ProjectComparisonChart
+          projects={filteredData.projects}
+          displayCurrency={filteredData.displayCurrency}
+        />
       )}
     </div>
   );
