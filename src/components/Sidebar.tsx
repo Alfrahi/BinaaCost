@@ -5,7 +5,6 @@ import {
   Home,
   FolderKanban,
   Package,
-  Database,
   Settings,
   BarChart,
   Users,
@@ -47,11 +46,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const navigation = [
     { name: t("navigation:dashboard"), href: "/", icon: Home },
-    { name: t("navigation:resources"), href: "/resources", icon: Package },
     {
-      name: t("navigation:costDatabases"),
-      href: "/cost-databases",
-      icon: Database,
+      name: t("navigation:costLibrary"),
+      href: "/cost-library",
+      icon: Package,
     },
     { name: t("navigation:analytics"), href: "/analytics", icon: BarChart },
     { name: t("navigation:settings"), href: "/settings", icon: Settings },

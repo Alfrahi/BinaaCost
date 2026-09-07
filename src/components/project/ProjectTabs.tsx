@@ -8,6 +8,7 @@ import PageLoader from "@/components/PageLoader";
 import { useProjectData } from "@/features/project/useProjectData";
 import CommentsDrawer from "@/components/CommentsDrawer";
 import { useProjectComments } from "@/hooks/useProjectComments";
+import { useScenarioManager } from "@/hooks/useScenarioManager";
 import FinancialSummaryBar from "./FinancialSummaryBar";
 import { calculateCategoryTotal } from "@/logic/shared";
 import {
@@ -111,6 +112,7 @@ function ProjectTabsComponent({
 
   const { options: materialUnits, isLoading: isLoadingMaterialUnits } =
     useSettingsOptions("material_unit");
+  const { scenarios } = useScenarioManager();
   const { options: rentalOptions, isLoading: isLoadingRentalOptions } =
     useSettingsOptions("equipment_rental_purchase");
   const { options: periodUnits, isLoading: isLoadingPeriodUnits } =
@@ -123,34 +125,63 @@ function ProjectTabsComponent({
     useSettingsOptions("risk_probability");
   const { options: durationUnits } = useSettingsOptions("duration_unit");
 
-  const tabItems = useMemo(
+  const tabGroups = useMemo(
     () => [
       {
-        value: "overview",
-        labelKey: "project_tabs:overview",
-        icon: LayoutDashboard,
-      },
-      { value: "costs", labelKey: "project_tabs:costs", icon: Receipt },
-      { value: "risks", labelKey: "project_tabs:risks", icon: ShieldAlert },
-      {
-        value: "scenario-analysis",
-        labelKey: "project_tabs:scenarioAnalysis",
-        icon: FlaskConical,
+        labelKey: "project_tabs:groupOverview",
+        items: [
+          {
+            value: "overview",
+            labelKey: "project_tabs:overview",
+            icon: LayoutDashboard,
+          },
+        ],
       },
       {
-        value: "profit-pricing",
-        labelKey: "project_tabs:profitPricing",
-        icon: TrendingUp,
+        labelKey: "project_tabs:groupEstimate",
+        items: [
+          { value: "costs", labelKey: "project_tabs:costs", icon: Receipt },
+        ],
       },
       {
-        value: "analytics",
-        labelKey: "project_tabs:analytics",
-        icon: BarChart,
+        labelKey: "project_tabs:groupPricing",
+        items: [
+          {
+            value: "profit-pricing",
+            labelKey: "project_tabs:profitPricing",
+            icon: TrendingUp,
+          },
+          { value: "risks", labelKey: "project_tabs:risks", icon: ShieldAlert },
+          {
+            value: "scenario-analysis",
+            labelKey: "project_tabs:scenarioAnalysis",
+            icon: FlaskConical,
+          },
+        ],
       },
-      { value: "reports", labelKey: "project_tabs:reports", icon: FileText },
-      { value: "versions", labelKey: "project_tabs:versions", icon: GitBranch },
+      {
+        labelKey: "project_tabs:groupReview",
+        items: [
+          {
+            value: "analytics",
+            labelKey: "project_tabs:analytics",
+            icon: BarChart,
+          },
+          { value: "reports", labelKey: "project_tabs:reports", icon: FileText },
+          {
+            value: "versions",
+            labelKey: "project_tabs:versions",
+            icon: GitBranch,
+          },
+        ],
+      },
     ],
     [],
+  );
+
+  const tabItems = useMemo(
+    () => tabGroups.flatMap((group) => group.items),
+    [tabGroups],
   );
 
   if (isLoading) {
@@ -224,15 +255,27 @@ function ProjectTabsComponent({
         ) : (
           <ScrollArea className="w-full whitespace-nowrap pb-2">
             <TabsList className="w-full justify-start">
-              {tabItems.map((item) => (
-                <TabsTrigger
-                  key={item.value}
-                  value={item.value}
-                  className="flex items-center gap-2 text-sm"
+              {tabGroups.map((group) => (
+                <div
+                  key={group.labelKey}
+                  className="flex items-center gap-1"
+                  role="group"
+                  aria-label={t(group.labelKey)}
                 >
-                  <item.icon className="w-4 h-4" />
-                  {t(item.labelKey)}
-                </TabsTrigger>
+                  <span className="px-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                    {t(group.labelKey)}
+                  </span>
+                  {group.items.map((item) => (
+                    <TabsTrigger
+                      key={item.value}
+                      value={item.value}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <item.icon className="w-4 h-4" />
+                      {t(item.labelKey)}
+                    </TabsTrigger>
+                  ))}
+                </div>
               ))}
             </TabsList>
           </ScrollArea>
@@ -319,6 +362,7 @@ function ProjectTabsComponent({
                   initialSettings={project.financial_settings}
                   settingsConfirmed={project.financial_settings_confirmed}
                   riskContingency={calculateCategoryTotal.risks(risks)}
+                  scenarioCount={scenarios.length}
                   onNavigateToRisks={() => setActiveTab("risks")}
                 />
               </TabsContent>
