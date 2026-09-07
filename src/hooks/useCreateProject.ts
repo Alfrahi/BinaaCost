@@ -71,9 +71,12 @@ export function useCreateProject() {
     table: "projects",
     operation: "INSERT",
     optimisticUpdater: optimisticUpdater,
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       toast.success(t("project_form:success_created"));
-      navigate("/");
+      const id = data?.id as string | undefined;
+      // Offline fallback: queued inserts return the payload, not a record id,
+      // so land on the dashboard when no server id is available.
+      navigate(id ? `/projects/${id}` : "/");
     },
     onError: (error: any) => {
       handleError(error);
