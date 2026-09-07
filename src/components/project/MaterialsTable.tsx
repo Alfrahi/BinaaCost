@@ -214,16 +214,16 @@ export function MaterialsTable({
               <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
                 {t("columns.description")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
                 {t("columns.quantity")}
               </TableHead>
               <TableHead className={`text-start ${headerClass} min-w-[80px]`}>
                 {t("columns.unit")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.unitPrice")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.estTotalCost")}
               </TableHead>
               <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
@@ -287,7 +287,9 @@ export function MaterialsTable({
               >
                 {t("columns.grandTotal")}
               </TableCell>
-              <TableCell className={`text-start ${footerClass} text-sm`}>
+              <TableCell
+                className={`text-end tabular-nums ${footerClass} text-sm`}
+              >
                 {format(grandTotal, currency)}
               </TableCell>
               <TableCell className={footerClass} />
