@@ -53,6 +53,10 @@
     "projectCost": "Project Cost Comparison",
     "projectCostTooltip": "Comparison of total direct costs across different projects.",
     "missingRatesWarning": "Warning: Exchange rates are missing for: {{currencies}}. Some conversions might be inaccurate.",
+    "missingRatesBlockingTitle": "Exchange rates required",
+    "missingRatesBlockingDescription": "Exchange rates are missing for: {{currencies}}. Cross-project totals cannot be shown accurately until these rates are provided.",
+    "affectedProjects": "Affected projects: {{projects}}.",
+    "provideRates": "Provide exchange rates",
     "noData": "No cost data available for the selected project.",
     "noDataForCurrency": "No cost data available for projects in the selected currency ({{currency}}).",
     "errorLoadingData": "Failed to load analytics data"

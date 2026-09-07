@@ -53,6 +53,10 @@
     "projectCost": "مقارنة تكلفة المشروع",
     "projectCostTooltip": "يقارن هذا الرسم البياني التكلفة الإجمالية للمشاريع المختلفة.",
     "missingRatesWarning": "تحذير: أسعار الصرف مفقودة لـ: {{currencies}}. قد تكون بعض التحويلات غير دقيقة.",
+    "missingRatesBlockingTitle": "أسعار الصرف مطلوبة",
+    "missingRatesBlockingDescription": "أسعار الصرف مفقودة لـ: {{currencies}}. لا يمكن عرض إجماليات المشاريع بدقة حتى يتم توفير هذه الأسعار.",
+    "affectedProjects": "المشاريع المتأثرة: {{projects}}.",
+    "provideRates": "توفير أسعار الصرف",
     "noData": "لا توجد بيانات تكلفة متاحة للمشروع المحدد.",
     "noDataForCurrency": "لا توجد بيانات تكلفة متاحة للمشاريع بالعملة المختارة ({{currency}}).",
     "errorLoadingData": "فشل تحميل بيانات التحليلات"

@@ -22,4 +22,6 @@ export interface AnalyticsData {
   grandTotal: number;
   displayCurrency: string;
   missingRates: string[];
+  /** Names of projects whose currency cannot be converted to displayCurrency. */
+  affectedProjects: string[];
 }
