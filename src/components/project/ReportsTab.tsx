@@ -9,6 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/components/AuthProvider";
 import { pb } from "@/integrations/pocketbase/client";
 import { calculateProjectFinancials } from "@/logic/financials";
+import {
+  FinancialAssumptionsStrip,
+  DefaultAssumptionsWarning,
+} from "./FinancialAssumptions";
 import { Loader2, FileText, Users, DollarSign } from "lucide-react";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import {
@@ -166,6 +170,12 @@ export default function ReportsTab({
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="space-y-3 mb-4">
+            <DefaultAssumptionsWarning project={project} />
+            <FinancialAssumptionsStrip
+              settings={project.financial_settings}
+            />
+          </div>
           <Tabs
             defaultValue="project-cost"
             value={activeReportTab}

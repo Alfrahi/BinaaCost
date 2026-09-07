@@ -14,6 +14,12 @@ export const DEFAULT_FINANCIAL_SETTINGS: FinancialSettings = {
   contingency_percent: 5,
 };
 
+export function hasConfirmedFinancialSettings(project: {
+  financial_settings_confirmed?: boolean | null;
+}): boolean {
+  return !!project?.financial_settings_confirmed;
+}
+
 export interface FinancialSummary {
   materialsTotal: number;
   laborTotal: number;

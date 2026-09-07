@@ -19,12 +19,19 @@ import {
 import { AddInternalShareForm } from "./internal-sharing/AddInternalShareForm";
 import { EditInternalShareRow } from "./internal-sharing/EditInternalShareRow";
 import { GenerateExternalLinkForm } from "./external-sharing/GenerateExternalLinkForm";
+import {
+  FinancialAssumptionsStrip,
+  DefaultAssumptionsWarning,
+} from "./FinancialAssumptions";
+import { FinancialSettings } from "@/logic/financials";
 
 interface ShareProjectDialogProps {
   projectId: string;
   projectName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  financialSettings?: FinancialSettings;
+  settingsConfirmed?: boolean;
 }
 
 export default function ShareProjectDialog({
@@ -32,6 +39,8 @@ export default function ShareProjectDialog({
   projectName,
   open,
   onOpenChange,
+  financialSettings,
+  settingsConfirmed,
 }: ShareProjectDialogProps) {
   const { t } = useTranslation(["project_detail", "common", "roles"]);
 
@@ -110,6 +119,16 @@ export default function ShareProjectDialog({
         </DialogHeader>
 
         <div className="space-y-8 py-4">
+          <div className="space-y-3">
+            {settingsConfirmed !== true && (
+              <DefaultAssumptionsWarning
+                project={{ financial_settings_confirmed: false }}
+              />
+            )}
+            {financialSettings && (
+              <FinancialAssumptionsStrip settings={financialSettings} />
+            )}
+          </div>
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">
               {t("project_detail:share.internalSharing")}

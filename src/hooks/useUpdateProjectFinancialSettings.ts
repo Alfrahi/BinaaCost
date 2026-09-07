@@ -19,6 +19,7 @@ export function useUpdateProjectFinancialSettings() {
     }) => {
       await pb.collection("projects").update(projectId, {
         financial_settings: newSettings,
+        financial_settings_confirmed: true,
       });
     },
     onSuccess: (_, variables) => {
