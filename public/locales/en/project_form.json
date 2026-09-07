@@ -36,5 +36,9 @@
   "success_updated": "Project updated successfully!",
   "error_updated": "Failed to update project: {{message}}",
   "notFound": "Project not found.",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "discardTitle": "Discard unsaved changes?",
+  "discardDescription": "You have unsaved changes. They will be lost if you leave this page.",
+  "keepEditing": "Keep editing",
+  "discardChanges": "Discard changes"
 }
