@@ -254,6 +254,11 @@ function ProjectTabsComponent({
                   sizeUnits={sizeUnits}
                   projectTypes={projectTypes}
                   durationUnits={durationUnits}
+                  totals={totals}
+                  materials={materials}
+                  labor={labor}
+                  equipment={equipment}
+                  additional={additional}
                 />
               </TabsContent>
 
