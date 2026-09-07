@@ -193,16 +193,16 @@ export function LaborTable({
               <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
                 {t("columns.workerType")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.numWorkers")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.dailyRate")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
                 {t("columns.totalDays")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.estTotalCost")}
               </TableHead>
               {canEdit && (
@@ -267,7 +267,9 @@ export function LaborTable({
               >
                 {t("columns.grandTotal")}
               </TableCell>
-              <TableCell className={`text-start ${footerClass} text-sm`}>
+              <TableCell
+                className={`text-end tabular-nums ${footerClass} text-sm`}
+              >
                 {format(grandTotal, currency)}
               </TableCell>
               <TableCell className={footerClass} />

@@ -220,16 +220,16 @@ export default function EquipmentTable({
               <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
                 {t("columns.rentalPurchase")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[80px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
                 {t("columns.quantity")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.costPerPeriod")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.usageDuration")}
               </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
                 {t("columns.estTotalCost")}
               </TableHead>
               <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
@@ -293,7 +293,9 @@ export default function EquipmentTable({
               >
                 {t("columns.grandTotal")}
               </TableCell>
-              <TableCell className={`text-start ${footerClass} text-sm`}>
+              <TableCell
+                className={`text-end tabular-nums ${footerClass} text-sm`}
+              >
                 {format(grandTotal, currency)}
               </TableCell>
               <TableCell className={footerClass} />

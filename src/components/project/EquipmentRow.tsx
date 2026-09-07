@@ -76,18 +76,20 @@ export function EquipmentRow({
       <TableCell className="text-start text-sm">
         {rentalOrPurchaseLabel}
       </TableCell>
-      <TableCell className="text-start text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
         {isPurchase ? item.quantity : `${item.quantity} `}
       </TableCell>
-      <TableCell className="text-start text-sm">
-        {format(item.cost_per_period, currency)}
-        {!isPurchase &&
-          `/${t(item.period_unit, { defaultValue: item.period_unit })}`}
+      <TableCell className="text-end tabular-nums text-sm">
+        <bdi>
+          {format(item.cost_per_period, currency)}
+          {!isPurchase &&
+            `/${t(item.period_unit, { defaultValue: item.period_unit })}`}
+        </bdi>
       </TableCell>
-      <TableCell className="text-start text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
         {isPurchase ? t("common:notApplicable") : item.usage_duration}
       </TableCell>
-      <TableCell className="text-start font-medium text-sm">
+      <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-2">

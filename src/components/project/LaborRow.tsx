@@ -46,14 +46,16 @@ export function LaborRow({
       <TableCell className="text-start font-medium text-sm">
         {item.worker_type}
       </TableCell>
-      <TableCell className="text-start text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
         {item.number_of_workers}
       </TableCell>
-      <TableCell className="text-start text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
         {format(item.daily_rate, currency)}
       </TableCell>
-      <TableCell className="text-start text-sm">{item.total_days}</TableCell>
-      <TableCell className="text-start font-medium text-sm">
+      <TableCell className="text-end tabular-nums text-sm">
+        {item.total_days}
+      </TableCell>
+      <TableCell className="text-end tabular-nums font-medium text-sm">
         {format(item.total_cost || 0, currency)}
       </TableCell>
       <TableCell className="text-end">
