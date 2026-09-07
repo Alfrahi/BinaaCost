@@ -19,6 +19,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useUpdateProjectFinancialSettings } from "@/hooks/useUpdateProjectFinancialSettings";
+import {
+  FinancialAssumptionsStrip,
+  DefaultAssumptionsWarning,
+} from "./FinancialAssumptions";
 import { cn } from "@/lib/utils";
 
 const settingsSchema = z.object({
@@ -45,6 +49,7 @@ interface Props {
   currency?: string;
   initialSettings?: FinancialSettings;
   riskContingency?: number;
+  settingsConfirmed?: boolean;
   onNavigateToRisks?: () => void;
 }
 
@@ -97,6 +102,7 @@ export default function ProfitPricingSummaryCard({
   currency = "USD",
   initialSettings,
   riskContingency,
+  settingsConfirmed,
   onNavigateToRisks,
 }: Props) {
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
@@ -145,7 +151,14 @@ export default function ProfitPricingSummaryCard({
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-sm">
+    <div className="space-y-4">
+      {settingsConfirmed !== true && (
+        <DefaultAssumptionsWarning
+          project={{ financial_settings_confirmed: false }}
+        />
+      )}
+      <FinancialAssumptionsStrip settings={settings} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-sm">
       <Card className="lg:col-span-1 shadow-sm border-border h-fit">
         <CardHeader className="bg-muted py-4 border-b">
           <CardTitle className="text-lg flex justify-between items-center m-0">
@@ -456,6 +469,7 @@ export default function ProfitPricingSummaryCard({
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

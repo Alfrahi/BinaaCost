@@ -311,6 +311,7 @@ function ProjectTabsComponent({
                   additionalTotal={totals.additionalTotal}
                   currency={project.currency}
                   initialSettings={project.financial_settings}
+                  settingsConfirmed={project.financial_settings_confirmed}
                   riskContingency={calculateCategoryTotal.risks(risks)}
                   onNavigateToRisks={() => setActiveTab("risks")}
                 />

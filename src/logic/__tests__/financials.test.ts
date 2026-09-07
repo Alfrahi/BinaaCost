@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { calculateProjectFinancials } from "../financials";
+import {
+  calculateProjectFinancials,
+  hasConfirmedFinancialSettings,
+} from "../financials";
 
 describe("Financial Logic", () => {
   const mockTotals = {
@@ -72,5 +75,23 @@ describe("Financial Logic", () => {
     expect(result.bidPrice).toBe(2809.6248);
     expect(result.taxAmount).toBe(231.794046);
     expect(result.grandTotal).toBe(3041.418846);
+  });
+});
+
+describe("hasConfirmedFinancialSettings", () => {
+  it("is true only when explicitly saved", () => {
+    expect(
+      hasConfirmedFinancialSettings({ financial_settings_confirmed: true }),
+    ).toBe(true);
+  });
+
+  it("is false for new/legacy projects (missing, false, or null flag)", () => {
+    expect(hasConfirmedFinancialSettings({})).toBe(false);
+    expect(
+      hasConfirmedFinancialSettings({ financial_settings_confirmed: false }),
+    ).toBe(false);
+    expect(
+      hasConfirmedFinancialSettings({ financial_settings_confirmed: null }),
+    ).toBe(false);
   });
 });

@@ -502,6 +502,26 @@ export const ProjectCostReport = React.forwardRef<
         <h3 className="text-xl font-bold text-text-primary mb-4">
           {t("project_reports:financialSummary")}
         </h3>
+        <div className="mb-3 text-sm text-text-secondary">
+          <span className="font-semibold">
+            {t("project_detail:profit_pricing.assumptions")}:{" "}
+          </span>
+          {t("project_detail:profit_pricing.overhead")}{" "}
+          {project.financial_settings.overhead_percent}% ·{" "}
+          {t("project_detail:profit_pricing.generalContingency")}{" "}
+          {project.financial_settings.contingency_percent}% ·{" "}
+          {t("project_detail:profit_pricing.markup")}{" "}
+          {project.financial_settings.markup_percent}% ·{" "}
+          {t("project_detail:profit_pricing.taxes")}{" "}
+          {project.financial_settings.tax_percent}%
+          {!project.financial_settings_confirmed && (
+            <span className="block text-xs text-text-secondary mt-1">
+              {t(
+                "project_detail:profit_pricing.defaultAssumptionsWarning",
+              )}
+            </span>
+          )}
+        </div>
         <div className="overflow-x-auto">
           {" "}
           <Table className="w-full text-sm mb-8">

@@ -22,6 +22,7 @@ export interface Project {
   user_id: string;
   deleted_at: string | null;
   financial_settings: ProjectFinancialSettings;
+  financial_settings_confirmed?: boolean;
 }
 
 export interface ProjectGroup {

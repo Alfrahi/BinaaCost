@@ -137,6 +137,8 @@
     "taxError": "Tax percentage must be non-negative",
     "generalContingencyError": "General contingency percentage must be non-negative",
     "viewPricing": "View pricing",
+    "assumptions": "Financial Assumptions",
+    "defaultAssumptionsWarning": "This estimate uses default financial assumptions; the percentages were never reviewed or saved. Open the Pricing tab to confirm them before sharing or exporting.",
     "showBreakdown": "Show cost breakdown",
     "hideBreakdown": "Hide cost breakdown"
   },
