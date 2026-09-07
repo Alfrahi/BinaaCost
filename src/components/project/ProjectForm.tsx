@@ -6,10 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { projectSchema } from "@/types/project-form";
 import { sanitizeText } from "@/utils/sanitizeText";
 
@@ -34,6 +44,25 @@ export default function ProjectForm({
   const navigate = useNavigate();
   const internalForm = useFormContext<ProjectFormValues>();
   const form = externalForm || internalForm;
+  const { isDirty } = form.formState;
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowDiscardDialog(true);
+    } else {
+      navigate("/");
+    }
+  };
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
 
   const { options: projectTypes, isLoading: isLoadingProjectTypes } =
     useSettingsOptions("project_type");
@@ -78,6 +107,7 @@ export default function ProjectForm({
       currency: sanitizeText(values.currency) || "USD",
     };
     onSubmit(sanitizedValues);
+    form.reset(sanitizedValues);
   };
 
   return (
@@ -283,7 +313,7 @@ export default function ProjectForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/")}
+                onClick={handleCancel}
                 className="text-sm"
               >
                 {t("common:cancel")}
@@ -299,6 +329,30 @@ export default function ProjectForm({
           </form>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("project_form:discardTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("project_form:discardDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("project_form:keepEditing")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                form.reset();
+                navigate("/");
+              }}
+            >
+              {t("project_form:discardChanges")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </FormProvider>
   );
 }
