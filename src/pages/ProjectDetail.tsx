@@ -92,6 +92,8 @@ export default function ProjectDetail() {
           projectName={project.name}
           open={shareDialogOpen}
           onOpenChange={setShareDialogOpen}
+          financialSettings={project.financial_settings}
+          settingsConfirmed={project.financial_settings_confirmed}
         />
       )}
 
