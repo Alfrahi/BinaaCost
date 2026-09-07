@@ -107,6 +107,7 @@ export function useAnalyticsData() {
       let projects: ProjectCostData[] = [];
       let displayCurrency = "USD";
       const missingRatesSet = new Set<string>();
+      const affectedProjectsSet = new Set<string>();
 
       if (selectedProjectId !== "all") {
         const project = projectsData.find((p) => p.id === selectedProjectId);
@@ -119,6 +120,7 @@ export function useAnalyticsData() {
         projects = projectsData.map((p) => {
           const missing = getMissingRates(p.currency, displayCurrency);
           missing.forEach((r) => missingRatesSet.add(r));
+          if (missing.length > 0) affectedProjectsSet.add(p.name);
 
           return {
             ...p,
@@ -172,6 +174,7 @@ export function useAnalyticsData() {
         ),
         displayCurrency,
         missingRates: Array.from(missingRatesSet),
+        affectedProjects: Array.from(affectedProjectsSet),
       };
     } catch (error) {
       handleError(error);
