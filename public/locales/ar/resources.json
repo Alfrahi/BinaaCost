@@ -10,6 +10,7 @@
   "materials.unitPrice": "سعر الوحدة",
   "labor": "العمالة",
   "equipment": "المعدات",
+  "databases": "قواعد بيانات التكلفة",
   "equipment.name": "الإسم",
   "equipment.type": "النوع",
   "equipment.rentalPurchase": "إيجار/شراء",

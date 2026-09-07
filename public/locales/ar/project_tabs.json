@@ -12,5 +12,9 @@
   "equipment": "المعدات",
   "additional": "تكاليف إضافية",
   "selectTab": "اختر علامة تبويب",
-  "groups": "التجميعات"
+  "groups": "التجميعات",
+  "groupOverview": "نظرة عامة",
+  "groupEstimate": "التقدير",
+  "groupPricing": "التسعير",
+  "groupReview": "المراجعة"
 }

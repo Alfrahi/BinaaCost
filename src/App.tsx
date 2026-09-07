@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -16,9 +16,8 @@ const CreateProject = React.lazy(() => import("./pages/CreateProject"));
 const ProjectDetail = React.lazy(() => import("./pages/ProjectDetail"));
 const EditProject = React.lazy(() => import("./pages/EditProject"));
 const Settings = React.lazy(() => import("./pages/Settings"));
-const Resources = React.lazy(() => import("./pages/Resources"));
+const CostLibrary = React.lazy(() => import("./pages/CostLibrary"));
 const Analytics = React.lazy(() => import("./pages/Analytics"));
-const CostDatabases = React.lazy(() => import("./pages/CostDatabases"));
 const AdminPanel = React.lazy(() => import("./pages/admin/AdminPanel"));
 const UserManagement = React.lazy(() => import("./pages/admin/UserManagement"));
 const ProjectManagement = React.lazy(
@@ -100,11 +99,31 @@ function AppContent() {
                   }
                 />
                 <Route
+                  path="/cost-library"
+                  element={
+                    <ProtectedRoute>
+                      <LayoutShell>
+                        <CostLibrary />
+                      </LayoutShell>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/resources"
                   element={
                     <ProtectedRoute>
                       <LayoutShell>
-                        <Resources />
+                        <Navigate to="/cost-library" replace />
+                      </LayoutShell>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/cost-databases"
+                  element={
+                    <ProtectedRoute>
+                      <LayoutShell>
+                        <Navigate to="/cost-library" replace />
                       </LayoutShell>
                     </ProtectedRoute>
                   }
@@ -115,16 +134,6 @@ function AppContent() {
                     <ProtectedRoute>
                       <LayoutShell>
                         <Analytics />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/cost-databases"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <CostDatabases />
                       </LayoutShell>
                     </ProtectedRoute>
                   }

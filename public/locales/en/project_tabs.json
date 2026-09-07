@@ -12,5 +12,9 @@
   "equipment": "Equipment",
   "additional": "Additional Costs",
   "selectTab": "Select Tab",
-  "groups": "Groups"
+  "groups": "Groups",
+  "groupOverview": "Overview",
+  "groupEstimate": "Estimate",
+  "groupPricing": "Pricing",
+  "groupReview": "Review"
 }
