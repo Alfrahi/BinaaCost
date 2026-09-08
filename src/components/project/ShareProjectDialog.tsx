@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2 } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import {
   useProjectSharing,
   ProjectShare,
@@ -43,6 +43,7 @@ export default function ShareProjectDialog({
   settingsConfirmed,
 }: ShareProjectDialogProps) {
   const { t } = useTranslation(["project_detail", "common", "roles"]);
+  const { formatDate } = useDateFormatter();
 
   const [editingShare, setEditingShare] = useState<ProjectShare | null>(null);
   const [deleteTargetInternal, setDeleteTargetInternal] =
@@ -229,7 +230,7 @@ export default function ShareProjectDialog({
                           {t("project_detail:share.external.linkHiddenNote")}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {format(new Date(link.expires_at), "MMM dd, yyyy")}
+                          {formatDate(link.expires_at, "short")}
                           {new Date(link.expires_at) < new Date() && (
                             <span className="ms-2 text-red-500 text-xs">
                               ({t("project_detail:share.external.expired")})
