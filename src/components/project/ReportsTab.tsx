@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePdfExport } from "@/hooks/usePdfExport";
+import { useProjectVersions } from "@/hooks/useProjectVersions";
 
 const LazyClientProposalReport = React.lazy(() =>
   import("../reports/ClientProposalReport").then((module) => ({
@@ -79,7 +80,7 @@ export default function ReportsTab({
   additionalCategories: { value: string; label: string }[];
   riskProbabilities: { value: string; label: string }[];
 }) {
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     "project_detail",
     "project_reports",
     "common",
@@ -94,6 +95,18 @@ export default function ReportsTab({
   const projectCostRef = useRef<HTMLDivElement>(null);
 
   const { generatePdf, isGenerating } = usePdfExport();
+  const { versions } = useProjectVersions(project.id);
+
+  // Latest finalized version, if any — stamped onto exported reports so the
+  // client-facing output records which locked estimate it reflects.
+  const versionStamp = useMemo(() => {
+    const finalized = versions.find((v) => v.is_final);
+    if (!finalized) return undefined;
+    return {
+      name: finalized.name,
+      date: new Date(finalized.created_at).toLocaleDateString(i18n.language),
+    };
+  }, [versions, i18n.language]);
 
   const allSettingsOptions = useMemo(
     () => ({
@@ -259,6 +272,7 @@ export default function ReportsTab({
                       groups={groups}
                       companyInfo={companyInfo}
                       preparedBy={user?.email || t("common:unknownUser")}
+                      versionStamp={versionStamp}
                       allSettingsOptions={allSettingsOptions}
                     />
                   </Suspense>
@@ -326,6 +340,7 @@ export default function ReportsTab({
                       terms={sanitizedTerms}
                       preparedBy={companyInfo.name || t("common:ourTeam")}
                       clientName={clientName}
+                      versionStamp={versionStamp}
                     />
                   </Suspense>
                 </div>

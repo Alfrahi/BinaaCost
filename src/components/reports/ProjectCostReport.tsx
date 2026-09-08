@@ -40,6 +40,7 @@ interface ProjectCostReportProps {
     email: string;
   };
   preparedBy: string;
+  versionStamp?: { name: string; date: string };
   allSettingsOptions: {
     material_unit: { value: string; label: string }[];
     equipment_period_unit: { value: string; label: string }[];
@@ -64,6 +65,7 @@ export const ProjectCostReport = React.forwardRef<
       groups,
       companyInfo,
       preparedBy,
+      versionStamp,
       allSettingsOptions,
     },
     ref,
@@ -77,6 +79,7 @@ export const ProjectCostReport = React.forwardRef<
       "project_equipment",
       "project_additional",
       "project_risk",
+      "project_versions",
       "durations",
     ]);
     const { format: formatCurrency } = useCurrencyFormatter();
@@ -303,6 +306,14 @@ export const ProjectCostReport = React.forwardRef<
             <p>
               <strong>{t("project_reports:preparedBy")}:</strong> {preparedBy}
             </p>
+            {versionStamp && (
+              <p>
+                <strong>{t("project_versions:versionStamp", {
+                  name: versionStamp.name,
+                  date: versionStamp.date,
+                })}</strong>
+              </p>
+            )}
             <p>
               <strong>{t("project_reports:date")}:</strong>{" "}
               {format(new Date(), "PPP", { locale: currentLocale })}

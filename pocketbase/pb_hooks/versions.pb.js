@@ -56,10 +56,48 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
   rec.set("name", name);
   rec.set("user_id", auth.id);
   rec.set("created_by_user_id", auth.id);
+  rec.set("is_final", false);
   rec.set("data", snapshot);
   $app.save(rec);
 
   return e.json(200, { id: rec.id });
+});
+
+// POST /api/versions/{id}/finalize — lock a version as final (owner only).
+// A finalized version's snapshot is immutable: the apply route rejects it.
+routerAdd("POST", "/api/versions/{id}/finalize", (e) => {
+  const auth = e.auth;
+  if (!auth || !auth.id) {
+    throw new UnauthorizedError("Authentication required");
+  }
+
+  const versionId = e.request.pathValue("id");
+  let version = null;
+  try {
+    version = $app.findRecordById("project_versions", versionId);
+  } catch (_) {
+    throw new NotFoundError("Version not found");
+  }
+
+  const projectId = version.get("project_id");
+  let project = null;
+  try {
+    project = $app.findRecordById("projects", projectId);
+  } catch (_) {
+    throw new NotFoundError("Project not found");
+  }
+  if (project.get("user_id") !== auth.id) {
+    throw new ForbiddenError("Only the owner can finalize versions");
+  }
+
+  if (version.get("is_final")) {
+    return e.json(200, { id: version.id, is_final: true });
+  }
+
+  version.set("is_final", true);
+  $app.save(version);
+
+  return e.json(200, { id: version.id, is_final: true });
 });
 
 routerAdd("POST", "/api/versions/{id}/apply", (e) => {
@@ -88,6 +126,11 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
   }
   if (project.get("user_id") !== auth.id) {
     throw new ForbiddenError("Only the owner can apply versions");
+  }
+
+  // A finalized version is immutable — reject any apply/restore onto it.
+  if (version.get("is_final")) {
+    throw new BadRequestError("Finalized versions cannot be restored");
   }
 
   // M6: server-side snapshot authority — prefer the stored version.data.

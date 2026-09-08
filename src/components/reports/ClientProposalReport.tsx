@@ -19,6 +19,7 @@ interface ClientProposalReportProps {
   terms: string;
   preparedBy: string;
   clientName: string;
+  versionStamp?: { name: string; date: string };
 }
 
 export const ClientProposalReport = React.forwardRef<
@@ -26,13 +27,14 @@ export const ClientProposalReport = React.forwardRef<
   ClientProposalReportProps
 >(
   (
-    { project, financials, companyInfo, terms, preparedBy, clientName },
+    { project, financials, companyInfo, terms, preparedBy, clientName, versionStamp },
     ref,
   ) => {
     const { t, i18n } = useTranslation([
       "project_reports",
       "project_detail",
       "common",
+      "project_versions",
       "durations",
     ]);
     const { format: formatCurrency } = useCurrencyFormatter();
@@ -99,6 +101,14 @@ export const ClientProposalReport = React.forwardRef<
             <p>
               <strong>{t("project_reports:preparedBy")}:</strong> {preparedBy}
             </p>
+            {versionStamp && (
+              <p>
+                <strong>{t("project_versions:versionStamp", {
+                  name: versionStamp.name,
+                  date: versionStamp.date,
+                })}</strong>
+              </p>
+            )}
             <p>
               <strong>{t("project_reports:date")}:</strong>{" "}
               {format(new Date(), "PPP", { locale: currentLocale })}

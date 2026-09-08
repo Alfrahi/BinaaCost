@@ -10,6 +10,9 @@ export interface ProjectVersion {
   id: string;
   name: string;
   created_at: string;
+  is_final: boolean;
+  created_by_user_id?: string;
+  author_name?: string;
   data?: any;
 }
 
@@ -29,12 +32,20 @@ export function useProjectVersions(projectId: string) {
       const records = await pb.collection("project_versions").getFullList({
         filter: `project_id="${projectId}"`,
         sort: "-created",
-        fields: "id,name,created",
+        fields: "id,name,created,is_final,created_by_user_id,data",
+        expand: "created_by_user_id",
       });
-      return records.map((r) => ({
+      return records.map((r: any) => ({
         id: r.id,
         name: r.name,
         created_at: r.created,
+        is_final: !!r.is_final,
+        created_by_user_id: r.created_by_user_id,
+        author_name:
+          r.expand?.created_by_user_id?.name ||
+          r.expand?.created_by_user_id?.email ||
+          undefined,
+        data: r.data,
       }));
     },
     enabled: !!projectId,
@@ -85,6 +96,32 @@ export function useProjectVersions(projectId: string) {
     onError: (err: any) => handleError(err),
   });
 
+  // Finalize is a JSVM route (online-only, like create). Optimistically mark
+  // the version as final so the timeline reflects the lock immediately.
+  const finalizeVersionMutation = useMutation<void, any, { id: string }>({
+    mutationFn: async ({ id }) => {
+      await callRouteWithParams("versions/finalize", { id });
+    },
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<ProjectVersion[]>(queryKey);
+      queryClient.setQueryData<ProjectVersion[]>(queryKey, (old) =>
+        (old ?? []).map((v) => (v.id === id ? { ...v, is_final: true } : v)),
+      );
+      return { previous };
+    },
+    onError: (err: any, _vars, context: any) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKey, context.previous);
+      }
+      handleError(err);
+    },
+    onSuccess: () => {
+      toast.success(t("success_finalized"));
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
   return {
     versions,
     isLoadingVersions,
@@ -93,5 +130,7 @@ export function useProjectVersions(projectId: string) {
     isCreatingVersion: createVersionMutation.isPending,
     deleteVersion: deleteVersionMutation.mutateAsync,
     isDeletingVersion: deleteVersionMutation.isPending,
+    finalizeVersion: finalizeVersionMutation.mutateAsync,
+    isFinalizingVersion: finalizeVersionMutation.isPending,
   };
 }
