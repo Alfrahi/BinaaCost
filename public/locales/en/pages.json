@@ -36,7 +36,13 @@
     "overwriteExisting": "Overwrite Existing",
     "warning_no_data": "No valid data found to import.",
     "success_import": "Successfully imported {{count}} items.",
-    "requiredHeaders": "CSV file is missing required headers: {{headers}}"
+    "requiredHeaders": "CSV file is missing required headers: {{headers}}",
+    "requiredColumnsInfo": "Required columns: {{columns}}",
+    "mapInstructions": "Map each field to a CSV column.",
+    "selectCsvColumn": "Select CSV column",
+    "missingMapping": "Missing mapping for: {{fields}}",
+    "validationErrors": "{{count}} rows failed validation: {{details}}",
+    "mapCsvColumns": "Map CSV Columns"
   },
   "analytics": {
     "title": "Analytics Dashboard",
