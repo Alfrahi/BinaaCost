@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   computeVersionCostSummary,
   computeVersionDelta,
+  computeVersionComparison,
+  getVersionFinancialSettings,
 } from "@/logic/versionCosts";
 
 describe("computeVersionCostSummary", () => {
@@ -96,5 +98,92 @@ describe("computeVersionDelta", () => {
       directTotal: 150,
     };
     expect(computeVersionDelta(prev, next).directTotal).toBe(-50);
+  });
+});
+
+describe("getVersionFinancialSettings", () => {
+  it("reads settings from the snapshot project", () => {
+    const settings = getVersionFinancialSettings({
+      project: {
+        financial_settings: {
+          overhead_percent: 12,
+          markup_percent: 25,
+          tax_percent: 5,
+          contingency_percent: 8,
+        },
+      },
+    });
+    expect(settings).toEqual({
+      overhead_percent: 12,
+      markup_percent: 25,
+      tax_percent: 5,
+      contingency_percent: 8,
+    });
+  });
+
+  it("falls back to defaults when settings are missing", () => {
+    const settings = getVersionFinancialSettings({});
+    expect(settings).toEqual({
+      overhead_percent: 10,
+      markup_percent: 20,
+      tax_percent: 0,
+      contingency_percent: 5,
+    });
+  });
+});
+
+describe("computeVersionComparison", () => {
+  const snapshotA = {
+    project: {
+      financial_settings: {
+        overhead_percent: 10,
+        markup_percent: 20,
+        tax_percent: 0,
+        contingency_percent: 5,
+      },
+    },
+    materials: [{ quantity: 10, unit_price: 5 }], // 50
+    labor_items: [],
+    equipment_items: [],
+    additional_costs: [],
+  };
+  const snapshotB = {
+    project: {
+      financial_settings: {
+        overhead_percent: 10,
+        markup_percent: 20,
+        tax_percent: 0,
+        contingency_percent: 5,
+      },
+    },
+    materials: [{ quantity: 20, unit_price: 5 }], // 100
+    labor_items: [],
+    equipment_items: [],
+    additional_costs: [],
+  };
+
+  it("computes category totals, grand totals, and deltas (B minus A)", () => {
+    const result = computeVersionComparison(snapshotA, snapshotB);
+    expect(result.a.summary.directTotal).toBe(50);
+    expect(result.b.summary.directTotal).toBe(100);
+    expect(result.deltas.materials).toBe(50);
+    expect(result.deltas.directTotal).toBe(50);
+    // grand total A: direct 50 → overhead 5, contingency 2.5, prime 57.5,
+    // markup 11.5, bid 69, tax 0 → 69. B: direct 100 → 138.
+    expect(result.a.financials.grandTotal).toBe(69);
+    expect(result.b.financials.grandTotal).toBe(138);
+    expect(result.deltas.grandTotal).toBe(69);
+  });
+
+  it("produces negative deltas when B is lower", () => {
+    const result = computeVersionComparison(snapshotB, snapshotA);
+    expect(result.deltas.materials).toBe(-50);
+    expect(result.deltas.grandTotal).toBe(-69);
+  });
+
+  it("exposes each version's financial assumptions", () => {
+    const result = computeVersionComparison(snapshotA, snapshotB);
+    expect(result.a.settings.overhead_percent).toBe(10);
+    expect(result.b.settings.markup_percent).toBe(20);
   });
 });
