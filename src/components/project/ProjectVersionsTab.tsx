@@ -2,6 +2,14 @@ import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/project/useProjectData";
@@ -16,6 +24,7 @@ import {
   RotateCcw,
   Lock,
   Plus,
+  GitCompareArrows,
 } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -26,6 +35,7 @@ import {
   computeVersionCostSummary,
   computeVersionDelta,
 } from "@/logic/versionCosts";
+import VersionComparison from "./VersionComparison";
 import { cn } from "@/lib/utils";
 
 export default function ProjectVersionsTab({
@@ -86,6 +96,10 @@ export default function ProjectVersionsTab({
   const [versionToFinalize, setVersionToFinalize] = useState<
     ProjectVersion | null
   >(null);
+
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareAId, setCompareAId] = useState<string>("");
+  const [compareBId, setCompareBId] = useState<string>("");
 
   const handleCreateVersion = useCallback(async () => {
     if (!newVersionName.trim()) return;
@@ -275,6 +289,84 @@ export default function ProjectVersionsTab({
     );
   }
 
+  if (compareOpen) {
+    const versionA = versions.find((v) => v.id === compareAId) || null;
+    const versionB = versions.find((v) => v.id === compareBId) || null;
+    return (
+      <Card className="p-4 sm:p-6 border-2 border-border shadow-md text-sm">
+        <div className="flex items-center justify-between mb-4 border-b pb-4">
+          <div>
+            <h3 className="text-lg font-bold text-text-primary">
+              {t("compareTitle")}
+            </h3>
+            <p className="text-sm text-text-secondary">
+              {t("compareDescription")}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCompareOpen(false)}
+            aria-label={t("common:close")}
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="space-y-1">
+            <Label className="text-sm">{t("compareVersionA")}</Label>
+            <Select
+              value={compareAId}
+              onValueChange={setCompareAId}
+              disabled={isLoadingVersions}
+            >
+              <SelectTrigger className="w-full text-sm">
+                <SelectValue placeholder={t("select")} />
+              </SelectTrigger>
+              <SelectContent>
+                {versions.map((v) => (
+                  <SelectItem key={v.id} value={v.id} className="text-sm">
+                    {v.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-sm">{t("compareVersionB")}</Label>
+            <Select
+              value={compareBId}
+              onValueChange={setCompareBId}
+              disabled={isLoadingVersions}
+            >
+              <SelectTrigger className="w-full text-sm">
+                <SelectValue placeholder={t("select")} />
+              </SelectTrigger>
+              <SelectContent>
+                {versions.map((v) => (
+                  <SelectItem key={v.id} value={v.id} className="text-sm">
+                    {v.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        {versionA && versionB ? (
+          <VersionComparison
+            versionA={versionA}
+            versionB={versionB}
+            currency={currency}
+          />
+        ) : (
+          <p className="text-center text-muted-foreground py-8 text-sm">
+            {t("compareSelectBoth")}
+          </p>
+        )}
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6 text-sm">
       {canEdit && (
@@ -312,7 +404,25 @@ export default function ProjectVersionsTab({
       )}
 
       <Card className="p-4 space-y-4">
-        <h3 className="font-semibold text-lg">{t("restore")}</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-lg">{t("restore")}</h3>
+          {timeline.length >= 2 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setCompareAId(versions[0]?.id || "");
+                setCompareBId(versions[1]?.id || "");
+                setCompareOpen(true);
+              }}
+              className="h-9 text-sm"
+              aria-label={t("compare")}
+            >
+              <GitCompareArrows className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("compare")}
+            </Button>
+          )}
+        </div>
         {isLoadingVersions ? (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="w-6 h-6 animate-spin" />
