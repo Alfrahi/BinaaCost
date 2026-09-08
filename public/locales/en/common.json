@@ -100,6 +100,7 @@
   "goToHomepage": "Go to Homepage",
   "selected": "selected",
   "importing": "Importing...",
+  "importCsv": "Import from CSV",
   "selectOption": "Select an option",
   "warning": "Warning",
   "back": "Back",

@@ -1,0 +1,104 @@
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { z } from "zod";
+import { QuickAddRow } from "../QuickAddRow";
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key.split(":").pop(),
+    i18n: { language: "en", dir: () => "ltr" },
+  }),
+}));
+
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+  quantity: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number().min(0.01, "Quantity must be greater than 0"),
+  ),
+  unit_price: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number().min(0.01, "Unit price must be greater than 0"),
+  ),
+});
+
+const fields = [
+  { key: "name", label: "Name" },
+  { key: "quantity", label: "Quantity", type: "number" },
+  { key: "unit_price", label: "Unit Price", type: "number" },
+];
+
+const buildValues = (raw: Record<string, string>) => ({
+  name: raw.name,
+  quantity: Number(raw.quantity),
+  unit_price: Number(raw.unit_price),
+});
+
+function renderRow(onSubmit = vi.fn()) {
+  render(
+    <QuickAddRow
+      fields={fields}
+      schema={schema}
+      buildValues={buildValues}
+      onSubmit={onSubmit}
+      submitLabel="Add"
+      ariaLabel="Add item"
+    />,
+  );
+  return {
+    nameInput: screen.getByLabelText("Name"),
+    qtyInput: screen.getByLabelText("Quantity"),
+    priceInput: screen.getByLabelText("Unit Price"),
+    onSubmit,
+  };
+}
+
+describe("QuickAddRow", () => {
+  it("submits on Enter with validated values, clears fields, and refocuses the first field", async () => {
+    const { nameInput, qtyInput, priceInput, onSubmit } = renderRow();
+
+    fireEvent.change(nameInput, { target: { value: "Concrete" } });
+    fireEvent.change(qtyInput, { target: { value: "10" } });
+    fireEvent.change(priceInput, { target: { value: "5.5" } });
+
+    fireEvent.keyDown(nameInput, { key: "Enter" });
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit).toHaveBeenCalledWith({
+      name: "Concrete",
+      quantity: 10,
+      unit_price: 5.5,
+    });
+
+    // Fields cleared and focus returned to the first field for the next item.
+    expect(nameInput.value).toBe("");
+    expect(qtyInput.value).toBe("");
+    expect(priceInput.value).toBe("");
+    expect(document.activeElement).toBe(nameInput);
+  });
+
+  it("shows an inline error and does not submit on invalid input", async () => {
+    const { qtyInput, onSubmit } = renderRow();
+
+    // name left empty → schema fails
+    fireEvent.change(qtyInput, { target: { value: "10" } });
+    fireEvent.keyDown(qtyInput, { key: "Enter" });
+
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toBeTruthy(),
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("clears the row on Escape", () => {
+    const { nameInput, qtyInput } = renderRow();
+
+    fireEvent.change(nameInput, { target: { value: "Concrete" } });
+    fireEvent.change(qtyInput, { target: { value: "10" } });
+
+    fireEvent.keyDown(nameInput, { key: "Escape" });
+
+    expect(nameInput.value).toBe("");
+    expect(qtyInput.value).toBe("");
+  });
+});

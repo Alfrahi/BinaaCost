@@ -8,6 +8,7 @@ import {
   MessageSquare,
   Edit2,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,9 +30,14 @@ import { BulkActionBar } from "@/components/BulkActionBar";
 import { safeAdd } from "@/utils/math";
 import { PaginationControls } from "@/components/PaginationControls";
 import { AdditionalCostForm } from "./AdditionalCostForm";
+import { QuickAddRow } from "./QuickAddRow";
+import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { AdditionalCostItem } from "@/types/project-items";
 import { useProjectAdditionalCosts } from "@/hooks/useProjectAdditionalCosts";
-import { AdditionalCostFormValues } from "@/types/schemas";
+import {
+  AdditionalCostFormValues,
+  additionalCostSchema,
+} from "@/types/schemas";
 
 const PAGE_SIZE = 50;
 
@@ -170,6 +176,7 @@ export function AdditionalCostsTable({
   const [deleteTarget, setDeleteTarget] = useState<AdditionalCostItem | null>(
     null,
   );
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -262,19 +269,64 @@ export function AdditionalCostsTable({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="text-lg font-semibold">{t("title")}</h2>
         {canEdit && !isFormOpen && (
-          <Button
-            onClick={() => openForm(null)}
-            size="sm"
-            aria-label={t("add")}
-            className="text-sm"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCsvImport(true)}
+              className="h-11 text-sm"
+              aria-label={t("common:importCsv")}
+            >
+              <Upload className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("common:importCsv")}
+            </Button>
+            <Button
+              onClick={() => openForm(null)}
+              className="h-11 text-sm"
+              aria-label={t("add")}
+            >
+              <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("add")}
+            </Button>
+          </div>
         )}
       </div>
+      {canEdit && !isFormOpen && (
+        <QuickAddRow
+          className="mb-4"
+          fields={[
+            {
+              key: "category",
+              label: t("columns.category"),
+              type: "select",
+              defaultValue: additionalCategories[0]?.value || "",
+              options: additionalCategories,
+            },
+            {
+              key: "amount",
+              label: `${t("columns.amount")} (${currency})`,
+              type: "number",
+              placeholder: t("columns.amountPlaceholder"),
+            },
+          ]}
+          schema={additionalCostSchema}
+          buildValues={(raw) => ({
+            category: raw.category,
+            amount: Number(raw.amount),
+            group_id: "ungrouped",
+          })}
+          onSubmit={(values) =>
+            handleAddOrUpdateAdditionalCost(
+              values as AdditionalCostFormValues,
+            )
+          }
+          isSubmitting={isAddingAdditionalCost}
+          submitLabel={t("add")}
+          ariaLabel={t("add")}
+        />
+      )}
       {isFormOpen && (
         <Card className="p-4 mb-4">
           <h3 className="text-lg font-semibold mb-4">
@@ -443,6 +495,14 @@ export function AdditionalCostsTable({
             Array.from(selection.selectedIds),
             groupId,
           )
+        }
+      />
+      <ProjectCsvImportDialog
+        open={showCsvImport}
+        onOpenChange={setShowCsvImport}
+        itemType="additional"
+        onImport={(values) =>
+          handleAddOrUpdateAdditionalCost(values as AdditionalCostFormValues)
         }
       />
     </div>

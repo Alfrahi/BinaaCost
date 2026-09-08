@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Layers, Trash } from "lucide-react";
+import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,7 +22,9 @@ import { safeAdd } from "@/utils/math";
 import { PaginationControls } from "@/components/PaginationControls";
 import { EquipmentRow } from "./EquipmentRow";
 import { EquipmentForm } from "./EquipmentForm";
-import { EquipmentFormValues } from "@/types/schemas";
+import { QuickAddRow } from "./QuickAddRow";
+import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
+import { equipmentSchema, EquipmentFormValues } from "@/types/schemas";
 import { EquipmentItem } from "@/types/project-items";
 import { useProjectEquipment } from "@/hooks/useProjectEquipment";
 
@@ -61,6 +63,7 @@ export default function EquipmentTable({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<EquipmentItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EquipmentItem | null>(null);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -151,19 +154,72 @@ export default function EquipmentTable({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="text-lg font-semibold">{t("title")}</h2>
         {canEdit && !isFormOpen && (
-          <Button
-            onClick={() => openForm(null)}
-            size="sm"
-            aria-label={t("add")}
-            className="text-sm"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCsvImport(true)}
+              className="h-11 text-sm"
+              aria-label={t("common:importCsv")}
+            >
+              <Upload className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("common:importCsv")}
+            </Button>
+            <Button
+              onClick={() => openForm(null)}
+              className="h-11 text-sm"
+              aria-label={t("add")}
+            >
+              <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("add")}
+            </Button>
+          </div>
         )}
       </div>
+      {canEdit && !isFormOpen && (
+        <QuickAddRow
+          className="mb-4"
+          fields={[
+            {
+              key: "name",
+              label: t("columns.name"),
+              placeholder: t("columns.namePlaceholder"),
+            },
+            {
+              key: "quantity",
+              label: t("columns.quantity"),
+              type: "number",
+              placeholder: t("columns.quantityPlaceholder"),
+            },
+            {
+              key: "cost_per_period",
+              label: `${t("columns.costPerPeriod")} (${currency})`,
+              type: "number",
+              placeholder: t("columns.costPerPeriodPlaceholder"),
+            },
+          ]}
+          schema={equipmentSchema}
+          buildValues={(raw) => ({
+            name: raw.name,
+            quantity: Number(raw.quantity),
+            cost_per_period: Number(raw.cost_per_period),
+            rental_or_purchase: rentalOptions[0]?.value || "Rental",
+            period_unit: periodUnits[0]?.value || "Day",
+            usage_duration: 1,
+            maintenance_cost: 0,
+            fuel_cost: 0,
+            group_id: "ungrouped",
+          })}
+          onSubmit={(values) =>
+            handleAddOrUpdateEquipment(values as EquipmentFormValues, currency)
+          }
+          isSubmitting={isAddingEquipment}
+          submitLabel={t("add")}
+          ariaLabel={t("add")}
+        />
+      )}
       {isFormOpen && (
         <Card className="p-4 mb-4">
           <h3 className="text-lg font-semibold mb-4">
@@ -352,6 +408,14 @@ export default function EquipmentTable({
         loading={isBulkMovingEquipment}
         onConfirm={(groupId) =>
           handleBulkMoveEquipment(Array.from(selection.selectedIds), groupId)
+        }
+      />
+      <ProjectCsvImportDialog
+        open={showCsvImport}
+        onOpenChange={setShowCsvImport}
+        itemType="equipment"
+        onImport={(values) =>
+          handleAddOrUpdateEquipment(values as EquipmentFormValues, currency)
         }
       />
     </div>
