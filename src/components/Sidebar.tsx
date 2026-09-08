@@ -106,9 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         className={cn(
           "fixed inset-y-0 z-40 bg-card transform transition-all duration-200 ease-in-out",
           isMobile ? "w-64" : isCollapsed ? "w-20" : "w-64",
-          isRtl
-            ? "start-0 border-e border-border"
-            : "start-0 border-e border-border",
+          "start-0 border-e border-border",
           sidebarOpen
             ? "translate-x-0"
             : isRtl
@@ -256,12 +254,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               {isRtl ? (
                 isCollapsed ? (
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5" />
                 ) : (
                   <ChevronRight className="h-5 w-5 me-2" />
                 )
               ) : isCollapsed ? (
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5" />
               ) : (
                 <ChevronLeft className="h-5 w-5 me-2" />
               )}
