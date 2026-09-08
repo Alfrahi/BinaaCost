@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
 import { useTranslation } from "react-i18next";
-import { Menu, Bell, UserCircle } from "lucide-react";
+import { Menu, UserCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -74,10 +74,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
           {i18n.language === "en" ? "العربية" : "English"}
         </Button>
 
-        <Button variant="ghost" size="icon" className="h-12 w-12">
-          <Bell className="h-6 w-6" />
-          <span className="sr-only">{t("common:notifications")}</span>
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-12 w-12 rounded-full">
