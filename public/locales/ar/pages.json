@@ -36,7 +36,13 @@
     "overwriteExisting": "الكتابة فوق العناصر الموجودة",
     "warning_no_data": "لم يتم العثور على بيانات صالحة للاستيراد.",
     "success_import": "تم استيراد {{count}} عنصر بنجاح.",
-    "requiredHeaders": "ملف CSV يفتقد الرؤوس المطلوبة: {{headers}}"
+    "requiredHeaders": "ملف CSV يفتقد الرؤوس المطلوبة: {{headers}}",
+    "requiredColumnsInfo": "الأعمدة المطلوبة: {{columns}}",
+    "mapInstructions": "قم بتعيين كل حقل إلى عمود CSV.",
+    "selectCsvColumn": "اختر عمود CSV",
+    "missingMapping": "تعيين مفقود لـ: {{fields}}",
+    "validationErrors": "فشل التحقق من {{count}} صف: {{details}}",
+    "mapCsvColumns": "تعيين أعمدة CSV"
   },
   "analytics": {
     "title": "لوحة تحكم التحليلات",

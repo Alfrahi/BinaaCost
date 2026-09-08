@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Layers, Trash } from "lucide-react";
+import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,7 +22,9 @@ import { calculateItemCost } from "@/logic/shared";
 import { PaginationControls } from "@/components/PaginationControls";
 import { MaterialRow } from "./MaterialRow";
 import { MaterialForm } from "./MaterialForm";
-import { MaterialFormValues } from "@/types/schemas";
+import { QuickAddRow } from "./QuickAddRow";
+import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
+import { materialSchema, MaterialFormValues } from "@/types/schemas";
 import { MaterialItem } from "@/types/project-items";
 import { useProjectMaterials } from "@/hooks/useProjectMaterials";
 
@@ -57,6 +59,7 @@ export function MaterialsTable({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MaterialItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<MaterialItem | null>(null);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -154,19 +157,68 @@ export function MaterialsTable({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="text-lg font-semibold">{t("title")}</h2>
         {canEdit && !isFormOpen && (
-          <Button
-            onClick={() => openForm(null)}
-            size="sm"
-            aria-label={t("add")}
-            className="text-sm"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCsvImport(true)}
+              className="h-11 text-sm"
+              aria-label={t("common:importCsv")}
+            >
+              <Upload className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("common:importCsv")}
+            </Button>
+            <Button
+              onClick={() => openForm(null)}
+              className="h-11 text-sm"
+              aria-label={t("add")}
+            >
+              <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+              {t("add")}
+            </Button>
+          </div>
         )}
       </div>
+      {canEdit && !isFormOpen && (
+        <QuickAddRow
+          className="mb-4"
+          fields={[
+            {
+              key: "name",
+              label: t("columns.name"),
+              placeholder: t("columns.namePlaceholder"),
+            },
+            {
+              key: "quantity",
+              label: t("columns.quantity"),
+              type: "number",
+              placeholder: t("columns.quantityPlaceholder"),
+            },
+            {
+              key: "unit_price",
+              label: `${t("columns.unitPrice")} (${currency})`,
+              type: "number",
+              placeholder: t("columns.unitPricePlaceholder"),
+            },
+          ]}
+          schema={materialSchema}
+          buildValues={(raw) => ({
+            name: raw.name,
+            quantity: Number(raw.quantity),
+            unit: materialUnits[0]?.value || "",
+            unit_price: Number(raw.unit_price),
+            group_id: "ungrouped",
+          })}
+          onSubmit={(values) =>
+            handleAddOrUpdateMaterial(values as MaterialFormValues, currency)
+          }
+          isSubmitting={isAddingMaterial}
+          submitLabel={t("add")}
+          ariaLabel={t("add")}
+        />
+      )}
       {isFormOpen && (
         <div className="p-4 border rounded bg-card mb-4">
           <h3 className="text-lg font-semibold mb-4">
@@ -346,6 +398,14 @@ export function MaterialsTable({
         loading={isBulkMovingMaterials}
         onConfirm={(groupId) =>
           handleBulkMoveMaterials(Array.from(selection.selectedIds), groupId)
+        }
+      />
+      <ProjectCsvImportDialog
+        open={showCsvImport}
+        onOpenChange={setShowCsvImport}
+        itemType="materials"
+        onImport={(values) =>
+          handleAddOrUpdateMaterial(values as MaterialFormValues, currency)
         }
       />
     </div>
