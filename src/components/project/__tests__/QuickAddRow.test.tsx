@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { z } from "zod";
-import { QuickAddRow } from "../QuickAddRow";
+import { QuickAddRow, QuickAddField } from "../QuickAddRow";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -22,7 +22,7 @@ const schema = z.object({
   ),
 });
 
-const fields = [
+const fields: QuickAddField[] = [
   { key: "name", label: "Name" },
   { key: "quantity", label: "Quantity", type: "number" },
   { key: "unit_price", label: "Unit Price", type: "number" },
@@ -46,9 +46,9 @@ function renderRow(onSubmit = vi.fn()) {
     />,
   );
   return {
-    nameInput: screen.getByLabelText("Name"),
-    qtyInput: screen.getByLabelText("Quantity"),
-    priceInput: screen.getByLabelText("Unit Price"),
+    nameInput: screen.getByLabelText("Name") as HTMLInputElement,
+    qtyInput: screen.getByLabelText("Quantity") as HTMLInputElement,
+    priceInput: screen.getByLabelText("Unit Price") as HTMLInputElement,
     onSubmit,
   };
 }
