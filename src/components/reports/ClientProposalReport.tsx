@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
-import { enUS, arSA } from "date-fns/locale";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Separator } from "@/components/ui/separator";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { FinancialSummary } from "@/logic/financials";
@@ -30,7 +29,7 @@ export const ClientProposalReport = React.forwardRef<
     { project, financials, companyInfo, terms, preparedBy, clientName, versionStamp },
     ref,
   ) => {
-    const { t, i18n } = useTranslation([
+    const { t } = useTranslation([
       "project_reports",
       "project_detail",
       "common",
@@ -38,8 +37,7 @@ export const ClientProposalReport = React.forwardRef<
       "durations",
     ]);
     const { format: formatCurrency } = useCurrencyFormatter();
-
-    const currentLocale = i18n.language === "ar" ? arSA : enUS;
+    const { formatDate } = useDateFormatter();
 
     return (
       <div ref={ref} className="bg-background p-6 sm:p-8 lg:p-10 print:p-0">
@@ -111,7 +109,7 @@ export const ClientProposalReport = React.forwardRef<
             )}
             <p>
               <strong>{t("project_reports:date")}:</strong>{" "}
-              {format(new Date(), "PPP", { locale: currentLocale })}
+              {formatDate(new Date(), "long")}
             </p>
           </div>
         </div>

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { useTranslation } from "react-i18next";
 import {
   Loader2,
@@ -64,6 +64,7 @@ export default function CommentsDrawer({
   currentUserId,
 }: Props) {
   const { t, i18n } = useTranslation(["project_detail", "common"]);
+  const { formatDate } = useDateFormatter();
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -216,10 +217,7 @@ export default function CommentsDrawer({
                           {name}
                         </span>
                         <span className="text-xs text-text-secondary">
-                          {format(
-                            new Date(comment.created_at),
-                            "MMM d, h:mm a",
-                          )}
+                          {formatDate(comment.created_at, "dateTime")}
                         </span>
                       </div>
 
