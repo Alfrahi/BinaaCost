@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X, Loader2 } from "lucide-react";
@@ -51,6 +51,7 @@ const formatJsonForDisplay = (data: any) => {
 
 export default function AuditLogs() {
   const { t } = useTranslation(["admin", "common"]);
+  const { formatDate } = useDateFormatter();
   const [search, setSearch] = useState("");
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -181,7 +182,7 @@ export default function AuditLogs() {
                       )}
                     >
                       <TableCell className="whitespace-nowrap text-sm">
-                        {format(new Date(log.created_at), "MMM dd, yyyy HH:mm")}
+                        {formatDate(log.created_at, "dateTime")}
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
                         {sanitizeText(log.user_email) || log.user_id}

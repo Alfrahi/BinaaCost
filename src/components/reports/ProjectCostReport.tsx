@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
-import { enUS, arSA } from "date-fns/locale";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import {
   Table,
   TableHeader,
@@ -70,7 +69,7 @@ export const ProjectCostReport = React.forwardRef<
     },
     ref,
   ) => {
-    const { t, i18n } = useTranslation([
+    const { t } = useTranslation([
       "project_reports",
       "project_detail",
       "common",
@@ -90,7 +89,7 @@ export const ProjectCostReport = React.forwardRef<
       return options?.find((opt) => opt.value === value)?.label || value;
     };
 
-    const currentLocale = i18n.language === "ar" ? arSA : enUS;
+    const { formatDate } = useDateFormatter();
 
     const renderCostTable = (
       items: any[],
@@ -316,7 +315,7 @@ export const ProjectCostReport = React.forwardRef<
             )}
             <p>
               <strong>{t("project_reports:date")}:</strong>{" "}
-              {format(new Date(), "PPP", { locale: currentLocale })}
+              {formatDate(new Date(), "long")}
             </p>
           </div>
         </div>

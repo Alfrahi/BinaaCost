@@ -21,10 +21,12 @@ import { RoleBadge } from "@/components/RoleBadge";
 import { Loader2, X } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { useAdminSubscriptionManagement } from "@/hooks/useAdminSubscriptionManagement";
 
 export default function SubscriptionManagement() {
   const { t } = useTranslation(["admin", "common"]);
+  const { formatDate } = useDateFormatter();
   const {
     search,
     setSearch,
@@ -186,10 +188,7 @@ export default function SubscriptionManagement() {
                             className="w-[150px] text-sm"
                           />
                         ) : user.subscription_expires_at ? (
-                          format(
-                            new Date(user.subscription_expires_at),
-                            "MMM dd, yyyy",
-                          )
+                          formatDate(user.subscription_expires_at, "short")
                         ) : (
                           t("admin:subscriptionManagement.never")
                         )}

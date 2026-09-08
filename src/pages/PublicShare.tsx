@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { calculateProjectFinancials } from "@/logic/financials";
 import { calculateItemCost } from "@/logic/shared";
-import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { ProjectCostReport } from "@/components/reports/ProjectCostReport";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import {
@@ -34,6 +34,7 @@ export default function PublicShare() {
   const [authError, setAuthError] = useState<string | null>(null);
 
   const { format: _formatCurrency } = useCurrencyFormatter();
+  const { formatDate } = useDateFormatter();
 
   const { options: materialUnits } = useSettingsOptions("material_unit");
   const { options: periodUnits } = useSettingsOptions("equipment_period_unit");
@@ -272,7 +273,7 @@ export default function PublicShare() {
           {expires_at && (
             <p className="text-muted-foreground mt-2">
               {t("public_share:linkExpires")}:{" "}
-              {format(new Date(expires_at), "MMM dd, yyyy HH:mm")}
+              {formatDate(expires_at, "dateTime")}
             </p>
           )}
         </CardContent>

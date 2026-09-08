@@ -3,7 +3,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format } from "date-fns";
+import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Loader2, Calendar, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RoleBadge } from "@/components/RoleBadge";
@@ -36,6 +36,7 @@ const formatJsonForDisplay = (data: any) => {
 
 export default function UserDetails() {
   const { t } = useTranslation(["admin", "common"]);
+  const { formatDate } = useDateFormatter();
   const { userId } = useParams();
   const { useQuery: useOfflineQuery } = useOfflinePb();
 
@@ -151,7 +152,7 @@ export default function UserDetails() {
                 <Calendar className="w-4 h-4" />
                 <span>
                   {t("admin:users.accountCreated")}:{" "}
-                  {format(new Date(user.created_at), "MMM dd, yyyy")}
+                  {formatDate(user.created_at, "short")}
                 </span>
               </div>
 
@@ -160,10 +161,7 @@ export default function UserDetails() {
                 <span>
                   {t("admin:users.lastSignIn")}:{" "}
                   {user.last_sign_in_at
-                    ? format(
-                        new Date(user.last_sign_in_at),
-                        "MMM dd, yyyy HH:mm",
-                      )
+                    ? formatDate(user.last_sign_in_at, "dateTime")
                     : t("admin:users.never")}
                 </span>
               </div>
@@ -215,18 +213,12 @@ export default function UserDetails() {
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {t("admin:users.createdAt")}:{" "}
-                            {format(
-                              new Date(project.created_at),
-                              "MMM dd, yyyy",
-                            )}
+                            {formatDate(project.created_at, "short")}
                           </div>
                           {project.deleted_at && (
                             <div className="text-destructive text-sm">
                               {t("admin:users.deletedAt")}:{" "}
-                              {format(
-                                new Date(project.deleted_at),
-                                "MMM dd, yyyy",
-                              )}
+                              {formatDate(project.deleted_at, "short")}
                             </div>
                           )}
                         </Link>
@@ -278,10 +270,7 @@ export default function UserDetails() {
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {log.table_name} •{" "}
-                              {format(
-                                new Date(log.created_at),
-                                "MMM dd, yyyy HH:mm",
-                              )}
+                              {formatDate(log.created_at, "dateTime")}
                             </div>
                           </div>
                         </div>
