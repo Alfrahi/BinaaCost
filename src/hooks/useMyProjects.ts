@@ -11,7 +11,10 @@ interface MyProjectData {
   name: string;
   description: string | null;
   created_at: string;
+  updated_at: string;
   user_id: string;
+  financial_settings: Record<string, number> | null;
+  currency: string;
 }
 
 interface MyProjectsResponse {
@@ -50,7 +53,10 @@ export function useMyProjects(globalSearchTerm: string) {
         });
 
       return {
-        data: mapRecords<MyProjectData>(result.items),
+        data: mapRecords<MyProjectData>(result.items).map((p) => ({
+          ...p,
+          updated_at: (p as any).updated,
+        })),
         count: result.totalItems,
       };
     },
