@@ -264,8 +264,8 @@ export function AdditionalCostsTable({
   }, [displayRows, currentPage]);
 
   const headerClass =
-    "text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 h-10";
-  const footerClass = "font-bold text-gray-900 bg-gray-50 h-10";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
+  const footerClass = "font-bold text-foreground bg-muted h-10";
 
   return (
     <div>
@@ -377,11 +377,11 @@ export function AdditionalCostsTable({
                 return (
                   <TableRow
                     key={`header-${row.data.id}`}
-                    className="bg-gray-100 hover:bg-gray-100"
+                    className="bg-muted hover:bg-muted"
                   >
                     <TableCell
                       colSpan={canEdit ? 5 : 4}
-                      className="font-semibold text-gray-700 text-sm"
+                      className="font-semibold text-foreground text-sm"
                     >
                       {row.data.name}
                     </TableCell>

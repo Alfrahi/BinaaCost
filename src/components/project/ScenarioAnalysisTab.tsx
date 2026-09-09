@@ -522,24 +522,24 @@ export function ScenarioAnalysisTab({
                 {t("financialSummary")}
               </h4>
               <div className="overflow-x-auto border rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("category")}
                       </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("original")}
                       </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("simulated")}
                       </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("difference")}
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+                  <tbody className="bg-card divide-y divide-border">
                     {[
                       {
                         label: t("project_tabs:materials"),
@@ -620,7 +620,7 @@ export function ScenarioAnalysisTab({
                         className={cn(
                           row.isPrimary
                             ? "bg-muted"
-                            : row.isBold && "bg-gray-100",
+                            : row.isBold && "bg-muted",
                           row.isPrimary
                             ? "font-bold text-primary"
                             : row.isBold && "font-semibold",
@@ -709,17 +709,17 @@ export function ScenarioAnalysisTab({
               </p>
             ) : (
               <ScrollArea className="h-64 border rounded-lg">
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {scenarios.map((s) => (
                     <div
                       key={s.id}
-                      className="flex items-center justify-between p-3 hover:bg-gray-50"
+                      className="flex items-center justify-between p-3 hover:bg-muted"
                     >
                       <div>
                         <div className="font-medium text-sm">
                           {s.name} {s.is_public && `(${t("public")})`}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-muted-foreground">
                           {s.description || t("common:noDescription")}
                         </div>
                       </div>
@@ -809,7 +809,7 @@ export function ScenarioAnalysisTab({
                 type="checkbox"
                 id="is_public"
                 {...scenarioForm.register("is_public")}
-                className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                className="h-4 w-4 text-primary border-input rounded focus:ring-primary"
               />
               <Label htmlFor="is_public" className="text-sm">
                 {t("makePublic")}
@@ -831,7 +831,7 @@ export function ScenarioAnalysisTab({
                 {t(scenarioForm.formState.errors.impact_rules.message!)}
               </p>
             )}
-            <div className="space-y-4 border p-3 rounded-md bg-gray-50">
+            <div className="space-y-4 border p-3 rounded-md bg-muted">
               {scenarioForm.watch("impact_rules").map((rule, index) => (
                 <Card key={index} className="p-3 space-y-3 relative">
                   <Button

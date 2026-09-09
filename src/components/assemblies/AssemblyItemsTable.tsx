@@ -68,7 +68,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
 
   if (items.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-gray-500">
+      <div className="p-4 text-center text-sm text-muted-foreground">
         {t("common:noItems")}
       </div>
     );
@@ -79,19 +79,19 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[100px]">
+            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[100px]">
               {t("common:type")}
             </TableHead>
-            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[200px]">
+            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[200px]">
               {t("common:description")}
             </TableHead>
-            <TableHead className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+            <TableHead className="px-4 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider min-w-[150px]">
               {t("common:quantity")}
             </TableHead>
-            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[120px]">
+            <TableHead className="px-4 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[120px]">
               {t("common:price")}
             </TableHead>
-            <TableHead className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[100px]">
+            <TableHead className="px-4 py-2 text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[100px]">
               {t("common:actions")}
             </TableHead>
           </TableRow>
@@ -109,7 +109,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                   {item.item_type === "additional" &&
                     itemDetails &&
                     "category" in itemDetails && (
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted-foreground">
                         {additionalCategories.find(
                           (c) => c.value === itemDetails.category,
                         )?.label || itemDetails.category}

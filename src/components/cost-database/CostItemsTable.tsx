@@ -140,7 +140,7 @@ export default function CostItemsTable({
   }
 
   const headerClass =
-    "text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 h-10 px-3 py-2";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
