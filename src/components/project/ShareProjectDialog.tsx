@@ -8,6 +8,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Loader2, Trash2 } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
@@ -156,21 +164,21 @@ export default function ShareProjectDialog({
                 </p>
               ) : (
                 <div className="border rounded-lg overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-start">
                           {t("project_detail:share.user")}
-                        </th>
-                        <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </TableHead>
+                        <TableHead className="text-start">
                           {t("project_detail:share.role")}
-                        </th>
-                        <th className="px-4 py-2 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </TableHead>
+                        <TableHead className="text-end">
                           {t("common:actions")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-100">
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {internalShares.map((share) => (
                         <EditInternalShareRow
                           key={share.share_id}
@@ -183,8 +191,8 @@ export default function ShareProjectDialog({
                           onDelete={handleDeleteInternalShareConfirmation}
                         />
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </div>
@@ -209,35 +217,35 @@ export default function ShareProjectDialog({
               </p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-start">
                         {t("project_detail:share.external.link")}
-                      </th>
-                      <th className="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      </TableHead>
+                      <TableHead className="text-start">
                         {t("project_detail:share.external.expires")}
-                      </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      </TableHead>
+                      <TableHead className="text-end">
                         {t("common:actions")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {externalLinks.map((link) => (
-                      <tr key={link.id}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 italic">
+                      <TableRow key={link.id}>
+                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground italic">
                           {t("project_detail:share.external.linkHiddenNote")}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm text-foreground">
                           {formatDate(link.expires_at, "short")}
                           {new Date(link.expires_at) < new Date() && (
                             <span className="ms-2 text-red-500 text-xs">
                               ({t("project_detail:share.external.expired")})
                             </span>
                           )}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-end text-sm font-medium">
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-end text-sm font-medium">
                           <Button
                             variant="destructive"
                             size="icon"
@@ -246,11 +254,11 @@ export default function ShareProjectDialog({
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             )}
           </div>

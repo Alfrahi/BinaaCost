@@ -77,7 +77,7 @@ export function CostItemForm({
   }, [initialData, form]);
 
   return (
-    <div className="border rounded-lg p-4 bg-gray-50 space-y-3">
+    <div className="border rounded-lg p-4 bg-muted space-y-3">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-lg">
           {initialData ? t("common:edit") : t("pages:cost_databases.add")}

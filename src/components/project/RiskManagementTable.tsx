@@ -132,7 +132,7 @@ export default function RiskManagementTable({
   }, [riskProbabilities, form]);
 
   const headerClass =
-    "text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 h-10";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
 
   const totalContingency = useMemo(
     () => calculateCategoryTotal.risks(risks),

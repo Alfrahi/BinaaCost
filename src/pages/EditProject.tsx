@@ -26,7 +26,7 @@ export default function EditProject() {
 
   if (loading) {
     return (
-      <div className="text-gray-500 text-sm">{t("project_form:loading")}</div>
+      <div className="text-muted-foreground text-sm">{t("project_form:loading")}</div>
     );
   }
 

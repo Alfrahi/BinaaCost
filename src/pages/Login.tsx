@@ -308,7 +308,7 @@ export default function Login() {
         )}
 
         {!signupEnabled && !settingsError && (
-          <p className="text-center text-sm text-gray-500 mt-4">
+          <p className="text-center text-sm text-muted-foreground mt-4">
             {t("signupDisabled")}
           </p>
         )}

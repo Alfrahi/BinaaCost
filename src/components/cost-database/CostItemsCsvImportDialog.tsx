@@ -69,7 +69,7 @@ export default function CostItemsCsvImportDialog({
                 className="text-sm"
                 disabled={loading}
               />
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {t("pages:data_import.requiredColumnsInfo")}
               </p>
             </div>
@@ -77,7 +77,7 @@ export default function CostItemsCsvImportDialog({
 
           {step === "map" && (
             <div className="space-y-4">
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-foreground">
                 {t("pages:data_import.mapInstructions")}
               </p>
               {SCHEMA_FIELDS.map((schemaField) => (
