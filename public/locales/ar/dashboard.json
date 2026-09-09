@@ -9,5 +9,9 @@
   "viewProject": "عرض المشروع {{projectName}}",
   "viewSharedProject": "عرض المشروع المشترك {{projectName}}",
   "projects": "مشاريع",
-  "sharedBy": "تمت المشاركة بواسطة {{email}}"
+  "sharedBy": "تمت المشاركة بواسطة {{email}}",
+  "createFirstProject": "أنشئ مشروعك الأول",
+  "shared": "مشترك",
+  "finalized": "معتمد",
+  "noDate": "لا يوجد تاريخ"
 }

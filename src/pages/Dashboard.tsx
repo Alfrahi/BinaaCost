@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Heading } from "@/components/ui/heading";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { toast } from "sonner";
@@ -17,6 +16,7 @@ import { mapRecord, mapRecords } from "@/lib/pb-mapper";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { useMyProjects } from "@/hooks/useMyProjects";
 import { useSharedProjects } from "@/hooks/useSharedProjects";
+import { ProjectCard } from "@/components/project/ProjectCard";
 
 export default function Dashboard() {
   const { t } = useTranslation(["dashboard", "common"]);
@@ -130,28 +130,29 @@ export default function Dashboard() {
               ))}
             </div>
           ) : myProjects?.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              {t("dashboard:noProjects")}
+            <div className="text-center py-8 space-y-3">
+              <p className="text-muted-foreground text-sm">
+                {t("dashboard:noProjects")}
+              </p>
+              <Button asChild className="text-sm">
+                <Link to="/projects/new">
+                  <Plus className={cn("w-4 h-4", getIconMarginClass())} />
+                  {t("dashboard:createFirstProject")}
+                </Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
               {myProjects?.map((project) => (
-                <motion.div
+                <ProjectCard
                   key={project.id}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="block p-3 border border-border rounded-lg hover:bg-muted transition-colors"
-                    onMouseEnter={() => prefetchProjectData(project.id)}
-                  >
-                    <div className="font-medium text-sm">{project.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(project.created_at).toLocaleDateString()}
-                    </div>
-                  </Link>
-                </motion.div>
+                  id={project.id}
+                  name={project.name}
+                  updatedAt={project.updated_at}
+                  currency={project.currency}
+                  financialSettings={project.financial_settings}
+                  onPrefetch={prefetchProjectData}
+                />
               ))}
             </div>
           )}
@@ -188,22 +189,18 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-3">
               {sharedProjects?.map((project) => (
-                <motion.div
+                <ProjectCard
                   key={project.id}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="block p-3 border border-border rounded-lg hover:bg-muted transition-colors"
-                    onMouseEnter={() => prefetchProjectData(project.id)}
-                  >
-                    <div className="font-medium text-sm">{project.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {t("dashboard:sharedBy", { email: project.owner_email })}
-                    </div>
-                  </Link>
-                </motion.div>
+                  id={project.id}
+                  name={project.name}
+                  updatedAt={project.updated_at}
+                  currency={project.currency}
+                  financialSettings={project.financial_settings}
+                  isShared
+                  sharedBy={project.owner_email}
+                  sharedRole={project.shared_role}
+                  onPrefetch={prefetchProjectData}
+                />
               ))}
             </div>
           )}

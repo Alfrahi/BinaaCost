@@ -11,9 +11,12 @@ interface SharedProjectData {
   name: string;
   description: string | null;
   created_at: string;
+  updated_at: string;
   user_id: string;
   owner_email?: string;
   shared_role?: string;
+  financial_settings: Record<string, number> | null;
+  currency: string;
 }
 
 interface SharedProjectsResponse {
@@ -66,9 +69,12 @@ export function useSharedProjects(globalSearchTerm: string) {
           name: project.name,
           description: project.description,
           created_at: project.created,
+          updated_at: project.updated,
           user_id: project.user_id,
           owner_email: owners.get(project.user_id)?.email,
           shared_role: share.role,
+          financial_settings: project.financial_settings,
+          currency: project.currency,
         });
       }
 
