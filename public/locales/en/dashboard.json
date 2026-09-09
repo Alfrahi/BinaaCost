@@ -9,5 +9,9 @@
   "viewProject": "View project {{projectName}}",
   "viewSharedProject": "View shared project {{projectName}}",
   "projects": "projects",
-  "sharedBy": "Shared by {{email}}"
+  "sharedBy": "Shared by {{email}}",
+  "createFirstProject": "Create your first project",
+  "shared": "Shared",
+  "finalized": "Finalized",
+  "noDate": "No date"
 }
