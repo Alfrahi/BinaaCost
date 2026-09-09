@@ -2,6 +2,14 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, Plus, Minus, Pencil, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -544,8 +552,8 @@ export default function VersionConflictResolver({
       : "";
 
     return (
-      <tr key={item.id} className="border-b last:border-b-0">
-        <td className="p-2 text-sm">
+      <TableRow key={item.id}>
+        <TableCell className="p-2 text-sm">
           <div className="flex items-center gap-2">
             {status === "version_only" && (
               <Checkbox
@@ -598,9 +606,9 @@ export default function VersionConflictResolver({
               {currentDisplay}
             </span>
           </div>
-        </td>
-        <td className="p-2 text-sm text-muted-foreground">{currentDetails}</td>
-        <td className="p-2 text-sm">
+        </TableCell>
+        <TableCell className="p-2 text-sm text-muted-foreground">{currentDetails}</TableCell>
+        <TableCell className="p-2 text-sm">
           {status === "version_only" && (
             <div className="flex items-center gap-2 text-green-600">
               <Plus className="w-4 h-4" /> {t("project_versions:status_added")}
@@ -618,8 +626,8 @@ export default function VersionConflictResolver({
               {t("project_versions:status_modified")}
             </div>
           )}
-        </td>
-        <td className="p-2 text-sm text-muted-foreground">
+        </TableCell>
+        <TableCell className="p-2 text-sm text-muted-foreground">
           {status === "modified" && (
             <span className={cn(isUpdated && "text-primary font-medium")}>
               {versionDetails}
@@ -630,8 +638,8 @@ export default function VersionConflictResolver({
               {versionDetails}
             </span>
           )}
-        </td>
-      </tr>
+        </TableCell>
+      </TableRow>
     );
   };
 
@@ -672,29 +680,29 @@ export default function VersionConflictResolver({
           </p>
         ) : (
           <div className="overflow-x-auto border rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-2 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/4 text-start">
                     {t("project_versions:currentProject")}
-                  </th>
-                  <th className="px-2 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                  </TableHead>
+                  <TableHead className="w-1/4 text-start">
                     {t("project_versions:currentDetails")}
-                  </th>
-                  <th className="px-2 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                  </TableHead>
+                  <TableHead className="w-1/4 text-start">
                     {t("project_versions:changeType")}
-                  </th>
-                  <th className="px-2 py-2 text-start text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                  </TableHead>
+                  <TableHead className="w-1/4 text-start">
                     {t("project_versions:versionDetails")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {allItems.map(({ item, versionItem, status }) =>
                   renderItemRow(item, category, status, versionItem),
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>

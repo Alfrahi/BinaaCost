@@ -113,21 +113,21 @@ export default function LocationAdjustmentsManager({
             )}
           </div>
           <div className="border rounded-lg overflow-hidden">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
+            <table className="min-w-full bg-card">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("cost_databases.city")}
                   </th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("cost_databases.multiplier")}
                   </th>
-                  <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("common:actions")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {isLoading ? (
                   <tr>
                     <td colSpan={3} className="text-center py-4">
@@ -142,17 +142,17 @@ export default function LocationAdjustmentsManager({
                   </tr>
                 ) : locations.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="text-center py-4 text-gray-500">
+                    <td colSpan={3} className="text-center py-4 text-muted-foreground">
                       {t("cost_databases.noLocationAdjustments")}
                     </td>
                   </tr>
                 ) : (
                   locations.map((location) => (
                     <tr key={location.id}>
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
                         {location.city}
                       </td>
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
                         {location.multiplier}
                       </td>
                       <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
@@ -208,7 +208,7 @@ export default function LocationAdjustmentsManager({
           </AlertDialog>
         </>
       ) : (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-muted-foreground">
           {t("cost_databases.selectDatabaseToManageLocations")}
         </p>
       )}
@@ -254,7 +254,7 @@ function LocationForm({
       <div>
         <Label
           htmlFor="city"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-foreground"
         >
           {t("cost_databases.city")}
         </Label>
@@ -271,7 +271,7 @@ function LocationForm({
       <div>
         <Label
           htmlFor="multiplier"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-foreground"
         >
           {t("cost_databases.multiplier")}
         </Label>

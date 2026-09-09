@@ -24,7 +24,11 @@ export default {
           DEFAULT: "#333333",
           foreground: "#FFFFFF",
         },
-        success: "#333333",
+        success: {
+          // green-700 — passes WCAG 4.5:1 as text on the light background.
+          DEFAULT: "#15803D",
+          foreground: "#FFFFFF",
+        },
         danger: "#EF4444",
         destructive: {
           DEFAULT: "#EF4444",

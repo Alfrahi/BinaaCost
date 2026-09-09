@@ -134,7 +134,7 @@ export default function SubscriptionManagement() {
                         <div className="font-medium text-sm">
                           {user.first_name} {user.last_name}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-muted-foreground">
                           {user.email}
                         </div>
                       </TableCell>

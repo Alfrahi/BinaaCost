@@ -163,7 +163,7 @@ export default function AssemblyImporter({
         </div>
         {selectedAssemblyId && (
           <div className="border rounded-md bg-card">
-            <div className="bg-gray-50 px-4 py-2 border-b">
+            <div className="bg-muted px-4 py-2 border-b">
               <span className="text-sm font-medium">
                 {t("project_detail:assembly_importer.itemsInAssembly")} (
                 {assemblyItems.length})
@@ -180,7 +180,7 @@ export default function AssemblyImporter({
                   {t("common:noItems")}
                 </div>
               ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-border">
                   {assemblyItems.map((item) => (
                     <li key={item.id} className="px-4 py-2 text-sm">
                       <span className="font-medium capitalize">

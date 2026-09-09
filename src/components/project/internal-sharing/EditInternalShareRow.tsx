@@ -2,6 +2,10 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,11 +45,11 @@ export function EditInternalShareRow({
   };
 
   return (
-    <tr key={share.share_id}>
-      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+    <TableRow key={share.share_id}>
+      <TableCell className="whitespace-nowrap text-sm text-foreground">
         {sanitizeText(share.email)}
-      </td>
-      <td className="px-4 py-3 whitespace-nowrap text-sm">
+      </TableCell>
+      <TableCell className="whitespace-nowrap text-sm">
         {isEditing ? (
           <Select
             value={currentRole}
@@ -69,8 +73,8 @@ export function EditInternalShareRow({
         ) : (
           <span className="capitalize">{t(`roles:${share.role}_display`)}</span>
         )}
-      </td>
-      <td className="px-4 py-3 whitespace-nowrap text-end text-sm font-medium">
+      </TableCell>
+      <TableCell className="whitespace-nowrap text-end text-sm font-medium">
         <div className="flex justify-end gap-2">
           {isEditing ? (
             <>
@@ -116,7 +120,7 @@ export function EditInternalShareRow({
             </>
           )}
         </div>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
