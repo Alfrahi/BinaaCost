@@ -75,7 +75,11 @@
       "expired": "Expired",
       "successDeleted": "External link deleted successfully!",
       "errorDelete": "Failed to delete external link: {{message}}",
-      "linkHiddenNote": "Link shown once at creation (token stored securely)"
+      "linkHiddenNote": "Link shown once at creation (token stored securely)",
+      "copyLink": "Copy link",
+      "shownOnceWarning": "This link is shown only once. Copy and save it now — it cannot be retrieved later.",
+      "clientFacing": "Client-facing",
+      "internal": "Internal"
     }
   },
   "assembly_importer": {

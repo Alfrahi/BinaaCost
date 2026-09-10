@@ -53,5 +53,9 @@
   "selectReport": "اختر تقريرًا",
   "projectCostReport": "تقرير تكلفة مشروع",
   "costBreakdown": "توزيع التكلفة",
-  "subtotal": "الإجمالي"
+  "subtotal": "الإجمالي",
+  "internalLabel": "داخلي",
+  "clientFacingLabel": "موجّه للعميل",
+  "internalReportHint": "تقرير تكلفة داخلي مفصّل — يتضمن تكاليف البنود والافتراضات المالية.",
+  "clientFacingReportHint": "عرض موجّه للعميل — يستبعد تفاصيل التكلفة الداخلية والافتراضات."
 }
