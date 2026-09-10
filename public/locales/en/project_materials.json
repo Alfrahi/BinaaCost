@@ -22,5 +22,6 @@
   "priceNonNegative": "Unit price must be non-negative",
   "add": "Add material",
   "edit": "Edit material",
-  "quantityMin": "Quantity must be at least 1"
+  "quantityMin": "Quantity must be at least 1",
+  "tableLabel": "Materials cost table"
 }

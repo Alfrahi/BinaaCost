@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLoader from "@/components/PageLoader";
@@ -80,6 +80,7 @@ function ProjectTabsComponent({
   ]);
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("overview");
+  const shouldReduceMotion = useReducedMotion();
 
   const {
     project,
@@ -284,9 +285,9 @@ function ProjectTabsComponent({
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
+            initial={shouldReduceMotion ? undefined : "hidden"}
+            animate={shouldReduceMotion ? undefined : "visible"}
+            exit={shouldReduceMotion ? undefined : "exit"}
             variants={tabVariants}
             transition={{ duration: 0.2 }}
           >

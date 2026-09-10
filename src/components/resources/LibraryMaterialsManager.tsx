@@ -349,7 +349,7 @@ export default function LibraryMaterialsManager() {
                 <Checkbox
                   checked={selection.allSelected}
                   onCheckedChange={selection.toggleAll}
-                  aria-label={t("common:all")}
+                  aria-label={t("common:selectAllMaterials")}
                 />
               </TableHead>
               <TableHead className={`${headerClass} text-start min-w-[150px]`}>

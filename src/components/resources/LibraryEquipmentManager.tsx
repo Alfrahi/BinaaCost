@@ -391,7 +391,7 @@ export default function LibraryEquipmentManager() {
                 <Checkbox
                   checked={selection.allSelected}
                   onCheckedChange={selection.toggleAll}
-                  aria-label={t("common:all")}
+                  aria-label={t("common:selectAllEquipment")}
                 />
               </TableHead>
               <TableHead className={`${headerClass} text-start min-w-[150px]`}>

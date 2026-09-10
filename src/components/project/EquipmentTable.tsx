@@ -311,7 +311,7 @@ export default function EquipmentTable({
         </div>
       ) : (
         <div className="overflow-x-auto border rounded-lg">
-          <Table>
+          <Table aria-label={t("project_equipment:tableLabel")}>
             <TableHeader>
               <TableRow>
                 {canEdit && (
@@ -319,7 +319,7 @@ export default function EquipmentTable({
                     <Checkbox
                       checked={selection.allSelected}
                       onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:all")}
+                      aria-label={t("common:selectAllEquipment")}
                     />
                   </TableHead>
                 )}
