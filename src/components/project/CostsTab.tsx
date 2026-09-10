@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Layers, PackagePlus } from "lucide-react";
 import { MaterialsTable } from "./MaterialsTable";
 import { LaborTable } from "./LaborTable";
-import EquipmentTable from "./EquipmentTable";
+import { EquipmentTable } from "./EquipmentTable";
 import { AdditionalCostsTable } from "./AdditionalCostsTable";
 import ProjectGroupsManager from "./ProjectGroupsManager";
 import AssemblyImporter from "./AssemblyImporter";
