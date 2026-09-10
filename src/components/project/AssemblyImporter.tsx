@@ -66,24 +66,45 @@ export default function AssemblyImporter({
             materialUnits.find((u) => u.value === item.unit)?.label ||
             item.unit ||
             t("common:unit");
-          return `${item.quantity} ${materialUnitLabel} @ ${formattedPrice}`;
+          return (
+            <bdi>
+              {`${item.quantity} ${materialUnitLabel} @ ${formattedPrice}`}
+            </bdi>
+          );
         }
         case "labor": {
           const laborDetails = item.details as AssemblyLaborDetails;
-          return `${item.quantity} ${t("project_detail:reports.workersUnit")} × ${laborDetails.total_days} ${t("project_equipment:Day")} @ ${formattedPrice}`;
+          return (
+            <bdi>
+              {`${item.quantity} ${t("project_detail:reports.workersUnit")} × ${laborDetails.total_days} ${t("project_equipment:Day")} @ ${formattedPrice}`}
+            </bdi>
+          );
         }
         case "equipment": {
           const equipmentUnitLabel =
             periodUnits.find((u) => u.value === item.unit)?.label ||
             item.unit ||
             t("project_equipment:Day");
-          return `${item.quantity} ${equipmentUnitLabel} @ ${formattedPrice}`;
+          return (
+            <bdi>
+              {`${item.quantity} ${equipmentUnitLabel} @ ${formattedPrice}`}
+            </bdi>
+          );
         }
         case "additional": {
-          return `1 ${t("common:each")} @ ${formattedPrice}`;
+          return (
+            <bdi>
+              {`1 ${t("common:each")} @ ${formattedPrice}`}
+            </bdi>
+          );
         }
-        default:
-          return `${item.quantity} ${item.unit || t("common:unit")} @ ${formattedPrice}`;
+        default: {
+          return (
+            <bdi>
+              {`${item.quantity} ${item.unit || t("common:unit")} @ ${formattedPrice}`}
+            </bdi>
+          );
+        }
       }
     },
     [formatCurrencyValue, materialUnits, periodUnits, t],
@@ -189,7 +210,7 @@ export default function AssemblyImporter({
                       {item.item_type === "additional"
                         ? `${additionalCategories.find((c) => c.value === (item.details as AssemblyAdditionalCostDetails)?.category)?.label || (item.details as AssemblyAdditionalCostDetails)?.category || t("common:notSpecified")}: ${item.description}`
                         : item.description}{" "}
-                      ({getTranslatedUnitDisplay(item)})
+                      {getTranslatedUnitDisplay(item)}
                     </li>
                   ))}
                 </ul>
