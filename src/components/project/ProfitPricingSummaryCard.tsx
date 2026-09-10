@@ -442,7 +442,7 @@ export default function ProfitPricingSummaryCard({
               </div>
             </div>
 
-            <div className="mt-6 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg transform scale-105">
+            <div className="mt-6 bg-success text-success-foreground p-4 rounded-lg shadow-lg transform scale-105">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-medium">
@@ -451,7 +451,7 @@ export default function ProfitPricingSummaryCard({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Info className="w-4 h-4 text-primary-foreground/80" />
+                        <Info className="w-4 h-4 text-success-foreground/80" />
                       </TooltipTrigger>
                       <TooltipContent className="text-xs">
                         <p>

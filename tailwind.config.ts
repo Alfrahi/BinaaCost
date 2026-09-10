@@ -16,8 +16,10 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#000000",
-          hover: "#333333",
+          // blue-900 — passes WCAG 4.5:1 on white (7:1), distinct from text-primary (#000000)
+          DEFAULT: "#1E3A8A",
+          // blue-800 for hover
+          hover: "#1E40AF",
           foreground: "#FFFFFF",
         },
         secondary: {
@@ -60,7 +62,8 @@ export default {
           DEFAULT: "#E5E7EB",
         },
         input: "#D1D5DB",
-        ring: "#000000",
+        // Use primary for focus rings
+        ring: "#1E3A8A",
         green: {
           600: "#16A34A",
         },
