@@ -665,11 +665,17 @@ export function ScenarioAnalysisTab({
                 {t("costComparison")}
               </h4>
               <div className="h-[400px] w-full">
-                <ReactECharts
-                  option={chartOptions}
-                  style={{ height: "100%", width: "100%" }}
-                  opts={{ renderer: "canvas" }}
-                />
+                {/* Force LTR on chart canvas; ECharts has no native RTL support.
+                    Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
+                    Axis labels and legend use translated keys, so they render correctly.
+                    Y-axis rotation for RTL is handled inside chartOptions. */}
+                <div dir="ltr">
+                  <ReactECharts
+                    option={chartOptions}
+                    style={{ height: "100%", width: "100%" }}
+                    opts={{ renderer: "canvas" }}
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
