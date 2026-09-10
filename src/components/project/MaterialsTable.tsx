@@ -1,17 +1,9 @@
+"use client";
+
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableFooter,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
@@ -19,7 +11,6 @@ import { BulkMoveDialog } from "@/components/project/BulkMoveDialog";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { safeAdd } from "@/utils/math";
 import { calculateItemCost } from "@/logic/shared";
-import { PaginationControls } from "@/components/PaginationControls";
 import { MaterialRow } from "./MaterialRow";
 import { MaterialForm } from "./MaterialForm";
 import { QuickAddRow } from "./QuickAddRow";
@@ -30,6 +21,7 @@ import { materialSchema, MaterialFormValues } from "@/types/schemas";
 import { MaterialItem } from "@/types/project-items";
 import { useProjectMaterials } from "@/hooks/useProjectMaterials";
 import { useIsMobile } from "@/hooks/useMobile";
+import DataTable from "@/components/ui/data-table";
 
 const PAGE_SIZE = 50;
 
@@ -118,32 +110,58 @@ export function MaterialsTable({
     [materials],
   );
 
-  const displayRows = useMemo(() => {
-    const rows: { type: "header" | "item"; data: any }[] = [];
+  const columns = useMemo<DataTableColumn<MaterialItem>[]>(
+    () => [
+      {
+        key: "name",
+        label: t("columns.name"),
+        align: "start",
+        minWidth: "150px",
+      },
+      {
+        key: "description",
+        label: t("columns.description"),
+        align: "start",
+        minWidth: "200px",
+      },
+      {
+        key: "quantity",
+        label: t("columns.quantity"),
+        align: "end",
+        minWidth: "100px",
+      },
+      {
+        key: "unit",
+        label: t("columns.unit"),
+        align: "start",
+        minWidth: "80px",
+        format: (value: string) =>
+          materialUnits.find((u) => u.value === value)?.label || value,
+      },
+      {
+        key: "unit_price",
+        label: t("columns.unitPrice"),
+        align: "end",
+        isCurrency: true,
+        minWidth: "120px",
+        format: (value: number) => format(value, currency),
+      },
+      {
+        key: "total",
+        label: t("columns.estTotalCost"),
+        align: "end",
+        minWidth: "120px",
+        format: (_, row: MaterialItem) =>
+          format(
+            calculateItemCost.material(row.quantity, row.unit_price),
+            currency,
+          ),
+      },
+    ],
+    [t, materialUnits, currency, format],
+  );
 
-    const ungrouped = materials.filter((m) => !m.group_id);
-    if (ungrouped.length > 0) {
-      if (groups.length > 0) {
-        rows.push({
-          type: "header",
-          data: { id: "ungrouped", name: t("project_detail:groups.ungrouped") },
-        });
-      }
-      ungrouped.forEach((item) => rows.push({ type: "item", data: item }));
-    }
-
-    groups.forEach((group) => {
-      const groupItems = materials.filter((m) => m.group_id === group.id);
-      if (groupItems.length > 0) {
-        rows.push({ type: "header", data: group });
-        groupItems.forEach((item) => rows.push({ type: "item", data: item }));
-      }
-    });
-
-    return rows;
-  }, [materials, groups, t]);
-
-  const totalPages = Math.ceil(displayRows.length / PAGE_SIZE);
+  const totalPages = Math.ceil(materials.length / PAGE_SIZE);
 
   useEffect(() => {
     if (currentPage > 0 && currentPage >= totalPages) {
@@ -151,14 +169,24 @@ export function MaterialsTable({
     }
   }, [totalPages, currentPage]);
 
-  const paginatedRows = useMemo(() => {
-    const start = currentPage * PAGE_SIZE;
-    return displayRows.slice(start, start + PAGE_SIZE);
-  }, [displayRows, currentPage]);
-
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
-  const footerClass = "font-bold text-foreground bg-muted h-10";
+  const renderRow = useCallback(
+    (item: MaterialItem) => (
+      <MaterialRow
+        key={item.id}
+        item={item}
+        materialUnits={materialUnits}
+        currency={currency}
+        isOwner={canEdit}
+        onEdit={() => openForm(item)}
+        onDelete={() => setDeleteTarget(item)}
+        onDuplicate={() => handleDuplicateMaterial(item)}
+        onComment={(commentItem) => onOpenComments(commentItem, "material")}
+        selected={selection.isSelected(item.id)}
+        onToggle={() => selection.toggle(item.id)}
+      />
+    ),
+    [materialUnits, currency, canEdit, openForm, setDeleteTarget, handleDuplicateMaterial, onOpenComments, selection],
+  );
 
   return (
     <div>
@@ -254,52 +282,33 @@ export function MaterialsTable({
       )}
       {isMobile ? (
         <div className="space-y-3">
-          {paginatedRows.map((row) => {
-            if (row.type === "header") {
-              return (
-                <div
-                  key={`header-${row.data.id}`}
-                  className="font-semibold text-sm text-muted-foreground pt-2"
-                >
-                  {row.data.name}
-                </div>
-              );
-            }
-            const item = row.data;
-            return (
-              <MobileItemCard
-                key={item.id}
-                name={item.name}
-                subtitle={`${item.quantity} × ${format(
-                  item.unit_price,
-                  currency,
-                )}`}
-                total={format(
-                  calculateItemCost.material(
-                    item.quantity,
-                    item.unit_price,
-                  ),
-                  currency,
-                )}
-                selected={selection.isSelected(item.id)}
-                onToggle={() => selection.toggle(item.id)}
-                isOwner={canEdit}
-                actions={isSelectMode ? undefined : (
-                  <ItemActions
-                    isOwner={canEdit}
-                    onComment={() => onOpenComments(item, "material")}
-                    onDuplicate={() => handleDuplicateMaterial(item)}
-                    onEdit={() => openForm(item)}
-                    onDelete={() => setDeleteTarget(item)}
-                    commentLabel={t("common:comments")}
-                    duplicateLabel={t("common:duplicate")}
-                    editLabel={t("common:edit")}
-                    deleteLabel={t("common:delete")}
-                  />
-                )}
-              />
-            );
-          })}
+          {materials.map((item) => (
+            <MobileItemCard
+              key={item.id}
+              name={item.name}
+              subtitle={`${item.quantity} × ${format(item.unit_price, currency)}`}
+              total={format(
+                calculateItemCost.material(item.quantity, item.unit_price),
+                currency,
+              )}
+              selected={selection.isSelected(item.id)}
+              onToggle={() => selection.toggle(item.id)}
+              isOwner={canEdit}
+              actions={isSelectMode ? undefined : (
+                <ItemActions
+                  isOwner={canEdit}
+                  onComment={() => onOpenComments(item, "material")}
+                  onDuplicate={() => handleDuplicateMaterial(item)}
+                  onEdit={() => openForm(item)}
+                  onDelete={() => setDeleteTarget(item)}
+                  commentLabel={t("common:comments")}
+                  duplicateLabel={t("common:duplicate")}
+                  editLabel={t("common:edit")}
+                  deleteLabel={t("common:delete")}
+                />
+              )}
+            />
+          ))}
           {materials.length === 0 && (
             <div className="text-center h-24 text-sm text-muted-foreground">
               {t("noItems")}
@@ -307,115 +316,42 @@ export function MaterialsTable({
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border rounded-lg">
-          <Table aria-label={t("project_materials:tableLabel")}>
-            <TableHeader>
-              <TableRow>
-                {canEdit && (
-                  <TableHead className={`w-[40px] ${headerClass}`}>
-                    <Checkbox
-                      checked={selection.allSelected}
-                      onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:selectAllMaterials")}
-                    />
-                  </TableHead>
-                )}
-                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                  {t("columns.name")}
-                </TableHead>
-                <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
-                  {t("columns.description")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                  {t("columns.quantity")}
-                </TableHead>
-                <TableHead className={`text-start ${headerClass} min-w-[80px]`}>
-                  {t("columns.unit")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.unitPrice")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.estTotalCost")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                  {t("common:actions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedRows.map((row) => {
-                if (row.type === "header") {
-                  return (
-                    <TableRow
-                      key={`header-${row.data.id}`}
-                      className="bg-muted hover:bg-muted"
-                    >
-                      <TableCell
-                        colSpan={canEdit ? 8 : 7}
-                        className="font-semibold text-foreground text-sm"
-                      >
-                        {row.data.name}
-                      </TableCell>
-                    </TableRow>
-                  );
-                } else {
-                  const item = row.data;
-                  return (
-                    <MaterialRow
-                      key={item.id}
-                      item={item}
-                      materialUnits={materialUnits}
-                      currency={currency}
-                      isOwner={canEdit}
-                      onEdit={() => openForm(item)}
-                      onDelete={() => setDeleteTarget(item)}
-                      onDuplicate={() => handleDuplicateMaterial(item)}
-                      onComment={(commentItem) =>
-                        onOpenComments(commentItem, "material")
-                      }
-                      selected={selection.isSelected(item.id)}
-                      onToggle={() => selection.toggle(item.id)}
-                    />
-                  );
-                }
-              })}
-              {materials.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={canEdit ? 8 : 7}
-                    className="text-center h-24 text-sm"
-                  >
-                    {t("noItems")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell
-                  colSpan={canEdit ? 6 : 5}
-                  className={`text-end ${footerClass} text-sm`}
-                >
-                  {t("columns.grandTotal")}
-                </TableCell>
-                <TableCell
-                  className={`text-end tabular-nums ${footerClass} text-sm`}
-                >
-                  {format(grandTotal, currency)}
-                </TableCell>
-                <TableCell className={footerClass} />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={materials}
+          getRowKey={(row) => row.id}
+          renderRow={renderRow}
+          grandTotal={format(grandTotal, currency)}
+          grandTotalLabel={t("columns.grandTotal")}
+          grandTotalColSpan={columns.length - 1}
+          emptyMessageKey="noItems"
+          pagination={{
+            currentPage,
+            totalPages,
+            onPageChange: setCurrentPage,
+            pageSize: PAGE_SIZE,
+          }}
+          selection={{
+            selectedIds: selection.selectedIds,
+            allSelected: selection.allSelected,
+            onToggle: selection.toggle,
+            onToggleAll: selection.toggleAll,
+            selectAllLabel: t("common:selectAllMaterials"),
+          }}
+          ariaLabel={t("project_materials:tableLabel")}
+          groupRows={{
+            groups,
+            getGroupId: (row) => row.group_id || undefined,
+            ungroupedLabelKey: "project_detail:groups.ungrouped",
+          }}
+        />
       )}
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
+      <BulkActionBar
+        count={selection.count}
+        onClear={selection.clear}
+        isSelectMode={isSelectMode}
+        onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
+      >
         <Button
           variant="secondary"
           size="sm"
@@ -471,4 +407,13 @@ export function MaterialsTable({
       />
     </div>
   );
+}
+
+interface DataTableColumn<T> {
+  key: string;
+  label: string;
+  align?: "start" | "end";
+  isCurrency?: boolean;
+  format?: (value: any, row: T) => React.ReactNode;
+  minWidth?: string;
 }
