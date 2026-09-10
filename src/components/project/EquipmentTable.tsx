@@ -1,25 +1,16 @@
+"use client";
+
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { BulkMoveDialog } from "@/components/project/BulkMoveDialog";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { safeAdd } from "@/utils/math";
-import { PaginationControls } from "@/components/PaginationControls";
+import { calculateItemCost } from "@/logic/shared";
 import { EquipmentRow } from "./EquipmentRow";
 import { EquipmentForm } from "./EquipmentForm";
 import { QuickAddRow } from "./QuickAddRow";
@@ -30,10 +21,11 @@ import { equipmentSchema, EquipmentFormValues } from "@/types/schemas";
 import { EquipmentItem } from "@/types/project-items";
 import { useProjectEquipment } from "@/hooks/useProjectEquipment";
 import { useIsMobile } from "@/hooks/useMobile";
+import DataTable from "@/components/ui/data-table";
 
 const PAGE_SIZE = 50;
 
-export default function EquipmentTable({
+export function EquipmentTable({
   projectId,
   equipment,
   groups = [],
@@ -111,36 +103,114 @@ export default function EquipmentTable({
 
   const grandTotal = useMemo(
     () =>
-      equipment.reduce((sum, item) => safeAdd(sum, item.total_cost || 0), 0),
+      equipment.reduce(
+        (sum, item) =>
+          safeAdd(
+            sum,
+            calculateItemCost.equipment({
+              quantity: item.quantity,
+              costPerPeriod: item.cost_per_period,
+              usageDuration: item.usage_duration,
+              maintenanceCost: item.maintenance_cost,
+              fuelCost: item.fuel_cost,
+            }).totalCost,
+          ),
+        0,
+      ),
     [equipment],
   );
 
-  const displayRows = useMemo(() => {
-    const rows: { type: "header" | "item"; data: any }[] = [];
+  const columns = useMemo<DataTableColumn<EquipmentItem>[]>(
+    () => [
+      {
+        key: "name",
+        label: t("columns.name"),
+        align: "start",
+        minWidth: "150px",
+      },
+      {
+        key: "type",
+        label: t("columns.type"),
+        align: "start",
+        minWidth: "100px",
+      },
+      {
+        key: "rental_or_purchase",
+        label: t("columns.rentalPurchase"),
+        align: "start",
+        minWidth: "120px",
+        format: (value: string) =>
+          rentalOptions.find((opt) => opt.value === value)?.label || value,
+      },
+      {
+        key: "quantity",
+        label: t("columns.quantity"),
+        align: "end",
+        minWidth: "100px",
+      },
+      {
+        key: "cost_per_period",
+        label: t("columns.costPerPeriod"),
+        align: "end",
+        isCurrency: true,
+        minWidth: "120px",
+        format: (value: number) =>
+          format(value, currency) +
+          (value &&
+            `/${t(periodUnits.find((u) => u.value === "day")?.value || "day", { defaultValue: "day" })}`),
+      },
+      {
+        key: "period_unit",
+        label: t("columns.periodUnit"),
+        align: "start",
+        minWidth: "100px",
+        format: (value: string) =>
+          periodUnits.find((u) => u.value === value)?.label || value,
+      },
+      {
+        key: "usage_duration",
+        label: t("columns.usageDuration"),
+        align: "end",
+        minWidth: "100px",
+      },
+      {
+        key: "maintenance_cost",
+        label: t("columns.maintenance"),
+        align: "end",
+        isCurrency: true,
+        minWidth: "100px",
+        format: (value: number) => format(value, currency),
+      },
+      {
+        key: "fuel_cost",
+        label: t("columns.fuel"),
+        align: "end",
+        isCurrency: true,
+        minWidth: "100px",
+        format: (value: number) => format(value, currency),
+      },
+      {
+        key: "total",
+        label: t("columns.estTotalCost"),
+        align: "end",
+        minWidth: "120px",
+        format: (_, row: EquipmentItem) =>
+          format(
+            calculateItemCost.equipment({
+              quantity: row.quantity,
+              costPerPeriod: row.cost_per_period,
+              usageDuration: row.usage_duration,
+              maintenanceCost: row.maintenance_cost,
+              fuelCost: row.fuel_cost,
+            }).totalCost,
+            currency,
+          ),
+      },
+    ],
+    [t, currency, format, rentalOptions, periodUnits],
+  );
 
-    const ungrouped = equipment.filter((m) => !m.group_id);
-    if (ungrouped.length > 0) {
-      if (groups.length > 0) {
-        rows.push({
-          type: "header",
-          data: { id: "ungrouped", name: t("project_detail:groups.ungrouped") },
-        });
-      }
-      ungrouped.forEach((item) => rows.push({ type: "item", data: item }));
-    }
-
-    groups.forEach((group) => {
-      const groupItems = equipment.filter((m) => m.group_id === group.id);
-      if (groupItems.length > 0) {
-        rows.push({ type: "header", data: group });
-        groupItems.forEach((item) => rows.push({ type: "item", data: item }));
-      }
-    });
-
-    return rows;
-  }, [equipment, groups, t]);
-
-  const totalPages = Math.ceil(displayRows.length / PAGE_SIZE);
+  const totalPages = Math.ceil(equipment.length / PAGE_SIZE);
 
   useEffect(() => {
     if (currentPage > 0 && currentPage >= totalPages) {
@@ -148,14 +218,33 @@ export default function EquipmentTable({
     }
   }, [totalPages, currentPage]);
 
-  const paginatedRows = useMemo(() => {
-    const start = currentPage * PAGE_SIZE;
-    return displayRows.slice(start, start + PAGE_SIZE);
-  }, [displayRows, currentPage]);
-
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
-  const footerClass = "font-bold text-foreground bg-muted h-10";
+  const renderRow = useCallback(
+    (item: EquipmentItem) => (
+      <EquipmentRow
+        key={item.id}
+        item={item}
+        currency={currency}
+        isOwner={canEdit}
+        onEdit={() => openForm(item)}
+        onDelete={() => setDeleteTarget(item)}
+        onDuplicate={() => handleDuplicateEquipment(item)}
+        onComment={(commentItem) => onOpenComments(commentItem, "equipment")}
+        selected={selection.isSelected(item.id)}
+        onToggle={() => selection.toggle(item.id)}
+        rentalOptions={rentalOptions}
+      />
+    ),
+    [
+      currency,
+      canEdit,
+      openForm,
+      setDeleteTarget,
+      handleDuplicateEquipment,
+      onOpenComments,
+      selection,
+      rentalOptions,
+    ],
+  );
 
   return (
     <div>
@@ -193,6 +282,18 @@ export default function EquipmentTable({
               placeholder: t("columns.namePlaceholder"),
             },
             {
+              key: "type",
+              label: t("columns.type"),
+              placeholder: t("columns.typePlaceholder"),
+            },
+            {
+              key: "rental_or_purchase",
+              label: t("columns.rentalPurchase"),
+              type: "select",
+              options: rentalOptions,
+              placeholder: t("columns.rentalPurchasePlaceholder"),
+            },
+            {
               key: "quantity",
               label: t("columns.quantity"),
               type: "number",
@@ -204,17 +305,43 @@ export default function EquipmentTable({
               type: "number",
               placeholder: t("columns.costPerPeriodPlaceholder"),
             },
+            {
+              key: "period_unit",
+              label: t("columns.periodUnit"),
+              type: "select",
+              options: periodUnits,
+              placeholder: t("columns.periodUnitPlaceholder"),
+            },
+            {
+              key: "usage_duration",
+              label: t("columns.usageDuration"),
+              type: "number",
+              placeholder: t("columns.usageDurationPlaceholder"),
+            },
+            {
+              key: "maintenance_cost",
+              label: t("columns.maintenance"),
+              type: "number",
+              placeholder: t("columns.maintenancePlaceholder"),
+            },
+            {
+              key: "fuel_cost",
+              label: t("columns.fuel"),
+              type: "number",
+              placeholder: t("columns.fuelPlaceholder"),
+            },
           ]}
           schema={equipmentSchema}
           buildValues={(raw) => ({
             name: raw.name,
+            type: raw.type,
+            rental_or_purchase: raw.rental_or_purchase,
             quantity: Number(raw.quantity),
             cost_per_period: Number(raw.cost_per_period),
-            rental_or_purchase: rentalOptions[0]?.value || "Rental",
-            period_unit: periodUnits[0]?.value || "Day",
-            usage_duration: 1,
-            maintenance_cost: 0,
-            fuel_cost: 0,
+            period_unit: raw.period_unit,
+            usage_duration: Number(raw.usage_duration),
+            maintenance_cost: Number(raw.maintenance_cost || 0),
+            fuel_cost: Number(raw.fuel_cost || 0),
             group_id: "ungrouped",
           })}
           onSubmit={(values) =>
@@ -226,7 +353,7 @@ export default function EquipmentTable({
         />
       )}
       {isFormOpen && (
-        <Card className="p-4 mb-4">
+        <div className="p-4 border rounded bg-card mb-4">
           <h3 className="text-lg font-semibold mb-4">
             {editingItem ? t("edit") : t("add")}
           </h3>
@@ -235,14 +362,14 @@ export default function EquipmentTable({
               editingItem
                 ? {
                     name: editingItem.name,
-                    type: editingItem.type || "",
                     rental_or_purchase: editingItem.rental_or_purchase,
                     quantity: editingItem.quantity,
                     cost_per_period: editingItem.cost_per_period,
                     period_unit: editingItem.period_unit,
                     usage_duration: editingItem.usage_duration,
-                    maintenance_cost: editingItem.maintenance_cost || 0,
-                    fuel_cost: editingItem.fuel_cost || 0,
+                    maintenance_cost: editingItem.maintenance_cost ?? undefined,
+                    fuel_cost: editingItem.fuel_cost ?? undefined,
+                    type: editingItem.type || undefined,
                     group_id: editingItem.group_id || "ungrouped",
                   }
                 : undefined
@@ -257,52 +384,34 @@ export default function EquipmentTable({
             periodUnits={periodUnits}
             isLoadingPeriodUnits={isLoadingPeriodUnits}
           />
-        </Card>
+        </div>
       )}
       {isMobile ? (
         <div className="space-y-3">
-          {paginatedRows.map((row) => {
-            if (row.type === "header") {
-              return (
-                <div
-                  key={`header-${row.data.id}`}
-                  className="font-semibold text-sm text-muted-foreground pt-2"
-                >
-                  {row.data.name}
-                </div>
-              );
-            }
-            const item = row.data;
-            const isPurchase = item.rental_or_purchase.toLowerCase() === "purchase";
-            return (
-              <MobileItemCard
-                key={item.id}
-                name={item.name}
-                subtitle={
-                  isPurchase
-                    ? `${t("columns.quantity")}: ${item.quantity}`
-                    : `${item.quantity} × ${format(item.cost_per_period, currency)}/${t(item.period_unit, { defaultValue: item.period_unit })} × ${item.usage_duration}`
-                }
-                total={format(item.total_cost || 0, currency)}
-                selected={selection.isSelected(item.id)}
-                onToggle={() => selection.toggle(item.id)}
-                isOwner={canEdit}
-                actions={isSelectMode ? undefined : (
-                  <ItemActions
-                    isOwner={canEdit}
-                    onComment={() => onOpenComments(item, "equipment")}
-                    onDuplicate={() => handleDuplicateEquipment(item)}
-                    onEdit={() => openForm(item)}
-                    onDelete={() => setDeleteTarget(item)}
-                    commentLabel={t("common:comments")}
-                    duplicateLabel={t("common:duplicate")}
-                    editLabel={t("common:edit")}
-                    deleteLabel={t("common:delete")}
-                  />
-                )}
-              />
-            );
-          })}
+          {equipment.map((item) => (
+            <MobileItemCard
+              key={item.id}
+              name={item.name}
+              subtitle={`${item.quantity} × ${format(item.cost_per_period, currency)}`}
+              total={format(item.total_cost || 0, currency)}
+              selected={selection.isSelected(item.id)}
+              onToggle={() => selection.toggle(item.id)}
+              isOwner={canEdit}
+              actions={isSelectMode ? undefined : (
+                <ItemActions
+                  isOwner={canEdit}
+                  onComment={() => onOpenComments(item, "equipment")}
+                  onDuplicate={() => handleDuplicateEquipment(item)}
+                  onEdit={() => openForm(item)}
+                  onDelete={() => setDeleteTarget(item)}
+                  commentLabel={t("common:comments")}
+                  duplicateLabel={t("common:duplicate")}
+                  editLabel={t("common:edit")}
+                  deleteLabel={t("common:delete")}
+                />
+              )}
+            />
+          ))}
           {equipment.length === 0 && (
             <div className="text-center h-24 text-sm text-muted-foreground">
               {t("noItems")}
@@ -310,118 +419,42 @@ export default function EquipmentTable({
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border rounded-lg">
-          <Table aria-label={t("project_equipment:tableLabel")}>
-            <TableHeader>
-              <TableRow>
-                {canEdit && (
-                  <TableHead className={`w-[40px] ${headerClass}`}>
-                    <Checkbox
-                      checked={selection.allSelected}
-                      onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:selectAllEquipment")}
-                    />
-                  </TableHead>
-                )}
-                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                  {t("columns.name")}
-                </TableHead>
-                <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
-                  {t("columns.type")}
-                </TableHead>
-                <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
-                  {t("columns.rentalPurchase")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
-                  {t("columns.quantity")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.costPerPeriod")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.usageDuration")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.estTotalCost")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                  {t("common:actions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedRows.map((row) => {
-                if (row.type === "header") {
-                  return (
-                    <TableRow
-                      key={`header-${row.data.id}`}
-                      className="bg-muted hover:bg-muted"
-                    >
-                      <TableCell
-                        colSpan={canEdit ? 9 : 8}
-                        className="font-semibold text-foreground text-sm"
-                      >
-                        {row.data.name}
-                      </TableCell>
-                    </TableRow>
-                  );
-                } else {
-                  const item = row.data;
-                  return (
-                    <EquipmentRow
-                      key={item.id}
-                      item={item}
-                      currency={currency}
-                      isOwner={canEdit}
-                      onEdit={() => openForm(item)}
-                      onDelete={() => setDeleteTarget(item)}
-                      onDuplicate={() => handleDuplicateEquipment(item)}
-                      onComment={(commentItem) =>
-                        onOpenComments(commentItem, "equipment")
-                      }
-                      selected={selection.isSelected(item.id)}
-                      onToggle={() => selection.toggle(item.id)}
-                      rentalOptions={rentalOptions}
-                    />
-                  );
-                }
-              })}
-              {equipment.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={canEdit ? 9 : 8}
-                    className="text-center h-24 text-sm"
-                  >
-                    {t("noItems")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell
-                  colSpan={canEdit ? 7 : 6}
-                  className={`text-end ${footerClass} text-sm`}
-                >
-                  {t("columns.grandTotal")}
-                </TableCell>
-                <TableCell
-                  className={`text-end tabular-nums ${footerClass} text-sm`}
-                >
-                  {format(grandTotal, currency)}
-                </TableCell>
-                <TableCell className={footerClass} />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={equipment}
+          getRowKey={(row) => row.id}
+          renderRow={renderRow}
+          grandTotal={format(grandTotal, currency)}
+          grandTotalLabel={t("columns.grandTotal")}
+          grandTotalColSpan={columns.length - 1}
+          emptyMessageKey="noItems"
+          pagination={{
+            currentPage,
+            totalPages,
+            onPageChange: setCurrentPage,
+            pageSize: PAGE_SIZE,
+          }}
+          selection={{
+            selectedIds: selection.selectedIds,
+            allSelected: selection.allSelected,
+            onToggle: selection.toggle,
+            onToggleAll: selection.toggleAll,
+            selectAllLabel: t("common:selectAllEquipment"),
+          }}
+          ariaLabel={t("project_equipment:tableLabel")}
+          groupRows={{
+            groups,
+            getGroupId: (row) => row.group_id || undefined,
+            ungroupedLabelKey: "project_detail:groups.ungrouped",
+          }}
+        />
       )}
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
+      <BulkActionBar
+        count={selection.count}
+        onClear={selection.clear}
+        isSelectMode={isSelectMode}
+        onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
+      >
         <Button
           variant="secondary"
           size="sm"
@@ -477,4 +510,13 @@ export default function EquipmentTable({
       />
     </div>
   );
+}
+
+interface DataTableColumn<T> {
+  key: string;
+  label: string;
+  align?: "start" | "end";
+  isCurrency?: boolean;
+  format?: (value: any, row: T) => React.ReactNode;
+  minWidth?: string;
 }

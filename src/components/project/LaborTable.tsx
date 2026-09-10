@@ -1,25 +1,15 @@
+"use client";
+
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { BulkMoveDialog } from "@/components/project/BulkMoveDialog";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { safeAdd } from "@/utils/math";
-import { PaginationControls } from "@/components/PaginationControls";
 import { LaborRow } from "./LaborRow";
 import { LaborForm } from "./LaborForm";
 import { QuickAddRow } from "./QuickAddRow";
@@ -30,6 +20,7 @@ import { laborSchema, LaborFormValues } from "@/types/schemas";
 import { LaborItem } from "@/types/project-items";
 import { useProjectLabor } from "@/hooks/useProjectLabor";
 import { useIsMobile } from "@/hooks/useMobile";
+import DataTable from "@/components/ui/data-table";
 
 const PAGE_SIZE = 50;
 
@@ -98,36 +89,54 @@ export function LaborTable({
   );
 
   const grandTotal = useMemo(
-    () => labor.reduce((sum, item) => safeAdd(sum, item.total_cost), 0),
+    () =>
+      labor.reduce(
+        (sum, item) => safeAdd(sum, item.total_cost || 0),
+        0,
+      ),
     [labor],
   );
 
-  const displayRows = useMemo(() => {
-    const rows: { type: "header" | "item"; data: any }[] = [];
+  const columns = useMemo<DataTableColumn<LaborItem>[]>(
+    () => [
+      {
+        key: "worker_type",
+        label: t("columns.workerType"),
+        align: "start",
+        minWidth: "150px",
+      },
+      {
+        key: "number_of_workers",
+        label: t("columns.numWorkers"),
+        align: "end",
+        minWidth: "100px",
+      },
+      {
+        key: "daily_rate",
+        label: t("columns.dailyRate"),
+        align: "end",
+        isCurrency: true,
+        minWidth: "120px",
+        format: (value: number) => format(value, currency),
+      },
+      {
+        key: "total_days",
+        label: t("columns.totalDays"),
+        align: "end",
+        minWidth: "100px",
+      },
+      {
+        key: "total",
+        label: t("columns.estTotalCost"),
+        align: "end",
+        minWidth: "120px",
+        format: (_, row: LaborItem) => format(row.total_cost || 0, currency),
+      },
+    ],
+    [t, currency, format],
+  );
 
-    const ungrouped = labor.filter((m) => !m.group_id);
-    if (ungrouped.length > 0) {
-      if (groups.length > 0) {
-        rows.push({
-          type: "header",
-          data: { id: "ungrouped", name: t("project_detail:groups.ungrouped") },
-        });
-      }
-      ungrouped.forEach((item) => rows.push({ type: "item", data: item }));
-    }
-
-    groups.forEach((group) => {
-      const groupItems = labor.filter((m) => m.group_id === group.id);
-      if (groupItems.length > 0) {
-        rows.push({ type: "header", data: group });
-        groupItems.forEach((item) => rows.push({ type: "item", data: item }));
-      }
-    });
-
-    return rows;
-  }, [labor, groups, t]);
-
-  const totalPages = Math.ceil(displayRows.length / PAGE_SIZE);
+  const totalPages = Math.ceil(labor.length / PAGE_SIZE);
 
   useEffect(() => {
     if (currentPage > 0 && currentPage >= totalPages) {
@@ -135,14 +144,23 @@ export function LaborTable({
     }
   }, [totalPages, currentPage]);
 
-  const paginatedRows = useMemo(() => {
-    const start = currentPage * PAGE_SIZE;
-    return displayRows.slice(start, start + PAGE_SIZE);
-  }, [displayRows, currentPage]);
-
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
-  const footerClass = "font-bold text-foreground bg-muted h-10";
+  const renderRow = useCallback(
+    (item: LaborItem) => (
+      <LaborRow
+        key={item.id}
+        item={item}
+        currency={currency}
+        isOwner={canEdit}
+        onEdit={() => openForm(item)}
+        onDelete={() => setDeleteTarget(item)}
+        onDuplicate={() => handleDuplicateLabor(item)}
+        onComment={(commentItem) => onOpenComments(commentItem, "labor")}
+        selected={selection.isSelected(item.id)}
+        onToggle={() => selection.toggle(item.id)}
+      />
+    ),
+    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateLabor, onOpenComments, selection],
+  );
 
   return (
     <div>
@@ -191,13 +209,19 @@ export function LaborTable({
               type: "number",
               placeholder: t("columns.dailyRatePlaceholder"),
             },
+            {
+              key: "total_days",
+              label: t("columns.totalDays"),
+              type: "number",
+              placeholder: t("columns.totalDaysPlaceholder"),
+            },
           ]}
           schema={laborSchema}
           buildValues={(raw) => ({
             worker_type: raw.worker_type,
             number_of_workers: Number(raw.number_of_workers),
             daily_rate: Number(raw.daily_rate),
-            total_days: 1,
+            total_days: Number(raw.total_days),
             group_id: "ungrouped",
           })}
           onSubmit={(values) =>
@@ -209,7 +233,7 @@ export function LaborTable({
         />
       )}
       {isFormOpen && (
-        <Card className="p-4 mb-4">
+        <div className="p-4 border rounded bg-card mb-4">
           <h3 className="text-lg font-semibold mb-4">
             {editingItem ? t("edit") : t("add")}
           </h3>
@@ -221,7 +245,7 @@ export function LaborTable({
                     number_of_workers: editingItem.number_of_workers,
                     daily_rate: editingItem.daily_rate,
                     total_days: editingItem.total_days,
-                    description: editingItem.description,
+                    description: editingItem.description || undefined,
                     group_id: editingItem.group_id || "ungrouped",
                   }
                 : undefined
@@ -232,50 +256,34 @@ export function LaborTable({
             groups={groups}
             currency={currency}
           />
-        </Card>
+        </div>
       )}
       {isMobile ? (
         <div className="space-y-3">
-          {paginatedRows.map((row) => {
-            if (row.type === "header") {
-              return (
-                <div
-                  key={`header-${row.data.id}`}
-                  className="font-semibold text-sm text-muted-foreground pt-2"
-                >
-                  {row.data.name}
-                </div>
-              );
-            }
-            const item = row.data;
-            return (
-              <MobileItemCard
-                key={item.id}
-                name={item.worker_type}
-                subtitle={`${item.number_of_workers} × ${format(
-                  item.daily_rate,
-                  currency,
-                )} × ${item.total_days}`}
-                total={format(item.total_cost || 0, currency)}
-                selected={selection.isSelected(item.id)}
-                onToggle={() => selection.toggle(item.id)}
-                isOwner={canEdit}
-                actions={isSelectMode ? undefined : (
-                  <ItemActions
-                    isOwner={canEdit}
-                    onComment={() => onOpenComments(item, "labor")}
-                    onDuplicate={() => handleDuplicateLabor(item)}
-                    onEdit={() => openForm(item)}
-                    onDelete={() => setDeleteTarget(item)}
-                    commentLabel={t("common:viewComments")}
-                    duplicateLabel={t("common:duplicate")}
-                    editLabel={t("common:edit")}
-                    deleteLabel={t("common:delete")}
-                  />
-                )}
-              />
-            );
-          })}
+          {labor.map((item) => (
+            <MobileItemCard
+              key={item.id}
+              name={item.worker_type}
+              subtitle={`${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days}`}
+              total={format(item.total_cost || 0, currency)}
+              selected={selection.isSelected(item.id)}
+              onToggle={() => selection.toggle(item.id)}
+              isOwner={canEdit}
+              actions={isSelectMode ? undefined : (
+                <ItemActions
+                  isOwner={canEdit}
+                  onComment={() => onOpenComments(item, "labor")}
+                  onDuplicate={() => handleDuplicateLabor(item)}
+                  onEdit={() => openForm(item)}
+                  onDelete={() => setDeleteTarget(item)}
+                  commentLabel={t("common:comments")}
+                  duplicateLabel={t("common:duplicate")}
+                  editLabel={t("common:edit")}
+                  deleteLabel={t("common:delete")}
+                />
+              )}
+            />
+          ))}
           {labor.length === 0 && (
             <div className="text-center h-24 text-sm text-muted-foreground">
               {t("noItems")}
@@ -283,113 +291,42 @@ export function LaborTable({
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border rounded-lg">
-          <Table aria-label={t("project_labor:tableLabel")}>
-            <TableHeader>
-              <TableRow>
-                {canEdit && (
-                  <TableHead className={`w-[40px] ${headerClass}`}>
-                    <Checkbox
-                      checked={selection.allSelected}
-                      onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:selectAllLabor")}
-                    />
-                  </TableHead>
-                )}
-                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                  {t("columns.workerType")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.numWorkers")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.dailyRate")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                  {t("columns.totalDays")}
-                </TableHead>
-                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                  {t("columns.estTotalCost")}
-                </TableHead>
-                {canEdit && (
-                  <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                    {t("common:actions")}
-                  </TableHead>
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedRows.map((row) => {
-                if (row.type === "header") {
-                  return (
-                    <TableRow
-                      key={`header-${row.data.id}`}
-                      className="bg-muted hover:bg-muted"
-                    >
-                      <TableCell
-                        colSpan={canEdit ? 7 : 6}
-                        className="font-semibold text-foreground text-sm"
-                      >
-                        {row.data.name}
-                      </TableCell>
-                    </TableRow>
-                  );
-                } else {
-                  const item = row.data;
-                  return (
-                    <LaborRow
-                      key={item.id}
-                      item={item}
-                      currency={currency}
-                      isOwner={canEdit}
-                      onEdit={() => openForm(item)}
-                      onDelete={() => setDeleteTarget(item)}
-                      onDuplicate={() => handleDuplicateLabor(item)}
-                      onComment={(commentItem) =>
-                        onOpenComments(commentItem, "labor")
-                      }
-                      selected={selection.isSelected(item.id)}
-                      onToggle={() => selection.toggle(item.id)}
-                    />
-                  );
-                }
-              })}
-              {labor.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={canEdit ? 7 : 6}
-                    className="text-center h-24 text-sm"
-                  >
-                    {t("noItems")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell
-                  colSpan={canEdit ? 5 : 4}
-                  className={`text-end ${footerClass} text-sm`}
-                >
-                  {t("columns.grandTotal")}
-                </TableCell>
-                <TableCell
-                  className={`text-end tabular-nums ${footerClass} text-sm`}
-                >
-                  {format(grandTotal, currency)}
-                </TableCell>
-                <TableCell className={footerClass} />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={labor}
+          getRowKey={(row) => row.id}
+          renderRow={renderRow}
+          grandTotal={format(grandTotal, currency)}
+          grandTotalLabel={t("columns.grandTotal")}
+          grandTotalColSpan={columns.length - 1}
+          emptyMessageKey="noItems"
+          pagination={{
+            currentPage,
+            totalPages,
+            onPageChange: setCurrentPage,
+            pageSize: PAGE_SIZE,
+          }}
+          selection={{
+            selectedIds: selection.selectedIds,
+            allSelected: selection.allSelected,
+            onToggle: selection.toggle,
+            onToggleAll: selection.toggleAll,
+            selectAllLabel: t("common:selectAllLabor"),
+          }}
+          ariaLabel={t("project_labor:tableLabel")}
+          groupRows={{
+            groups,
+            getGroupId: (row) => row.group_id || undefined,
+            ungroupedLabelKey: "project_detail:groups.ungrouped",
+          }}
+        />
       )}
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
+      <BulkActionBar
+        count={selection.count}
+        onClear={selection.clear}
+        isSelectMode={isSelectMode}
+        onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
+      >
         <Button
           variant="secondary"
           size="sm"
@@ -445,4 +382,13 @@ export function LaborTable({
       />
     </div>
   );
+}
+
+interface DataTableColumn<T> {
+  key: string;
+  label: string;
+  align?: "start" | "end";
+  isCurrency?: boolean;
+  format?: (value: any, row: T) => React.ReactNode;
+  minWidth?: string;
 }
