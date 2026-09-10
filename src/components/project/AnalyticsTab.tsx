@@ -122,10 +122,15 @@ export default function AnalyticsTab({
             }
           >
             <LazyChartContainer>
-              <ReactECharts
-                option={pieChartOptions}
-                style={{ height: "100%", width: "100%" }}
-              />
+              {/* Force LTR on chart canvas; ECharts has no native RTL support.
+                  Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
+                  Axis labels and legend use translated keys, so they render correctly. */}
+              <div dir="ltr">
+                <ReactECharts
+                  option={pieChartOptions}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </div>
             </LazyChartContainer>
           </Suspense>
         </CardContent>
@@ -146,10 +151,15 @@ export default function AnalyticsTab({
             }
           >
             <LazyChartContainer>
-              <ReactECharts
-                option={barChartOptions}
-                style={{ height: "100%", width: "100%" }}
-              />
+              {/* Force LTR on chart canvas; ECharts has no native RTL support.
+                  Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
+                  Axis labels and legend use translated keys, so they render correctly. */}
+              <div dir="ltr">
+                <ReactECharts
+                  option={barChartOptions}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </div>
             </LazyChartContainer>
           </Suspense>
         </CardContent>
