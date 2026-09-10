@@ -23,10 +23,13 @@ import { PaginationControls } from "@/components/PaginationControls";
 import { EquipmentRow } from "./EquipmentRow";
 import { EquipmentForm } from "./EquipmentForm";
 import { QuickAddRow } from "./QuickAddRow";
+import { MobileItemCard } from "./MobileItemCard";
+import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { equipmentSchema, EquipmentFormValues } from "@/types/schemas";
 import { EquipmentItem } from "@/types/project-items";
 import { useProjectEquipment } from "@/hooks/useProjectEquipment";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const PAGE_SIZE = 50;
 
@@ -59,6 +62,8 @@ export default function EquipmentTable({
     "common",
   ]);
   const { format } = useCurrencyFormatter();
+  const isMobile = useIsMobile();
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<EquipmentItem | null>(null);
@@ -254,117 +259,169 @@ export default function EquipmentTable({
           />
         </Card>
       )}
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {canEdit && (
-                <TableHead className={`w-[40px] ${headerClass}`}>
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:all")}
-                  />
-                </TableHead>
-              )}
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("columns.name")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
-                {t("columns.type")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
-                {t("columns.rentalPurchase")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
-                {t("columns.quantity")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.costPerPeriod")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.usageDuration")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.estTotalCost")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRows.map((row) => {
-              if (row.type === "header") {
-                return (
-                  <TableRow
-                    key={`header-${row.data.id}`}
-                    className="bg-muted hover:bg-muted"
-                  >
-                    <TableCell
-                      colSpan={canEdit ? 9 : 8}
-                      className="font-semibold text-foreground text-sm"
-                    >
-                      {row.data.name}
-                    </TableCell>
-                  </TableRow>
-                );
-              } else {
-                const item = row.data;
-                return (
-                  <EquipmentRow
-                    key={item.id}
-                    item={item}
-                    currency={currency}
+      {isMobile ? (
+        <div className="space-y-3">
+          {paginatedRows.map((row) => {
+            if (row.type === "header") {
+              return (
+                <div
+                  key={`header-${row.data.id}`}
+                  className="font-semibold text-sm text-muted-foreground pt-2"
+                >
+                  {row.data.name}
+                </div>
+              );
+            }
+            const item = row.data;
+            const isPurchase = item.rental_or_purchase.toLowerCase() === "purchase";
+            return (
+              <MobileItemCard
+                key={item.id}
+                name={item.name}
+                subtitle={
+                  isPurchase
+                    ? `${t("columns.quantity")}: ${item.quantity}`
+                    : `${item.quantity} × ${format(item.cost_per_period, currency)}/${t(item.period_unit, { defaultValue: item.period_unit })} × ${item.usage_duration}`
+                }
+                total={format(item.total_cost || 0, currency)}
+                selected={selection.isSelected(item.id)}
+                onToggle={() => selection.toggle(item.id)}
+                isOwner={canEdit}
+                actions={isSelectMode ? undefined : (
+                  <ItemActions
                     isOwner={canEdit}
+                    onComment={() => onOpenComments(item, "equipment")}
+                    onDuplicate={() => handleDuplicateEquipment(item)}
                     onEdit={() => openForm(item)}
                     onDelete={() => setDeleteTarget(item)}
-                    onDuplicate={() => handleDuplicateEquipment(item)}
-                    onComment={(commentItem) =>
-                      onOpenComments(commentItem, "equipment")
-                    }
-                    selected={selection.isSelected(item.id)}
-                    onToggle={() => selection.toggle(item.id)}
-                    rentalOptions={rentalOptions}
+                    commentLabel={t("common:comments")}
+                    duplicateLabel={t("common:duplicate")}
+                    editLabel={t("common:edit")}
+                    deleteLabel={t("common:delete")}
                   />
-                );
-              }
-            })}
-            {equipment.length === 0 && (
+                )}
+              />
+            );
+          })}
+          {equipment.length === 0 && (
+            <div className="text-center h-24 text-sm text-muted-foreground">
+              {t("noItems")}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {canEdit && (
+                  <TableHead className={`w-[40px] ${headerClass}`}>
+                    <Checkbox
+                      checked={selection.allSelected}
+                      onCheckedChange={selection.toggleAll}
+                      aria-label={t("common:all")}
+                    />
+                  </TableHead>
+                )}
+                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
+                  {t("columns.name")}
+                </TableHead>
+                <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
+                  {t("columns.type")}
+                </TableHead>
+                <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
+                  {t("columns.rentalPurchase")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
+                  {t("columns.quantity")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.costPerPeriod")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.usageDuration")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.estTotalCost")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                  {t("common:actions")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedRows.map((row) => {
+                if (row.type === "header") {
+                  return (
+                    <TableRow
+                      key={`header-${row.data.id}`}
+                      className="bg-muted hover:bg-muted"
+                    >
+                      <TableCell
+                        colSpan={canEdit ? 9 : 8}
+                        className="font-semibold text-foreground text-sm"
+                      >
+                        {row.data.name}
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else {
+                  const item = row.data;
+                  return (
+                    <EquipmentRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                      isOwner={canEdit}
+                      onEdit={() => openForm(item)}
+                      onDelete={() => setDeleteTarget(item)}
+                      onDuplicate={() => handleDuplicateEquipment(item)}
+                      onComment={(commentItem) =>
+                        onOpenComments(commentItem, "equipment")
+                      }
+                      selected={selection.isSelected(item.id)}
+                      onToggle={() => selection.toggle(item.id)}
+                      rentalOptions={rentalOptions}
+                    />
+                  );
+                }
+              })}
+              {equipment.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={canEdit ? 9 : 8}
+                    className="text-center h-24 text-sm"
+                  >
+                    {t("noItems")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
               <TableRow>
                 <TableCell
-                  colSpan={canEdit ? 9 : 8}
-                  className="text-center h-24 text-sm"
+                  colSpan={canEdit ? 7 : 6}
+                  className={`text-end ${footerClass} text-sm`}
                 >
-                  {t("noItems")}
+                  {t("columns.grandTotal")}
                 </TableCell>
+                <TableCell
+                  className={`text-end tabular-nums ${footerClass} text-sm`}
+                >
+                  {format(grandTotal, currency)}
+                </TableCell>
+                <TableCell className={footerClass} />
               </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell
-                colSpan={canEdit ? 7 : 6}
-                className={`text-end ${footerClass} text-sm`}
-              >
-                {t("columns.grandTotal")}
-              </TableCell>
-              <TableCell
-                className={`text-end tabular-nums ${footerClass} text-sm`}
-              >
-                {format(grandTotal, currency)}
-              </TableCell>
-              <TableCell className={footerClass} />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+            </TableFooter>
+          </Table>
+        </div>
+      )}
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      <BulkActionBar count={selection.count} onClear={selection.clear}>
+      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
         <Button
           variant="secondary"
           size="sm"

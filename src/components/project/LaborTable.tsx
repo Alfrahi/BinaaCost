@@ -23,10 +23,13 @@ import { PaginationControls } from "@/components/PaginationControls";
 import { LaborRow } from "./LaborRow";
 import { LaborForm } from "./LaborForm";
 import { QuickAddRow } from "./QuickAddRow";
+import { MobileItemCard } from "./MobileItemCard";
+import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { laborSchema, LaborFormValues } from "@/types/schemas";
 import { LaborItem } from "@/types/project-items";
 import { useProjectLabor } from "@/hooks/useProjectLabor";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const PAGE_SIZE = 50;
 
@@ -47,6 +50,8 @@ export function LaborTable({
 }) {
   const { t } = useTranslation(["project_labor", "project_detail", "common"]);
   const { format } = useCurrencyFormatter();
+  const isMobile = useIsMobile();
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LaborItem | null>(null);
@@ -229,112 +234,162 @@ export function LaborTable({
           />
         </Card>
       )}
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {canEdit && (
-                <TableHead className={`w-[40px] ${headerClass}`}>
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:all")}
-                  />
-                </TableHead>
-              )}
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("columns.workerType")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.numWorkers")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.dailyRate")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                {t("columns.totalDays")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.estTotalCost")}
-              </TableHead>
-              {canEdit && (
-                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                  {t("common:actions")}
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRows.map((row) => {
-              if (row.type === "header") {
-                return (
-                  <TableRow
-                    key={`header-${row.data.id}`}
-                    className="bg-muted hover:bg-muted"
-                  >
-                    <TableCell
-                      colSpan={canEdit ? 7 : 6}
-                      className="font-semibold text-foreground text-sm"
-                    >
-                      {row.data.name}
-                    </TableCell>
-                  </TableRow>
-                );
-              } else {
-                const item = row.data;
-                return (
-                  <LaborRow
-                    key={item.id}
-                    item={item}
-                    currency={currency}
+      {isMobile ? (
+        <div className="space-y-3">
+          {paginatedRows.map((row) => {
+            if (row.type === "header") {
+              return (
+                <div
+                  key={`header-${row.data.id}`}
+                  className="font-semibold text-sm text-muted-foreground pt-2"
+                >
+                  {row.data.name}
+                </div>
+              );
+            }
+            const item = row.data;
+            return (
+              <MobileItemCard
+                key={item.id}
+                name={item.worker_type}
+                subtitle={`${item.number_of_workers} × ${format(
+                  item.daily_rate,
+                  currency,
+                )} × ${item.total_days}`}
+                total={format(item.total_cost || 0, currency)}
+                selected={selection.isSelected(item.id)}
+                onToggle={() => selection.toggle(item.id)}
+                isOwner={canEdit}
+                actions={isSelectMode ? undefined : (
+                  <ItemActions
                     isOwner={canEdit}
+                    onComment={() => onOpenComments(item, "labor")}
+                    onDuplicate={() => handleDuplicateLabor(item)}
                     onEdit={() => openForm(item)}
                     onDelete={() => setDeleteTarget(item)}
-                    onDuplicate={() => handleDuplicateLabor(item)}
-                    onComment={(commentItem) =>
-                      onOpenComments(commentItem, "labor")
-                    }
-                    selected={selection.isSelected(item.id)}
-                    onToggle={() => selection.toggle(item.id)}
+                    commentLabel={t("common:viewComments")}
+                    duplicateLabel={t("common:duplicate")}
+                    editLabel={t("common:edit")}
+                    deleteLabel={t("common:delete")}
                   />
-                );
-              }
-            })}
-            {labor.length === 0 && (
+                )}
+              />
+            );
+          })}
+          {labor.length === 0 && (
+            <div className="text-center h-24 text-sm text-muted-foreground">
+              {t("noItems")}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {canEdit && (
+                  <TableHead className={`w-[40px] ${headerClass}`}>
+                    <Checkbox
+                      checked={selection.allSelected}
+                      onCheckedChange={selection.toggleAll}
+                      aria-label={t("common:all")}
+                    />
+                  </TableHead>
+                )}
+                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
+                  {t("columns.workerType")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.numWorkers")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.dailyRate")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                  {t("columns.totalDays")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.estTotalCost")}
+                </TableHead>
+                {canEdit && (
+                  <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                    {t("common:actions")}
+                  </TableHead>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedRows.map((row) => {
+                if (row.type === "header") {
+                  return (
+                    <TableRow
+                      key={`header-${row.data.id}`}
+                      className="bg-muted hover:bg-muted"
+                    >
+                      <TableCell
+                        colSpan={canEdit ? 7 : 6}
+                        className="font-semibold text-foreground text-sm"
+                      >
+                        {row.data.name}
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else {
+                  const item = row.data;
+                  return (
+                    <LaborRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                      isOwner={canEdit}
+                      onEdit={() => openForm(item)}
+                      onDelete={() => setDeleteTarget(item)}
+                      onDuplicate={() => handleDuplicateLabor(item)}
+                      onComment={(commentItem) =>
+                        onOpenComments(commentItem, "labor")
+                      }
+                      selected={selection.isSelected(item.id)}
+                      onToggle={() => selection.toggle(item.id)}
+                    />
+                  );
+                }
+              })}
+              {labor.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={canEdit ? 7 : 6}
+                    className="text-center h-24 text-sm"
+                  >
+                    {t("noItems")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
               <TableRow>
                 <TableCell
-                  colSpan={canEdit ? 7 : 6}
-                  className="text-center h-24 text-sm"
+                  colSpan={canEdit ? 5 : 4}
+                  className={`text-end ${footerClass} text-sm`}
                 >
-                  {t("noItems")}
+                  {t("columns.grandTotal")}
                 </TableCell>
+                <TableCell
+                  className={`text-end tabular-nums ${footerClass} text-sm`}
+                >
+                  {format(grandTotal, currency)}
+                </TableCell>
+                <TableCell className={footerClass} />
               </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell
-                colSpan={canEdit ? 5 : 4}
-                className={`text-end ${footerClass} text-sm`}
-              >
-                {t("columns.grandTotal")}
-              </TableCell>
-              <TableCell
-                className={`text-end tabular-nums ${footerClass} text-sm`}
-              >
-                {format(grandTotal, currency)}
-              </TableCell>
-              <TableCell className={footerClass} />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+            </TableFooter>
+          </Table>
+        </div>
+      )}
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      <BulkActionBar count={selection.count} onClear={selection.clear}>
+      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
         <Button
           variant="secondary"
           size="sm"
