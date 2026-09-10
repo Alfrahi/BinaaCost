@@ -267,6 +267,9 @@ export const ProjectCostReport = React.forwardRef<
             <h2 className="text-3xl font-extrabold text-primary mb-2">
               {t("project_reports:projectCostReport")}
             </h2>
+            <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-text-secondary mb-2">
+              {t("project_reports:internalLabel")}
+            </span>
             <p className="text-lg font-semibold text-text-primary">
               {project.name}
             </p>
