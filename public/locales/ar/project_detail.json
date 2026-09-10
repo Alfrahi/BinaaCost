@@ -141,7 +141,8 @@
     "assumptions": "الافتراضات المالية",
     "defaultAssumptionsWarning": "يستخدم هذا التقدير الافتراضات المالية الافتراضية؛ لم تتم مراجعة النسب أو حفظها. افتح تبويب التسعير لتأكيدها قبل المشاركة أو التصدير.",
     "showBreakdown": "إظهار تفاصيل التكلفة",
-    "hideBreakdown": "إخفاء تفاصيل التكلفة"
+    "hideBreakdown": "إخفاء تفاصيل التكلفة",
+    "editing": "جارٍ التعديل"
   },
   "comments": {
     "title": "تعليقات لـ {{item}}",
@@ -150,5 +151,7 @@
     "item": "عنصر"
   },
   "reports.workersUnit": "عمال",
-  "editDetails": "تعديل التفاصيل"
+  "editDetails": "تعديل التفاصيل",
+  "selectModeOn": "خروج من وضع التحديد",
+  "selectModeOff": "وضع التحديد"
 }

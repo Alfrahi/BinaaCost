@@ -23,10 +23,13 @@ import { PaginationControls } from "@/components/PaginationControls";
 import { MaterialRow } from "./MaterialRow";
 import { MaterialForm } from "./MaterialForm";
 import { QuickAddRow } from "./QuickAddRow";
+import { MobileItemCard } from "./MobileItemCard";
+import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { materialSchema, MaterialFormValues } from "@/types/schemas";
 import { MaterialItem } from "@/types/project-items";
 import { useProjectMaterials } from "@/hooks/useProjectMaterials";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const PAGE_SIZE = 50;
 
@@ -55,6 +58,8 @@ export function MaterialsTable({
     "common",
   ]);
   const { format } = useCurrencyFormatter();
+  const isMobile = useIsMobile();
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MaterialItem | null>(null);
@@ -247,114 +252,170 @@ export function MaterialsTable({
           />
         </div>
       )}
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {canEdit && (
-                <TableHead className={`w-[40px] ${headerClass}`}>
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:all")}
-                  />
-                </TableHead>
-              )}
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("columns.name")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
-                {t("columns.description")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                {t("columns.quantity")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[80px]`}>
-                {t("columns.unit")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.unitPrice")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.estTotalCost")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRows.map((row) => {
-              if (row.type === "header") {
-                return (
-                  <TableRow
-                    key={`header-${row.data.id}`}
-                    className="bg-muted hover:bg-muted"
-                  >
-                    <TableCell
-                      colSpan={canEdit ? 8 : 7}
-                      className="font-semibold text-foreground text-sm"
-                    >
-                      {row.data.name}
-                    </TableCell>
-                  </TableRow>
-                );
-              } else {
-                const item = row.data;
-                return (
-                  <MaterialRow
-                    key={item.id}
-                    item={item}
-                    materialUnits={materialUnits}
-                    currency={currency}
+      {isMobile ? (
+        <div className="space-y-3">
+          {paginatedRows.map((row) => {
+            if (row.type === "header") {
+              return (
+                <div
+                  key={`header-${row.data.id}`}
+                  className="font-semibold text-sm text-muted-foreground pt-2"
+                >
+                  {row.data.name}
+                </div>
+              );
+            }
+            const item = row.data;
+            return (
+              <MobileItemCard
+                key={item.id}
+                name={item.name}
+                subtitle={`${item.quantity} × ${format(
+                  item.unit_price,
+                  currency,
+                )}`}
+                total={format(
+                  calculateItemCost.material(
+                    item.quantity,
+                    item.unit_price,
+                  ),
+                  currency,
+                )}
+                selected={selection.isSelected(item.id)}
+                onToggle={() => selection.toggle(item.id)}
+                isOwner={canEdit}
+                actions={isSelectMode ? undefined : (
+                  <ItemActions
                     isOwner={canEdit}
+                    onComment={() => onOpenComments(item, "material")}
+                    onDuplicate={() => handleDuplicateMaterial(item)}
                     onEdit={() => openForm(item)}
                     onDelete={() => setDeleteTarget(item)}
-                    onDuplicate={() => handleDuplicateMaterial(item)}
-                    onComment={(commentItem) =>
-                      onOpenComments(commentItem, "material")
-                    }
-                    selected={selection.isSelected(item.id)}
-                    onToggle={() => selection.toggle(item.id)}
+                    commentLabel={t("common:comments")}
+                    duplicateLabel={t("common:duplicate")}
+                    editLabel={t("common:edit")}
+                    deleteLabel={t("common:delete")}
                   />
-                );
-              }
-            })}
-            {materials.length === 0 && (
+                )}
+              />
+            );
+          })}
+          {materials.length === 0 && (
+            <div className="text-center h-24 text-sm text-muted-foreground">
+              {t("noItems")}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {canEdit && (
+                  <TableHead className={`w-[40px] ${headerClass}`}>
+                    <Checkbox
+                      checked={selection.allSelected}
+                      onCheckedChange={selection.toggleAll}
+                      aria-label={t("common:all")}
+                    />
+                  </TableHead>
+                )}
+                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
+                  {t("columns.name")}
+                </TableHead>
+                <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
+                  {t("columns.description")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                  {t("columns.quantity")}
+                </TableHead>
+                <TableHead className={`text-start ${headerClass} min-w-[80px]`}>
+                  {t("columns.unit")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.unitPrice")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.estTotalCost")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                  {t("common:actions")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedRows.map((row) => {
+                if (row.type === "header") {
+                  return (
+                    <TableRow
+                      key={`header-${row.data.id}`}
+                      className="bg-muted hover:bg-muted"
+                    >
+                      <TableCell
+                        colSpan={canEdit ? 8 : 7}
+                        className="font-semibold text-foreground text-sm"
+                      >
+                        {row.data.name}
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else {
+                  const item = row.data;
+                  return (
+                    <MaterialRow
+                      key={item.id}
+                      item={item}
+                      materialUnits={materialUnits}
+                      currency={currency}
+                      isOwner={canEdit}
+                      onEdit={() => openForm(item)}
+                      onDelete={() => setDeleteTarget(item)}
+                      onDuplicate={() => handleDuplicateMaterial(item)}
+                      onComment={(commentItem) =>
+                        onOpenComments(commentItem, "material")
+                      }
+                      selected={selection.isSelected(item.id)}
+                      onToggle={() => selection.toggle(item.id)}
+                    />
+                  );
+                }
+              })}
+              {materials.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={canEdit ? 8 : 7}
+                    className="text-center h-24 text-sm"
+                  >
+                    {t("noItems")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
               <TableRow>
                 <TableCell
-                  colSpan={canEdit ? 8 : 7}
-                  className="text-center h-24 text-sm"
+                  colSpan={canEdit ? 6 : 5}
+                  className={`text-end ${footerClass} text-sm`}
                 >
-                  {t("noItems")}
+                  {t("columns.grandTotal")}
                 </TableCell>
+                <TableCell
+                  className={`text-end tabular-nums ${footerClass} text-sm`}
+                >
+                  {format(grandTotal, currency)}
+                </TableCell>
+                <TableCell className={footerClass} />
               </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell
-                colSpan={canEdit ? 6 : 5}
-                className={`text-end ${footerClass} text-sm`}
-              >
-                {t("columns.grandTotal")}
-              </TableCell>
-              <TableCell
-                className={`text-end tabular-nums ${footerClass} text-sm`}
-              >
-                {format(grandTotal, currency)}
-              </TableCell>
-              <TableCell className={footerClass} />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+            </TableFooter>
+          </Table>
+        </div>
+      )}
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      <BulkActionBar count={selection.count} onClear={selection.clear}>
+      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
         <Button
           variant="secondary"
           size="sm"
