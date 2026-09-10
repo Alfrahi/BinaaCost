@@ -44,7 +44,7 @@ export function MobileItemCard({
           <div className="font-medium text-sm truncate">{name}</div>
           {subtitle && (
             <div className="text-xs text-muted-foreground mt-0.5">
-              {subtitle}
+              <bdi>{subtitle}</bdi>
             </div>
           )}
           <div className="text-sm font-semibold tabular-nums mt-1">

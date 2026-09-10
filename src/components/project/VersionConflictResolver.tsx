@@ -254,18 +254,26 @@ const getDetailsDisplay = (
   formatCurrency: any,
   currency: string,
   options: any,
-): string => {
+) => {
   switch (type) {
     case "materials": {
       const mat = item as MaterialItem;
       const unitLabel =
         options.material_unit.find((u: any) => u.value === mat.unit)?.label ||
         mat.unit;
-      return `${mat.quantity} ${unitLabel} @ ${formatCurrency(mat.unit_price, currency)}`;
+      return (
+        <bdi>
+          {`${mat.quantity} ${unitLabel} @ ${formatCurrency(mat.unit_price, currency)}`}
+        </bdi>
+      );
     }
     case "labor": {
       const lab = item as LaborItem;
-      return `${lab.number_of_workers} ${t("project_detail:reports.workersUnit")} × ${lab.total_days} ${t("project_equipment:Day")} @ ${formatCurrency(lab.daily_rate, currency)}`;
+      return (
+        <bdi>
+          {`${lab.number_of_workers} ${t("project_detail:reports.workersUnit")} × ${lab.total_days} ${t("project_equipment:Day")} @ ${formatCurrency(lab.daily_rate, currency)}`}
+        </bdi>
+      );
     }
     case "equipment": {
       const eq = item as EquipmentItem;
@@ -273,23 +281,41 @@ const getDetailsDisplay = (
         options.equipment_period_unit.find(
           (u: any) => u.value === eq.period_unit,
         )?.label || eq.period_unit;
-      return `${eq.quantity} ${periodUnitLabel} @ ${formatCurrency(eq.cost_per_period, currency)}`;
+      return (
+        <bdi>
+          {`${eq.quantity} ${periodUnitLabel} @ ${formatCurrency(eq.cost_per_period, currency)}`}
+        </bdi>
+      );
     }
     case "additional": {
       const add = item as AdditionalCostItem;
-      return formatCurrency(add.amount, currency);
+      return (
+        <bdi>
+          {formatCurrency(add.amount, currency)}
+        </bdi>
+      );
     }
     case "risks": {
       const risk = item as Risk;
       const probLabel =
         options.risk_probability.find((p: any) => p.value === risk.probability)
           ?.label || risk.probability;
-      return `${probLabel} - Impact: ${formatCurrency(risk.impact_amount, currency)}`;
+      return (
+        <bdi>
+          {`${probLabel} - Impact: ${formatCurrency(risk.impact_amount, currency)}`}
+        </bdi>
+      );
     }
     case "groups":
-      return `Order: ${(item as ProjectGroup).sort_order}`;
+      return (
+        <bdi>
+          {`Order: ${(item as ProjectGroup).sort_order}`}
+        </bdi>
+      );
     default:
-      return "";
+      return (
+        <bdi></bdi>
+      );
   }
 };
 
