@@ -275,7 +275,7 @@ export default function CostItemsTable({
                   <Checkbox
                     checked={selection.allSelected}
                     onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:all")}
+                    aria-label={t("common:selectAll")}
                   />
                 </th>
               )}

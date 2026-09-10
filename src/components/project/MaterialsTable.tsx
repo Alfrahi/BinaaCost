@@ -308,7 +308,7 @@ export function MaterialsTable({
         </div>
       ) : (
         <div className="overflow-x-auto border rounded-lg">
-          <Table>
+          <Table aria-label={t("project_materials:tableLabel")}>
             <TableHeader>
               <TableRow>
                 {canEdit && (
@@ -316,7 +316,7 @@ export function MaterialsTable({
                     <Checkbox
                       checked={selection.allSelected}
                       onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:all")}
+                      aria-label={t("common:selectAllMaterials")}
                     />
                   </TableHead>
                 )}

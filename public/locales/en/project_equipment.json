@@ -39,5 +39,6 @@
   "periodUnitRequired": "Period unit is required",
   "usageDurationMin": "Usage duration must be at least 1",
   "add": "Add equipment",
-  "edit": "Edit equipment"
+  "edit": "Edit equipment",
+  "tableLabel": "Equipment cost table"
 }
