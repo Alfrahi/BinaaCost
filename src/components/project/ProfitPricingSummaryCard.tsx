@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useIsMobile } from "@/hooks/useMobile";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -109,6 +110,7 @@ export default function ProfitPricingSummaryCard({
 }: Props) {
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
   const { format } = useCurrencyFormatter();
+  const isMobile = useIsMobile();
 
   const [settings, setSettings] = useState<FinancialSettings>(
     initialSettings || DEFAULT_FINANCIAL_SETTINGS,
@@ -479,6 +481,25 @@ export default function ProfitPricingSummaryCard({
               {t("project_detail:profit_pricing.seeAlsoRisks")}
             </Button>
           )}
+
+          {isMobile && isDirty && (
+            <div
+              className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-xl p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="flex items-center justify-between max-w-lg mx-auto">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-medium">{t("project_detail:profit_pricing.finalProjectTotal")}</span>
+                  <span className="text-sm text-muted-foreground">({t("project_detail:profit_pricing.editing")})</span>
+                </div>
+                <span className="text-2xl font-bold tabular-nums">
+                  {format(financials.grandTotal, currency, { notation: "compact" })}
+                </span>
+              </div>
+            </div>
+          )}
+
         </CardContent>
       </Card>
       </div>

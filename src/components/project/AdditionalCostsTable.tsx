@@ -31,9 +31,12 @@ import { safeAdd } from "@/utils/math";
 import { PaginationControls } from "@/components/PaginationControls";
 import { AdditionalCostForm } from "./AdditionalCostForm";
 import { QuickAddRow } from "./QuickAddRow";
+import { MobileItemCard } from "./MobileItemCard";
+import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { AdditionalCostItem } from "@/types/project-items";
 import { useProjectAdditionalCosts } from "@/hooks/useProjectAdditionalCosts";
+import { useIsMobile } from "@/hooks/useMobile";
 import {
   AdditionalCostFormValues,
   additionalCostSchema,
@@ -168,6 +171,8 @@ export function AdditionalCostsTable({
     "common",
   ]);
   const { format } = useCurrencyFormatter();
+  const isMobile = useIsMobile();
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AdditionalCostItem | null>(
@@ -344,66 +349,116 @@ export function AdditionalCostsTable({
           />
         </Card>
       )}
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {canEdit && (
-                <TableHead className={`w-[40px] ${headerClass}`}>
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:all")}
-                  />
-                </TableHead>
-              )}
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("columns.category")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
-                {t("columns.description")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
-                {t("columns.amount")}
-              </TableHead>
-              <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRows.map((row) => {
-              if (row.type === "header") {
-                return (
-                  <TableRow
-                    key={`header-${row.data.id}`}
-                    className="bg-muted hover:bg-muted"
-                  >
-                    <TableCell
-                      colSpan={canEdit ? 5 : 4}
-                      className="font-semibold text-foreground text-sm"
-                    >
-                      {row.data.name}
-                    </TableCell>
-                  </TableRow>
-                );
-              } else {
-                const item = row.data;
-                return (
-                  <AdditionalCostRow
-                    key={item.id}
-                    item={item}
-                    currency={currency}
+      {isMobile ? (
+        <div className="space-y-3">
+          {paginatedRows.map((row) => {
+            if (row.type === "header") {
+              return (
+                <div
+                  key={`header-${row.data.id}`}
+                  className="font-semibold text-sm text-muted-foreground pt-2"
+                >
+                  {row.data.name}
+                </div>
+              );
+            }
+            const item = row.data;
+            return (
+              <MobileItemCard
+                key={item.id}
+                name={
+                  additionalCategories.find(
+                    (c) => c.value === item.category,
+                  )?.label || item.category
+                }
+                subtitle={item.description || undefined}
+                total={format(item.amount, currency)}
+                selected={selection.isSelected(item.id)}
+                onToggle={() => selection.toggle(item.id)}
+                isOwner={canEdit}
+                actions={isSelectMode ? undefined : (
+                  <ItemActions
                     isOwner={canEdit}
-                    onEdit={openForm}
-                    onDelete={handleDeleteAdditionalCost}
-                    onDuplicate={handleDuplicateAdditionalCost}
-                    onComment={(commentItem) =>
-                      onOpenComments(commentItem, "additional")
-                    }
-                    selected={selection.isSelected(item.id)}
-                    onToggle={() => selection.toggle(item.id)}
-                    additionalCategories={additionalCategories}
+                    onComment={() => onOpenComments(item, "additional")}
+                    onDuplicate={() => handleDuplicateAdditionalCost(item)}
+                    onEdit={() => openForm(item)}
+                    onDelete={() => handleDeleteAdditionalCost(item.id)}
+                    commentLabel={t("common:comments")}
+                    duplicateLabel={t("common:duplicate")}
+                    editLabel={t("common:edit")}
+                    deleteLabel={t("common:delete")}
+                  />
+                )}
+              />
+            );
+          })}
+          {additionalCosts.length === 0 && (
+            <div className="text-center h-24 text-sm text-muted-foreground">
+              {t("noItems")}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {canEdit && (
+                  <TableHead className={`w-[40px] ${headerClass}`}>
+                    <Checkbox
+                      checked={selection.allSelected}
+                      onCheckedChange={selection.toggleAll}
+                      aria-label={t("common:all")}
+                    />
+                  </TableHead>
+                )}
+                <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
+                  {t("columns.category")}
+                </TableHead>
+                <TableHead className={`text-start ${headerClass} min-w-[200px]`}>
+                  {t("columns.description")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[120px]`}>
+                  {t("columns.amount")}
+                </TableHead>
+                <TableHead className={`text-end ${headerClass} min-w-[100px]`}>
+                  {t("common:actions")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedRows.map((row) => {
+                if (row.type === "header") {
+                  return (
+                    <TableRow
+                      key={`header-${row.data.id}`}
+                      className="bg-muted hover:bg-muted"
+                    >
+                      <TableCell
+                        colSpan={canEdit ? 5 : 4}
+                        className="font-semibold text-foreground text-sm"
+                      >
+                        {row.data.name}
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else {
+                  const item = row.data;
+                  return (
+                    <AdditionalCostRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                      isOwner={canEdit}
+                      onEdit={openForm}
+                      onDelete={handleDeleteAdditionalCost}
+                      onDuplicate={handleDuplicateAdditionalCost}
+                      onComment={(commentItem) =>
+                        onOpenComments(commentItem, "additional")
+                      }
+                      selected={selection.isSelected(item.id)}
+                      onToggle={() => selection.toggle(item.id)}
+                      additionalCategories={additionalCategories}
                   />
                 );
               }
@@ -437,12 +492,13 @@ export function AdditionalCostsTable({
           </TableFooter>
         </Table>
       </div>
+      )}
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      <BulkActionBar count={selection.count} onClear={selection.clear}>
+      <BulkActionBar count={selection.count} onClear={selection.clear} isSelectMode={isSelectMode} onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}>
         <Button
           variant="secondary"
           size="sm"
