@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, Suspense } from "react";
+import React, { useState, useRef, useMemo, Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -96,17 +96,38 @@ export default function ReportsTab({
 
   const { generatePdf, isGenerating } = usePdfExport();
   const { versions } = useProjectVersions(project.id);
+  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
 
-  // Latest finalized version, if any — stamped onto exported reports so the
-  // client-facing output records which locked estimate it reflects.
-  const versionStamp = useMemo(() => {
-    const finalized = versions.find((v) => v.is_final);
-    if (!finalized) return undefined;
+  // Set default selected version to latest finalized, otherwise latest by date
+  useEffect(() => {
+    if (versions.length === 0) {
+      setSelectedVersionId(null);
+      return;
+    }
+    const finalized = versions.find(v => v.is_final);
+    if (finalized) {
+      setSelectedVersionId(finalized.id);
+    } else {
+      // sort by created_at descending
+      const sorted = [...versions].sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setSelectedVersionId(sorted[0]?.id ?? null);
+    }
+  }, [versions]);
+
+  const selectedVersion = useMemo(() => {
+    if (!selectedVersionId || versions.length === 0) return null;
+    return versions.find(v => v.id === selectedVersionId) ?? null;
+  }, [selectedVersionId, versions]);
+
+  const versionStampForExport = useMemo<{ name: string; date: string } | undefined>(() => {
+    if (!selectedVersion) return undefined;
     return {
-      name: finalized.name,
-      date: new Date(finalized.created_at).toLocaleDateString(i18n.language),
+      name: selectedVersion.name,
+      date: new Date(selectedVersion.created_at).toLocaleDateString(i18n.language),
     };
-  }, [versions, i18n.language]);
+  }, [selectedVersion, i18n.language]);
 
   const allSettingsOptions = useMemo(
     () => ({
@@ -234,6 +255,52 @@ export default function ReportsTab({
             )}
 
             <TabsContent value="project-cost" className="mt-4 space-y-4">
+              <div className="mb-4">
+                <Label htmlFor="version-select-project-cost" className="text-sm">
+                  {t("project_reports:versionToExport")}
+                </Label>
+                <Select
+                  value={selectedVersionId}
+                  onValueChange={setSelectedVersionId}
+                  className="w-full mt-1"
+                >
+                  {versions.length > 0 ? versions.map(v => (
+                    <SelectItem
+                      key={v.id}
+                      value={v.id}
+                    >
+                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                    </SelectItem>
+                  )) : (
+                    <SelectItem value="" disabled>
+                      {t("common:none")}
+                    </SelectItem>
+                  )}
+                </Select>
+              </div>
+              <div className="mb-4">
+                <Label htmlFor="version-select-client-proposal" className="text-sm">
+                  {t("project_reports:versionToExport")}
+                </Label>
+                <Select
+                  value={selectedVersionId}
+                  onValueChange={setSelectedVersionId}
+                  className="w-full mt-1"
+                >
+                  {versions.length > 0 ? versions.map(v => (
+                    <SelectItem
+                      key={v.id}
+                      value={v.id}
+                    >
+                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                    </SelectItem>
+                  )) : (
+                    <SelectItem value="" disabled>
+                      {t("common:none")}
+                    </SelectItem>
+                  )}
+                </Select>
+              </div>
               <Button
                 onClick={() => handleGeneratePdf("projectCost")}
                 disabled={isGenerating}
@@ -272,7 +339,7 @@ export default function ReportsTab({
                       groups={groups}
                       companyInfo={companyInfo}
                       preparedBy={user?.email || t("common:unknownUser")}
-                      versionStamp={versionStamp}
+                      versionStamp={versionStampForExport}
                       allSettingsOptions={allSettingsOptions}
                     />
                   </Suspense>
@@ -281,6 +348,29 @@ export default function ReportsTab({
             </TabsContent>
 
             <TabsContent value="client-proposal" className="mt-4 space-y-4">
+              <div className="mb-4">
+                <Label htmlFor="version-select-client-proposal" className="text-sm">
+                  {t("project_reports:versionToExport")}
+                </Label>
+                <Select
+                  value={selectedVersionId}
+                  onValueChange={setSelectedVersionId}
+                  className="w-full mt-1"
+                >
+                  {versions.length > 0 ? versions.map(v => (
+                    <SelectItem
+                      key={v.id}
+                      value={v.id}
+                    >
+                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                    </SelectItem>
+                  )) : (
+                    <SelectItem value="" disabled>
+                      {t("common:none")}
+                    </SelectItem>
+                  )}
+                </Select>
+              </div>
               <div>
                 <Label htmlFor="clientName" className="text-sm">
                   {t("project_reports:clientName")}
@@ -305,6 +395,29 @@ export default function ReportsTab({
                   placeholder={t("project_reports:defaultTerms")}
                   className="text-sm"
                 />
+              </div>
+              <div className="mb-4">
+                <Label htmlFor="version-select-client-proposal" className="text-sm">
+                  {t("project_reports:versionToExport")}
+                </Label>
+                <Select
+                  value={selectedVersionId}
+                  onValueChange={setSelectedVersionId}
+                  className="w-full mt-1"
+                >
+                  {versions.length > 0 ? versions.map(v => (
+                    <SelectItem
+                      key={v.id}
+                      value={v.id}
+                    >
+                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                    </SelectItem>
+                  )) : (
+                    <SelectItem value="" disabled>
+                      {t("common:none")}
+                    </SelectItem>
+                  )}
+                </Select>
               </div>
               <Button
                 onClick={() => handleGeneratePdf("clientProposal")}
@@ -340,7 +453,7 @@ export default function ReportsTab({
                       terms={sanitizedTerms}
                       preparedBy={companyInfo.name || t("common:ourTeam")}
                       clientName={clientName}
-                      versionStamp={versionStamp}
+                      versionStamp={versionStampForExport}
                     />
                   </Suspense>
                 </div>
