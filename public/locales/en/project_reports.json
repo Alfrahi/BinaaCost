@@ -53,5 +53,9 @@
   "selectReport": "Select Report",
   "projectCostReport": "Project Cost Report",
   "costBreakdown": "Cost Breakdown",
-  "subtotal": "Subtotal"
+  "subtotal": "Subtotal",
+  "internalLabel": "Internal",
+  "clientFacingLabel": "Client-facing",
+  "internalReportHint": "Detailed internal cost report — includes line-item costs and financial assumptions.",
+  "clientFacingReportHint": "Client-facing proposal — omits internal cost detail and assumptions."
 }

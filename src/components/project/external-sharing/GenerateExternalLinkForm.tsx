@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Link as LinkIcon, Copy } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Link as LinkIcon, Copy, AlertTriangle } from "lucide-react";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 import { toast } from "sonner";
@@ -60,9 +61,14 @@ export function GenerateExternalLinkForm({
 
   return (
     <div className="space-y-4 pt-6 border-t border-border">
-      <h3 className="font-semibold text-lg text-text-primary">
-        {t("project_detail:share.external.title")}
-      </h3>
+      <div className="flex items-center gap-2">
+        <h3 className="font-semibold text-lg text-text-primary">
+          {t("project_detail:share.external.title")}
+        </h3>
+        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+          {t("project_detail:share.external.clientFacing")}
+        </span>
+      </div>
       <p className="text-sm text-muted-foreground">
         {t("project_detail:share.external.description")}
       </p>
@@ -121,17 +127,33 @@ export function GenerateExternalLinkForm({
       </form>
 
       {generatedLink && (
-        <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-muted text-text-primary text-sm">
-          <LinkIcon className="w-4 h-4" />
-          <span className="flex-1 truncate">{generatedLink}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyLink}
-            className="text-primary hover:bg-muted"
+        <div className="space-y-3">
+          <Alert
+            data-testid="shown-once-warning"
+            className="border-danger/50 bg-danger/10 text-start"
           >
-            <Copy className="w-4 h-4" />
-          </Button>
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription className="text-sm font-medium">
+              {t("project_detail:share.external.shownOnceWarning")}
+            </AlertDescription>
+          </Alert>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 border border-border rounded-md bg-muted">
+            <LinkIcon className="w-4 h-4 shrink-0 self-center" aria-hidden="true" />
+            <span
+              className="flex-1 truncate text-sm text-text-primary font-mono"
+              data-testid="generated-link"
+            >
+              {generatedLink}
+            </span>
+            <Button
+              type="button"
+              onClick={handleCopyLink}
+              className="shrink-0 text-sm"
+            >
+              <Copy className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
+              {t("project_detail:share.external.copyLink")}
+            </Button>
+          </div>
         </div>
       )}
     </div>

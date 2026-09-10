@@ -71,7 +71,7 @@ export function DefaultAssumptionsWarning({ project }: WarningProps) {
   return (
     <Alert
       data-testid="default-assumptions-warning"
-      className="border-warning/50 bg-warning/10 text-start"
+      className="border-danger/50 bg-danger/10 text-start"
     >
       <AlertTriangle className="h-4 w-4" aria-hidden="true" />
       <AlertDescription className="flex items-center justify-between gap-2 text-sm">

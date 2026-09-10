@@ -96,12 +96,12 @@ export default function ReportsTab({
 
   const { generatePdf, isGenerating } = usePdfExport();
   const { versions } = useProjectVersions(project.id);
-  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
+  const [selectedVersionId, setSelectedVersionId] = useState<string | undefined>(undefined);
 
   // Set default selected version to latest finalized, otherwise latest by date
   useEffect(() => {
     if (versions.length === 0) {
-      setSelectedVersionId(null);
+      setSelectedVersionId(undefined);
       return;
     }
     const finalized = versions.find(v => v.is_final);
@@ -112,7 +112,7 @@ export default function ReportsTab({
       const sorted = [...versions].sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
-      setSelectedVersionId(sorted[0]?.id ?? null);
+      setSelectedVersionId(sorted[0]?.id ?? undefined);
     }
   }, [versions]);
 
@@ -177,11 +177,15 @@ export default function ReportsTab({
         value: "project-cost",
         labelKey: "project_reports:detailedCostReport",
         icon: DollarSign,
+        badgeKey: "project_reports:internalLabel",
+        badgeClass: "bg-muted text-text-secondary",
       },
       {
         value: "client-proposal",
         labelKey: "project_reports:clientProposal",
         icon: Users,
+        badgeKey: "project_reports:clientFacingLabel",
+        badgeClass: "bg-primary/10 text-primary",
       },
     ],
     [],
@@ -232,7 +236,7 @@ export default function ReportsTab({
                       value={item.value}
                       className="text-sm"
                     >
-                      {t(item.labelKey)}
+                      {t(item.labelKey)} — {t(item.badgeKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -248,6 +252,14 @@ export default function ReportsTab({
                     >
                       <item.icon className="w-4 h-4" />
                       {t(item.labelKey)}
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                          item.badgeClass,
+                        )}
+                      >
+                        {t(item.badgeKey)}
+                      </span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -262,43 +274,24 @@ export default function ReportsTab({
                 <Select
                   value={selectedVersionId}
                   onValueChange={setSelectedVersionId}
-                  className="w-full mt-1"
                 >
-                  {versions.length > 0 ? versions.map(v => (
-                    <SelectItem
-                      key={v.id}
-                      value={v.id}
-                    >
-                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
-                    </SelectItem>
-                  )) : (
-                    <SelectItem value="" disabled>
-                      {t("common:none")}
-                    </SelectItem>
-                  )}
-                </Select>
-              </div>
-              <div className="mb-4">
-                <Label htmlFor="version-select-client-proposal" className="text-sm">
-                  {t("project_reports:versionToExport")}
-                </Label>
-                <Select
-                  value={selectedVersionId}
-                  onValueChange={setSelectedVersionId}
-                  className="w-full mt-1"
-                >
-                  {versions.length > 0 ? versions.map(v => (
-                    <SelectItem
-                      key={v.id}
-                      value={v.id}
-                    >
-                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
-                    </SelectItem>
-                  )) : (
-                    <SelectItem value="" disabled>
-                      {t("common:none")}
-                    </SelectItem>
-                  )}
+                  <SelectTrigger id="version-select-project-cost" className="w-full mt-1 text-sm">
+                    <SelectValue placeholder={t("project_reports:versionToExport")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {versions.length > 0 ? versions.map(v => (
+                      <SelectItem
+                        key={v.id}
+                        value={v.id}
+                      >
+                        {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                      </SelectItem>
+                    )) : (
+                      <SelectItem value="" disabled>
+                        {t("common:none")}
+                      </SelectItem>
+                    )}
+                  </SelectContent>
                 </Select>
               </div>
               <Button
@@ -355,20 +348,24 @@ export default function ReportsTab({
                 <Select
                   value={selectedVersionId}
                   onValueChange={setSelectedVersionId}
-                  className="w-full mt-1"
                 >
-                  {versions.length > 0 ? versions.map(v => (
-                    <SelectItem
-                      key={v.id}
-                      value={v.id}
-                    >
-                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
-                    </SelectItem>
-                  )) : (
-                    <SelectItem value="" disabled>
-                      {t("common:none")}
-                    </SelectItem>
-                  )}
+                  <SelectTrigger id="version-select-client-proposal" className="w-full mt-1 text-sm">
+                    <SelectValue placeholder={t("project_reports:versionToExport")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {versions.length > 0 ? versions.map(v => (
+                      <SelectItem
+                        key={v.id}
+                        value={v.id}
+                      >
+                        {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
+                      </SelectItem>
+                    )) : (
+                      <SelectItem value="" disabled>
+                        {t("common:none")}
+                      </SelectItem>
+                    )}
+                  </SelectContent>
                 </Select>
               </div>
               <div>
@@ -395,29 +392,6 @@ export default function ReportsTab({
                   placeholder={t("project_reports:defaultTerms")}
                   className="text-sm"
                 />
-              </div>
-              <div className="mb-4">
-                <Label htmlFor="version-select-client-proposal" className="text-sm">
-                  {t("project_reports:versionToExport")}
-                </Label>
-                <Select
-                  value={selectedVersionId}
-                  onValueChange={setSelectedVersionId}
-                  className="w-full mt-1"
-                >
-                  {versions.length > 0 ? versions.map(v => (
-                    <SelectItem
-                      key={v.id}
-                      value={v.id}
-                    >
-                      {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
-                    </SelectItem>
-                  )) : (
-                    <SelectItem value="" disabled>
-                      {t("common:none")}
-                    </SelectItem>
-                  )}
-                </Select>
               </div>
               <Button
                 onClick={() => handleGeneratePdf("clientProposal")}
