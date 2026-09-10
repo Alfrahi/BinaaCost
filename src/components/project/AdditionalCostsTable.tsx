@@ -100,11 +100,11 @@ function AdditionalCostRow({
             size="icon"
             onClick={() => onComment(item)}
             title={t("common:comments")}
-            aria-label={t("common:comments")}
-            className="h-7 w-7"
+            aria-label={`${t("common:comments")} ${item.category}`}
+            className="h-11 w-11"
           >
             <MessageSquare
-              className="w-3 h-3 text-text-secondary"
+              className="w-4 h-4 text-text-secondary"
               aria-hidden="true"
             />
           </Button>
@@ -115,28 +115,30 @@ function AdditionalCostRow({
                 size="icon"
                 onClick={() => onDuplicate(item)}
                 title={t("common:duplicate")}
-                aria-label={t("common:duplicate")}
-                className="h-7 w-7"
+                aria-label={`${t("common:duplicate")} ${item.category}`}
+                className="h-11 w-11"
               >
-                <Copy className="w-3 h-3" aria-hidden="true" />
+                <Copy className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => onEdit(item)}
-                aria-label={t("common:edit")}
-                className="h-7 w-7"
+                title={t("common:edit")}
+                aria-label={`${t("common:edit")} ${item.category}`}
+                className="h-11 w-11"
               >
-                <Edit2 className="w-3 h-3" aria-hidden="true" />
+                <Edit2 className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="destructive"
                 size="icon"
                 onClick={() => onDelete(item.id)}
-                aria-label={t("common:delete")}
-                className="h-7 w-7"
+                title={t("common:delete")}
+                aria-label={`${t("common:delete")} ${item.category}`}
+                className="h-11 w-11"
               >
-                <Trash2 className="w-3 h-3" aria-hidden="true" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}
@@ -400,7 +402,7 @@ export function AdditionalCostsTable({
         </div>
       ) : (
         <div className="overflow-x-auto border rounded-lg">
-          <Table>
+          <Table aria-label={t("project_additional:tableLabel")}>
             <TableHeader>
               <TableRow>
                 {canEdit && (
@@ -408,7 +410,7 @@ export function AdditionalCostsTable({
                     <Checkbox
                       checked={selection.allSelected}
                       onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:all")}
+                      aria-label={t("common:selectAllAdditional")}
                     />
                   </TableHead>
                 )}

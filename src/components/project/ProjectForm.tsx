@@ -132,7 +132,10 @@ export default function ProjectForm({
             className="space-y-6"
           >
             {error && (
-              <div className="p-4 bg-red-50 text-red-700 rounded-md text-sm">
+              <div
+                role="alert"
+                className="p-4 bg-red-50 text-red-700 rounded-md text-sm"
+              >
                 {error}
               </div>
             )}
@@ -147,10 +150,18 @@ export default function ProjectForm({
                   {...form.register("name")}
                   placeholder={t("project_form:namePlaceholder")}
                   aria-label={t("project_form:name")}
+                  aria-invalid={!!form.formState.errors.name}
+                  aria-describedby={
+                    form.formState.errors.name ? "name-error" : undefined
+                  }
                   className="text-sm"
                 />
                 {form.formState.errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p
+                    id="name-error"
+                    role="alert"
+                    className="text-red-500 text-sm mt-1"
+                  >
                     {t(form.formState.errors.name.message!)}
                   </p>
                 )}
@@ -185,7 +196,7 @@ export default function ProjectForm({
                     className="text-sm"
                   />
                   {form.formState.errors.type && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p role="alert" className="text-red-500 text-sm mt-1">
                       {t(form.formState.errors.type.message!)}
                     </p>
                   )}
@@ -200,10 +211,18 @@ export default function ProjectForm({
                       {...form.register("size")}
                       placeholder={t("project_form:sizePlaceholder")}
                       aria-label={t("project_form:size")}
+                      aria-invalid={!!form.formState.errors.size}
+                      aria-describedby={
+                        form.formState.errors.size ? "size-error" : undefined
+                      }
                       className="text-sm"
                     />
                     {form.formState.errors.size && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p
+                        id="size-error"
+                        role="alert"
+                        className="text-red-500 text-sm mt-1"
+                      >
                         {t(form.formState.errors.size.message!)}
                       </p>
                     )}
@@ -224,7 +243,7 @@ export default function ProjectForm({
                       className="text-sm"
                     />
                     {form.formState.errors.size_unit && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p role="alert" className="text-red-500 text-sm mt-1">
                         {t(form.formState.errors.size_unit.message!)}
                       </p>
                     )}
@@ -270,10 +289,20 @@ export default function ProjectForm({
                     {...form.register("duration_days")}
                     placeholder={t("project_form:durationPlaceholder")}
                     aria-label={t("project_form:duration")}
+                    aria-invalid={!!form.formState.errors.duration_days}
+                    aria-describedby={
+                      form.formState.errors.duration_days
+                        ? "duration-error"
+                        : undefined
+                    }
                     className="text-sm"
                   />
                   {form.formState.errors.duration_days && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p
+                      id="duration-error"
+                      role="alert"
+                      className="text-red-500 text-sm mt-1"
+                    >
                       {t(form.formState.errors.duration_days.message!)}
                     </p>
                   )}
@@ -308,7 +337,7 @@ export default function ProjectForm({
                   className="text-sm"
                 />
                 {form.formState.errors.currency && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p role="alert" className="text-red-500 text-sm mt-1">
                     {t(form.formState.errors.currency.message!)}
                   </p>
                 )}

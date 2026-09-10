@@ -120,11 +120,11 @@ export function EquipmentRow({
             size="icon"
             onClick={() => onComment(item)}
             title={t("common:comments")}
-            aria-label={t("common:comments")}
-            className="h-7 w-7"
+            aria-label={`${t("common:comments")} ${item.name}`}
+            className="h-11 w-11"
           >
             <MessageSquare
-              className="w-3 h-3 text-text-secondary"
+              className="w-4 h-4 text-text-secondary"
               aria-hidden="true"
             />
           </Button>
@@ -135,17 +135,18 @@ export function EquipmentRow({
                 size="icon"
                 onClick={onDuplicate}
                 title={t("common:duplicate")}
-                aria-label={t("common:duplicate")}
-                className="h-7 w-7"
+                aria-label={`${t("common:duplicate")} ${item.name}`}
+                className="h-11 w-11"
               >
-                <Copy className="w-3 h-3" aria-hidden="true" />
+                <Copy className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={onEdit}
-                aria-label={t("common:edit")}
-                className="h-7 w-7"
+                title={t("common:edit")}
+                aria-label={`${t("common:edit")} ${item.name}`}
+                className="h-11 w-11"
               >
                 <Edit2 className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -153,10 +154,11 @@ export function EquipmentRow({
                 variant="destructive"
                 size="icon"
                 onClick={onDelete}
-                aria-label={t("common:delete")}
-                className="h-7 w-7"
+                title={t("common:delete")}
+                aria-label={`${t("common:delete")} ${item.name}`}
+                className="h-11 w-11"
               >
-                <Trash2 className="w-3 h-3" aria-hidden="true" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}

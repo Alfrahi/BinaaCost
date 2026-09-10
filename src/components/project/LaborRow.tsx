@@ -64,10 +64,11 @@ export function LaborRow({
             size="icon"
             variant="ghost"
             onClick={() => onComment(item)}
+            title={t("common:viewComments")}
             aria-label={`${t("common:viewComments")} ${item.worker_type}`}
-            className="h-7 w-7"
+            className="h-11 w-11"
           >
-            <MessageSquare className="w-3 h-3" />
+            <MessageSquare className="w-4 h-4" />
           </Button>
           {isOwner && (
             <>
@@ -75,28 +76,31 @@ export function LaborRow({
                 size="icon"
                 variant="ghost"
                 onClick={() => onDuplicate(item)}
+                title={t("common:duplicate")}
                 aria-label={`${t("common:duplicate")} ${item.worker_type}`}
-                className="h-7 w-7"
+                className="h-11 w-11"
               >
-                <Copy className="w-3 h-3" />
+                <Copy className="w-4 h-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => onEdit(item)}
+                title={t("common:edit")}
                 aria-label={`${t("common:edit")} ${item.worker_type}`}
-                className="h-7 w-7"
+                className="h-11 w-11"
               >
-                <Edit2 className="w-3 h-3" />
+                <Edit2 className="w-4 h-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
                 onClick={() => onDelete(item)}
+                title={t("common:delete")}
                 aria-label={`${t("common:delete")} ${item.worker_type}`}
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </>
           )}

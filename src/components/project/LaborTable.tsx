@@ -284,7 +284,7 @@ export function LaborTable({
         </div>
       ) : (
         <div className="overflow-x-auto border rounded-lg">
-          <Table>
+          <Table aria-label={t("project_labor:tableLabel")}>
             <TableHeader>
               <TableRow>
                 {canEdit && (
@@ -292,7 +292,7 @@ export function LaborTable({
                     <Checkbox
                       checked={selection.allSelected}
                       onCheckedChange={selection.toggleAll}
-                      aria-label={t("common:all")}
+                      aria-label={t("common:selectAllLabor")}
                     />
                   </TableHead>
                 )}

@@ -16,5 +16,6 @@
   "amountError": "Amount must be non-negative",
   "add": "Add additional cost",
   "edit": "Edit additional cost",
-  "amountNonNegative": "Amount must be non-negative"
+  "amountNonNegative": "Amount must be non-negative",
+  "tableLabel": "Additional costs table"
 }

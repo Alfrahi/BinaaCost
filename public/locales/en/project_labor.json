@@ -20,5 +20,6 @@
   "dailyRateNonNegative": "Daily rate must be non-negative",
   "totalDaysMin": "Total days must be at least 1",
   "add": "Add labor item",
-  "edit": "Edit labor item"
+  "edit": "Edit labor item",
+  "tableLabel": "Labor cost table"
 }

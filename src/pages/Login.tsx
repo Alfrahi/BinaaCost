@@ -200,10 +200,14 @@ export default function Login() {
                 id="email"
                 type="email"
                 placeholder={t("emailPlaceholder")}
+                aria-invalid={!!loginForm.formState.errors.email}
+                aria-describedby={
+                  loginForm.formState.errors.email ? "email-error" : undefined
+                }
                 {...loginForm.register("email")}
               />
               {loginForm.formState.errors.email && (
-                <p className="text-red-500 text-xs">
+                <p id="email-error" role="alert" className="text-red-500 text-xs">
                   {loginForm.formState.errors.email.message}
                 </p>
               )}
@@ -214,10 +218,20 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder={t("passwordPlaceholder")}
+                aria-invalid={!!loginForm.formState.errors.password}
+                aria-describedby={
+                  loginForm.formState.errors.password
+                    ? "password-error"
+                    : undefined
+                }
                 {...loginForm.register("password")}
               />
               {loginForm.formState.errors.password && (
-                <p className="text-red-500 text-xs">
+                <p
+                  id="password-error"
+                  role="alert"
+                  className="text-red-500 text-xs"
+                >
                   {loginForm.formState.errors.password.message}
                 </p>
               )}
@@ -237,10 +251,20 @@ export default function Login() {
                 id="signup-email"
                 type="email"
                 placeholder={t("emailPlaceholder")}
+                aria-invalid={!!signupForm.formState.errors.email}
+                aria-describedby={
+                  signupForm.formState.errors.email
+                    ? "signup-email-error"
+                    : undefined
+                }
                 {...signupForm.register("email")}
               />
               {signupForm.formState.errors.email && (
-                <p className="text-red-500 text-xs">
+                <p
+                  id="signup-email-error"
+                  role="alert"
+                  className="text-red-500 text-xs"
+                >
                   {signupForm.formState.errors.email.message}
                 </p>
               )}
@@ -251,10 +275,20 @@ export default function Login() {
                 id="signup-password"
                 type="password"
                 placeholder={t("passwordPlaceholder")}
+                aria-invalid={!!signupForm.formState.errors.password}
+                aria-describedby={
+                  signupForm.formState.errors.password
+                    ? "signup-password-error"
+                    : undefined
+                }
                 {...signupForm.register("password")}
               />
               {signupForm.formState.errors.password && (
-                <p className="text-red-500 text-xs">
+                <p
+                  id="signup-password-error"
+                  role="alert"
+                  className="text-red-500 text-xs"
+                >
                   {signupForm.formState.errors.password.message}
                 </p>
               )}
@@ -265,10 +299,20 @@ export default function Login() {
                 id="signup-confirm"
                 type="password"
                 placeholder={t("passwordPlaceholder")}
+                aria-invalid={!!signupForm.formState.errors.confirmPassword}
+                aria-describedby={
+                  signupForm.formState.errors.confirmPassword
+                    ? "signup-confirm-error"
+                    : undefined
+                }
                 {...signupForm.register("confirmPassword")}
               />
               {signupForm.formState.errors.confirmPassword && (
-                <p className="text-red-500 text-xs">
+                <p
+                  id="signup-confirm-error"
+                  role="alert"
+                  className="text-red-500 text-xs"
+                >
                   {signupForm.formState.errors.confirmPassword.message}
                 </p>
               )}
