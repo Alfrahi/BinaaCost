@@ -22,6 +22,7 @@ import { EquipmentItem } from "@/types/project-items";
 import { useProjectEquipment } from "@/hooks/useProjectEquipment";
 import { useIsMobile } from "@/hooks/useMobile";
 import DataTable from "@/components/ui/data-table";
+import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
 
@@ -358,6 +359,39 @@ export function EquipmentTable({
           isSubmitting={isAddingEquipment}
           submitLabel={t("add")}
           ariaLabel={t("add")}
+        />
+      )}
+      {canEdit && !isFormOpen && (
+        <AssemblyIntegrationRow
+          itemTypes={["equipment"]}
+          onImport={{
+            equipment: async (items) => {
+              for (const item of items) {
+                const details = item.details as {
+                  type?: string | null;
+                  rental_or_purchase?: string;
+                  usage_duration?: number;
+                  maintenance_cost?: number | null;
+                  fuel_cost?: number | null;
+                } | null;
+                await handleAddOrUpdateEquipment(
+                  {
+                    name: item.description,
+                    type: details?.type || undefined,
+                    rental_or_purchase: details?.rental_or_purchase || "Rental",
+                    quantity: item.quantity,
+                    cost_per_period: item.unit_price,
+                    period_unit: item.unit || "Day",
+                    usage_duration: details?.usage_duration ?? 1,
+                    maintenance_cost: details?.maintenance_cost ?? 0,
+                    fuel_cost: details?.fuel_cost ?? 0,
+                    group_id: "ungrouped",
+                  },
+                  currency,
+                );
+              }
+            },
+          }}
         />
       )}
       {isFormOpen && (

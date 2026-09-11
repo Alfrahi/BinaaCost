@@ -22,6 +22,7 @@ import { MaterialItem } from "@/types/project-items";
 import { useProjectMaterials } from "@/hooks/useProjectMaterials";
 import { useIsMobile } from "@/hooks/useMobile";
 import DataTable from "@/components/ui/data-table";
+import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
 
@@ -258,6 +259,28 @@ export function MaterialsTable({
           isSubmitting={isAddingMaterial}
           submitLabel={t("add")}
           ariaLabel={t("add")}
+        />
+      )}
+      {canEdit && !isFormOpen && (
+        <AssemblyIntegrationRow
+          itemTypes={["material"]}
+          onImport={{
+            materials: async (items) => {
+              for (const item of items) {
+                await handleAddOrUpdateMaterial(
+                  {
+                    name: item.description,
+                    description: "",
+                    quantity: item.quantity,
+                    unit: item.unit || "unit",
+                    unit_price: item.unit_price,
+                    group_id: "ungrouped",
+                  },
+                  currency,
+                );
+              }
+            },
+          }}
         />
       )}
       {isFormOpen && (
