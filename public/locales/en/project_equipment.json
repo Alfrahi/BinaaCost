@@ -40,5 +40,6 @@
   "usageDurationMin": "Usage duration must be at least 1",
   "add": "Add equipment",
   "edit": "Edit equipment",
-  "tableLabel": "Equipment cost table"
+  "tableLabel": "Equipment cost table",
+  "formula": "Formula"
 }

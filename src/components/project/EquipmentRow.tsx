@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2, Copy, MessageSquare } from "lucide-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { calculateItemCost } from "@/logic/shared";
+import { useTranslation } from "react-i18next";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslation } from "react-i18next";
 import { EquipmentItem } from "@/types/project-items";
 
 interface EquipmentRowProps {
@@ -53,6 +53,15 @@ export function EquipmentRow({
 
   const maintenance = item.maintenance_cost || 0;
   const fuel = item.fuel_cost || 0;
+  const totalCost = item.total_cost || 0;
+
+  // Build formula string based on rental vs purchase
+  const periodLabel = isPurchase
+    ? ""
+    : `/${t(item.period_unit, { defaultValue: item.period_unit })}`;
+  const formula = isPurchase
+    ? `${item.quantity} × ${format(item.cost_per_period, currency)} = ${format(totalCost, currency)}`
+    : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`;
 
   const rentalOrPurchaseLabel =
     rentalOptions.find((option) => option.value === item.rental_or_purchase)
@@ -77,25 +86,26 @@ export function EquipmentRow({
         {rentalOrPurchaseLabel}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {isPurchase ? item.quantity : `${item.quantity} `}
+        <bdi dir="ltr">{isPurchase ? item.quantity : `${item.quantity}`}</bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi>
+        <bdi dir="ltr">
           {format(item.cost_per_period, currency)}
-          {!isPurchase &&
-            `/${t(item.period_unit, { defaultValue: item.period_unit })}`}
+          {!isPurchase && periodLabel}
         </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {isPurchase ? t("common:notApplicable") : item.usage_duration}
+        {isPurchase ? t("common:notApplicable") : <bdi dir="ltr">{item.usage_duration}</bdi>}
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-2">
-              {format(item.total_cost || 0, currency)}
+            <TooltipTrigger asChild className="cursor-help underline decoration-dotted underline-offset-2">
+              <bdi dir="ltr">{format(totalCost, currency)}</bdi>
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
+              <div className="font-semibold mb-1">{t("project_equipment:formula")}</div>
+              <code className="font-mono text-text-secondary mb-2">{formula}</code>
               <div className="font-semibold mb-1 border-b pb-1">
                 {t("project_equipment:breakdown")}
               </div>

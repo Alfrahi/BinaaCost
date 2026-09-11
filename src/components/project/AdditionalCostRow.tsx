@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2, Copy, MessageSquare } from "lucide-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { AdditionalCostItem } from "@/types/project-items";
 
 interface AdditionalCostRowProps {
@@ -36,6 +42,8 @@ export function AdditionalCostRow({
   const { t } = useTranslation(["project_additional", "common"]);
   const { format } = useCurrencyFormatter();
 
+  const formula = `${format(item.amount, currency)}`;
+
   return (
     <TableRow>
       <TableCell className="w-[40px]">
@@ -55,7 +63,17 @@ export function AdditionalCostRow({
         {item.description || t("common:notSpecified")}
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm min-w-[120px]">
-        {format(item.amount, currency)}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <bdi dir="ltr">{format(item.amount, currency)}</bdi>
+            </TooltipTrigger>
+            <TooltipContent className="p-3 text-xs">
+              <div className="font-semibold mb-1">{t("project_additional:formula")}</div>
+              <code className="font-mono text-text-secondary">{formula}</code>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       <TableCell className="text-end min-w-[100px]">
         <div className="flex gap-2 justify-end">
