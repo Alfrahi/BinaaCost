@@ -21,6 +21,7 @@ import { LaborItem } from "@/types/project-items";
 import { useProjectLabor } from "@/hooks/useProjectLabor";
 import { useIsMobile } from "@/hooks/useMobile";
 import DataTable from "@/components/ui/data-table";
+import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
 
@@ -238,6 +239,28 @@ export function LaborTable({
           isSubmitting={isAddingLabor}
           submitLabel={t("add")}
           ariaLabel={t("add")}
+        />
+      )}
+      {canEdit && !isFormOpen && (
+        <AssemblyIntegrationRow
+          itemTypes={["labor"]}
+          onImport={{
+            labor: async (items) => {
+              for (const item of items) {
+                const details = item.details as { total_days: number } | null;
+                await handleAddOrUpdateLabor(
+                  {
+                    worker_type: item.description,
+                    number_of_workers: item.quantity,
+                    daily_rate: item.unit_price,
+                    total_days: details?.total_days ?? 1,
+                    group_id: "ungrouped",
+                  },
+                  currency,
+                );
+              }
+            },
+          }}
         />
       )}
       {isFormOpen && (

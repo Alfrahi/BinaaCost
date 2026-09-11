@@ -89,6 +89,8 @@
     "noAssemblies": "لا توجد تجميعات متاحة. قم بإنشاء واحدة في الموارد.",
     "itemsInAssembly": "العناصر في التجميع",
     "importItems": "استيراد العناصر",
+    "addFromAssembly": "إضافة من تجميع",
+    "noItemsOfType": "لا توجد عناصر مطابقة لهذا النوع في التجميع المحدد.",
     "success_imported": "تم استيراد {{count}} عنصر بنجاح.",
     "error_imported": "فشل استيراد {{count}} عنصر."
   },
