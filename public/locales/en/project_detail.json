@@ -141,12 +141,15 @@
     "markupError": "Markup percentage must be non-negative",
     "taxError": "Tax percentage must be non-negative",
     "generalContingencyError": "General contingency percentage must be non-negative",
-    "viewPricing": "View pricing",
+    "locationFactorError": "Location factor must be at least 0.01",
     "assumptions": "Financial Assumptions",
     "defaultAssumptionsWarning": "This estimate uses default financial assumptions; the percentages were never reviewed or saved. Open the Pricing tab to confirm them before sharing or exporting.",
     "showBreakdown": "Show cost breakdown",
     "hideBreakdown": "Hide cost breakdown",
-    "editing": "editing"
+    "editing": "editing",
+    "locationFactor": "Location Adjustment",
+    "locationFactorDesc": "Cost multiplier for the project location (e.g. 1.15 = +15%). Applied to materials, labor, and equipment before overhead and markup.",
+    "locationFactorTooltip": "Multiplies direct costs (materials, labor, equipment) by a location-specific factor. Additional costs are not affected."
   },
   "comments": {
     "title": "Comments for {{item}}",
@@ -158,5 +161,4 @@
   "editDetails": "Edit Details",
   "selectModeOn": "Exit Select Mode",
   "selectModeOff": "Select Items"
-}
 }

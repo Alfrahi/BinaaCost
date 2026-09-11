@@ -24,6 +24,10 @@ interface EquipmentRowProps {
   selected: boolean;
   onToggle: () => void;
   rentalOptions: { value: string; label: string }[];
+  /** Project-level location cost multiplier (default 1) */
+  locationFactor?: number;
+  /** Label for the location factor shown in formula tooltip */
+  locationLabel?: string;
 }
 
 export function EquipmentRow({
@@ -37,6 +41,8 @@ export function EquipmentRow({
   selected,
   onToggle,
   rentalOptions,
+  locationFactor = 1,
+  locationLabel,
 }: EquipmentRowProps) {
   const { t } = useTranslation(["project_equipment", "common"]);
   const { format } = useCurrencyFormatter();
@@ -53,15 +59,20 @@ export function EquipmentRow({
 
   const maintenance = item.maintenance_cost || 0;
   const fuel = item.fuel_cost || 0;
-  const totalCost = item.total_cost || 0;
+  const baseCostAdjusted = baseCost * locationFactor;
+  const totalCost = baseCostAdjusted + maintenance + fuel;
 
-  // Build formula string based on rental vs purchase
+  // Build formula string including location factor when applied
   const periodLabel = isPurchase
     ? ""
     : `/${t(item.period_unit, { defaultValue: item.period_unit })}`;
-  const formula = isPurchase
-    ? `${item.quantity} × ${format(item.cost_per_period, currency)} = ${format(totalCost, currency)}`
-    : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`;
+  const formula = locationFactor !== 1
+    ? (isPurchase
+        ? `${item.quantity} × ${format(item.cost_per_period, currency)} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} = ${format(totalCost, currency)}`
+        : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`)
+    : (isPurchase
+        ? `${item.quantity} × ${format(item.cost_per_period, currency)} = ${format(totalCost, currency)}`
+        : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`);
 
   const rentalOrPurchaseLabel =
     rentalOptions.find((option) => option.value === item.rental_or_purchase)

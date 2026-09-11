@@ -39,6 +39,10 @@ const settingsSchema = z.object({
   contingency_percent: z.coerce
     .number()
     .min(0, "project_detail:profit_pricing.generalContingencyError"),
+  location_factor: z.coerce
+    .number()
+    .min(0.01, "project_detail:profit_pricing.locationFactorError")
+    .optional(),
 });
 
 interface Props {
@@ -276,6 +280,29 @@ export default function ProfitPricingSummaryCard({
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="location-factor" className="text-sm text-text-secondary">
+              {t("project_detail:profit_pricing.locationFactor")}
+            </Label>
+            <div className="relative mt-1">
+              <Input
+                id="location-factor"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={settings.location_factor ?? 1}
+                onChange={(e) => handleChange("location_factor", e.target.value)}
+                className="pe-8 text-sm"
+              />
+              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+                ×
+              </span>
+            </div>
+            <p className="text-xs text-text-secondary mt-1">
+              {t("project_detail:profit_pricing.locationFactorDesc")}
+            </p>
+          </div>
+
           {isDirty && (
             <Button
               className="w-full mt-4 text-sm"
@@ -326,6 +353,28 @@ export default function ProfitPricingSummaryCard({
                 className="text-base font-bold text-text-primary"
               />
             </div>
+
+            {/* Location adjustment chain line — visible only when factor ≠ 1 */}
+            {(settings.location_factor ?? 1) !== 1 && (
+              <div className="px-2 pt-1">
+                <SummaryRow
+                  label={
+                    settings.location_label
+                      ? `${t("project_detail:profit_pricing.locationFactor")} (${settings.location_label} ×${settings.location_factor})`
+                      : `${t("project_detail:profit_pricing.locationFactor")} (×${settings.location_factor})`
+                  }
+                  value={format(financials.locationAdjustmentAmount, currency, {
+                    showSign: true,
+                  })}
+                  className={cn(
+                    "text-sm font-medium",
+                    financials.locationAdjustmentAmount >= 0
+                      ? "text-green-600"
+                      : "text-red-600",
+                  )}
+                />
+              </div>
+            )}
 
             <div className="px-2 space-y-3">
               <div className="flex items-center gap-4 text-sm">

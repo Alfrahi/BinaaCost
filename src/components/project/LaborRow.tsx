@@ -22,6 +22,10 @@ interface LaborRowProps {
   onComment: (item: LaborItem) => void;
   selected: boolean;
   onToggle: () => void;
+  /** Project-level location cost multiplier (default 1) */
+  locationFactor?: number;
+  /** Label for the location factor shown in formula tooltip */
+  locationLabel?: string;
 }
 
 export function LaborRow({
@@ -34,12 +38,17 @@ export function LaborRow({
   onComment,
   selected,
   onToggle,
+  locationFactor = 1,
+  locationLabel,
 }: LaborRowProps) {
   const { t } = useTranslation(["project_labor", "common"]);
   const { format } = useCurrencyFormatter();
 
-  const totalCost = item.total_cost || 0;
-  const formula = `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days} = ${format(totalCost, currency)}`;
+  const baseCost = item.total_cost || 0;
+  const adjustedTotal = baseCost * locationFactor;
+  const formula = locationFactor !== 1
+    ? `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} = ${format(adjustedTotal, currency)}`
+    : `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days} = ${format(baseCost, currency)}`;
 
   return (
     <TableRow>
@@ -68,7 +77,7 @@ export function LaborRow({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <bdi dir="ltr">{format(totalCost, currency)}</bdi>
+              <bdi dir="ltr">{format(adjustedTotal, currency)}</bdi>
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_labor:formula")}</div>
