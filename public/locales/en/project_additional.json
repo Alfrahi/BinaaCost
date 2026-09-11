@@ -17,5 +17,6 @@
   "add": "Add additional cost",
   "edit": "Edit additional cost",
   "amountNonNegative": "Amount must be non-negative",
-  "tableLabel": "Additional costs table"
+  "tableLabel": "Additional costs table",
+  "formula": "Formula"
 }
