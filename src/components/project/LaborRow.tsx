@@ -5,6 +5,12 @@ import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { LaborItem } from "@/types/project-items";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LaborRowProps {
   item: LaborItem;
@@ -32,6 +38,9 @@ export function LaborRow({
   const { t } = useTranslation(["project_labor", "common"]);
   const { format } = useCurrencyFormatter();
 
+  const totalCost = item.total_cost || 0;
+  const formula = `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days} = ${format(totalCost, currency)}`;
+
   return (
     <TableRow>
       {isOwner && (
@@ -47,16 +56,26 @@ export function LaborRow({
         {item.worker_type}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {item.number_of_workers}
+        <bdi dir="ltr">{item.number_of_workers}</bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {format(item.daily_rate, currency)}
+        <bdi dir="ltr">{format(item.daily_rate, currency)}</bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {item.total_days}
+        <bdi dir="ltr">{item.total_days}</bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
-        {format(item.total_cost || 0, currency)}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <bdi dir="ltr">{format(totalCost, currency)}</bdi>
+            </TooltipTrigger>
+            <TooltipContent className="p-3 text-xs">
+              <div className="font-semibold mb-1">{t("project_labor:formula")}</div>
+              <code className="font-mono text-text-secondary">{formula}</code>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       <TableCell className="text-end">
         <div className="flex justify-end gap-1">

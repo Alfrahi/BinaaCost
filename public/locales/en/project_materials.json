@@ -23,5 +23,6 @@
   "add": "Add material",
   "edit": "Edit material",
   "quantityMin": "Quantity must be at least 1",
-  "tableLabel": "Materials cost table"
+  "tableLabel": "Materials cost table",
+  "formula": "Formula"
 }

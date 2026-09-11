@@ -6,6 +6,12 @@ import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { calculateItemCost } from "@/logic/shared";
 import { useTranslation } from "react-i18next";
 import React from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { MaterialItem } from "@/types/project-items";
 
 interface MaterialRowProps {
@@ -36,6 +42,9 @@ export const MaterialRow = React.memo(function MaterialRow({
   const { t } = useTranslation(["common", "project_materials"]);
   const { format } = useCurrencyFormatter();
 
+  const totalCost = calculateItemCost.material(item.quantity, item.unit_price);
+  const formula = `${item.quantity} × ${format(item.unit_price, currency)} = ${format(totalCost, currency)}`;
+
   return (
     <TableRow>
       <TableCell className="w-[40px]">
@@ -50,19 +59,26 @@ export const MaterialRow = React.memo(function MaterialRow({
       <TableCell className="text-start text-sm">{item.name}</TableCell>
       <TableCell className="text-start text-sm">{item.description}</TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {item.quantity}
+        <bdi dir="ltr">{item.quantity}</bdi>
       </TableCell>
       <TableCell className="text-start text-sm">
         {materialUnits.find((u) => u.value === item.unit)?.label || item.unit}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {format(item.unit_price, currency)}
+        <bdi dir="ltr">{format(item.unit_price, currency)}</bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
-        {format(
-          calculateItemCost.material(item.quantity, item.unit_price),
-          currency,
-        )}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <bdi dir="ltr">{format(totalCost, currency)}</bdi>
+            </TooltipTrigger>
+            <TooltipContent className="p-3 text-xs">
+              <div className="font-semibold mb-1">{t("project_materials:formula")}</div>
+              <code className="font-mono text-text-secondary">{formula}</code>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       <TableCell className="text-end">
         <div className="flex gap-2 justify-end">

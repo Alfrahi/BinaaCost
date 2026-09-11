@@ -21,5 +21,6 @@
   "totalDaysMin": "Total days must be at least 1",
   "add": "Add labor item",
   "edit": "Edit labor item",
-  "tableLabel": "Labor cost table"
+  "tableLabel": "Labor cost table",
+  "formula": "Formula"
 }
