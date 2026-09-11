@@ -36,6 +36,8 @@ export function EquipmentTable({
   isLoadingRentalOptions,
   periodUnits,
   isLoadingPeriodUnits,
+  locationFactor = 1,
+  locationLabel,
 }: {
   projectId: string;
   equipment: EquipmentItem[];
@@ -47,6 +49,8 @@ export function EquipmentTable({
   isLoadingRentalOptions: boolean;
   periodUnits: { value: string; label: string }[];
   isLoadingPeriodUnits: boolean;
+  locationFactor?: number;
+  locationLabel?: string;
 }) {
   const { t } = useTranslation([
     "project_equipment",
@@ -113,11 +117,11 @@ export function EquipmentTable({
               usageDuration: item.usage_duration,
               maintenanceCost: item.maintenance_cost,
               fuelCost: item.fuel_cost,
-            }).totalCost,
+            }).totalCost * locationFactor,
           ),
         0,
       ),
-    [equipment],
+    [equipment, locationFactor],
   );
 
   const columns = useMemo<DataTableColumn<EquipmentItem>[]>(
@@ -202,12 +206,12 @@ export function EquipmentTable({
               usageDuration: row.usage_duration,
               maintenanceCost: row.maintenance_cost,
               fuelCost: row.fuel_cost,
-            }).totalCost,
+            }).totalCost * locationFactor,
             currency,
           ),
       },
     ],
-    [t, currency, format, rentalOptions, periodUnits],
+    [t, currency, format, rentalOptions, periodUnits, locationFactor],
   );
 
   const totalPages = Math.ceil(equipment.length / PAGE_SIZE);
@@ -232,6 +236,8 @@ export function EquipmentTable({
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
         rentalOptions={rentalOptions}
+        locationFactor={locationFactor}
+        locationLabel={locationLabel}
       />
     ),
     [
@@ -243,6 +249,8 @@ export function EquipmentTable({
       onOpenComments,
       selection,
       rentalOptions,
+      locationFactor,
+      locationLabel,
     ],
   );
 

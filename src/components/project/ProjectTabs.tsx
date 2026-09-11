@@ -326,6 +326,8 @@ function ProjectTabsComponent({
                   isLoadingPeriodUnits={isLoadingPeriodUnits}
                   additionalCategories={additionalCategories}
                   isLoadingAdditionalCategories={isLoadingAdditionalCategories}
+                  locationFactor={project.financial_settings?.location_factor}
+                  locationLabel={project.financial_settings?.location_label}
                 />
               </TabsContent>
 

@@ -31,6 +31,8 @@ export function LaborTable({
   canEdit,
   currency,
   onOpenComments,
+  locationFactor = 1,
+  locationLabel,
 }: {
   projectId: string;
   labor: LaborItem[];
@@ -38,6 +40,8 @@ export function LaborTable({
   canEdit: boolean;
   currency: string;
   onOpenComments: (item: LaborItem, itemType: string) => void;
+  locationFactor?: number;
+  locationLabel?: string;
 }) {
   const { t } = useTranslation(["project_labor", "project_detail", "common"]);
   const { format } = useCurrencyFormatter();
@@ -90,11 +94,12 @@ export function LaborTable({
 
   const grandTotal = useMemo(
     () =>
-      labor.reduce(
-        (sum, item) => safeAdd(sum, item.total_cost || 0),
-        0,
-      ),
-    [labor],
+      labor
+        .reduce(
+          (sum, item) => safeAdd(sum, (item.total_cost || 0) * locationFactor),
+          0,
+        ),
+    [labor, locationFactor],
   );
 
   const columns = useMemo<DataTableColumn<LaborItem>[]>(
@@ -130,10 +135,11 @@ export function LaborTable({
         label: t("columns.estTotalCost"),
         align: "end",
         minWidth: "120px",
-        format: (_, row: LaborItem) => format(row.total_cost || 0, currency),
+        format: (_, row: LaborItem) =>
+          format((row.total_cost || 0) * locationFactor, currency),
       },
     ],
-    [t, currency, format],
+    [t, currency, format, locationFactor],
   );
 
   const totalPages = Math.ceil(labor.length / PAGE_SIZE);
@@ -157,9 +163,11 @@ export function LaborTable({
         onComment={(commentItem) => onOpenComments(commentItem, "labor")}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
+        locationFactor={locationFactor}
+        locationLabel={locationLabel}
       />
     ),
-    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateLabor, onOpenComments, selection],
+    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateLabor, onOpenComments, selection, locationFactor, locationLabel],
   );
 
   return (
