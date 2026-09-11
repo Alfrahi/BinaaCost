@@ -89,6 +89,8 @@
     "noAssemblies": "No assemblies available. Create one in Resources.",
     "itemsInAssembly": "Items in Assembly",
     "importItems": "Import Items",
+    "addFromAssembly": "Add from Assembly",
+    "noItemsOfType": "No matching items of this type in the selected assembly.",
     "success_imported": "{{count}} items imported successfully.",
     "error_imported": "Failed to import {{count}} items."
   },

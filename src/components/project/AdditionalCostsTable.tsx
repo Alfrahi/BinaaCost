@@ -24,6 +24,7 @@ import {
   additionalCostSchema,
 } from "@/types/schemas";
 import DataTable from "@/components/ui/data-table";
+import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
 
@@ -219,6 +220,24 @@ export function AdditionalCostsTable({
           isSubmitting={isAddingAdditionalCost}
           submitLabel={t("add")}
           ariaLabel={t("add")}
+        />
+      )}
+      {canEdit && !isFormOpen && (
+        <AssemblyIntegrationRow
+          itemTypes={["additional"]}
+          onImport={{
+            additional: async (items) => {
+              for (const item of items) {
+                const details = item.details as { category: string } | null;
+                await handleAddOrUpdateAdditionalCost({
+                  category: details?.category || "Miscellaneous",
+                  description: item.description,
+                  amount: item.unit_price,
+                  group_id: "ungrouped",
+                });
+              }
+            },
+          }}
         />
       )}
       {isFormOpen && (
