@@ -39,12 +39,25 @@ export default function FinancialSummaryBar({
     settings ?? DEFAULT_FINANCIAL_SETTINGS,
   );
 
+  const locationFactor = settings?.location_factor ?? 1;
+  const hasLocationAdjustment = locationFactor !== 1;
+  const locationLabel = settings?.location_label
+    ? `${settings.location_label} ×${locationFactor}`
+    : `×${locationFactor}`;
+
   const steps: { label: string; value: number; key: string }[] = [
     {
       key: "direct",
       label: t("project_detail:profit_pricing.totalDirectCosts"),
       value: financials.directCosts,
     },
+    ...(hasLocationAdjustment
+      ? [{
+          key: "location",
+          label: locationLabel,
+          value: financials.locationAdjustmentAmount,
+        }]
+      : []),
     {
       key: "overhead",
       label: t("project_detail:profit_pricing.overhead"),

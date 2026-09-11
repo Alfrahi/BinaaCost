@@ -34,6 +34,8 @@ export function MaterialsTable({
   onOpenComments,
   materialUnits,
   isLoadingMaterialUnits,
+  locationFactor = 1,
+  locationLabel,
 }: {
   projectId: string;
   materials: MaterialItem[];
@@ -43,6 +45,8 @@ export function MaterialsTable({
   onOpenComments: (item: MaterialItem, itemType: string) => void;
   materialUnits: { value: string; label: string }[];
   isLoadingMaterialUnits: boolean;
+  locationFactor?: number;
+  locationLabel?: string;
 }) {
   const { t } = useTranslation([
     "project_materials",
@@ -103,11 +107,12 @@ export function MaterialsTable({
         (sum, item) =>
           safeAdd(
             sum,
-            calculateItemCost.material(item.quantity, item.unit_price),
+            calculateItemCost.material(item.quantity, item.unit_price) *
+              locationFactor,
           ),
         0,
       ),
-    [materials],
+    [materials, locationFactor],
   );
 
   const columns = useMemo<DataTableColumn<MaterialItem>[]>(
@@ -153,12 +158,13 @@ export function MaterialsTable({
         minWidth: "120px",
         format: (_, row: MaterialItem) =>
           format(
-            calculateItemCost.material(row.quantity, row.unit_price),
+            calculateItemCost.material(row.quantity, row.unit_price) *
+              locationFactor,
             currency,
           ),
       },
     ],
-    [t, materialUnits, currency, format],
+    [t, materialUnits, currency, format, locationFactor],
   );
 
   const totalPages = Math.ceil(materials.length / PAGE_SIZE);
@@ -183,9 +189,11 @@ export function MaterialsTable({
         onComment={(commentItem) => onOpenComments(commentItem, "material")}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
+        locationFactor={locationFactor}
+        locationLabel={locationLabel}
       />
     ),
-    [materialUnits, currency, canEdit, openForm, setDeleteTarget, handleDuplicateMaterial, onOpenComments, selection],
+    [materialUnits, currency, canEdit, openForm, setDeleteTarget, handleDuplicateMaterial, onOpenComments, selection, locationFactor, locationLabel],
   );
 
   return (

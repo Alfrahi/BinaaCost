@@ -5,6 +5,10 @@ export interface FinancialSettings {
   markup_percent: number;
   tax_percent: number;
   contingency_percent: number;
+  /** Optional location cost multiplier (e.g. 1.15 = +15%) applied to direct costs before any percent loadings. */
+  location_factor?: number;
+  /** Human-readable label for the location factor (e.g. "Riyadh". */
+  location_label?: string;
 }
 
 export const DEFAULT_FINANCIAL_SETTINGS: FinancialSettings = {
@@ -12,6 +16,7 @@ export const DEFAULT_FINANCIAL_SETTINGS: FinancialSettings = {
   markup_percent: 20,
   tax_percent: 0,
   contingency_percent: 5,
+  location_factor: 1,
 };
 
 export function hasConfirmedFinancialSettings(project: {
@@ -25,6 +30,11 @@ export interface FinancialSummary {
   laborTotal: number;
   equipmentTotal: number;
   additionalTotal: number;
+  /** Direct costs before any location adjustment. */
+  directCostsBase: number;
+  /** The amount added or removed by the location factor (positive or negative). */
+  locationAdjustmentAmount: number;
+  /** Effective direct costs after location adjustment. */
   directCosts: number;
   overheadAmount: number;
   contingencyAmount: number;
@@ -46,15 +56,30 @@ export function calculateProjectFinancials(
   costs: CostInputs,
   settings: FinancialSettings,
 ): FinancialSummary {
-  const materialsTotal = new Decimal(costs.materialsTotal || 0);
-  const laborTotal = new Decimal(costs.laborTotal || 0);
-  const equipmentTotal = new Decimal(costs.equipmentTotal || 0);
+  const locationFactor = new Decimal(settings.location_factor ?? 1);
+
+  const materialsTotal = new Decimal(costs.materialsTotal || 0).times(
+    locationFactor,
+  );
+  const laborTotal = new Decimal(costs.laborTotal || 0).times(locationFactor);
+  const equipmentTotal = new Decimal(costs.equipmentTotal || 0).times(
+    locationFactor,
+  );
   const additionalTotal = new Decimal(costs.additionalTotal || 0);
 
   const directCosts = materialsTotal
     .plus(laborTotal)
     .plus(equipmentTotal)
     .plus(additionalTotal);
+
+  // directCosts computed *without* the factor, for display purposes
+  const directCostsBase = new Decimal(costs.materialsTotal || 0)
+    .plus(costs.laborTotal || 0)
+    .plus(costs.equipmentTotal || 0)
+    .plus(costs.additionalTotal || 0);
+
+  // The amount added by location adjustment (can be negative for factor < 1)
+  const locationAdjustmentAmount = directCosts.minus(directCostsBase);
 
   const overheadAmount = directCosts
     .times(settings.overhead_percent || 0)
@@ -81,6 +106,8 @@ export function calculateProjectFinancials(
     laborTotal: laborTotal.toNumber(),
     equipmentTotal: equipmentTotal.toNumber(),
     additionalTotal: additionalTotal.toNumber(),
+    directCostsBase: directCostsBase.toNumber(),
+    locationAdjustmentAmount: locationAdjustmentAmount.toNumber(),
     directCosts: directCosts.toNumber(),
     overheadAmount: overheadAmount.toNumber(),
     contingencyAmount: contingencyAmount.toNumber(),

@@ -36,6 +36,7 @@ export function AdditionalCostsTable({
   onOpenComments,
   additionalCategories,
   isLoadingAdditionalCategories,
+  locationFactor = 1,
 }: {
   projectId: string;
   additionalCosts: AdditionalCostItem[];
@@ -45,6 +46,7 @@ export function AdditionalCostsTable({
   onOpenComments: (item: AdditionalCostItem, itemType: string) => void;
   additionalCategories: { value: string; label: string }[];
   isLoadingAdditionalCategories: boolean;
+  locationFactor?: number;
 }) {
   const { t } = useTranslation(["project_additional", "project_detail", "common"]);
   const { format } = useCurrencyFormatter();
@@ -96,8 +98,8 @@ export function AdditionalCostsTable({
   );
 
   const grandTotal = useMemo(
-    () => additionalCosts.reduce((sum, item) => safeAdd(sum, item.amount), 0),
-    [additionalCosts],
+    () => additionalCosts.reduce((sum, item) => safeAdd(sum, item.amount * locationFactor), 0),
+    [additionalCosts, locationFactor],
   );
 
   const columns = useMemo<DataTableColumn<AdditionalCostItem>[]>(
@@ -122,10 +124,10 @@ export function AdditionalCostsTable({
         align: "end",
         isCurrency: true,
         minWidth: "120px",
-        format: (value: number) => format(value, currency),
+        format: (value: number) => format(value * locationFactor, currency),
       },
     ],
-    [t, currency, format, additionalCategories],
+    [t, currency, format, additionalCategories, locationFactor],
   );
 
   const totalPages = Math.ceil(additionalCosts.length / PAGE_SIZE);

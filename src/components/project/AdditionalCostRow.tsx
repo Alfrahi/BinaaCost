@@ -25,6 +25,8 @@ interface AdditionalCostRowProps {
   selected: boolean;
   onToggle: () => void;
   additionalCategories: { value: string; label: string }[];
+  /** Project-level location cost multiplier (default 1) */
+  locationFactor?: number;
 }
 
 export function AdditionalCostRow({
@@ -38,11 +40,15 @@ export function AdditionalCostRow({
   selected,
   onToggle,
   additionalCategories,
+  locationFactor = 1,
 }: AdditionalCostRowProps) {
   const { t } = useTranslation(["project_additional", "common"]);
   const { format } = useCurrencyFormatter();
 
-  const formula = `${format(item.amount, currency)}`;
+  const adjustedAmount = item.amount * locationFactor;
+  const formula = locationFactor !== 1
+    ? `${format(item.amount, currency)} × ${locationFactor} = ${format(adjustedAmount, currency)}`
+    : format(item.amount, currency);
 
   return (
     <TableRow>
@@ -66,7 +72,7 @@ export function AdditionalCostRow({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <bdi dir="ltr">{format(item.amount, currency)}</bdi>
+              <bdi dir="ltr">{format(adjustedAmount, currency)}</bdi>
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_additional:formula")}</div>

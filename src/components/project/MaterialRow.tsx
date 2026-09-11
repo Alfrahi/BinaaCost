@@ -25,6 +25,10 @@ interface MaterialRowProps {
   onComment: (item: MaterialItem) => void;
   selected: boolean;
   onToggle: () => void;
+  /** Project level location cost multiplier (default 1) */
+  locationFactor?: number;
+  /** Label for the location factor (e.g. "Riyadh") shown in tooltip */
+  locationLabel?: string;
 }
 
 export const MaterialRow = React.memo(function MaterialRow({
@@ -38,12 +42,17 @@ export const MaterialRow = React.memo(function MaterialRow({
   onComment,
   selected,
   onToggle,
+  locationFactor = 1,
+  locationLabel,
 }: MaterialRowProps) {
   const { t } = useTranslation(["common", "project_materials"]);
   const { format } = useCurrencyFormatter();
 
-  const totalCost = calculateItemCost.material(item.quantity, item.unit_price);
-  const formula = `${item.quantity} × ${format(item.unit_price, currency)} = ${format(totalCost, currency)}`;
+  const baseTotal = calculateItemCost.material(item.quantity, item.unit_price);
+  const adjustedTotal = baseTotal * locationFactor;
+  const formula = locationFactor !== 1
+    ? `${item.quantity} × ${format(item.unit_price, currency)} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} = ${format(adjustedTotal, currency)}`
+    : `${item.quantity} × ${format(item.unit_price, currency)} = ${format(baseTotal, currency)}`;
 
   return (
     <TableRow>
@@ -71,7 +80,7 @@ export const MaterialRow = React.memo(function MaterialRow({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <bdi dir="ltr">{format(totalCost, currency)}</bdi>
+              <bdi dir="ltr">{format(adjustedTotal, currency)}</bdi>
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_materials:formula")}</div>

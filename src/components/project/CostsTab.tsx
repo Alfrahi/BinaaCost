@@ -39,6 +39,8 @@ interface CostsTabProps {
   isLoadingPeriodUnits: boolean;
   additionalCategories: { value: string; label: string }[];
   isLoadingAdditionalCategories: boolean;
+  locationFactor?: number;
+  locationLabel?: string;
 }
 
 export default function CostsTab({
@@ -59,6 +61,8 @@ export default function CostsTab({
   isLoadingPeriodUnits,
   additionalCategories,
   isLoadingAdditionalCategories,
+  locationFactor = 1,
+  locationLabel,
 }: CostsTabProps) {
   const { t } = useTranslation(["project_detail", "project_tabs", "common"]);
   const isMobile = useIsMobile();
@@ -162,6 +166,8 @@ export default function CostsTab({
             onOpenComments={(item) => onOpenComments(item, "material")}
             materialUnits={materialUnits}
             isLoadingMaterialUnits={isLoadingMaterialUnits}
+            locationFactor={locationFactor}
+            locationLabel={locationLabel}
           />
         </TabsContent>
 
@@ -173,6 +179,8 @@ export default function CostsTab({
             canEdit={canEdit}
             currency={currency}
             onOpenComments={(item) => onOpenComments(item, "labor")}
+            locationFactor={locationFactor}
+            locationLabel={locationLabel}
           />
         </TabsContent>
 
@@ -188,6 +196,8 @@ export default function CostsTab({
             isLoadingRentalOptions={isLoadingRentalOptions}
             periodUnits={periodUnits}
             isLoadingPeriodUnits={isLoadingPeriodUnits}
+            locationFactor={locationFactor}
+            locationLabel={locationLabel}
           />
         </TabsContent>
 
@@ -201,6 +211,7 @@ export default function CostsTab({
             onOpenComments={(item) => onOpenComments(item, "additional")}
             additionalCategories={additionalCategories}
             isLoadingAdditionalCategories={isLoadingAdditionalCategories}
+            locationFactor={locationFactor}
           />
         </TabsContent>
       </Tabs>
