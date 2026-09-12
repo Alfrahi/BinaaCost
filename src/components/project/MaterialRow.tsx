@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MaterialItem } from "@/types/project-items";
+import { InlineEditableCell } from "./InlineEditableCell";
 
 interface MaterialRowProps {
   item: MaterialItem;
@@ -23,6 +24,7 @@ interface MaterialRowProps {
   onDelete: () => void;
   onDuplicate: () => void;
   onComment: (item: MaterialItem) => void;
+  onUpdateField: (id: string, field: Partial<MaterialItem>) => void;
   selected: boolean;
   onToggle: () => void;
   /** Project level location cost multiplier (default 1) */
@@ -40,6 +42,7 @@ export const MaterialRow = React.memo(function MaterialRow({
   onDelete,
   onDuplicate,
   onComment,
+  onUpdateField,
   selected,
   onToggle,
   locationFactor = 1,
@@ -68,13 +71,29 @@ export const MaterialRow = React.memo(function MaterialRow({
       <TableCell className="text-start text-sm">{item.name}</TableCell>
       <TableCell className="text-start text-sm">{item.description}</TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{item.quantity}</bdi>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.quantity}
+            display={String(item.quantity)}
+            onCommit={(v) => onUpdateField(item.id, { quantity: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("columns.quantity")} ${item.name}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-start text-sm">
         {materialUnits.find((u) => u.value === item.unit)?.label || item.unit}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{format(item.unit_price, currency)}</bdi>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.unit_price}
+            display={format(item.unit_price, currency)}
+            onCommit={(v) => onUpdateField(item.id, { unit_price: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("columns.unitPrice")} ${item.name}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>
