@@ -14,6 +14,18 @@ import {
 } from "@/components/ui/table";
 import { PaginationControls } from "@/components/PaginationControls";
 import { useTranslation } from "react-i18next";
+import { ArrowUp, ArrowDown, ChevronsUpDown, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const ALIGN_CLASS = { start: "text-start", end: "text-end" } as const;
+const MIN_WIDTH_CLASSES: Record<string, string> = {
+  "80px": "min-w-[80px]",
+  "100px": "min-w-[100px]",
+  "120px": "min-w-[120px]",
+  "150px": "min-w-[150px]",
+  "200px": "min-w-[200px]",
+} as const;
 
 export interface DataTableColumn<T> {
   key: string;
@@ -22,7 +34,9 @@ export interface DataTableColumn<T> {
   isCurrency?: boolean;
   format?: (value: any, row: T) => React.ReactNode;
   className?: string;
-  minWidth?: string;
+  minWidth?: keyof typeof MIN_WIDTH_CLASSES;
+  /** Value used for sorting. Defaults to `row[col.key]`. */
+  sortValue?: (row: T) => string | number;
 }
 
 export interface DataTableProps<T> {
@@ -57,7 +71,15 @@ export interface DataTableProps<T> {
     ungroupedLabel?: string;
     ungroupedLabelKey?: string;
   };
+  /** Show a search box that filters rows by `getSearchText`. */
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  getSearchText?: (row: T) => string;
+  /** Enable sortable column headers. */
+  sortable?: boolean;
 }
+
+type SortState = { key: string; dir: "asc" | "desc" } | null;
 
 function DataTable<T>({
   columns,
@@ -74,20 +96,50 @@ function DataTable<T>({
   className,
   stickyHeader = false,
   groupRows,
+  searchable = false,
+  searchPlaceholder,
+  getSearchText,
+  sortable = false,
   t,
 }: Omit<DataTableProps<T>, "getRowKey"> & { t: (key: string, options?: any) => string }) {
   const hasSelection = !!selection;
   const hasGroups = !!groupRows;
+  const [search, setSearch] = React.useState("");
+  const [sort, setSort] = React.useState<SortState>(null);
+
+  const filteredData = React.useMemo(() => {
+    let rows = data;
+    if (searchable && search.trim() && getSearchText) {
+      const term = search.trim().toLowerCase();
+      rows = rows.filter((row) => getSearchText(row).toLowerCase().includes(term));
+    }
+    if (sort && sortable) {
+      const col = columns.find((c) => c.key === sort.key);
+      if (col) {
+        const getVal = col.sortValue ?? ((row: T) => (row as any)[col.key]);
+        const dir = sort.dir === "asc" ? 1 : -1;
+        rows = [...rows].sort((a, b) => {
+          const av = getVal(a);
+          const bv = getVal(b);
+          if (typeof av === "number" && typeof bv === "number") {
+            return (av - bv) * dir;
+          }
+          return String(av ?? "").localeCompare(String(bv ?? "")) * dir;
+        });
+      }
+    }
+    return rows;
+  }, [data, searchable, search, getSearchText, sort, sortable, columns]);
 
   const displayData = React.useMemo(() => {
     if (!hasGroups || !groupRows.groups || groupRows.groups.length === 0) {
-      return data.map((row) => ({ type: "item" as const, row }));
+      return filteredData.map((row) => ({ type: "item" as const, row }));
     }
 
     const grouped: Record<string, T[]> = {};
     const ungrouped: T[] = [];
 
-    data.forEach((row) => {
+    filteredData.forEach((row) => {
       const groupId = groupRows.getGroupId(row);
       if (groupId && groupId !== "ungrouped") {
         if (!grouped[groupId]) grouped[groupId] = [];
@@ -121,83 +173,145 @@ function DataTable<T>({
     }
 
     return result;
-  }, [data, hasGroups, groupRows, t]);
+  }, [filteredData, hasGroups, groupRows, t]);
 
   const totalColSpan = columns.length + (hasSelection ? 1 : 0);
 
+  const handleSort = (col: DataTableColumn<T>) => {
+    if (!sortable) return;
+    setSort((prev) => {
+      if (prev?.key === col.key) {
+        return prev.dir === "asc" ? { key: col.key, dir: "desc" } : null;
+      }
+      return { key: col.key, dir: "asc" };
+    });
+  };
+
+  const SortIcon = ({ col }: { col: DataTableColumn<T> }) => {
+    if (!sortable) return null;
+    if (sort?.key === col.key) {
+      return sort.dir === "asc" ? (
+        <ArrowUp className="inline-block w-3 h-3 ms-1" aria-hidden="true" />
+      ) : (
+        <ArrowDown className="inline-block w-3 h-3 ms-1" aria-hidden="true" />
+      );
+    }
+    return (
+      <ChevronsUpDown
+        className="inline-block w-3 h-3 ms-1 text-muted-foreground/50"
+        aria-hidden="true"
+      />
+    );
+  };
+
   return (
-    <div className={cn("overflow-x-auto border rounded-lg", className)}>
-      <Table aria-label={ariaLabel} className="w-full">
-        <TableHeader>
-          <TableRow className={cn(stickyHeader && "sticky top-0 z-10 bg-muted")}>
-            {hasSelection && (
-              <TableHead className={cn("w-[40px] text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10", selection?.selectAllLabel && "cursor-pointer")}>
-                <Checkbox
-                  checked={selection?.allSelected ?? false}
-                  onCheckedChange={selection?.onToggleAll}
-                  aria-label={selection?.selectAllLabel || t("common:all")}
-                />
-              </TableHead>
-            )}
-            {columns.map((col) => (
-              <TableHead
-                key={col.key}
-                className={cn(
-                  `text-${col.align || "start"} text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums`,
-                  col.className,
-                  col.minWidth && `min-w-[${col.minWidth}]`,
-                )}
-              >
-                {col.label}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={totalColSpan}
-                className="text-center h-24 text-sm text-muted-foreground"
-              >
-                {emptyMessage || (emptyMessageKey ? t(emptyMessageKey) : t("common:noItems"))}
-              </TableCell>
-            </TableRow>
-          ) : (
-            displayData.map((item) => {
-              if (item.type === "header") {
-                return (
-                  <TableRow key={`header-${item.group?.id}`} className="bg-muted hover:bg-muted">
-                    <TableCell
-                      colSpan={totalColSpan}
-                      className="font-semibold text-foreground text-sm"
-                    >
-                      {item.group?.name}
-                    </TableCell>
-                  </TableRow>
-                );
-              }
-              return renderRow(item.row!);
-            })
+    <div className={cn("border rounded-lg", className)}>
+      {searchable && (
+        <div className="relative p-3 border-b">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={searchPlaceholder || t("common:search")}
+            aria-label={searchPlaceholder || t("common:search")}
+            className="ps-9 pe-9"
+          />
+          {search && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearch("")}
+              className="absolute end-1 top-1/2 -translate-y-1/2 h-8 w-8"
+              aria-label={t("common:clearFilters")}
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </Button>
           )}
-        </TableBody>
-        {grandTotal && (
-          <TableFooter>
-            <TableRow className="bg-muted">
-              <TableCell
-                colSpan={grandTotalColSpan ?? columns.length - 1}
-                className="text-end font-semibold uppercase text-foreground"
-              >
-                {grandTotalLabel || t("common:subtotal")}
-              </TableCell>
-              <TableCell className="text-end font-bold text-foreground tabular-nums">
-                {grandTotal}
-              </TableCell>
-              {hasSelection && <TableCell className="bg-muted" />}
+        </div>
+      )}
+      <div className="overflow-x-auto">
+        <Table aria-label={ariaLabel} className="w-full">
+          <TableHeader>
+            <TableRow className={cn(stickyHeader && "sticky top-0 z-10 bg-muted")}>
+              {hasSelection && (
+                <TableHead className={cn("w-[40px] text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10", selection?.selectAllLabel && "cursor-pointer")}>
+                  <Checkbox
+                    checked={selection?.allSelected ?? false}
+                    onCheckedChange={selection?.onToggleAll}
+                    aria-label={selection?.selectAllLabel || t("common:all")}
+                  />
+                </TableHead>
+              )}
+              {columns.map((col) => (
+                <TableHead
+                  key={col.key}
+                  className={cn(
+                    `${ALIGN_CLASS[col.align || "start"]} text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums`,
+                    col.className,
+                    col.minWidth && MIN_WIDTH_CLASSES[col.minWidth],
+                    sortable && "cursor-pointer select-none",
+                  )}
+                  onClick={sortable ? () => handleSort(col) : undefined}
+                  aria-sort={
+                    sort?.key === col.key
+                      ? sort.dir === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : undefined
+                  }
+                >
+                  {col.label}
+                  <SortIcon col={col} />
+                </TableHead>
+              ))}
             </TableRow>
-          </TableFooter>
-        )}
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={totalColSpan}
+                  className="text-center h-24 text-sm text-muted-foreground"
+                >
+                  {emptyMessage || (emptyMessageKey ? t(emptyMessageKey) : t("common:noItems"))}
+                </TableCell>
+              </TableRow>
+            ) : (
+              displayData.map((item) => {
+                if (item.type === "header") {
+                  return (
+                    <TableRow key={`header-${item.group?.id}`} className="bg-muted hover:bg-muted">
+                      <TableCell
+                        colSpan={totalColSpan}
+                        className="font-semibold text-foreground text-sm"
+                      >
+                        {item.group?.name}
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
+                return renderRow(item.row!);
+              })
+            )}
+          </TableBody>
+          {grandTotal && (
+            <TableFooter>
+              <TableRow className="bg-muted">
+                <TableCell
+                  colSpan={grandTotalColSpan ?? columns.length - 1}
+                  className="text-end font-semibold uppercase text-foreground"
+                >
+                  {grandTotalLabel || t("common:subtotal")}
+                </TableCell>
+                <TableCell className="text-end font-bold text-foreground tabular-nums">
+                  {grandTotal}
+                </TableCell>
+                {hasSelection && <TableCell className="bg-muted" />}
+              </TableRow>
+            </TableFooter>
+          )}
+        </Table>
+      </div>
       {pagination && (
         <PaginationControls
           currentPage={pagination.currentPage}
