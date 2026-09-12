@@ -6,13 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2, Copy, MessageSquare } from "lucide-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { useTranslation } from "react-i18next";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { AdditionalCostItem } from "@/types/project-items";
+import { InlineEditableCell } from "./InlineEditableCell";
 
 interface AdditionalCostRowProps {
   item: AdditionalCostItem;
@@ -22,6 +17,7 @@ interface AdditionalCostRowProps {
   onDelete: (id: string) => void;
   onDuplicate: (item: AdditionalCostItem) => void;
   onComment: (item: AdditionalCostItem) => void;
+  onUpdateField: (id: string, field: Partial<AdditionalCostItem>) => void;
   selected: boolean;
   onToggle: () => void;
   additionalCategories: { value: string; label: string }[];
@@ -37,6 +33,7 @@ export function AdditionalCostRow({
   onDelete,
   onDuplicate,
   onComment,
+  onUpdateField,
   selected,
   onToggle,
   additionalCategories,
@@ -46,9 +43,6 @@ export function AdditionalCostRow({
   const { format } = useCurrencyFormatter();
 
   const adjustedAmount = item.amount * locationFactor;
-  const formula = locationFactor !== 1
-    ? `${format(item.amount, currency)} × ${locationFactor} = ${format(adjustedAmount, currency)}`
-    : format(item.amount, currency);
 
   return (
     <TableRow>
@@ -69,17 +63,15 @@ export function AdditionalCostRow({
         {item.description || t("common:notSpecified")}
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm min-w-[120px]">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <bdi dir="ltr">{format(adjustedAmount, currency)}</bdi>
-            </TooltipTrigger>
-            <TooltipContent className="p-3 text-xs">
-              <div className="font-semibold mb-1">{t("project_additional:formula")}</div>
-              <code className="font-mono text-text-secondary">{formula}</code>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.amount}
+            display={format(adjustedAmount, currency)}
+            onCommit={(v) => onUpdateField(item.id, { amount: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_additional:columns.amount")} ${item.category}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end min-w-[100px]">
         <div className="flex gap-2 justify-end">

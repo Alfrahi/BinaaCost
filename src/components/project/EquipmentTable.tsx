@@ -78,6 +78,7 @@ export function EquipmentTable({
     handleAddOrUpdateEquipment,
     handleDuplicateEquipment,
     handleDeleteEquipment,
+    handleUpdateEquipmentField,
     handleBulkDeleteEquipment,
     handleBulkMoveEquipment,
     isAddingEquipment,
@@ -242,6 +243,7 @@ export function EquipmentTable({
         onDelete={() => setDeleteTarget(item)}
         onDuplicate={() => handleDuplicateEquipment(item)}
         onComment={(commentItem) => onOpenComments(commentItem, "equipment")}
+        onUpdateField={handleUpdateEquipmentField}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
         rentalOptions={rentalOptions}
@@ -260,6 +262,7 @@ export function EquipmentTable({
       rentalOptions,
       locationFactor,
       locationLabel,
+      handleUpdateEquipmentField,
     ],
   );
 

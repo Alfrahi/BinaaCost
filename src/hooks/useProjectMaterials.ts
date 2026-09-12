@@ -264,6 +264,13 @@ export function useProjectMaterials(projectId: string) {
     [deleteItem],
   );
 
+  const handleUpdateMaterialField = useCallback(
+    async (id: string, field: Partial<MaterialItem>) => {
+      await updateItem({ id, ...field });
+    },
+    [updateItem],
+  );
+
   const handleBulkDeleteMaterials = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
@@ -282,6 +289,7 @@ export function useProjectMaterials(projectId: string) {
     handleAddOrUpdateMaterial,
     handleDuplicateMaterial,
     handleDeleteMaterial,
+    handleUpdateMaterialField,
     handleBulkDeleteMaterials,
     handleBulkMoveMaterials,
     isAddingMaterial: isAdding,

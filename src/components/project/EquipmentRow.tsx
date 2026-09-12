@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { EquipmentItem } from "@/types/project-items";
+import { InlineEditableCell } from "./InlineEditableCell";
 
 interface EquipmentRowProps {
   item: EquipmentItem;
@@ -21,6 +22,7 @@ interface EquipmentRowProps {
   onDelete: () => void;
   onDuplicate: () => void;
   onComment: (item: EquipmentItem) => void;
+  onUpdateField: (id: string, field: Partial<EquipmentItem>) => void;
   selected: boolean;
   onToggle: () => void;
   rentalOptions: { value: string; label: string }[];
@@ -38,6 +40,7 @@ export function EquipmentRow({
   onDelete,
   onDuplicate,
   onComment,
+  onUpdateField,
   selected,
   onToggle,
   rentalOptions,
@@ -97,16 +100,41 @@ export function EquipmentRow({
         {rentalOrPurchaseLabel}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{isPurchase ? item.quantity : `${item.quantity}`}</bdi>
-      </TableCell>
-      <TableCell className="text-end tabular-nums text-sm">
         <bdi dir="ltr">
-          {format(item.cost_per_period, currency)}
-          {!isPurchase && periodLabel}
+          <InlineEditableCell
+            value={item.quantity}
+            display={String(item.quantity)}
+            onCommit={(v) => onUpdateField(item.id, { quantity: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.quantity")} ${item.name}`}
+          />
         </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        {isPurchase ? t("common:notApplicable") : <bdi dir="ltr">{item.usage_duration}</bdi>}
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.cost_per_period}
+            display={`${format(item.cost_per_period, currency)}${!isPurchase ? periodLabel : ""}`}
+            onCommit={(v) => onUpdateField(item.id, { cost_per_period: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.costPerPeriod")} ${item.name}`}
+          />
+        </bdi>
+      </TableCell>
+      <TableCell className="text-end tabular-nums text-sm">
+        {isPurchase ? (
+          t("common:notApplicable")
+        ) : (
+          <bdi dir="ltr">
+            <InlineEditableCell
+              value={item.usage_duration}
+              display={String(item.usage_duration)}
+              onCommit={(v) => onUpdateField(item.id, { usage_duration: v })}
+              disabled={!isOwner}
+              ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.usageDuration")} ${item.name}`}
+            />
+          </bdi>
+        )}
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>

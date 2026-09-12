@@ -70,6 +70,7 @@ export function AdditionalCostsTable({
     handleAddOrUpdateAdditionalCost,
     handleDuplicateAdditionalCost,
     handleDeleteAdditionalCost,
+    handleUpdateAdditionalCostField,
     handleBulkDeleteAdditionalCosts,
     handleBulkMoveAdditionalCosts,
     isAddingAdditionalCost,
@@ -151,12 +152,13 @@ export function AdditionalCostsTable({
         onDelete={() => setDeleteTarget(item)}
         onDuplicate={() => handleDuplicateAdditionalCost(item)}
         onComment={(commentItem: AdditionalCostItem) => onOpenComments(commentItem, "additional")}
+        onUpdateField={handleUpdateAdditionalCostField}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
         additionalCategories={additionalCategories}
       />
     ),
-    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateAdditionalCost, onOpenComments, selection, additionalCategories],
+    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateAdditionalCost, onOpenComments, selection, additionalCategories, handleUpdateAdditionalCostField],
   );
 
   return (
