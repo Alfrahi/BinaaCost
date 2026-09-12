@@ -287,7 +287,7 @@ export default function ReportsTab({
                         {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
                       </SelectItem>
                     )) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="none" disabled>
                         {t("common:none")}
                       </SelectItem>
                     )}
@@ -361,7 +361,7 @@ export default function ReportsTab({
                         {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
                       </SelectItem>
                     )) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="none" disabled>
                         {t("common:none")}
                       </SelectItem>
                     )}
