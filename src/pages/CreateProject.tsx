@@ -1,5 +1,6 @@
 "use client";
 import ProjectForm from "@/components/project/ProjectForm";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCreateProject } from "@/hooks/useCreateProject";
 
 export default function CreateProject() {
@@ -7,6 +8,7 @@ export default function CreateProject() {
 
   return (
     <div className="max-w-2xl mx-auto py-8 text-sm">
+      <Breadcrumbs />
       <ProjectForm
         form={form}
         onSubmit={handleSubmit}

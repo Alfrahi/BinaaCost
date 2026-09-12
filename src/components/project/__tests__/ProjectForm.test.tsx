@@ -48,10 +48,10 @@ function renderForm() {
 }
 
 describe("ProjectForm dirty guard", () => {
-  it("hides description and client requirements in create mode", () => {
+  it("shows description and client requirements in create mode", () => {
     renderForm();
-    expect(screen.queryByLabelText("description")).toBeNull();
-    expect(screen.queryByLabelText("clientRequirements")).toBeNull();
+    expect(screen.getByLabelText("description")).toBeTruthy();
+    expect(screen.getByLabelText("clientRequirements")).toBeTruthy();
   });
 
   it("shows the discard dialog when cancelling with unsaved changes", () => {
