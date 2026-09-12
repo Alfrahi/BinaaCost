@@ -301,6 +301,9 @@ export default function ProfitPricingSummaryCard({
             <p className="text-xs text-text-secondary mt-1">
               {t("project_detail:profit_pricing.locationFactorDesc")}
             </p>
+            <p className="text-xs text-text-secondary mt-1">
+              {t("project_detail:profit_pricing.locationFactorTooltip")}
+            </p>
           </div>
 
           {isDirty && (
@@ -512,10 +515,8 @@ export default function ProfitPricingSummaryCard({
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <span className="text-2xl font-bold">
-                  {format(financials.grandTotal, currency, {
-                    notation: "compact",
-                  })}
+                <span className="text-2xl font-bold tabular-nums">
+                  {format(financials.grandTotal, currency)}
                 </span>
               </div>
             </div>
@@ -543,7 +544,7 @@ export default function ProfitPricingSummaryCard({
                   <span className="text-sm text-muted-foreground">({t("project_detail:profit_pricing.editing")})</span>
                 </div>
                 <span className="text-2xl font-bold tabular-nums">
-                  {format(financials.grandTotal, currency, { notation: "compact" })}
+                  {format(financials.grandTotal, currency)}
                 </span>
               </div>
             </div>

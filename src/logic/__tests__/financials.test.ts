@@ -50,7 +50,7 @@ describe("Financial Logic", () => {
     expect(result.grandTotal).toBe(0);
   });
 
-  it("keeps the full chain decimal-exact with fractional costs", () => {
+  it("rounds every chain step to 2dp so the displayed chain reconciles", () => {
     const result = calculateProjectFinancials(
       {
         materialsTotal: 1234.56,
@@ -66,15 +66,15 @@ describe("Financial Logic", () => {
       },
     );
 
-    // direct = 2035.96; overhead = 254.495; contingency = 152.697
+    // direct = 2035.96; each step rounded to 2dp so the chain sums by hand
     expect(result.directCosts).toBe(2035.96);
-    expect(result.overheadAmount).toBe(254.495);
-    expect(result.contingencyAmount).toBe(152.697);
-    expect(result.primeCost).toBe(2443.152);
-    expect(result.markupAmount).toBe(366.4728);
-    expect(result.bidPrice).toBe(2809.6248);
-    expect(result.taxAmount).toBe(231.794046);
-    expect(result.grandTotal).toBe(3041.418846);
+    expect(result.overheadAmount).toBe(254.5);
+    expect(result.contingencyAmount).toBe(152.7);
+    expect(result.primeCost).toBe(2443.16);
+    expect(result.markupAmount).toBe(366.47);
+    expect(result.bidPrice).toBe(2809.63);
+    expect(result.taxAmount).toBe(231.79);
+    expect(result.grandTotal).toBe(3041.42);
   });
 
   it("applies location factor to direct costs (factor 1.2 = +20%)", () => {
