@@ -21,7 +21,7 @@ import { materialSchema, MaterialFormValues } from "@/types/schemas";
 import { MaterialItem } from "@/types/project-items";
 import { useProjectMaterials } from "@/hooks/useProjectMaterials";
 import { useIsMobile } from "@/hooks/useMobile";
-import DataTable from "@/components/ui/data-table";
+import DataTable, { DataTableColumn } from "@/components/ui/data-table";
 import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
@@ -438,13 +438,4 @@ export function MaterialsTable({
       />
     </div>
   );
-}
-
-interface DataTableColumn<T> {
-  key: string;
-  label: string;
-  align?: "start" | "end";
-  isCurrency?: boolean;
-  format?: (value: any, row: T) => React.ReactNode;
-  minWidth?: string;
 }
