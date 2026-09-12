@@ -21,7 +21,7 @@ import { equipmentSchema, EquipmentFormValues } from "@/types/schemas";
 import { EquipmentItem } from "@/types/project-items";
 import { useProjectEquipment } from "@/hooks/useProjectEquipment";
 import { useIsMobile } from "@/hooks/useMobile";
-import DataTable from "@/components/ui/data-table";
+import DataTable, { DataTableColumn } from "@/components/ui/data-table";
 import { AssemblyIntegrationRow } from "./AssemblyIntegrationRow";
 
 const PAGE_SIZE = 50;
@@ -552,13 +552,4 @@ export function EquipmentTable({
       />
     </div>
   );
-}
-
-interface DataTableColumn<T> {
-  key: string;
-  label: string;
-  align?: "start" | "end";
-  isCurrency?: boolean;
-  format?: (value: any, row: T) => React.ReactNode;
-  minWidth?: string;
 }
