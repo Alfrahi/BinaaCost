@@ -122,25 +122,25 @@ export function MaterialsTable({
         key: "name",
         label: t("columns.name"),
         align: "start",
-        minWidth: "150px",
+        minWidth: "150",
       },
       {
         key: "description",
         label: t("columns.description"),
         align: "start",
-        minWidth: "200px",
+        minWidth: "200",
       },
       {
         key: "quantity",
         label: t("columns.quantity"),
         align: "end",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "unit",
         label: t("columns.unit"),
         align: "start",
-        minWidth: "80px",
+        minWidth: "80",
         format: (value: string) =>
           materialUnits.find((u) => u.value === value)?.label || value,
       },
@@ -149,20 +149,23 @@ export function MaterialsTable({
         label: t("columns.unitPrice"),
         align: "end",
         isCurrency: true,
-        minWidth: "120px",
+        minWidth: "120",
         format: (value: number) => format(value, currency),
       },
       {
         key: "total",
         label: t("columns.estTotalCost"),
         align: "end",
-        minWidth: "120px",
+        minWidth: "120",
         format: (_, row: MaterialItem) =>
           format(
             calculateItemCost.material(row.quantity, row.unit_price) *
               locationFactor,
             currency,
           ),
+        sortValue: (row) =>
+          calculateItemCost.material(row.quantity, row.unit_price) *
+          locationFactor,
       },
     ],
     [t, materialUnits, currency, format, locationFactor],
@@ -375,6 +378,11 @@ export function MaterialsTable({
             getGroupId: (row) => row.group_id || undefined,
             ungroupedLabelKey: "project_detail:groups.ungrouped",
           }}
+          stickyHeader={true}
+          searchable
+          searchPlaceholder={t("common:search")}
+          getSearchText={(row) => `${row.name} ${row.description || ""}`}
+          sortable
         />
       )}
       <BulkActionBar

@@ -109,7 +109,7 @@ export function AdditionalCostsTable({
         key: "category",
         label: t("columns.category"),
         align: "start",
-        minWidth: "150px",
+        minWidth: "150",
         format: (value: string) =>
           additionalCategories.find((c) => c.value === value)?.label || value,
       },
@@ -117,15 +117,16 @@ export function AdditionalCostsTable({
         key: "description",
         label: t("columns.description"),
         align: "start",
-        minWidth: "200px",
+        minWidth: "200",
       },
       {
         key: "amount",
         label: t("columns.amount"),
         align: "end",
         isCurrency: true,
-        minWidth: "120px",
+        minWidth: "120",
         format: (value: number) => format(value * locationFactor, currency),
+        sortValue: (row) => row.amount * locationFactor,
       },
     ],
     [t, currency, format, additionalCategories, locationFactor],
@@ -321,6 +322,13 @@ export function AdditionalCostsTable({
             getGroupId: (row) => row.group_id || undefined,
             ungroupedLabelKey: "project_detail:groups.ungrouped",
           }}
+          stickyHeader={true}
+          searchable
+          searchPlaceholder={t("common:search")}
+          getSearchText={(row) =>
+            `${row.description || ""} ${row.category || ""}`
+          }
+          sortable
         />
       )}
       <BulkActionBar
