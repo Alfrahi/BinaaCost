@@ -287,6 +287,13 @@ export function useProjectEquipment(projectId: string) {
     [deleteItem],
   );
 
+  const handleUpdateEquipmentField = useCallback(
+    async (id: string, field: Partial<EquipmentItem>) => {
+      await updateItem({ id, ...field });
+    },
+    [updateItem],
+  );
+
   const handleBulkDeleteEquipment = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
@@ -305,6 +312,7 @@ export function useProjectEquipment(projectId: string) {
     handleAddOrUpdateEquipment,
     handleDuplicateEquipment,
     handleDeleteEquipment,
+    handleUpdateEquipmentField,
     handleBulkDeleteEquipment,
     handleBulkMoveEquipment,
     isAddingEquipment: isAdding,

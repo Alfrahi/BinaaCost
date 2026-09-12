@@ -74,6 +74,7 @@ export function MaterialsTable({
     handleAddOrUpdateMaterial,
     handleDuplicateMaterial,
     handleDeleteMaterial,
+    handleUpdateMaterialField,
     handleBulkDeleteMaterials,
     handleBulkMoveMaterials,
     isAddingMaterial,
@@ -191,13 +192,14 @@ export function MaterialsTable({
         onDelete={() => setDeleteTarget(item)}
         onDuplicate={() => handleDuplicateMaterial(item)}
         onComment={(commentItem) => onOpenComments(commentItem, "material")}
+        onUpdateField={handleUpdateMaterialField}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
         locationFactor={locationFactor}
         locationLabel={locationLabel}
       />
     ),
-    [materialUnits, currency, canEdit, openForm, setDeleteTarget, handleDuplicateMaterial, onOpenComments, selection, locationFactor, locationLabel],
+    [materialUnits, currency, canEdit, openForm, setDeleteTarget, handleDuplicateMaterial, onOpenComments, selection, locationFactor, locationLabel, handleUpdateMaterialField],
   );
 
   return (

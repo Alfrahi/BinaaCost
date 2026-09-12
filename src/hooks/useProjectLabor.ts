@@ -259,6 +259,13 @@ export function useProjectLabor(projectId: string) {
     [deleteItem],
   );
 
+  const handleUpdateLaborField = useCallback(
+    async (id: string, field: Partial<LaborItem>) => {
+      await updateItem({ id, ...field });
+    },
+    [updateItem],
+  );
+
   const handleBulkDeleteLabor = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
@@ -277,6 +284,7 @@ export function useProjectLabor(projectId: string) {
     handleAddOrUpdateLabor,
     handleDuplicateLabor,
     handleDeleteLabor,
+    handleUpdateLaborField,
     handleBulkDeleteLabor,
     handleBulkMoveLabor,
     isAddingLabor: isAdding,

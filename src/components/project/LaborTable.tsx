@@ -65,6 +65,7 @@ export function LaborTable({
     handleAddOrUpdateLabor,
     handleDuplicateLabor,
     handleDeleteLabor,
+    handleUpdateLaborField,
     handleBulkDeleteLabor,
     handleBulkMoveLabor,
     isAddingLabor,
@@ -163,13 +164,14 @@ export function LaborTable({
         onDelete={() => setDeleteTarget(item)}
         onDuplicate={() => handleDuplicateLabor(item)}
         onComment={(commentItem) => onOpenComments(commentItem, "labor")}
+        onUpdateField={handleUpdateLaborField}
         selected={selection.isSelected(item.id)}
         onToggle={() => selection.toggle(item.id)}
         locationFactor={locationFactor}
         locationLabel={locationLabel}
       />
     ),
-    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateLabor, onOpenComments, selection, locationFactor, locationLabel],
+    [currency, canEdit, openForm, setDeleteTarget, handleDuplicateLabor, onOpenComments, selection, locationFactor, locationLabel, handleUpdateLaborField],
   );
 
   return (

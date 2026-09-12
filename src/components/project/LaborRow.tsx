@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { LaborItem } from "@/types/project-items";
 import { Checkbox } from "@/components/ui/checkbox";
+import { InlineEditableCell } from "./InlineEditableCell";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +21,7 @@ interface LaborRowProps {
   onDelete: (item: LaborItem) => void;
   onDuplicate: (item: LaborItem) => void;
   onComment: (item: LaborItem) => void;
+  onUpdateField: (id: string, field: Partial<LaborItem>) => void;
   selected: boolean;
   onToggle: () => void;
   /** Project-level location cost multiplier (default 1) */
@@ -36,6 +38,7 @@ export function LaborRow({
   onDelete,
   onDuplicate,
   onComment,
+  onUpdateField,
   selected,
   onToggle,
   locationFactor = 1,
@@ -65,13 +68,37 @@ export function LaborRow({
         {item.worker_type}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{item.number_of_workers}</bdi>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.number_of_workers}
+            display={String(item.number_of_workers)}
+            onCommit={(v) => onUpdateField(item.id, { number_of_workers: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_labor:columns.numWorkers")} ${item.worker_type}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{format(item.daily_rate, currency)}</bdi>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.daily_rate}
+            display={format(item.daily_rate, currency)}
+            onCommit={(v) => onUpdateField(item.id, { daily_rate: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_labor:columns.dailyRate")} ${item.worker_type}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
-        <bdi dir="ltr">{item.total_days}</bdi>
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.total_days}
+            display={String(item.total_days)}
+            onCommit={(v) => onUpdateField(item.id, { total_days: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_labor:columns.totalDays")} ${item.worker_type}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>

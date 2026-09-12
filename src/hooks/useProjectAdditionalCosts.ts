@@ -207,6 +207,13 @@ export function useProjectAdditionalCosts(projectId: string) {
     [deleteItem],
   );
 
+  const handleUpdateAdditionalCostField = useCallback(
+    async (id: string, field: Partial<AdditionalCostItem>) => {
+      await updateItem({ id, ...field });
+    },
+    [updateItem],
+  );
+
   const handleBulkDeleteAdditionalCosts = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
@@ -225,6 +232,7 @@ export function useProjectAdditionalCosts(projectId: string) {
     handleAddOrUpdateAdditionalCost,
     handleDuplicateAdditionalCost,
     handleDeleteAdditionalCost,
+    handleUpdateAdditionalCostField,
     handleBulkDeleteAdditionalCosts,
     handleBulkMoveAdditionalCosts,
     isAddingAdditionalCost: isAdding,
