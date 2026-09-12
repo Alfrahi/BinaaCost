@@ -254,32 +254,20 @@ function ProjectTabsComponent({
             </SelectContent>
           </Select>
         ) : (
-          <ScrollArea className="w-full whitespace-nowrap pb-2">
-            <TabsList className="w-full justify-start">
-              {tabGroups.map((group) => (
-                <div
-                  key={group.labelKey}
-                  className="flex items-center gap-1"
-                  role="group"
-                  aria-label={t(group.labelKey)}
-                >
-                  <span className="px-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    {t(group.labelKey)}
-                  </span>
-                  {group.items.map((item) => (
-                    <TabsTrigger
-                      key={item.value}
-                      value={item.value}
-                      className="flex items-center gap-2 text-sm"
-                    >
-                      <item.icon className="w-4 h-4" />
-                      {t(item.labelKey)}
-                    </TabsTrigger>
-                  ))}
-                </div>
-              ))}
-            </TabsList>
-          </ScrollArea>
+          <TabsList className="w-full border-b border-border rounded-none">
+          <div className="flex gap-1 p-1">
+            {tabItems.map((item) => (
+              <TabsTrigger
+                key={item.value}
+                value={item.value}
+                className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-sm hover:bg-muted transition-colors"
+              >
+                <item.icon className="w-4 h-4" />
+                {t(item.labelKey)}
+              </TabsTrigger>
+            ))}
+          </div>
+        </TabsList>
         )}
 
         <AnimatePresence mode="wait">
