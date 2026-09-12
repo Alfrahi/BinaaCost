@@ -31,6 +31,7 @@
     "category": "Category",
     "categoryPlaceholder": "e.g. Structural",
     "item": "Item",
+    "items": "Items",
     "notFound": "Assembly not found."
   },
   "fields": {

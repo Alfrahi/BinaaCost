@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Plus, Edit2, Trash2, Package, Eye, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { pb } from "@/integrations/pocketbase/client";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import {
   Select,
@@ -96,6 +98,22 @@ export function AssemblyList({
     deleteAssembly,
   } = useAssemblies();
   const { user } = useAuth();
+
+  // Item counts per assembly, fetched once and grouped client-side.
+  const { data: itemCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: ["assembly_item_counts", user?.id],
+    queryFn: async () => {
+      const records = await pb.collection("cost_assembly_items").getFullList({
+        fields: "assembly_id",
+      });
+      const counts: Record<string, number> = {};
+      for (const r of records) {
+        counts[r.assembly_id] = (counts[r.assembly_id] || 0) + 1;
+      }
+      return counts;
+    },
+    enabled: !!user?.id,
+  });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAssembly, setEditingAssembly] = useState<Assembly | null>(null);
@@ -202,6 +220,9 @@ export function AssemblyList({
                 {t("resources:assemblies.category")}
               </TableHead>
               <TableHead className={`${headerClass} text-end`}>
+                {t("resources:assemblies.items")}
+              </TableHead>
+              <TableHead className={`${headerClass} text-end`}>
                 {t("common:actions")}
               </TableHead>
             </TableRow>
@@ -209,14 +230,14 @@ export function AssemblyList({
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={5} className="text-center py-8">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto" />
                 </TableCell>
               </TableRow>
             ) : assemblies.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center py-8 text-text-secondary text-sm"
                 >
                   {t("common:noItems")}
@@ -239,6 +260,9 @@ export function AssemblyList({
                   </TableCell>
                   <TableCell className="text-start text-sm text-text-primary">
                     {assembly.category || t("common:notSpecified")}
+                  </TableCell>
+                  <TableCell className="text-end text-sm tabular-nums text-text-primary">
+                    {itemCounts[assembly.id] ?? 0}
                   </TableCell>
                   <TableCell className="text-end text-sm">
                     <div className="flex justify-end gap-1">
