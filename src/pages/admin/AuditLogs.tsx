@@ -200,7 +200,7 @@ export default function AuditLogs() {
                           <div className="space-y-3">
                             {log.old_data && (
                               <div className="text-red-600 text-xs p-2 border rounded bg-red-50/50">
-                                <strong>Old Data:</strong>
+                                <strong>{t("admin:auditLogs.oldData")}</strong>
                                 <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
                                   {formatJsonForDisplay(log.old_data)}
                                 </pre>
@@ -208,7 +208,7 @@ export default function AuditLogs() {
                             )}
                             {log.new_data && (
                               <div className="text-green-600 text-xs p-2 border rounded bg-green-50/50">
-                                <strong>New Data:</strong>
+                                <strong>{t("admin:auditLogs.newData")}</strong>
                                 <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
                                   {formatJsonForDisplay(log.new_data)}
                                 </pre>

@@ -130,6 +130,8 @@
     "searchPlaceholder": "Search by action or table name",
     "noLogsFound": "No audit logs found.",
     "noDetailsAvailable": "No details available for this log entry.",
+    "oldData": "Old Data:",
+    "newData": "New Data:",
     "rowsPerPage": "Rows per page",
     "page": "Page"
   },
