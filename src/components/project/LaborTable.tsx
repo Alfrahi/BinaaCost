@@ -109,35 +109,36 @@ export function LaborTable({
         key: "worker_type",
         label: t("columns.workerType"),
         align: "start",
-        minWidth: "150px",
+        minWidth: "150",
       },
       {
         key: "number_of_workers",
         label: t("columns.numWorkers"),
         align: "end",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "daily_rate",
         label: t("columns.dailyRate"),
         align: "end",
         isCurrency: true,
-        minWidth: "120px",
+        minWidth: "120",
         format: (value: number) => format(value, currency),
       },
       {
         key: "total_days",
         label: t("columns.totalDays"),
         align: "end",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "total",
         label: t("columns.estTotalCost"),
         align: "end",
-        minWidth: "120px",
+        minWidth: "120",
         format: (_, row: LaborItem) =>
           format((row.total_cost || 0) * locationFactor, currency),
+        sortValue: (row) => (row.total_cost || 0) * locationFactor,
       },
     ],
     [t, currency, format, locationFactor],
@@ -350,6 +351,11 @@ export function LaborTable({
             getGroupId: (row) => row.group_id || undefined,
             ungroupedLabelKey: "project_detail:groups.ungrouped",
           }}
+          stickyHeader={true}
+          searchable
+          searchPlaceholder={t("common:search")}
+          getSearchText={(row) => `${row.worker_type} ${row.description || ""}`}
+          sortable
         />
       )}
       <BulkActionBar

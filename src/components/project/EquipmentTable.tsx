@@ -131,19 +131,19 @@ export function EquipmentTable({
         key: "name",
         label: t("columns.name"),
         align: "start",
-        minWidth: "150px",
+        minWidth: "150",
       },
       {
         key: "type",
         label: t("columns.type"),
         align: "start",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "rental_or_purchase",
         label: t("columns.rentalPurchase"),
         align: "start",
-        minWidth: "120px",
+        minWidth: "120",
         format: (value: string) =>
           rentalOptions.find((opt) => opt.value === value)?.label || value,
       },
@@ -151,14 +151,14 @@ export function EquipmentTable({
         key: "quantity",
         label: t("columns.quantity"),
         align: "end",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "cost_per_period",
         label: t("columns.costPerPeriod"),
         align: "end",
         isCurrency: true,
-        minWidth: "120px",
+        minWidth: "120",
         format: (value: number) =>
           format(value, currency) +
           (value &&
@@ -168,7 +168,7 @@ export function EquipmentTable({
         key: "period_unit",
         label: t("columns.periodUnit"),
         align: "start",
-        minWidth: "100px",
+        minWidth: "100",
         format: (value: string) =>
           periodUnits.find((u) => u.value === value)?.label || value,
       },
@@ -176,14 +176,14 @@ export function EquipmentTable({
         key: "usage_duration",
         label: t("columns.usageDuration"),
         align: "end",
-        minWidth: "100px",
+        minWidth: "100",
       },
       {
         key: "maintenance_cost",
         label: t("columns.maintenance"),
         align: "end",
         isCurrency: true,
-        minWidth: "100px",
+        minWidth: "100",
         format: (value: number) => format(value, currency),
       },
       {
@@ -191,14 +191,14 @@ export function EquipmentTable({
         label: t("columns.fuel"),
         align: "end",
         isCurrency: true,
-        minWidth: "100px",
+        minWidth: "100",
         format: (value: number) => format(value, currency),
       },
       {
         key: "total",
         label: t("columns.estTotalCost"),
         align: "end",
-        minWidth: "120px",
+        minWidth: "120",
         format: (_, row: EquipmentItem) =>
           format(
             calculateItemCost.equipment({
@@ -210,6 +210,14 @@ export function EquipmentTable({
             }).totalCost * locationFactor,
             currency,
           ),
+        sortValue: (row) =>
+          calculateItemCost.equipment({
+            quantity: row.quantity,
+            costPerPeriod: row.cost_per_period,
+            usageDuration: row.usage_duration,
+            maintenanceCost: row.maintenance_cost,
+            fuelCost: row.fuel_cost,
+          }).totalCost * locationFactor,
       },
     ],
     [t, currency, format, rentalOptions, periodUnits, locationFactor],
@@ -489,6 +497,11 @@ export function EquipmentTable({
             getGroupId: (row) => row.group_id || undefined,
             ungroupedLabelKey: "project_detail:groups.ungrouped",
           }}
+          stickyHeader={true}
+          searchable
+          searchPlaceholder={t("common:search")}
+          getSearchText={(row) => `${row.name} ${row.type || ""}`}
+          sortable
         />
       )}
       <BulkActionBar
