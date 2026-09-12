@@ -21,7 +21,7 @@ export default function BottomNav() {
   return (
     <nav
       className="flex justify-around bg-muted border-t border-border py-2 overflow-x-auto"
-      aria-label="Mobile Navigation"
+      aria-label={t("mobileNavigation")}
     >
       {navItems.map(({ path, name, icon: Icon }) => {
         const active =

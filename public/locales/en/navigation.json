@@ -9,5 +9,6 @@
   "openSidebar": "Open sidebar",
   "logout": "Logout",
   "dataImport": "Data Import",
-  "assemblies": "Assemblies"
+  "assemblies": "Assemblies",
+  "mobileNavigation": "Mobile Navigation"
 }
