@@ -9,5 +9,6 @@
   "openSidebar": "فتح الشريط الجانبي",
   "logout": "تسجيل الخروج",
   "dataImport": "استيراد البيانات",
-  "assemblies": "التجميعات"
+  "assemblies": "التجميعات",
+  "mobileNavigation": "التنقل للجوال"
 }
