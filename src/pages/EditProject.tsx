@@ -1,6 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 import ProjectForm from "@/components/project/ProjectForm";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useUpdateProject } from "@/hooks/useUpdateProject";
 import { FormProvider } from "react-hook-form";
 import { CurrencyConversionDialog } from "@/components/project/CurrencyConversionDialog";
@@ -40,6 +41,7 @@ export default function EditProject() {
 
   return (
     <div className="max-w-2xl mx-auto py-8 text-sm">
+      <Breadcrumbs />
       <FormProvider {...form}>
         <ProjectForm
           onSubmit={handleSubmit}

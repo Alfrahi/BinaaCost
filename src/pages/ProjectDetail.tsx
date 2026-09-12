@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import PageLoader from "@/components/PageLoader";
 import ProjectTabs from "@/components/project/ProjectTabs";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2, Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -39,6 +40,7 @@ export default function ProjectDetail() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
