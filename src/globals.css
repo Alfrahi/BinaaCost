@@ -33,6 +33,12 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Latin (English) uses a Latin-first stack; Arabic uses Noto Sans Arabic. */
+    html[lang="en"] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
+    }
+
     /* ================================
         Numeric & Data Safety
        ================================ */

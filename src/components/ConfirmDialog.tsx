@@ -13,7 +13,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title: string;
-  body: string;
+  body: React.ReactNode;
   confirmLabel: string;
   loading?: boolean;
   destructive?: boolean;
