@@ -121,6 +121,7 @@
     "riskContingencyInfo": "Probability-weighted total from your risk register (Σ impact × weight). Not included in the total above — it is additive with General Contingency, not interchangeable with it.",
     "riskContingencyCombinedTooltip": "General Contingency (a flat % of direct costs) and Risk Contingency (probability-weighted from identified risks) are additive: they cover different unknowns. Do not merge one into the other; both contribute to total risk coverage.",
     "seeAlsoRisks": "See also: Risk Management",
+    "viewPricing": "View Pricing",
     "markup": "Markup",
     "markupWithPercent": "Markup ({{percent}}%)",
     "markupDesc": "Profit margin added to the project cost.",
