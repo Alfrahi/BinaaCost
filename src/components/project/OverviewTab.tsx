@@ -94,6 +94,15 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
           label={t("project_overview:directCosts")}
           value={format(financials.directCosts, project.currency)}
         />
+        <StatCard
+          label={t("project_overview:profit")}
+          value={format(financials.markupAmount, project.currency)}
+          hint={
+            financials.grandTotal > 0
+              ? `${((financials.markupAmount / financials.grandTotal) * 100).toFixed(1)}%`
+              : undefined
+          }
+        />
       </div>
 
       <div className="bg-card rounded-lg border border-border p-4">
