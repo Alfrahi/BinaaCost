@@ -3,6 +3,7 @@ import { Edit2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { AssemblyItem } from "@/types/assemblies";
+import { safeAdd, safeMult } from "@/utils/math";
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 interface AssemblyItemsTableProps {
   items: AssemblyItem[];
@@ -20,6 +21,28 @@ interface AssemblyItemsTableProps {
   materialUnits: { value: string; label: string }[];
   periodUnits: { value: string; label: string }[];
   additionalCategories: { value: string; label: string }[];
+}
+
+/** Extended cost of a single assembly item (qty × rate, with type-specific multipliers). */
+function itemCost(item: AssemblyItem): number {
+  const details = item.details as
+    | { total_days?: number; usage_duration?: number; maintenance_cost?: number | null; fuel_cost?: number | null }
+    | null;
+  if (item.item_type === "labor") {
+    return safeMult(item.quantity, item.unit_price, details?.total_days ?? 1);
+  }
+  if (item.item_type === "equipment") {
+    const base = safeMult(
+      item.quantity,
+      item.unit_price,
+      details?.usage_duration ?? 1,
+    );
+    return safeAdd(base, details?.maintenance_cost ?? 0, details?.fuel_cost ?? 0);
+  }
+  if (item.item_type === "additional") {
+    return item.unit_price;
+  }
+  return safeMult(item.quantity, item.unit_price);
 }
 
 export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
@@ -38,6 +61,11 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
     "project_additional",
   ]);
   const { format } = useCurrencyFormatter();
+
+  const grandTotal = useMemo(
+    () => items.reduce((sum, item) => safeAdd(sum, itemCost(item)), 0),
+    [items],
+  );
 
   const getUnitLabel = useCallback(
     (unit: string | null, type: string) => {
@@ -91,6 +119,9 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
             <TableHead className="px-4 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[120px]">
               {t("common:price")}
             </TableHead>
+            <TableHead className="px-4 py-2 text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[120px]">
+              {t("common:cost")}
+            </TableHead>
             <TableHead className="px-4 py-2 text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[100px]">
               {t("common:actions")}
             </TableHead>
@@ -133,6 +164,9 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                 <TableCell className="px-4 py-2 text-start text-sm min-w-[120px]">
                   {format(item.unit_price, "USD")}
                 </TableCell>
+                <TableCell className="px-4 py-2 text-end tabular-nums text-sm font-medium min-w-[120px]">
+                  {format(itemCost(item), "USD")}
+                </TableCell>
                 <TableCell className="px-4 py-2 text-end text-sm min-w-[100px]">
                   <div className="flex justify-end gap-1">
                     <Button
@@ -158,6 +192,17 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
               </TableRow>
             );
           })}
+          <TableRow className="bg-muted">
+            <TableCell
+              colSpan={5}
+              className="px-4 py-2 text-end text-xs font-semibold uppercase text-foreground"
+            >
+              {t("common:total")}
+            </TableCell>
+            <TableCell className="px-4 py-2 text-end text-sm font-bold tabular-nums">
+              {format(grandTotal, "USD")}
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>
