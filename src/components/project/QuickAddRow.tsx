@@ -94,11 +94,16 @@ export function QuickAddRow({
       <div className="flex flex-wrap items-end gap-2">
         {fields.map((field, idx) => (
           <div key={field.key} className="flex-1 min-w-[120px] space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">
+            <label
+              htmlFor={field.key}
+              className="text-xs font-medium text-muted-foreground"
+            >
               {field.label}
             </label>
             {field.type === "select" ? (
               <select
+                id={field.key}
+                name={field.key}
                 value={values[field.key] ?? ""}
                 onChange={(e) => setField(field.key, e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -114,6 +119,8 @@ export function QuickAddRow({
             ) : (
               <Input
                 ref={idx === 0 ? firstInputRef : undefined}
+                id={field.key}
+                name={field.key}
                 type={field.type === "number" ? "number" : "text"}
                 value={values[field.key] ?? ""}
                 onChange={(e) => setField(field.key, e.target.value)}

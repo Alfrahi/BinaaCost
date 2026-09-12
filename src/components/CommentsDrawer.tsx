@@ -259,7 +259,7 @@ export default function CommentsDrawer({
                           />
 
                           {isOwner && (
-                            <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 p-1">
+                            <div className="absolute top-0 end-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity flex gap-1 p-1">
                               <Button
                                 variant="ghost"
                                 size="icon"
