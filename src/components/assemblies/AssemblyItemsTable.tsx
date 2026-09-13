@@ -186,7 +186,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-7 w-7 text-red-500 hover:text-red-600"
+                      className="h-7 w-7 text-destructive hover:text-destructive"
                       onClick={() => onDelete(item)}
                       aria-label={`${t("common:delete")} ${item.description}`}
                     >

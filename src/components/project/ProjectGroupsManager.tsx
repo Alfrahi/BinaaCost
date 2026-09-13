@@ -173,11 +173,11 @@ function SortableGroupItem({
               aria-label={`${t("common:move")} ${group.name}`}
             >
               <GripVertical
-                className="w-4 h-4 text-text-secondary"
+                className="w-4 h-4 text-muted-foreground"
                 aria-hidden="true"
               />
             </button>
-            <span className="text-text-primary">{group.name}</span>
+            <span className="text-foreground">{group.name}</span>
           </div>
           <div className="flex gap-1">
             <Button
@@ -245,7 +245,7 @@ export default function ProjectGroupsManager({
   return (
     <div className="border border-border rounded-lg p-4 bg-muted mb-4 shadow-sm text-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-text-primary">
+        <h3 className="font-semibold text-lg text-foreground">
           {t("project_detail:groups.manageGroups")}
         </h3>
         <Button
@@ -287,7 +287,7 @@ export default function ProjectGroupsManager({
           </DndContext>
 
           {(groups || []).length === 0 && (
-            <p className="text-center text-sm text-text-secondary py-4">
+            <p className="text-center text-sm text-muted-foreground py-4">
               {t("project_detail:groups.noGroups")}
             </p>
           )}

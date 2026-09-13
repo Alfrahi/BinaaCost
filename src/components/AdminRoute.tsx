@@ -17,7 +17,7 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-base text-text-secondary">
+      <div className="min-h-screen flex items-center justify-center text-base text-muted-foreground">
         {t("loading")}
       </div>
     );

@@ -241,10 +241,10 @@ export default function ProjectVersionsTab({
       <Card className="p-4 sm:p-6 border-2 border-border shadow-md text-sm">
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div>
-            <h3 className="text-lg font-bold text-text-primary">
+            <h3 className="text-lg font-bold text-foreground">
               {t("restorePreview")}
             </h3>
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-muted-foreground">
               {t("restoreDescription")}
             </p>
           </div>
@@ -295,10 +295,10 @@ export default function ProjectVersionsTab({
       <Card className="p-4 sm:p-6 border-2 border-border shadow-md text-sm">
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div>
-            <h3 className="text-lg font-bold text-text-primary">
+            <h3 className="text-lg font-bold text-foreground">
               {t("compareTitle")}
             </h3>
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-muted-foreground">
               {t("compareDescription")}
             </p>
           </div>

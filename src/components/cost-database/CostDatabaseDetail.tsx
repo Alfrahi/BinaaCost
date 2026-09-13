@@ -46,7 +46,7 @@ export default function CostDatabaseDetail({
 
   if (error) {
     return (
-      <div className="text-red-500 text-base">
+      <div className="text-destructive text-base">
         {t("common:error")}: {error.message}
       </div>
     );
@@ -75,10 +75,10 @@ export default function CostDatabaseDetail({
           />
         </Button>
         <div>
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="text-xl font-bold text-foreground">
             {database.name}
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm text-muted-foreground">
             {database.description || t("common:noDescription")}
           </p>
         </div>

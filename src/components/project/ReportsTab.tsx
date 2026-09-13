@@ -178,7 +178,7 @@ export default function ReportsTab({
         labelKey: "project_reports:detailedCostReport",
         icon: DollarSign,
         badgeKey: "project_reports:internalLabel",
-        badgeClass: "bg-muted text-text-secondary",
+        badgeClass: "bg-muted text-muted-foreground",
       },
       {
         value: "client-proposal",

@@ -108,7 +108,7 @@ export function LaborRow({
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_labor:formula")}</div>
-              <code className="font-mono text-text-secondary">{formula}</code>
+              <code className="font-mono text-muted-foreground">{formula}</code>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

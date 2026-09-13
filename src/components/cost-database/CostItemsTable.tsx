@@ -159,11 +159,11 @@ export default function CostItemsTable({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold">{database.name}</h2>
-            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-text-secondary">
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
               {database.currency}
             </span>
           </div>
-          <p className="text-sm text-text-secondary">{database.description}</p>
+          <p className="text-sm text-muted-foreground">{database.description}</p>
         </div>
       </div>
 
@@ -207,11 +207,11 @@ export default function CostItemsTable({
       )}
 
       <div className="flex justify-between items-center">
-        <div className="text-sm text-text-secondary">
+        <div className="text-sm text-muted-foreground">
           {count} {t("common:items")}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("pages:cost_databases.adjustByLocation")}:
           </span>
           <Select
@@ -235,7 +235,7 @@ export default function CostItemsTable({
               ))}
             </SelectContent>
           </Select>
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("common:rowsPerPage")}:
           </span>
           <Select
@@ -374,7 +374,7 @@ export default function CostItemsTable({
                         ? 6
                         : 5
                   }
-                  className="text-center py-8 text-text-secondary text-sm"
+                  className="text-center py-8 text-muted-foreground text-sm"
                 >
                   {t("common:noItems")}
                 </td>

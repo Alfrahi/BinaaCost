@@ -37,7 +37,7 @@ export function BulkActionBar({
               variant="ghost"
               size="icon"
               onClick={onClear}
-              className="h-11 w-11 text-text-secondary hover:text-text-primary"
+              className="h-11 w-11 text-muted-foreground hover:text-foreground"
             >
               <X className="w-5 h-5" />
             </Button>

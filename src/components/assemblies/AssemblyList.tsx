@@ -53,7 +53,7 @@ function AssemblyFormDialog({
   return (
     <div className="border border-border rounded-lg p-4 bg-muted space-y-3">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-text-primary">
+        <h3 className="font-semibold text-lg text-foreground">
           {initialData ? t("common:edit") : t("common:add")}{" "}
           {t("resources:assemblies.assembly")}
         </h3>
@@ -151,7 +151,7 @@ export function AssemblyList({
   }, []);
 
   const headerClass =
-    "text-xs font-semibold text-text-secondary uppercase tracking-wider bg-muted h-10 px-3 py-2";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
@@ -238,7 +238,7 @@ export function AssemblyList({
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="text-center py-8 text-text-secondary text-sm"
+                  className="text-center py-8 text-muted-foreground text-sm"
                 >
                   {t("common:noItems")}
                 </TableCell>
@@ -246,7 +246,7 @@ export function AssemblyList({
             ) : (
               assemblies.map((assembly) => (
                 <TableRow key={assembly.id} className="border-t border-border">
-                  <TableCell className="font-medium text-start text-sm text-text-primary">
+                  <TableCell className="font-medium text-start text-sm text-foreground">
                     <div className="flex items-center gap-2">
                       <Package
                         className="w-4 h-4 text-primary"
@@ -255,13 +255,13 @@ export function AssemblyList({
                       {assembly.name}
                     </div>
                   </TableCell>
-                  <TableCell className="text-start text-sm text-text-primary">
+                  <TableCell className="text-start text-sm text-foreground">
                     {assembly.description || t("common:noDescription")}
                   </TableCell>
-                  <TableCell className="text-start text-sm text-text-primary">
+                  <TableCell className="text-start text-sm text-foreground">
                     {assembly.category || t("common:notSpecified")}
                   </TableCell>
-                  <TableCell className="text-end text-sm tabular-nums text-text-primary">
+                  <TableCell className="text-end text-sm tabular-nums text-foreground">
                     {itemCounts[assembly.id] ?? 0}
                   </TableCell>
                   <TableCell className="text-end text-sm">

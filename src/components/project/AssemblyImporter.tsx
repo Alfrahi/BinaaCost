@@ -130,7 +130,7 @@ export default function AssemblyImporter({
   return (
     <div className="border rounded-lg p-4 bg-muted mb-4 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-text-primary">
+        <h3 className="font-semibold text-lg text-foreground">
           {t("project_detail:assembly_importer.importFromAssembly")}
         </h3>
         <Button
@@ -192,12 +192,12 @@ export default function AssemblyImporter({
             </div>
             <ScrollArea className="h-48">
               {isLoadingAssemblyItems ? (
-                <div className="flex items-center justify-center h-full text-text-secondary text-sm">
+                <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
                   <Loader2 className="w-5 h-5 animate-spin ms-2" />
                   {t("common:loading")}
                 </div>
               ) : assemblyItems.length === 0 ? (
-                <div className="text-center text-sm text-text-secondary py-4">
+                <div className="text-center text-sm text-muted-foreground py-4">
                   {t("common:noItems")}
                 </div>
               ) : (

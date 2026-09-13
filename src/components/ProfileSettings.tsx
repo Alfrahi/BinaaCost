@@ -118,7 +118,7 @@ export default function ProfileSettings() {
             className="text-sm"
           />
           {profileForm.formState.errors.first_name && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-destructive text-sm mt-1">
               {t(profileForm.formState.errors.first_name.message!)}
             </p>
           )}
@@ -135,7 +135,7 @@ export default function ProfileSettings() {
             className="text-sm"
           />
           {profileForm.formState.errors.last_name && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-destructive text-sm mt-1">
               {t(profileForm.formState.errors.last_name.message!)}
             </p>
           )}
@@ -213,7 +213,7 @@ export default function ProfileSettings() {
             newPassword,
             confirmNewPassword: newPassword,
           }).error?.errors[0]?.message && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-destructive text-sm mt-1">
               {t(
                 passwordSchema.safeParse({
                   newPassword,
@@ -240,7 +240,7 @@ export default function ProfileSettings() {
             newPassword,
             confirmNewPassword: confirmPassword,
           }).error?.errors[0]?.message && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-destructive text-sm mt-1">
               {t(
                 passwordSchema.safeParse({
                   newPassword,

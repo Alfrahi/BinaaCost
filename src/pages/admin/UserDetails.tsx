@@ -128,13 +128,13 @@ export default function UserDetails() {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
-                <span className="text-xl font-medium text-text-primary">
+                <span className="text-xl font-medium text-foreground">
                   {user.first_name?.charAt(0)}
                   {user.last_name?.charAt(0)}
                 </span>
               </div>
               <div>
-                <div className="font-medium text-sm text-text-primary">
+                <div className="font-medium text-sm text-foreground">
                   {user.first_name} {user.last_name}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -208,7 +208,7 @@ export default function UserDetails() {
                           to={`/projects/${project.id}`}
                           className="block p-3 border border-border rounded-lg hover:bg-muted transition-colors"
                         >
-                          <div className="font-medium text-sm text-text-primary">
+                          <div className="font-medium text-sm text-foreground">
                             {project.name}
                           </div>
                           <div className="text-sm text-muted-foreground">
@@ -265,7 +265,7 @@ export default function UserDetails() {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <div className="font-medium text-sm text-text-primary">
+                            <div className="font-medium text-sm text-foreground">
                               {log.action}
                             </div>
                             <div className="text-sm text-muted-foreground">

@@ -299,7 +299,7 @@ export default function CostDatabaseList({
                   </label>
                   <Input {...form.register("name")} />
                   {form.formState.errors.name && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-destructive text-sm mt-1">
                       {t(form.formState.errors.name.message!)}
                     </p>
                   )}
@@ -324,7 +324,7 @@ export default function CostDatabaseList({
                     className="text-sm"
                   />
                   {form.formState.errors.currency && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-destructive text-sm mt-1">
                       {t(form.formState.errors.currency.message!)}
                     </p>
                   )}

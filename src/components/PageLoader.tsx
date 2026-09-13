@@ -7,7 +7,7 @@ export default function PageLoader({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "w-full h-screen flex flex-col items-center justify-center bg-background text-text-primary",
+        "w-full h-screen flex flex-col items-center justify-center bg-background text-foreground",
         className,
       )}
     >

@@ -32,7 +32,7 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="text-center py-8 text-text-secondary">
+      <div className="text-center py-8 text-muted-foreground">
         {t("project_detail:notFound")}
       </div>
     );

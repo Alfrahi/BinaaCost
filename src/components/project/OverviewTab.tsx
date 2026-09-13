@@ -140,7 +140,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             return (
               <div key={cat.key} className="space-y-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-text-secondary">{cat.label}</span>
+                  <span className="text-muted-foreground">{cat.label}</span>
                   <span className="tabular-nums font-medium">
                     {format(cat.value, project.currency)}
                   </span>
@@ -164,11 +164,11 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
           {t("project_overview:attention")}
         </h3>
         {!needsAttention ? (
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm text-muted-foreground">
             {t("project_overview:allGood")}
           </p>
         ) : (
-          <ul className="space-y-1 text-sm text-text-secondary list-disc ps-5">
+          <ul className="space-y-1 text-sm text-muted-foreground list-disc ps-5">
             {incompleteCount > 0 && (
               <li>
                 {t("project_overview:incompleteItems", {
@@ -182,7 +182,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
           </ul>
         )}
         {project.updated_at && (
-          <p className="mt-3 text-xs text-text-secondary">
+          <p className="mt-3 text-xs text-muted-foreground">
             {t("project_overview:lastEdited", {
               date: new Date(project.updated_at).toLocaleString(),
             })}
@@ -191,17 +191,17 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
       </div>
 
       <div className="bg-card rounded-lg shadow p-4 sm:p-6 text-sm border border-border/60">
-        <h3 className="text-sm font-semibold text-text-secondary mb-2">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
           {t("project_overview:details")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div className="font-semibold">{t("project_overview:type")}</div>
-            <div className="text-text-secondary">{translatedType}</div>
+            <div className="text-muted-foreground">{translatedType}</div>
           </div>
           <div>
             <div className="font-semibold">{t("project_overview:size")}</div>
-            <div className="text-text-secondary">
+            <div className="text-muted-foreground">
               {project.size} {sizeUnitLabel}
             </div>
           </div>
@@ -209,7 +209,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:location")}
             </div>
-            <div className="text-text-secondary">
+            <div className="text-muted-foreground">
               {project.location || t("common:notSpecified")}
             </div>
           </div>
@@ -217,7 +217,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:duration")}
             </div>
-            <div className="text-text-secondary">
+            <div className="text-muted-foreground">
               {project.duration_days} {durationUnitLabel}
             </div>
           </div>
@@ -225,7 +225,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:clientRequirements")}
             </div>
-            <div className="text-text-secondary">
+            <div className="text-muted-foreground">
               {project.client_requirements || t("common:notSpecified")}
             </div>
           </div>
@@ -233,7 +233,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:description")}
             </div>
-            <div className="text-text-secondary">
+            <div className="text-muted-foreground">
               {project.description || t("common:notSpecified")}
             </div>
           </div>

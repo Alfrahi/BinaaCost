@@ -77,12 +77,12 @@ const SummaryRow = ({
   <div className={cn("flex justify-between items-center py-1", className)}>
     <div>
       <div className="flex items-center gap-1">
-        <span className="font-medium text-text-primary text-sm">{label}</span>
+        <span className="font-medium text-foreground text-sm">{label}</span>
         {tooltip && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Info className="w-3 h-3 text-text-secondary" />
+                <Info className="w-3 h-3 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent className="text-xs">
                 <p>{tooltip}</p>
@@ -92,7 +92,7 @@ const SummaryRow = ({
         )}
       </div>
       {subLabel && (
-        <div className="text-xs text-text-secondary">{subLabel}</div>
+        <div className="text-xs text-muted-foreground">{subLabel}</div>
       )}
     </div>
     <div className={cn("font-semibold text-sm", valueClassName)}>{value}</div>
@@ -189,7 +189,7 @@ export default function ProfitPricingSummaryCard({
         </CardHeader>
         <CardContent className="pt-6 space-y-5">
           <div>
-            <Label htmlFor="overhead" className="text-sm text-text-secondary">
+            <Label htmlFor="overhead" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.overhead")}
             </Label>
             <div className="relative mt-1">
@@ -203,11 +203,11 @@ export default function ProfitPricingSummaryCard({
                 }
                 className="pe-8 text-sm"
               />
-              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+              <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">
                 %
               </span>
             </div>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("project_detail:profit_pricing.overheadDesc")}
             </p>
           </div>
@@ -215,7 +215,7 @@ export default function ProfitPricingSummaryCard({
           <div>
             <Label
               htmlFor="contingency"
-              className="text-sm text-text-secondary"
+              className="text-sm text-muted-foreground"
             >
               {t("project_detail:profit_pricing.generalContingency")}
             </Label>
@@ -230,17 +230,17 @@ export default function ProfitPricingSummaryCard({
                 }
                 className="pe-8 text-sm"
               />
-              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+              <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">
                 %
               </span>
             </div>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("project_detail:profit_pricing.generalContingencyDesc")}
             </p>
           </div>
 
           <div>
-            <Label htmlFor="markup" className="text-sm text-text-secondary">
+            <Label htmlFor="markup" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.markup")}
             </Label>
             <div className="relative mt-1">
@@ -252,17 +252,17 @@ export default function ProfitPricingSummaryCard({
                 onChange={(e) => handleChange("markup_percent", e.target.value)}
                 className="pe-8 text-sm"
               />
-              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+              <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">
                 %
               </span>
             </div>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("project_detail:profit_pricing.markupDesc")}
             </p>
           </div>
 
           <div>
-            <Label htmlFor="taxes" className="text-sm text-text-secondary">
+            <Label htmlFor="taxes" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.taxes")}
             </Label>
             <div className="relative mt-1">
@@ -274,14 +274,14 @@ export default function ProfitPricingSummaryCard({
                 onChange={(e) => handleChange("tax_percent", e.target.value)}
                 className="pe-8 text-sm"
               />
-              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+              <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">
                 %
               </span>
             </div>
           </div>
 
           <div>
-            <Label htmlFor="location-factor" className="text-sm text-text-secondary">
+            <Label htmlFor="location-factor" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.locationFactor")}
             </Label>
             <div className="relative mt-1">
@@ -294,14 +294,14 @@ export default function ProfitPricingSummaryCard({
                 onChange={(e) => handleChange("location_factor", e.target.value)}
                 className="pe-8 text-sm"
               />
-              <span className="absolute end-3 top-2.5 text-text-secondary text-sm">
+              <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">
                 ×
               </span>
             </div>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("project_detail:profit_pricing.locationFactorDesc")}
             </p>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("project_detail:profit_pricing.locationFactorTooltip")}
             </p>
           </div>
@@ -332,28 +332,28 @@ export default function ProfitPricingSummaryCard({
               <SummaryRow
                 label={t("project_tabs:materials")}
                 value={format(materialsTotal, currency)}
-                className="text-text-secondary"
+                className="text-muted-foreground"
               />
               <SummaryRow
                 label={t("project_tabs:labor")}
                 value={format(laborTotal, currency)}
-                className="text-text-secondary"
+                className="text-muted-foreground"
               />
               <SummaryRow
                 label={t("project_tabs:equipment")}
                 value={format(equipmentTotal, currency)}
-                className="text-text-secondary"
+                className="text-muted-foreground"
               />
               <SummaryRow
                 label={t("project_tabs:additional")}
                 value={format(additionalTotal, currency)}
-                className="text-text-secondary"
+                className="text-muted-foreground"
               />
               <div className="border-t border-border my-2"></div>
               <SummaryRow
                 label={t("project_detail:profit_pricing.totalDirectCosts")}
                 value={format(financials.directCosts, currency)}
-                className="text-base font-bold text-text-primary"
+                className="text-base font-bold text-foreground"
               />
             </div>
 
@@ -372,8 +372,8 @@ export default function ProfitPricingSummaryCard({
                   className={cn(
                     "text-sm font-medium",
                     financials.locationAdjustmentAmount >= 0
-                      ? "text-green-600"
-                      : "text-red-600",
+                      ? "text-success"
+                      : "text-destructive",
                   )}
                 />
               </div>
@@ -381,7 +381,7 @@ export default function ProfitPricingSummaryCard({
 
             <div className="px-2 space-y-3">
               <div className="flex items-center gap-4 text-sm">
-                <div className="w-8 text-center text-text-secondary text-lg">
+                <div className="w-8 text-center text-muted-foreground text-lg">
                   +
                 </div>
                 <div className="flex-1">
@@ -391,8 +391,8 @@ export default function ProfitPricingSummaryCard({
                       { percent: settings.overhead_percent },
                     )}
                     value={format(financials.overheadAmount, currency)}
-                    className="text-text-primary"
-                    valueClassName="text-red-600"
+                    className="text-foreground"
+                    valueClassName="text-destructive"
                     tooltip={t(
                       "project_detail:profit_pricing.tooltips.overhead",
                     )}
@@ -403,8 +403,8 @@ export default function ProfitPricingSummaryCard({
                       { percent: settings.contingency_percent },
                     )}
                     value={format(financials.contingencyAmount, currency)}
-                    className="text-text-primary"
-                    valueClassName="text-red-600"
+                    className="text-foreground"
+                    valueClassName="text-destructive"
                     tooltip={t(
                       "project_detail:profit_pricing.tooltips.generalContingency",
                     )}
@@ -419,12 +419,12 @@ export default function ProfitPricingSummaryCard({
                       "project_detail:profit_pricing.riskContingency",
                     )}
                     value={format(riskContingency, currency)}
-                    className="text-text-secondary"
+                    className="text-muted-foreground"
                     tooltip={t(
                       "project_detail:profit_pricing.riskContingencyCombinedTooltip",
                     )}
                   />
-                  <p className="text-xs text-text-secondary -mt-1">
+                  <p className="text-xs text-muted-foreground -mt-1">
                     {t("project_detail:profit_pricing.riskContingencyInfo")}
                   </p>
                 </div>
@@ -435,7 +435,7 @@ export default function ProfitPricingSummaryCard({
                   <SummaryRow
                     label={t("project_detail:profit_pricing.scenarios")}
                     value={String(scenarioCount)}
-                    className="text-text-secondary"
+                    className="text-muted-foreground"
                   />
                 </div>
               )}
@@ -446,12 +446,12 @@ export default function ProfitPricingSummaryCard({
                 label={t("project_detail:profit_pricing.primeCost")}
                 subLabel={t("project_detail:profit_pricing.primeCostDesc")}
                 value={format(financials.primeCost, currency)}
-                className="text-lg font-semibold text-text-primary"
+                className="text-lg font-semibold text-foreground"
                 tooltip={t("project_detail:profit_pricing.tooltips.primeCost")}
               />
 
               <div className="flex items-center gap-4 text-sm mt-2">
-                <div className="w-8 text-center text-text-secondary text-lg">
+                <div className="w-8 text-center text-muted-foreground text-lg">
                   +
                 </div>
                 <div className="flex-1">
@@ -461,8 +461,8 @@ export default function ProfitPricingSummaryCard({
                       { percent: settings.markup_percent },
                     )}
                     value={format(financials.markupAmount, currency)}
-                    className="text-text-primary font-medium"
-                    valueClassName="text-green-600"
+                    className="text-foreground font-medium"
+                    valueClassName="text-success"
                     tooltip={t("project_detail:profit_pricing.tooltips.markup")}
                   />
                 </div>
@@ -473,12 +473,12 @@ export default function ProfitPricingSummaryCard({
               <SummaryRow
                 label={t("project_detail:profit_pricing.subtotalBeforeTax")}
                 value={format(financials.bidPrice, currency)}
-                className="text-lg font-bold text-text-primary"
+                className="text-lg font-bold text-foreground"
                 tooltip={t("project_detail:profit_pricing.tooltips.subtotal")}
               />
 
               <div className="flex items-center gap-4 text-sm mt-2">
-                <div className="w-8 text-center text-text-secondary text-lg">
+                <div className="w-8 text-center text-muted-foreground text-lg">
                   +
                 </div>
                 <div className="flex-1">
@@ -487,7 +487,7 @@ export default function ProfitPricingSummaryCard({
                       percent: settings.tax_percent,
                     })}
                     value={format(financials.taxAmount, currency)}
-                    className="text-text-primary"
+                    className="text-foreground"
                     tooltip={t("project_detail:profit_pricing.tooltips.tax")}
                   />
                 </div>

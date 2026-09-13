@@ -168,7 +168,7 @@ export default function CommentsDrawer({
             isRtl ? "sm:text-right" : "sm:text-left",
           )}
         >
-          <SheetTitle className="flex items-center gap-2 text-xl font-semibold text-text-primary">
+          <SheetTitle className="flex items-center gap-2 text-xl font-semibold text-foreground">
             <MessageSquare className="w-5 h-5" />
             {t("comments.title", { item: itemName || t("common:item") })}
           </SheetTitle>
@@ -184,7 +184,7 @@ export default function CommentsDrawer({
 
         <ScrollArea className="flex-1 p-6 relative" ref={scrollAreaRef}>
           {comments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-text-secondary text-center text-sm">
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-center text-sm">
               <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
               <p>{t("comments.noComments")}</p>
             </div>
@@ -208,15 +208,15 @@ export default function CommentsDrawer({
 
                 return (
                   <div key={comment.id} className="flex gap-3 group">
-                    <div className="w-8 h-8 mt-1 flex items-center justify-center bg-muted rounded-full text-text-primary shrink-0">
+                    <div className="w-8 h-8 mt-1 flex items-center justify-center bg-muted rounded-full text-foreground shrink-0">
                       <span className="text-xs font-medium">{initials}</span>
                     </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-text-primary">
+                        <span className="text-sm font-medium text-foreground">
                           {name}
                         </span>
-                        <span className="text-xs text-text-secondary">
+                        <span className="text-xs text-muted-foreground">
                           {formatDate(comment.created_at, "dateTime")}
                         </span>
                       </div>
@@ -252,7 +252,7 @@ export default function CommentsDrawer({
                       ) : (
                         <div className="relative">
                           <div
-                            className="text-sm text-text-primary bg-muted p-3 rounded-lg rounded-tl-none group-hover:bg-border transition-colors"
+                            className="text-sm text-foreground bg-muted p-3 rounded-lg rounded-tl-none group-hover:bg-border transition-colors"
                             dangerouslySetInnerHTML={{
                               __html: sanitizeHtml(comment.content),
                             }}
@@ -263,7 +263,7 @@ export default function CommentsDrawer({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 text-text-secondary hover:text-primary"
+                                className="h-6 w-6 text-muted-foreground hover:text-primary"
                                 onClick={() => startEditing(comment)}
                                 title={t("common:edit")}
                                 aria-label={t("common:edit")}

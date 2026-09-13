@@ -90,7 +90,7 @@ export function CostDatabaseForm({
           </Label>
           <Input id="db-name" {...form.register("name")} className="text-sm" />
           {form.formState.errors.name && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-destructive text-xs mt-1">
               {t(form.formState.errors.name.message!)}
             </p>
           )}
@@ -119,7 +119,7 @@ export function CostDatabaseForm({
             className="text-sm"
           />
           {form.formState.errors.currency && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-destructive text-xs mt-1">
               {t(form.formState.errors.currency.message!)}
             </p>
           )}
