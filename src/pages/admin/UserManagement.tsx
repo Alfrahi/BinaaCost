@@ -9,6 +9,14 @@ import { Link } from "react-router-dom";
 import { RoleBadge } from "@/components/RoleBadge";
 import EditRoleModal from "@/components/EditRoleModal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { useAdminUserManagement } from "@/hooks/useAdminUserManagement";
 
@@ -75,39 +83,39 @@ export default function UserManagement() {
 
       <div className="border rounded-lg overflow-hidden">
         <div className="bg-background">
-          <table className="w-full">
-            <thead className="bg-muted">
-              <tr>
-                <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-muted">
+              <TableRow>
+                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("admin:users.email")}
-                </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                </TableHead>
+                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("admin:users.name")}
-                </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                </TableHead>
+                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("admin:users.role")}
-                </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                </TableHead>
+                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("admin:users.plan")}
-                </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                </TableHead>
+                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("admin:users.createdAt")}
-                </th>
-                <th className="px-4 py-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                </TableHead>
+                <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {t("common:actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-background divide-y divide-border">
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center">
+                <TableRow>
+                  <TableCell colSpan={6} className="px-4 py-8 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : users.length === 0 ? (
-                <tr>
-                  <td
+                <TableRow>
+                  <TableCell
                     colSpan={6}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
@@ -121,27 +129,27 @@ export default function UserManagement() {
                     ) : (
                       t("admin:users.noUsersFound")
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 users.map((user) => (
-                  <tr key={user.id}>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
+                  <TableRow key={user.id}>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
                       {user.email}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
                       {user.first_name} {user.last_name}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm">
                       <RoleBadge role={user.role} />
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {user.plan}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-end text-sm font-medium">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-end text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <Button variant="outline" size="sm" asChild>
                           <Link to={`/admin/users/${user.id}`}>
@@ -169,12 +177,12 @@ export default function UserManagement() {
                           {t("common:delete")}
                         </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
