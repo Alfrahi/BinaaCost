@@ -1,4 +1,4 @@
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Loader2, AlertTriangle } from "lucide-react";
@@ -51,8 +51,7 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <h1 className="text-2xl font-bold">{t("pages:analytics.title")}</h1>
+      <PageHeader title={t("pages:analytics.title")} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">

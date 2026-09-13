@@ -14,12 +14,12 @@ export function Heading({
   const Tag = `h${level}` as const;
 
   const baseClasses = {
-    1: "text-3xl font-bold tracking-tight",
-    2: "text-2xl font-bold tracking-tight",
-    3: "text-xl font-bold tracking-tight",
-    4: "text-lg font-semibold",
-    5: "text-base font-semibold",
-    6: "text-sm font-semibold",
+    1: "text-2xl font-bold",
+    2: "text-xl font-semibold",
+    3: "text-lg font-semibold",
+    4: "text-base font-semibold",
+    5: "text-sm font-semibold",
+    6: "text-xs font-semibold",
   };
 
   return (

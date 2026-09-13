@@ -19,7 +19,7 @@ export default function CostDatabases() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="space-y-6">
       <Breadcrumbs /> {/* Add Breadcrumbs here */}
       {selectedDatabaseId ? (
         <CostDatabaseDetail

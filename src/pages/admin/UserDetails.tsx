@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
@@ -110,13 +110,14 @@ export default function UserDetails() {
 
   return (
     <div className="space-y-6 text-sm">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("admin:users.userDetails")}</h1>
-        <Button variant="outline" asChild className="text-sm">
-          <Link to="/admin/users">{t("common:back")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("admin:users.userDetails")}
+        actions={
+          <Button variant="outline" asChild className="text-sm">
+            <Link to="/admin/users">{t("common:back")}</Link>
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1">
