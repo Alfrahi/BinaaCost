@@ -85,7 +85,7 @@ export default function ProjectManagement() {
               <Button
                 variant="ghost"
                 onClick={() => setSearch("")}
-                className="absolute right-0 top-0 h-full px-3 text-sm"
+                className="absolute end-0 top-0 h-full px-3 text-sm"
                 aria-label={t("common:clearFilters")}
               >
                 <X className="h-4 w-4" />

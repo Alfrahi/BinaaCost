@@ -235,7 +235,7 @@ export default function CommentsDrawer({
                               onClick={cancelEditing}
                               className="h-7 px-2 text-sm"
                             >
-                              <X className="w-4 h-4 mr-1" />{" "}
+                              <X className="w-4 h-4 ms-1" />{" "}
                               {t("common:cancel")}
                             </Button>
                             <Button
@@ -244,7 +244,7 @@ export default function CommentsDrawer({
                               className="h-7 px-2 text-sm"
                               disabled={loading}
                             >
-                              <Check className="w-4 h-4 mr-1" />{" "}
+                              <Check className="w-4 h-4 ms-1" />{" "}
                               {t("common:save")}
                             </Button>
                           </div>
@@ -296,7 +296,7 @@ export default function CommentsDrawer({
               className="absolute bottom-4 right-4 rounded-full shadow-lg text-sm"
               size="sm"
             >
-              <ArrowDownCircle className="w-4 h-4 mr-2" />
+              <ArrowDownCircle className="w-4 h-4 ms-2" />
               {t("common:newComments")}
             </Button>
           )}
