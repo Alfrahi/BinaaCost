@@ -112,7 +112,7 @@ export function LaborForm({
             ))}
           </datalist>
           {form.formState.errors.worker_type && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.worker_type.message!)}
             </p>
           )}
@@ -130,7 +130,7 @@ export function LaborForm({
             className="text-sm"
           />
           {form.formState.errors.number_of_workers && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.number_of_workers.message!)}
             </p>
           )}
@@ -149,7 +149,7 @@ export function LaborForm({
             className="text-sm"
           />
           {form.formState.errors.daily_rate && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.daily_rate.message!)}
             </p>
           )}
@@ -167,7 +167,7 @@ export function LaborForm({
             className="text-sm"
           />
           {form.formState.errors.total_days && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.total_days.message!)}
             </p>
           )}

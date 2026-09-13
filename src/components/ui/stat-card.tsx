@@ -11,14 +11,14 @@ interface StatCardProps {
 export function StatCard({ label, value, hint, className }: StatCardProps) {
   return (
     <div className={cn("bg-card rounded-lg border border-border p-4", className)}>
-      <div className="text-xs font-medium uppercase tracking-wide text-text-secondary">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
-      <div className="mt-1 text-xl font-bold tabular-nums text-text-primary">
+      <div className="mt-1 text-xl font-bold tabular-nums text-foreground">
         {value}
       </div>
       {hint ? (
-        <div className="mt-1 text-xs text-text-secondary">{hint}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{hint}</div>
       ) : null}
     </div>
   );

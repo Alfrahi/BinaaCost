@@ -20,13 +20,13 @@ const ErrorContent = ({
   t: any;
 }) => (
   <div className="flex flex-col items-center justify-center text-center p-6 max-w-md mx-auto">
-    <div className="bg-red-100 p-4 rounded-full mb-4">
-      <AlertCircle className="w-8 h-8 text-danger" />
+    <div className="bg-destructive/10 p-4 rounded-full mb-4">
+      <AlertCircle className="w-8 h-8 text-destructive" />
     </div>
-    <h2 className="text-xl font-bold text-text-primary mb-2">
+    <h2 className="text-xl font-bold text-foreground mb-2">
       {t("boundaryTitle")}
     </h2>
-    <p className="text-base text-text-secondary mb-6">{displayMessage}</p>
+    <p className="text-base text-muted-foreground mb-6">{displayMessage}</p>
 
     <div className="flex gap-3 justify-center">
       {onRetry && (

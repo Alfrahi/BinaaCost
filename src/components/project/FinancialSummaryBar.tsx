@@ -89,21 +89,21 @@ export default function FinancialSummaryBar({
     >
       {steps.map((step, i) => (
         <span key={step.key} className="flex items-center gap-x-2">
-          {i > 0 && <span className="text-text-secondary">+</span>}
-          <span className="text-text-secondary">{step.label}</span>
+          {i > 0 && <span className="text-muted-foreground">+</span>}
+          <span className="text-muted-foreground">{step.label}</span>
           <span className="font-medium tabular-nums">
             {format(step.value, currency)}
           </span>
         </span>
       ))}
-      <span className="text-text-secondary">=</span>
+      <span className="text-muted-foreground">=</span>
     </div>
   );
 
   const grandTotal = (
     <span className="flex items-baseline gap-2">
       <span className="text-sm font-medium">{grandTotalLabel}</span>
-      <span className="text-lg font-bold tabular-nums text-text-primary">
+      <span className="text-lg font-bold tabular-nums text-foreground">
         {format(financials.grandTotal, currency)}
       </span>
     </span>

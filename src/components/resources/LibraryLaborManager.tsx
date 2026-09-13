@@ -170,7 +170,7 @@ export default function LibraryLaborManager() {
   }, [deleteItems, selection, t]);
 
   const headerClass =
-    "text-xs font-semibold text-text-secondary uppercase tracking-wider bg-muted h-10 px-3 py-2";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
@@ -276,11 +276,11 @@ export default function LibraryLaborManager() {
       </div>
 
       <div className="flex justify-between items-center">
-        <div className="text-sm text-text-secondary">
+        <div className="text-sm text-muted-foreground">
           {t("common:item", { count: count })}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("common:rowsPerPage")}:
           </span>
           <Select
@@ -344,7 +344,7 @@ export default function LibraryLaborManager() {
               <TableRow>
                 <TableCell
                   colSpan={4}
-                  className="text-center text-text-secondary text-sm"
+                  className="text-center text-muted-foreground text-sm"
                 >
                   {t("common:noItems")}
                 </TableCell>
@@ -359,10 +359,10 @@ export default function LibraryLaborManager() {
                       aria-label={`${t("common:select")} ${item.worker_type}`}
                     />
                   </TableCell>
-                  <TableCell className="px-3 py-2 font-medium text-start text-sm min-w-[200px] text-text-primary">
+                  <TableCell className="px-3 py-2 font-medium text-start text-sm min-w-[200px] text-foreground">
                     {item.worker_type}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start text-sm min-w-[150px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start text-sm min-w-[150px] text-foreground">
                     {format(item.daily_rate, "USD")}
                   </TableCell>
                   <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">

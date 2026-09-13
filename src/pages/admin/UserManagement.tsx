@@ -134,10 +134,10 @@ export default function UserManagement() {
               ) : (
                 users.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-foreground">
                       {user.email}
                     </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-text-primary">
+                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-foreground">
                       {user.first_name} {user.last_name}
                     </TableCell>
                     <TableCell className="px-4 py-4 whitespace-nowrap text-sm">

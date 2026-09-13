@@ -136,7 +136,7 @@ export default function LocationAdjustmentsManager({
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={3} className="text-center py-4 text-red-500">
+                    <td colSpan={3} className="text-center py-4 text-destructive">
                       {t("common:error")}: {error.message}
                     </td>
                   </tr>

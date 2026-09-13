@@ -56,7 +56,7 @@ export default function Breadcrumbs() {
   };
 
   return (
-    <nav className="text-sm text-text-secondary mb-2" aria-label="Breadcrumb">
+    <nav className="text-sm text-muted-foreground mb-2" aria-label="Breadcrumb">
       <ol className="flex flex-wrap gap-1 items-center">
         <li>
           <Link to="/" className="hover:underline">
@@ -99,7 +99,7 @@ export default function Breadcrumbs() {
             <li key={idx} className="flex items-center gap-1">
               <span>{separator}</span>
               {isLast ? (
-                <span className="font-semibold text-text-primary">
+                <span className="font-semibold text-foreground">
                   {translatedSeg}
                 </span>
               ) : (

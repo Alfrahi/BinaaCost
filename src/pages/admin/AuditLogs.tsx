@@ -199,7 +199,7 @@ export default function AuditLogs() {
                         <TableCell colSpan={4} className="py-4 px-6 bg-muted">
                           <div className="space-y-3">
                             {log.old_data && (
-                              <div className="text-red-600 text-xs p-2 border rounded bg-red-50/50">
+                              <div className="text-destructive text-xs p-2 border rounded bg-destructive/10">
                                 <strong>{t("admin:auditLogs.oldData")}</strong>
                                 <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
                                   {formatJsonForDisplay(log.old_data)}
@@ -207,7 +207,7 @@ export default function AuditLogs() {
                               </div>
                             )}
                             {log.new_data && (
-                              <div className="text-green-600 text-xs p-2 border rounded bg-green-50/50">
+                              <div className="text-success text-xs p-2 border rounded bg-success/10">
                                 <strong>{t("admin:auditLogs.newData")}</strong>
                                 <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
                                   {formatJsonForDisplay(log.new_data)}
@@ -233,7 +233,7 @@ export default function AuditLogs() {
 
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("admin:auditLogs.rowsPerPage")}:
           </span>
           <Select
@@ -264,7 +264,7 @@ export default function AuditLogs() {
           >
             {t("common:previous")}
           </Button>
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("admin:auditLogs.page")} {currentPage} {t("common:of")}{" "}
             {totalPages}
           </span>

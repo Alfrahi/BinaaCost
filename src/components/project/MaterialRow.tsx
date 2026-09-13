@@ -103,7 +103,7 @@ export const MaterialRow = React.memo(function MaterialRow({
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_materials:formula")}</div>
-              <code className="font-mono text-text-secondary">{formula}</code>
+              <code className="font-mono text-muted-foreground">{formula}</code>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -119,7 +119,7 @@ export const MaterialRow = React.memo(function MaterialRow({
             className="h-8 w-8"
           >
             <MessageSquare
-              className="w-4 h-4 text-text-secondary"
+              className="w-4 h-4 text-muted-foreground"
               aria-hidden="true"
             />
           </Button>

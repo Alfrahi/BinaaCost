@@ -144,7 +144,7 @@ export function EquipmentRow({
             </TooltipTrigger>
             <TooltipContent className="p-3 text-xs">
               <div className="font-semibold mb-1">{t("project_equipment:formula")}</div>
-              <code className="font-mono text-text-secondary mb-2">{formula}</code>
+              <code className="font-mono text-muted-foreground mb-2">{formula}</code>
               <div className="font-semibold mb-1 border-b pb-1">
                 {t("project_equipment:breakdown")}
               </div>
@@ -173,7 +173,7 @@ export function EquipmentRow({
             className="h-8 w-8"
           >
             <MessageSquare
-              className="w-4 h-4 text-text-secondary"
+              className="w-4 h-4 text-muted-foreground"
               aria-hidden="true"
             />
           </Button>

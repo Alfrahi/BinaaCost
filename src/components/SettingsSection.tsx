@@ -72,7 +72,7 @@ export default function SettingsSection({
       <div className="mb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
           <div className="font-semibold text-lg">{label}</div>
-          <div className="text-sm text-text-secondary">{description}</div>
+          <div className="text-sm text-muted-foreground">{description}</div>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-auto">
           <div className="flex items-center w-full">
@@ -134,24 +134,24 @@ export default function SettingsSection({
         <table className="min-w-full bg-card rounded border">
           <thead>
             <tr className="bg-muted">
-              <th className="px-3 py-2 text-start text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {t("admin:dropdowns.option")}
               </th>
-              <th className="px-3 py-2 text-start text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {t("common:translationAr")}
               </th>
               {isCurrency && (
-                <th className="px-3 py-2 text-start text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   {t("common:exchangeRateUSD")}
                 </th>
               )}
               {isRiskProbability && (
-                <th className="px-3 py-2 text-start text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   {t("admin:dropdowns.numericValue")}
                 </th>
               )}
               {isAdmin && (
-                <th className="px-3 py-2 text-end text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                <th className="px-3 py-2 text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   {t("common:actions")}
                 </th>
               )}
@@ -170,7 +170,7 @@ export default function SettingsSection({
                         ? 3
                         : 2
                   }
-                  className="text-center py-4 text-text-secondary text-sm"
+                  className="text-center py-4 text-muted-foreground text-sm"
                 >
                   {t("common:loading")}
                 </td>
@@ -187,7 +187,7 @@ export default function SettingsSection({
                         ? 3
                         : 2
                   }
-                  className="text-center py-4 text-text-secondary text-sm"
+                  className="text-center py-4 text-muted-foreground text-sm"
                 >
                   {t("admin:dropdowns.noOptionsFound")}
                 </td>
@@ -237,19 +237,19 @@ export default function SettingsSection({
                     </>
                   ) : (
                     <>
-                      <td className="px-3 py-2 text-start text-sm text-text-primary">
+                      <td className="px-3 py-2 text-start text-sm text-foreground">
                         {getDisplayValue(o)}
                       </td>
-                      <td className="px-3 py-2 text-start text-sm text-text-secondary">
+                      <td className="px-3 py-2 text-start text-sm text-muted-foreground">
                         {o.translations?.ar || ""}
                       </td>
                       {isCurrency && (
-                        <td className="px-3 py-2 text-start text-sm text-text-secondary">
+                        <td className="px-3 py-2 text-start text-sm text-muted-foreground">
                           {o.rate ? o.rate.toFixed(4) : "-"}
                         </td>
                       )}
                       {isRiskProbability && (
-                        <td className="px-3 py-2 text-start text-sm text-text-secondary">
+                        <td className="px-3 py-2 text-start text-sm text-muted-foreground">
                           {o.numeric_value !== undefined
                             ? o.numeric_value.toFixed(2)
                             : "-"}
@@ -269,7 +269,7 @@ export default function SettingsSection({
                           <Button
                             variant="destructive"
                             size="icon"
-                            className="h-7 w-7 text-destructive hover:text-destructive hover:bg-red-50"
+                            className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => setDeleteTarget(o)}
                             aria-label={`${t("common:delete")} ${o.value}`}
                           >
@@ -298,30 +298,30 @@ export default function SettingsSection({
             <DialogTitle className="text-xl font-semibold">
               {t("admin:dropdowns.confirmChange")}
             </DialogTitle>
-            <p className="text-base text-text-secondary pt-2">
+            <p className="text-base text-muted-foreground pt-2">
               {t("admin:dropdowns.confirmChangeMessage")}
             </p>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-red-50 p-3 rounded border border-red-100">
-                <div className="font-semibold text-red-800 mb-1">
+              <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+                <div className="font-semibold text-destructive mb-1">
                   {t("admin:dropdowns.oldValue")}
                 </div>
                 <div>{pendingEdit?.oldValue}</div>
                 {pendingEdit?.oldTranslation && (
-                  <div className="text-text-secondary text-xs mt-1">
+                  <div className="text-muted-foreground text-xs mt-1">
                     {pendingEdit.oldTranslation}
                   </div>
                 )}
                 {isCurrency && pendingEdit?.rate !== undefined && (
-                  <div className="text-text-secondary text-xs mt-1">
+                  <div className="text-muted-foreground text-xs mt-1">
                     {t("common:exchangeRate")}: {pendingEdit.rate.toFixed(4)}
                   </div>
                 )}
                 {isRiskProbability &&
                   pendingEdit?.numericValue !== undefined && (
-                    <div className="text-text-secondary text-xs mt-1">
+                    <div className="text-muted-foreground text-xs mt-1">
                       {t("admin:dropdowns.numericValue")}:{" "}
                       {pendingEdit.numericValue.toFixed(2)}
                     </div>
@@ -330,29 +330,29 @@ export default function SettingsSection({
 
               <div className="flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                 <ArrowRight
-                  className="w-4 h-4 text-text-secondary rtl:rotate-180"
+                  className="w-4 h-4 text-muted-foreground rtl:rotate-180"
                   aria-hidden="true"
                 />
               </div>
 
               <div className="bg-muted p-3 rounded border border-border">
-                <div className="font-semibold text-text-primary mb-1">
+                <div className="font-semibold text-foreground mb-1">
                   {t("admin:dropdowns.newValue")}
                 </div>
                 <div>{pendingEdit?.newValue}</div>
                 {pendingEdit?.newTranslation && (
-                  <div className="text-text-secondary text-xs mt-1">
+                  <div className="text-muted-foreground text-xs mt-1">
                     {pendingEdit.newTranslation}
                   </div>
                 )}
                 {isCurrency && pendingEdit?.rate !== undefined && (
-                  <div className="text-text-secondary text-xs mt-1">
+                  <div className="text-muted-foreground text-xs mt-1">
                     {t("common:exchangeRate")}: {pendingEdit.rate.toFixed(4)}
                   </div>
                 )}
                 {isRiskProbability &&
                   pendingEdit?.numericValue !== undefined && (
-                    <div className="text-text-secondary text-xs mt-1">
+                    <div className="text-muted-foreground text-xs mt-1">
                       {t("admin:dropdowns.numericValue")}:{" "}
                       {pendingEdit.numericValue.toFixed(2)}
                     </div>

@@ -202,7 +202,7 @@ export default function LibraryEquipmentManager() {
   }, [deleteItems, selection, t]);
 
   const headerClass =
-    "text-xs font-semibold text-text-secondary uppercase tracking-wider bg-muted h-10 px-3 py-2";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
@@ -243,7 +243,7 @@ export default function LibraryEquipmentManager() {
               </Label>
               <Input id="name" {...form.register("name")} className="text-sm" />
               {form.formState.errors.name && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.name.message!)}
                 </p>
               )}
@@ -272,7 +272,7 @@ export default function LibraryEquipmentManager() {
                 className="text-sm"
               />
               {form.formState.errors.rental_or_purchase && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.rental_or_purchase.message!)}
                 </p>
               )}
@@ -292,7 +292,7 @@ export default function LibraryEquipmentManager() {
                 className="text-sm"
               />
               {form.formState.errors.cost_per_period && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.cost_per_period.message!)}
                 </p>
               )}
@@ -311,7 +311,7 @@ export default function LibraryEquipmentManager() {
                   className="text-sm"
                 />
                 {form.formState.errors.period_unit && (
-                  <p className="text-danger text-xs mt-1">
+                  <p className="text-destructive text-xs mt-1">
                     {t(form.formState.errors.period_unit.message!)}
                   </p>
                 )}
@@ -348,11 +348,11 @@ export default function LibraryEquipmentManager() {
       </div>
 
       <div className="flex justify-between items-center">
-        <div className="text-sm text-text-secondary">
+        <div className="text-sm text-muted-foreground">
           {t("common:item", { count: count })}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("common:rowsPerPage")}:
           </span>
           <Select
@@ -425,7 +425,7 @@ export default function LibraryEquipmentManager() {
               <TableRow>
                 <TableCell
                   colSpan={7}
-                  className="text-center py-8 text-text-secondary"
+                  className="text-center py-8 text-muted-foreground"
                 >
                   {t("common:noItems")}
                 </TableCell>
@@ -440,21 +440,21 @@ export default function LibraryEquipmentManager() {
                       aria-label={`${t("common:select")} ${item.name}`}
                     />
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-foreground">
                     {item.name}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[100px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[100px] text-foreground">
                     {item.type || t("common:noDescription")}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-foreground">
                     {rentalOptions.find(
                       (o) => o.value === item.rental_or_purchase,
                     )?.label || item.rental_or_purchase}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-foreground">
                     {format(item.cost_per_period, "USD")}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[100px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[100px] text-foreground">
                     {periodUnits.find((u) => u.value === item.period_unit)
                       ?.label || item.period_unit}
                   </TableCell>

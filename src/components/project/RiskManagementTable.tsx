@@ -166,7 +166,7 @@ export default function RiskManagementTable({
             <Label className="text-sm">{t("fields.description")}</Label>
             <Input {...form.register("description")} className="text-sm" />
             {form.formState.errors.description && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-destructive text-sm mt-1">
                 {t(form.formState.errors.description.message!)}
               </p>
             )}
@@ -182,7 +182,7 @@ export default function RiskManagementTable({
               className="text-sm"
             />
             {form.formState.errors.probability && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-destructive text-sm mt-1">
                 {t(form.formState.errors.probability.message!)}
               </p>
             )}
@@ -195,7 +195,7 @@ export default function RiskManagementTable({
               className="text-sm"
             />
             {form.formState.errors.impact_amount && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-destructive text-sm mt-1">
                 {t(form.formState.errors.impact_amount.message!)}
               </p>
             )}
@@ -210,13 +210,13 @@ export default function RiskManagementTable({
               type="number"
               {...form.register("contingency_amount")}
               readOnly
-              className="bg-muted text-text-secondary cursor-not-allowed"
+              className="bg-muted text-muted-foreground cursor-not-allowed"
             />
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("common:riskAutoCalc")}
             </p>
             {form.formState.errors.contingency_amount && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-destructive text-sm mt-1">
                 {t(form.formState.errors.contingency_amount.message!)}
               </p>
             )}
@@ -325,7 +325,7 @@ export default function RiskManagementTable({
               <TableRow>
                 <TableCell
                   colSpan={canEdit ? 6 : 5}
-                  className="text-center py-8 text-text-secondary text-sm"
+                  className="text-center py-8 text-muted-foreground text-sm"
                 >
                   {t("noItems")}
                 </TableCell>
@@ -341,7 +341,7 @@ export default function RiskManagementTable({
             {format(totalContingency, currency)}
           </span>
         </div>
-        <p className="text-xs text-text-secondary">{t("formulaHint")}</p>
+        <p className="text-xs text-muted-foreground">{t("formulaHint")}</p>
         {onNavigateToPricing && (
           <Button
             variant="link"

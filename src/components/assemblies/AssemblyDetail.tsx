@@ -199,7 +199,7 @@ function AssemblyItemManager({
   return (
     <Card className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-text-primary">
+        <h3 className="font-semibold text-lg text-foreground">
           {t("resources:assemblies.itemsList")} ({items.length})
         </h3>
         {!itemFormOpen && (
@@ -233,7 +233,7 @@ function AssemblyItemManager({
       )}
 
       {items.length === 0 && !itemFormOpen ? (
-        <div className="text-center py-8 text-sm text-text-secondary">
+        <div className="text-center py-8 text-sm text-muted-foreground">
           {t("common:noItems")}
         </div>
       ) : (
@@ -299,7 +299,7 @@ export function AssemblyDetail({ assemblyId, onBack }: AssemblyDetailProps) {
 
   if (assemblyError) {
     return (
-      <div className="text-danger text-base">
+      <div className="text-destructive text-base">
         {t("common:error")}: {assemblyError.message}
       </div>
     );
@@ -328,10 +328,10 @@ export function AssemblyDetail({ assemblyId, onBack }: AssemblyDetailProps) {
           />
         </Button>
         <div>
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="text-xl font-bold text-foreground">
             {assembly.name}
           </h2>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm text-muted-foreground">
             {assembly.description || t("common:noDescription")}
           </p>
         </div>

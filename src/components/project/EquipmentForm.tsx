@@ -193,7 +193,7 @@ export function EquipmentForm({
             })}
           </datalist>
           {form.formState.errors.name && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.name.message!)}
             </p>
           )}
@@ -227,7 +227,7 @@ export function EquipmentForm({
             className="text-sm"
           />
           {form.formState.errors.rental_or_purchase && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.rental_or_purchase.message!)}
             </p>
           )}
@@ -246,7 +246,7 @@ export function EquipmentForm({
             className="text-sm"
           />
           {form.formState.errors.quantity && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.quantity.message!)}
             </p>
           )}
@@ -272,7 +272,7 @@ export function EquipmentForm({
             className="text-sm"
           />
           {form.formState.errors.cost_per_period && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.cost_per_period.message!)}
             </p>
           )}
@@ -291,7 +291,7 @@ export function EquipmentForm({
               className="text-sm"
             />
             {form.formState.errors.period_unit && (
-              <p className="text-red-500 text-sm">
+              <p className="text-destructive text-sm">
                 {t(form.formState.errors.period_unit.message!)}
               </p>
             )}
@@ -312,7 +312,7 @@ export function EquipmentForm({
               className="text-sm"
             />
             {form.formState.errors.usage_duration && (
-              <p className="text-red-500 text-sm">
+              <p className="text-destructive text-sm">
                 {t(form.formState.errors.usage_duration.message!)}
               </p>
             )}

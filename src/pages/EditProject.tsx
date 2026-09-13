@@ -33,7 +33,7 @@ export default function EditProject() {
 
   if (fetchError || !initialData) {
     return (
-      <div className="text-red-500 text-sm">
+      <div className="text-destructive text-sm">
         {fetchError?.message || t("project_form:notFound")}
       </div>
     );

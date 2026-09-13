@@ -90,7 +90,7 @@ export function AdditionalCostForm({
             className="text-sm"
           />
           {form.formState.errors.category && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.category.message!)}
             </p>
           )}
@@ -122,7 +122,7 @@ export function AdditionalCostForm({
             className="text-sm"
           />
           {form.formState.errors.amount && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.amount.message!)}
             </p>
           )}

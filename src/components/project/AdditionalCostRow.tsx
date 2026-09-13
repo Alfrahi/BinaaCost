@@ -84,7 +84,7 @@ export function AdditionalCostRow({
             className="h-8 w-8"
           >
             <MessageSquare
-              className="w-4 h-4 text-text-secondary"
+              className="w-4 h-4 text-muted-foreground"
               aria-hidden="true"
             />
           </Button>

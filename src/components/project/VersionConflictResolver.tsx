@@ -620,10 +620,10 @@ export default function VersionConflictResolver({
               className={cn(
                 status === "current_only" &&
                   isRemoved &&
-                  "line-through text-red-500",
+                  "line-through text-destructive",
                 status === "version_only" &&
                   isAdded &&
-                  "text-green-600 font-medium",
+                  "text-success font-medium",
                 status === "modified" &&
                   isUpdated &&
                   "text-primary font-medium",
@@ -636,12 +636,12 @@ export default function VersionConflictResolver({
         <TableCell className="p-2 text-sm text-muted-foreground">{currentDetails}</TableCell>
         <TableCell className="p-2 text-sm">
           {status === "version_only" && (
-            <div className="flex items-center gap-2 text-green-600">
+            <div className="flex items-center gap-2 text-success">
               <Plus className="w-4 h-4" /> {t("project_versions:status_added")}
             </div>
           )}
           {status === "current_only" && (
-            <div className="flex items-center gap-2 text-red-600">
+            <div className="flex items-center gap-2 text-destructive">
               <Minus className="w-4 h-4" />{" "}
               {t("project_versions:status_removed")}
             </div>
@@ -660,7 +660,7 @@ export default function VersionConflictResolver({
             </span>
           )}
           {status === "version_only" && (
-            <span className={cn(isAdded && "text-green-600 font-medium")}>
+            <span className={cn(isAdded && "text-success font-medium")}>
               {versionDetails}
             </span>
           )}

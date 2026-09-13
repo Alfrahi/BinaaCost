@@ -62,7 +62,7 @@ export function GenerateExternalLinkForm({
   return (
     <div className="space-y-4 pt-6 border-t border-border">
       <div className="flex items-center gap-2">
-        <h3 className="font-semibold text-lg text-text-primary">
+        <h3 className="font-semibold text-lg text-foreground">
           {t("project_detail:share.external.title")}
         </h3>
         <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
@@ -130,7 +130,7 @@ export function GenerateExternalLinkForm({
         <div className="space-y-3">
           <Alert
             data-testid="shown-once-warning"
-            className="border-danger/50 bg-danger/10 text-start"
+            className="border-destructive/50 bg-destructive/10 text-start"
           >
             <AlertTriangle className="h-4 w-4" aria-hidden="true" />
             <AlertDescription className="text-sm font-medium">
@@ -140,7 +140,7 @@ export function GenerateExternalLinkForm({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 border border-border rounded-md bg-muted">
             <LinkIcon className="w-4 h-4 shrink-0 self-center" aria-hidden="true" />
             <span
-              className="flex-1 truncate text-sm text-text-primary font-mono"
+              className="flex-1 truncate text-sm text-foreground font-mono"
               data-testid="generated-link"
             >
               {generatedLink}

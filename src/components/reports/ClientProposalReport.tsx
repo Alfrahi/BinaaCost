@@ -51,11 +51,11 @@ export const ClientProposalReport = React.forwardRef<
                 className="h-12 mb-2"
               />
             )}
-            <h1 className="text-2xl font-bold text-text-primary">
+            <h1 className="text-2xl font-bold text-foreground">
               {companyInfo.name}
             </h1>
-            <p className="text-sm text-text-secondary">{companyInfo.website}</p>
-            <p className="text-sm text-text-secondary">{companyInfo.email}</p>
+            <p className="text-sm text-muted-foreground">{companyInfo.website}</p>
+            <p className="text-sm text-muted-foreground">{companyInfo.email}</p>
           </div>
           <div className="text-end">
             <h2 className="text-3xl font-extrabold text-primary mb-2">
@@ -64,17 +64,17 @@ export const ClientProposalReport = React.forwardRef<
             <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary mb-2">
               {t("project_reports:clientFacingLabel")}
             </span>
-            <p className="text-lg font-semibold text-text-primary">
+            <p className="text-lg font-semibold text-foreground">
               {project.name}
             </p>
-            <p className="text-sm text-text-secondary">{project.description}</p>
+            <p className="text-sm text-muted-foreground">{project.description}</p>
           </div>
         </div>
 
         <Separator className="my-6 bg-border" />
 
         {/* Proposal Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-text-primary">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-foreground">
           <div>
             <p>
               <strong>{t("project_reports:client")}:</strong>{" "}
@@ -120,10 +120,10 @@ export const ClientProposalReport = React.forwardRef<
         <Separator className="my-6 bg-border" />
 
         {/* Project Summary */}
-        <h3 className="text-xl font-bold text-text-primary mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:projectSummary")}
         </h3>
-        <p className="text-sm text-text-primary mb-8">
+        <p className="text-sm text-foreground mb-8">
           {project.client_requirements ||
             t("project_reports:noClientRequirements")}
         </p>
@@ -131,10 +131,10 @@ export const ClientProposalReport = React.forwardRef<
         <Separator className="my-6 bg-border" />
 
         {/* Proposed Cost */}
-        <h3 className="text-xl font-bold text-text-primary mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:proposedCost")}
         </h3>
-        <div className="mb-3 text-sm text-text-secondary">
+        <div className="mb-3 text-sm text-muted-foreground">
           <span className="font-semibold">
             {t("project_detail:profit_pricing.assumptions")}:{" "}
           </span>
@@ -147,7 +147,7 @@ export const ClientProposalReport = React.forwardRef<
           {t("project_detail:profit_pricing.taxes")}{" "}
           {project.financial_settings.tax_percent}%
           {!project.financial_settings_confirmed && (
-            <span className="block text-xs text-text-secondary mt-1">
+            <span className="block text-xs text-muted-foreground mt-1">
               {t(
                 "project_detail:profit_pricing.defaultAssumptionsWarning",
               )}
@@ -158,30 +158,30 @@ export const ClientProposalReport = React.forwardRef<
           <table className="w-full text-sm mb-8">
             <tbody>
               <tr className="bg-muted">
-                <td className="font-semibold uppercase text-text-primary">
+                <td className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.totalDirectCosts")}
                 </td>
-                <td className="text-end font-bold text-text-primary">
+                <td className="text-end font-bold text-foreground">
                   {formatCurrency(financials.directCosts, project.currency)}
                 </td>
               </tr>
               <tr className="border-t border-border">
-                <td className="text-text-primary">
+                <td className="text-foreground">
                   {t("project_detail:profit_pricing.overheadWithPercent", {
                     percent: project.financial_settings.overhead_percent,
                   })}
                 </td>
-                <td className="text-end text-text-primary">
+                <td className="text-end text-foreground">
                   {formatCurrency(financials.overheadAmount, project.currency)}
                 </td>
               </tr>
               <tr className="border-t border-border">
-                <td className="text-text-primary">
+                <td className="text-foreground">
                   {t("project_detail:profit_pricing.generalContingencyWithPercent", {
                     percent: project.financial_settings.contingency_percent,
                   })}
                 </td>
-                <td className="text-end text-text-primary">
+                <td className="text-end text-foreground">
                   {formatCurrency(
                     financials.contingencyAmount,
                     project.currency,
@@ -189,38 +189,38 @@ export const ClientProposalReport = React.forwardRef<
                 </td>
               </tr>
               <tr className="bg-muted border-t border-border">
-                <td className="font-semibold uppercase text-text-primary">
+                <td className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.primeCost")}
                 </td>
-                <td className="text-end font-bold text-text-primary">
+                <td className="text-end font-bold text-foreground">
                   {formatCurrency(financials.primeCost, project.currency)}
                 </td>
               </tr>
               <tr className="border-t border-border">
-                <td className="text-text-primary">
+                <td className="text-foreground">
                   {t("project_detail:profit_pricing.markupWithPercent", {
                     percent: project.financial_settings.markup_percent,
                   })}
                 </td>
-                <td className="text-end text-text-primary">
+                <td className="text-end text-foreground">
                   {formatCurrency(financials.markupAmount, project.currency)}
                 </td>
               </tr>
               <tr className="bg-muted border-t border-border">
-                <td className="font-semibold uppercase text-text-primary">
+                <td className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.subtotalBeforeTax")}
                 </td>
-                <td className="text-end font-bold text-text-primary">
+                <td className="text-end font-bold text-foreground">
                   {formatCurrency(financials.bidPrice, project.currency)}
                 </td>
               </tr>
               <tr className="border-t border-border">
-                <td className="text-text-primary">
+                <td className="text-foreground">
                   {t("project_detail:profit_pricing.taxesWithPercent", {
                     percent: project.financial_settings.tax_percent,
                   })}
                 </td>
-                <td className="text-end text-text-primary">
+                <td className="text-end text-foreground">
                   {formatCurrency(financials.taxAmount, project.currency)}
                 </td>
               </tr>
@@ -239,11 +239,11 @@ export const ClientProposalReport = React.forwardRef<
         <Separator className="my-6 bg-border" />
 
         {/* Terms and Conditions */}
-        <h3 className="text-xl font-bold text-text-primary mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:termsAndConditions")}
         </h3>
         <div
-          className="text-sm text-text-primary leading-relaxed"
+          className="text-sm text-foreground leading-relaxed"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(terms) }}
         />
       </div>
