@@ -43,13 +43,11 @@ export const useCurrencyFormatter = () => {
       const formatter = new Intl.NumberFormat(locale, defaultOptions);
       let formatted = formatter.format(amount);
 
-      if (
-        options?.showSign &&
-        amount !== 0 &&
-        !formatted.includes("+") &&
-        !formatted.includes("-")
-      ) {
-        formatted = (amount > 0 ? "+" : "") + formatted;
+      // showSign: prepend "+" for positive values. Detect sign from the
+      // numeric value rather than the formatted string, since Arabic locale
+      // uses U+2212 (−) for negatives and the ASCII "-" check would miss it.
+      if (options?.showSign && amount > 0) {
+        formatted = "+" + formatted;
       }
 
       return formatted;
