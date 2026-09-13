@@ -749,6 +749,18 @@ export default function VersionConflictResolver({
     return count;
   }, [selectedResolution]);
 
+  const changeSummary = useMemo(() => {
+    let added = 0;
+    let removed = 0;
+    let updated = 0;
+    CATEGORY_KEYS.forEach((category) => {
+      added += selectedResolution[category].toAdd.length;
+      removed += selectedResolution[category].toRemove.length;
+      updated += selectedResolution[category].toUpdate.length;
+    });
+    return { added, removed, updated };
+  }, [selectedResolution]);
+
   return (
     <div className="space-y-6 text-sm">
       {currentCurrency !== versionCurrency && (
@@ -786,6 +798,13 @@ export default function VersionConflictResolver({
       </Tabs>
 
       <div className="flex justify-end gap-2 pt-4 border-t">
+        <div className="flex-1 self-center text-xs text-muted-foreground">
+          {t("project_versions:changeSummary", {
+            added: changeSummary.added,
+            removed: changeSummary.removed,
+            updated: changeSummary.updated,
+          })}
+        </div>
         <Button
           variant="outline"
           onClick={onCancel}

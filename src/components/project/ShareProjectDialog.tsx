@@ -237,31 +237,44 @@ export default function ShareProjectDialog({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {externalLinks.map((link) => (
-                      <TableRow key={link.id}>
-                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground italic">
-                          {t("project_detail:share.external.linkHiddenNote")}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-sm text-foreground">
-                          {formatDate(link.expires_at, "short")}
-                          {new Date(link.expires_at) < new Date() && (
-                            <span className="ms-2 text-red-500 text-xs">
-                              ({t("project_detail:share.external.expired")})
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-end text-sm font-medium">
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => setDeleteTargetExternal(link)}
-                            className="h-7 w-7"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {externalLinks.map((link) => {
+                        const isExpired =
+                          new Date(link.expires_at) < new Date();
+                        return (
+                          <TableRow key={link.id}>
+                            <TableCell className="whitespace-nowrap text-sm">
+                              <span
+                                className={
+                                  isExpired
+                                    ? "text-muted-foreground"
+                                    : "text-success font-medium"
+                                }
+                              >
+                                {isExpired
+                                  ? t("project_detail:share.external.expired")
+                                  : t("project_detail:share.external.active")}
+                              </span>
+                              <span className="ms-2 text-xs text-muted-foreground italic">
+                                {t("project_detail:share.external.linkHiddenNote")}
+                              </span>
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-sm text-foreground">
+                              {formatDate(link.expires_at, "short")}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap text-end text-sm font-medium">
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => setDeleteTargetExternal(link)}
+                                className="h-7 w-7"
+                                aria-label={t("common:delete")}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                   </TableBody>
                 </Table>
               </div>
