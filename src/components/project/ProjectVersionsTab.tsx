@@ -433,17 +433,19 @@ export default function ProjectVersionsTab({
           </p>
         ) : (
           <ol className="space-y-3" aria-label={t("restore")}>
-            {timeline.map(({ version, summary, delta }) => {
+            {timeline.map(({ version, summary, delta }, idx) => {
               const prev = versions[versions.indexOf(version) + 1];
               const prevTotal = prev
                 ? computeVersionCostSummary(prev.data).directTotal
                 : null;
+              const isCurrent = idx === 0;
               return (
                 <li
                   key={version.id}
                   className={cn(
                     "border rounded-lg p-3 sm:p-4 bg-card",
                     version.is_final && "border-primary/40 bg-muted/40",
+                    isCurrent && "border-primary/60",
                   )}
                   data-testid={`version-row-${version.id}`}
                 >
@@ -453,6 +455,14 @@ export default function ProjectVersionsTab({
                         <span className="font-semibold text-base truncate">
                           {version.name}
                         </span>
+                        {isCurrent && (
+                          <span
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium"
+                            aria-label={t("currentBadge")}
+                          >
+                            {t("currentBadge")}
+                          </span>
+                        )}
                         {version.is_final && (
                           <span
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium"
