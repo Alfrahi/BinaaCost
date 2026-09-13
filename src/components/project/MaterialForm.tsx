@@ -168,7 +168,7 @@ export function MaterialForm({
             })}
           </datalist>
           {form.formState.errors.name && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.name.message!)}
             </p>
           )}
@@ -201,7 +201,7 @@ export function MaterialForm({
             className="text-sm"
           />
           {form.formState.errors.quantity && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.quantity.message!)}
             </p>
           )}
@@ -219,7 +219,7 @@ export function MaterialForm({
             className="text-sm"
           />
           {form.formState.errors.unit && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.unit.message!)}
             </p>
           )}
@@ -238,7 +238,7 @@ export function MaterialForm({
             className="text-sm"
           />
           {form.formState.errors.unit_price && (
-            <p className="text-red-500 text-sm">
+            <p className="text-destructive text-sm">
               {t(form.formState.errors.unit_price.message!)}
             </p>
           )}

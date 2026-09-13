@@ -123,12 +123,12 @@ export const ProjectCostReport = React.forwardRef<
                 {columns.map((col) => (
                   <TableHead
                     key={col.key}
-                    className={`text-${col.align || "start"} text-xs font-medium text-text-secondary uppercase`}
+                    className={`text-${col.align || "start"} text-xs font-medium text-muted-foreground uppercase`}
                   >
                     {col.label}
                   </TableHead>
                 ))}
-                <TableHead className="text-end text-xs font-medium text-text-secondary uppercase">
+                <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase">
                   {t("common:total")} ({project.currency})
                 </TableHead>
               </TableRow>
@@ -140,7 +140,7 @@ export const ProjectCostReport = React.forwardRef<
                     <TableRow className="bg-muted">
                       <TableCell
                         colSpan={columns.length + 1}
-                        className="font-semibold text-text-primary"
+                        className="font-semibold text-foreground"
                       >
                         {groups.find((g) => g.id === groupId)?.name}
                       </TableCell>
@@ -184,7 +184,7 @@ export const ProjectCostReport = React.forwardRef<
                         {columns.map((col) => (
                           <TableCell
                             key={col.key}
-                            className={`text-${col.align || "start"} text-text-primary`}
+                            className={`text-${col.align || "start"} text-foreground`}
                           >
                             {col.isCurrency
                               ? formatCurrency(item[col.key], project.currency)
@@ -205,7 +205,7 @@ export const ProjectCostReport = React.forwardRef<
                                     : item[col.key] || t("common:notSpecified")}
                           </TableCell>
                         ))}
-                        <TableCell className="text-end font-medium text-text-primary">
+                        <TableCell className="text-end font-medium text-foreground">
                           {formatCurrency(itemTotal, project.currency)}
                         </TableCell>
                       </TableRow>
@@ -217,7 +217,7 @@ export const ProjectCostReport = React.forwardRef<
                 <TableRow>
                   <TableCell
                     colSpan={columns.length + 1}
-                    className="text-center text-text-secondary py-4"
+                    className="text-center text-muted-foreground py-4"
                   >
                     {t("common:noItems")}
                   </TableCell>
@@ -228,11 +228,11 @@ export const ProjectCostReport = React.forwardRef<
               <TableRow className="bg-muted">
                 <TableCell
                   colSpan={columns.length}
-                  className="text-end font-semibold uppercase text-text-primary"
+                  className="text-end font-semibold uppercase text-foreground"
                 >
                   {t("common:subtotal")}
                 </TableCell>
-                <TableCell className="text-end font-bold text-text-primary">
+                <TableCell className="text-end font-bold text-foreground">
                   {formatCurrency(
                     calculateCategoryTotal[itemType](items as any),
                     project.currency,
@@ -257,30 +257,30 @@ export const ProjectCostReport = React.forwardRef<
                 className="h-12 mb-2"
               />
             )}
-            <h1 className="text-2xl font-bold text-text-primary">
+            <h1 className="text-2xl font-bold text-foreground">
               {companyInfo.name}
             </h1>
-            <p className="text-sm text-text-secondary">{companyInfo.website}</p>
-            <p className="text-sm text-text-secondary">{companyInfo.email}</p>
+            <p className="text-sm text-muted-foreground">{companyInfo.website}</p>
+            <p className="text-sm text-muted-foreground">{companyInfo.email}</p>
           </div>
           <div className="text-end">
             <h2 className="text-3xl font-extrabold text-primary mb-2">
               {t("project_reports:projectCostReport")}
             </h2>
-            <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-text-secondary mb-2">
+            <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground mb-2">
               {t("project_reports:internalLabel")}
             </span>
-            <p className="text-lg font-semibold text-text-primary">
+            <p className="text-lg font-semibold text-foreground">
               {project.name}
             </p>
-            <p className="text-sm text-text-secondary">{project.description}</p>
+            <p className="text-sm text-muted-foreground">{project.description}</p>
           </div>
         </div>
 
         <Separator className="my-6 bg-border" />
 
         {/* Project Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-text-primary">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-foreground">
           <div>
             <p>
               <strong>{t("project_detail:overview.type")}:</strong>{" "}
@@ -326,12 +326,12 @@ export const ProjectCostReport = React.forwardRef<
         <Separator className="my-6 bg-border" />
 
         {/* Cost Breakdown */}
-        <h3 className="text-xl font-bold text-text-primary mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:costBreakdown")}
         </h3>
 
         <div className="mb-8">
-          <h4 className="text-lg font-semibold text-text-primary mb-2">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
             {t("project_tabs:materials")}
           </h4>
           {renderCostTable(materials, "materials", [
@@ -351,7 +351,7 @@ export const ProjectCostReport = React.forwardRef<
         </div>
 
         <div className="mb-8">
-          <h4 className="text-lg font-semibold text-text-primary mb-2">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
             {t("project_tabs:labor")}
           </h4>
           {renderCostTable(labor, "labor", [
@@ -373,7 +373,7 @@ export const ProjectCostReport = React.forwardRef<
         </div>
 
         <div className="mb-8">
-          <h4 className="text-lg font-semibold text-text-primary mb-2">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
             {t("project_tabs:equipment")}
           </h4>
           {renderCostTable(equipment, "equipment", [
@@ -411,7 +411,7 @@ export const ProjectCostReport = React.forwardRef<
         </div>
 
         <div className="mb-8">
-          <h4 className="text-lg font-semibold text-text-primary mb-2">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
             {t("project_tabs:additional")}
           </h4>
           {renderCostTable(additional, "additional", [
@@ -432,7 +432,7 @@ export const ProjectCostReport = React.forwardRef<
         </div>
 
         <div className="mb-8">
-          <h4 className="text-lg font-semibold text-text-primary mb-2">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
             {t("project_tabs:risks")}
           </h4>
           <div className="overflow-x-auto">
@@ -440,16 +440,16 @@ export const ProjectCostReport = React.forwardRef<
             <Table className="w-full text-sm">
               <TableHeader>
                 <TableRow className="bg-muted">
-                  <TableHead className="text-start text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("project_risk:fields.description")}
                   </TableHead>
-                  <TableHead className="text-start text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("project_risk:fields.probability")}
                   </TableHead>
-                  <TableHead className="text-end text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("project_risk:fields.impactAmount")} ({project.currency})
                   </TableHead>
-                  <TableHead className="text-end text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("project_risk:fields.riskContingency")} (
                     {project.currency})
                   </TableHead>
@@ -461,16 +461,16 @@ export const ProjectCostReport = React.forwardRef<
                     key={risk.id || index}
                     className="border-t border-border"
                   >
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {risk.description}
                     </TableCell>
-                    <TableCell className="text-text-primary">
+                    <TableCell className="text-foreground">
                       {getOptionLabel("risk_probability", risk.probability)}
                     </TableCell>
-                    <TableCell className="text-end text-text-primary">
+                    <TableCell className="text-end text-foreground">
                       {formatCurrency(risk.impact_amount, project.currency)}
                     </TableCell>
-                    <TableCell className="text-end font-medium text-text-primary">
+                    <TableCell className="text-end font-medium text-foreground">
                       {formatCurrency(
                         risk.contingency_amount,
                         project.currency,
@@ -482,7 +482,7 @@ export const ProjectCostReport = React.forwardRef<
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-text-secondary py-4"
+                      className="text-center text-muted-foreground py-4"
                     >
                       {t("common:noItems")}
                     </TableCell>
@@ -493,11 +493,11 @@ export const ProjectCostReport = React.forwardRef<
                 <TableRow className="bg-muted">
                   <TableCell
                     colSpan={3}
-                    className="text-end font-semibold uppercase text-text-primary"
+                    className="text-end font-semibold uppercase text-foreground"
                   >
                     {t("project_risk:totalRiskContingency")}
                   </TableCell>
-                  <TableCell className="text-end font-bold text-text-primary">
+                  <TableCell className="text-end font-bold text-foreground">
                     {formatCurrency(
                       calculateCategoryTotal.risks(risks),
                       project.currency,
@@ -512,10 +512,10 @@ export const ProjectCostReport = React.forwardRef<
         <Separator className="my-6 bg-border" />
 
         {/* Financial Summary */}
-        <h3 className="text-xl font-bold text-text-primary mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:financialSummary")}
         </h3>
-        <div className="mb-3 text-sm text-text-secondary">
+        <div className="mb-3 text-sm text-muted-foreground">
           <span className="font-semibold">
             {t("project_detail:profit_pricing.assumptions")}:{" "}
           </span>
@@ -528,7 +528,7 @@ export const ProjectCostReport = React.forwardRef<
           {t("project_detail:profit_pricing.taxes")}{" "}
           {project.financial_settings.tax_percent}%
           {!project.financial_settings_confirmed && (
-            <span className="block text-xs text-text-secondary mt-1">
+            <span className="block text-xs text-muted-foreground mt-1">
               {t(
                 "project_detail:profit_pricing.defaultAssumptionsWarning",
               )}
@@ -540,30 +540,30 @@ export const ProjectCostReport = React.forwardRef<
           <Table className="w-full text-sm mb-8">
             <TableBody>
               <TableRow className="bg-muted">
-                <TableCell className="font-semibold uppercase text-text-primary">
+                <TableCell className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.totalDirectCosts")}
                 </TableCell>
-                <TableCell className="text-end font-bold text-text-primary">
+                <TableCell className="text-end font-bold text-foreground">
                   {formatCurrency(financials.directCosts, project.currency)}
                 </TableCell>
               </TableRow>
               <TableRow className="border-t border-border">
-                <TableCell className="text-text-primary">
+                <TableCell className="text-foreground">
                   {t("project_detail:profit_pricing.overheadWithPercent", {
                     percent: project.financial_settings.overhead_percent,
                   })}
                 </TableCell>
-                <TableCell className="text-end text-text-primary">
+                <TableCell className="text-end text-foreground">
                   {formatCurrency(financials.overheadAmount, project.currency)}
                 </TableCell>
               </TableRow>
               <TableRow className="border-t border-border">
-                <TableCell className="text-text-primary">
+                <TableCell className="text-foreground">
                   {t("project_detail:profit_pricing.generalContingencyWithPercent", {
                     percent: project.financial_settings.contingency_percent,
                   })}
                 </TableCell>
-                <TableCell className="text-end text-text-primary">
+                <TableCell className="text-end text-foreground">
                   {formatCurrency(
                     financials.contingencyAmount,
                     project.currency,
@@ -571,38 +571,38 @@ export const ProjectCostReport = React.forwardRef<
                 </TableCell>
               </TableRow>
               <TableRow className="bg-muted border-t border-border">
-                <TableCell className="font-semibold uppercase text-text-primary">
+                <TableCell className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.primeCost")}
                 </TableCell>
-                <TableCell className="text-end font-bold text-text-primary">
+                <TableCell className="text-end font-bold text-foreground">
                   {formatCurrency(financials.primeCost, project.currency)}
                 </TableCell>
               </TableRow>
               <TableRow className="border-t border-border">
-                <TableCell className="text-text-primary">
+                <TableCell className="text-foreground">
                   {t("project_detail:profit_pricing.markupWithPercent", {
                     percent: project.financial_settings.markup_percent,
                   })}
                 </TableCell>
-                <TableCell className="text-end text-text-primary">
+                <TableCell className="text-end text-foreground">
                   {formatCurrency(financials.markupAmount, project.currency)}
                 </TableCell>
               </TableRow>
               <TableRow className="bg-muted border-t border-border">
-                <TableCell className="font-semibold uppercase text-text-primary">
+                <TableCell className="font-semibold uppercase text-foreground">
                   {t("project_detail:profit_pricing.subtotalBeforeTax")}
                 </TableCell>
-                <TableCell className="text-end font-bold text-text-primary">
+                <TableCell className="text-end font-bold text-foreground">
                   {formatCurrency(financials.bidPrice, project.currency)}
                 </TableCell>
               </TableRow>
               <TableRow className="border-t border-border">
-                <TableCell className="text-text-primary">
+                <TableCell className="text-foreground">
                   {t("project_detail:profit_pricing.taxesWithPercent", {
                     percent: project.financial_settings.tax_percent,
                   })}
                 </TableCell>
-                <TableCell className="text-end text-text-primary">
+                <TableCell className="text-end text-foreground">
                   {formatCurrency(financials.taxAmount, project.currency)}
                 </TableCell>
               </TableRow>

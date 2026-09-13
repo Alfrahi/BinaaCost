@@ -31,7 +31,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
   );
 
   return (
-    <div className="flex h-screen bg-background text-text-primary">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}

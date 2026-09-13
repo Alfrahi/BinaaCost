@@ -207,7 +207,7 @@ export default function Login() {
                 {...loginForm.register("email")}
               />
               {loginForm.formState.errors.email && (
-                <p id="email-error" role="alert" className="text-red-500 text-xs">
+                <p id="email-error" role="alert" className="text-destructive text-xs">
                   {loginForm.formState.errors.email.message}
                 </p>
               )}
@@ -230,7 +230,7 @@ export default function Login() {
                 <p
                   id="password-error"
                   role="alert"
-                  className="text-red-500 text-xs"
+                  className="text-destructive text-xs"
                 >
                   {loginForm.formState.errors.password.message}
                 </p>
@@ -263,7 +263,7 @@ export default function Login() {
                 <p
                   id="signup-email-error"
                   role="alert"
-                  className="text-red-500 text-xs"
+                  className="text-destructive text-xs"
                 >
                   {signupForm.formState.errors.email.message}
                 </p>
@@ -287,7 +287,7 @@ export default function Login() {
                 <p
                   id="signup-password-error"
                   role="alert"
-                  className="text-red-500 text-xs"
+                  className="text-destructive text-xs"
                 >
                   {signupForm.formState.errors.password.message}
                 </p>
@@ -311,7 +311,7 @@ export default function Login() {
                 <p
                   id="signup-confirm-error"
                   role="alert"
-                  className="text-red-500 text-xs"
+                  className="text-destructive text-xs"
                 >
                   {signupForm.formState.errors.confirmPassword.message}
                 </p>
@@ -328,7 +328,7 @@ export default function Login() {
             {mode === "signin" ? (
               <button
                 type="button"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
                 onClick={() => {
                   setMode("signup");
                   setSubmitError(null);
@@ -339,7 +339,7 @@ export default function Login() {
             ) : (
               <button
                 type="button"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
                 onClick={() => {
                   setMode("signin");
                   setSubmitError(null);

@@ -441,7 +441,7 @@ export function ScenarioAnalysisTab({
               variant="ghost"
               size="icon"
               onClick={() => setIsManageScenariosOpen(true)}
-              className="text-text-secondary hover:text-text-primary"
+              className="text-muted-foreground hover:text-foreground"
               aria-label={t("manageScenarios")}
             >
               <Settings className="w-4 h-4" aria-hidden="true" />
@@ -645,8 +645,8 @@ export function ScenarioAnalysisTab({
                           className={cn(
                             "px-4 py-2 text-end text-sm",
                             row.simulated - row.original > 0
-                              ? "text-red-600"
-                              : "text-green-600",
+                              ? "text-destructive"
+                              : "text-success",
                           )}
                         >
                           {format(row.simulated - row.original, currency, {
@@ -793,7 +793,7 @@ export function ScenarioAnalysisTab({
                 className="text-sm"
               />
               {scenarioForm.formState.errors.name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(scenarioForm.formState.errors.name.message!)}
                 </p>
               )}
@@ -833,7 +833,7 @@ export function ScenarioAnalysisTab({
             </div>
             <h4 className="font-semibold text-base mt-6">{t("impactRules")}</h4>
             {scenarioForm.formState.errors.impact_rules && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-destructive text-xs mt-1">
                 {t(scenarioForm.formState.errors.impact_rules.message!)}
               </p>
             )}
@@ -844,7 +844,7 @@ export function ScenarioAnalysisTab({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 end-2 h-6 w-6 text-red-500"
+                    className="absolute top-2 end-2 h-6 w-6 text-destructive"
                     onClick={() => handleRemoveRule(index)}
                     aria-label={t("common:remove")}
                   >
@@ -905,7 +905,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.item_type && (
-                        <p className="text-red-500 text-xs mt-1">
+                        <p className="text-destructive text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.item_type?.message ?? "",
@@ -947,7 +947,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.field && (
-                        <p className="text-red-500 text-xs mt-1">
+                        <p className="text-destructive text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.field?.message ?? "",
@@ -988,7 +988,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.adjustment_type && (
-                        <p className="text-red-500 text-xs mt-1">
+                        <p className="text-destructive text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.adjustment_type?.message ?? "",
@@ -1025,7 +1025,7 @@ export function ScenarioAnalysisTab({
                       )}
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.value && (
-                        <p className="text-red-500 text-xs mt-1">
+                        <p className="text-destructive text-xs mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.value?.message ?? "",

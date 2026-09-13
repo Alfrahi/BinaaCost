@@ -40,7 +40,7 @@ export function ItemActions({
           aria-label={commentLabel}
           className="h-11 w-11"
         >
-          <MessageSquare className="w-4 h-4 text-text-secondary" aria-hidden="true" />
+          <MessageSquare className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
         </Button>
       )}
       {isOwner && (

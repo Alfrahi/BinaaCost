@@ -134,7 +134,7 @@ export default function ProjectForm({
             {error && (
               <div
                 role="alert"
-                className="p-4 bg-red-50 text-red-700 rounded-md text-sm"
+                className="p-4 bg-destructive/10 text-destructive rounded-md text-sm"
               >
                 {error}
               </div>
@@ -160,7 +160,7 @@ export default function ProjectForm({
                   <p
                     id="name-error"
                     role="alert"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-destructive text-sm mt-1"
                   >
                     {t(form.formState.errors.name.message!)}
                   </p>
@@ -194,7 +194,7 @@ export default function ProjectForm({
                     className="text-sm"
                   />
                   {form.formState.errors.type && (
-                    <p role="alert" className="text-red-500 text-sm mt-1">
+                    <p role="alert" className="text-destructive text-sm mt-1">
                       {t(form.formState.errors.type.message!)}
                     </p>
                   )}
@@ -219,7 +219,7 @@ export default function ProjectForm({
                       <p
                         id="size-error"
                         role="alert"
-                        className="text-red-500 text-sm mt-1"
+                        className="text-destructive text-sm mt-1"
                       >
                         {t(form.formState.errors.size.message!)}
                       </p>
@@ -241,7 +241,7 @@ export default function ProjectForm({
                       className="text-sm"
                     />
                     {form.formState.errors.size_unit && (
-                      <p role="alert" className="text-red-500 text-sm mt-1">
+                      <p role="alert" className="text-destructive text-sm mt-1">
                         {t(form.formState.errors.size_unit.message!)}
                       </p>
                     )}
@@ -297,7 +297,7 @@ export default function ProjectForm({
                     <p
                       id="duration-error"
                       role="alert"
-                      className="text-red-500 text-sm mt-1"
+                      className="text-destructive text-sm mt-1"
                     >
                       {t(form.formState.errors.duration_days.message!)}
                     </p>
@@ -333,7 +333,7 @@ export default function ProjectForm({
                   className="text-sm"
                 />
                 {form.formState.errors.currency && (
-                  <p role="alert" className="text-red-500 text-sm mt-1">
+                  <p role="alert" className="text-destructive text-sm mt-1">
                     {t(form.formState.errors.currency.message!)}
                   </p>
                 )}

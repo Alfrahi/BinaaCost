@@ -184,7 +184,7 @@ export default function LibraryMaterialsManager() {
   }, [deleteItems, selection, t]);
 
   const headerClass =
-    "text-xs font-semibold text-text-secondary uppercase tracking-wider bg-muted h-10 px-3 py-2";
+    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
@@ -225,7 +225,7 @@ export default function LibraryMaterialsManager() {
               </Label>
               <Input id="name" {...form.register("name")} className="text-sm" />
               {form.formState.errors.name && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.name.message!)}
                 </p>
               )}
@@ -253,7 +253,7 @@ export default function LibraryMaterialsManager() {
                 className="text-sm"
               />
               {form.formState.errors.unit && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.unit.message!)}
                 </p>
               )}
@@ -270,7 +270,7 @@ export default function LibraryMaterialsManager() {
                 className="text-sm"
               />
               {form.formState.errors.unit_price && (
-                <p className="text-danger text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {t(form.formState.errors.unit_price.message!)}
                 </p>
               )}
@@ -306,11 +306,11 @@ export default function LibraryMaterialsManager() {
       </div>
 
       <div className="flex justify-between items-center">
-        <div className="text-sm text-text-secondary">
+        <div className="text-sm text-muted-foreground">
           {t("common:item", { count: count })}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             {t("common:rowsPerPage")}:
           </span>
           <Select
@@ -380,7 +380,7 @@ export default function LibraryMaterialsManager() {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="text-center py-8 text-text-secondary"
+                  className="text-center py-8 text-muted-foreground"
                 >
                   {t("common:noItems")}
                 </TableCell>
@@ -395,17 +395,17 @@ export default function LibraryMaterialsManager() {
                       aria-label={`${t("common:select")} ${item.name}`}
                     />
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-foreground">
                     {item.name}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[200px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[200px] text-foreground">
                     {item.description || t("common:noDescription")}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[80px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[80px] text-foreground">
                     {materialUnits.find((u) => u.value === item.unit)?.label ||
                       item.unit}
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-text-primary">
+                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-foreground">
                     {format(item.unit_price, "USD")}
                   </TableCell>
                   <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">

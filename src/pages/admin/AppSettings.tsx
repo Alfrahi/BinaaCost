@@ -28,7 +28,7 @@ export default function AppSettings() {
 
   if (error) {
     return (
-      <div className="text-danger text-sm">
+      <div className="text-destructive text-sm">
         {t("common:error")}: {error.message}
       </div>
     );

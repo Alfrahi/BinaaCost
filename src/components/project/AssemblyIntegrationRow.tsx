@@ -154,7 +154,7 @@ export function AssemblyIntegrationRow({
                     <Loader2 className="w-5 h-5 animate-spin" />
                   </div>
                 ) : previewItems.length === 0 ? (
-                  <div className="text-center text-sm text-text-secondary py-4">
+                  <div className="text-center text-sm text-muted-foreground py-4">
                     {t("project_detail:assembly_importer.noItemsOfType")}
                   </div>
                 ) : (

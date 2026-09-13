@@ -33,7 +33,7 @@ export default function BottomNav() {
             key={path}
             to={path}
             className={`flex flex-col items-center justify-center gap-1 text-xs font-medium py-1 px-2 transition-colors ${
-              active ? "text-primary" : "text-text-secondary hover:text-primary"
+              active ? "text-primary" : "text-muted-foreground hover:text-primary"
             }`}
             aria-label={name}
             aria-current={active ? "page" : undefined}

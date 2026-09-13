@@ -68,7 +68,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
           variant="ghost"
           size="sm"
           onClick={toggleLanguage}
-          className="text-sm font-medium text-text-primary"
+          className="text-sm font-medium text-foreground"
           aria-label={t("common:switchLanguage")}
         >
           {i18n.language === "en" ? "العربية" : "English"}
@@ -85,7 +85,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
                   alt={userDisplayName || "User"}
                 />
                 <AvatarFallback>
-                  <UserCircle className="h-7 w-7 text-text-secondary" />
+                  <UserCircle className="h-7 w-7 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
             </Button>

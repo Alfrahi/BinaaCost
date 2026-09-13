@@ -163,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive(item.href)
                     ? "bg-muted text-primary"
-                    : "text-text-secondary hover:bg-muted hover:text-text-primary",
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   isCollapsed && "justify-center px-0",
                 )}
                 onClick={() => isMobile && setSidebarOpen(false)}
@@ -182,7 +182,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <>
               <Separator className="my-4 bg-border" />
               {!isCollapsed && (
-                <h3 className="px-4 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2">
+                <h3 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                   {t("navigation:adminPanel")}
                 </h3>
               )}
@@ -195,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                       isActive(item.href)
                         ? "bg-muted text-primary"
-                        : "text-text-secondary hover:bg-muted hover:text-text-primary",
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       isCollapsed && "justify-center px-0",
                     )}
                     onClick={() => isMobile && setSidebarOpen(false)}
@@ -217,7 +217,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start text-sm text-text-secondary hover:bg-muted hover:text-text-primary",
+                "w-full justify-start text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
                 isCollapsed && "justify-center px-0",
               )}
               onClick={() => signOut()}

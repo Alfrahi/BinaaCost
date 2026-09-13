@@ -143,7 +143,7 @@ export default function ShareProjectDialog({
               <h3 className="font-semibold text-lg">
                 {t("project_detail:share.internalSharing")}
               </h3>
-              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-text-secondary">
+              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                 {t("project_detail:share.external.internal")}
               </span>
             </div>

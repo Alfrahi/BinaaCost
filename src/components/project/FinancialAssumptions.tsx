@@ -41,13 +41,13 @@ export function FinancialAssumptionsStrip({ settings, className }: StripProps) {
       data-testid="financial-assumptions"
       className={cn("flex flex-wrap items-center gap-2 text-xs", className)}
     >
-      <span className="font-medium text-text-secondary">
+      <span className="font-medium text-muted-foreground">
         {t("project_detail:profit_pricing.assumptions")}:
       </span>
       {items.map((item) => (
         <span
           key={item.label}
-          className="rounded-full bg-muted px-2 py-1 tabular-nums text-text-secondary"
+          className="rounded-full bg-muted px-2 py-1 tabular-nums text-muted-foreground"
         >
           {item.label} {item.value ?? 0}%
         </span>
@@ -71,7 +71,7 @@ export function DefaultAssumptionsWarning({ project }: WarningProps) {
   return (
     <Alert
       data-testid="default-assumptions-warning"
-      className="border-danger/50 bg-danger/10 text-start"
+      className="border-destructive/50 bg-destructive/10 text-start"
     >
       <AlertTriangle className="h-4 w-4" aria-hidden="true" />
       <AlertDescription className="flex items-center justify-between gap-2 text-sm">
