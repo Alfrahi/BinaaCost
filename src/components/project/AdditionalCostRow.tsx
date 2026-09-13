@@ -81,7 +81,7 @@ export function AdditionalCostRow({
             onClick={() => onComment(item)}
             title={t("common:comments")}
             aria-label={`${t("common:comments")} ${item.category}`}
-            className="h-11 w-11"
+            className="h-8 w-8"
           >
             <MessageSquare
               className="w-4 h-4 text-text-secondary"
@@ -96,7 +96,7 @@ export function AdditionalCostRow({
                 onClick={() => onDuplicate(item)}
                 title={t("common:duplicate")}
                 aria-label={`${t("common:duplicate")} ${item.category}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Copy className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -106,7 +106,7 @@ export function AdditionalCostRow({
                 onClick={() => onEdit(item)}
                 title={t("common:edit")}
                 aria-label={`${t("common:edit")} ${item.category}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Edit2 className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -116,7 +116,7 @@ export function AdditionalCostRow({
                 onClick={() => onDelete(item.id)}
                 title={t("common:delete")}
                 aria-label={`${t("common:delete")} ${item.category}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>

@@ -121,7 +121,7 @@ export function LaborRow({
             onClick={() => onComment(item)}
             title={t("common:viewComments")}
             aria-label={`${t("common:viewComments")} ${item.worker_type}`}
-            className="h-11 w-11"
+            className="h-8 w-8"
           >
             <MessageSquare className="w-4 h-4" />
           </Button>
@@ -133,7 +133,7 @@ export function LaborRow({
                 onClick={() => onDuplicate(item)}
                 title={t("common:duplicate")}
                 aria-label={`${t("common:duplicate")} ${item.worker_type}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -143,14 +143,14 @@ export function LaborRow({
                 onClick={() => onEdit(item)}
                 title={t("common:edit")}
                 aria-label={`${t("common:edit")} ${item.worker_type}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Edit2 className="w-4 h-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-11 w-11"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                 onClick={() => onDelete(item)}
                 title={t("common:delete")}
                 aria-label={`${t("common:delete")} ${item.worker_type}`}
