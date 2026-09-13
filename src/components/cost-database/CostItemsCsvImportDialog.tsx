@@ -134,7 +134,7 @@ export default function CostItemsCsvImportDialog({
                   className="flex flex-col space-y-1"
                   disabled={loading}
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <RadioGroupItem value="skip" id="skip" />
                     <Label
                       htmlFor="skip"
@@ -143,7 +143,7 @@ export default function CostItemsCsvImportDialog({
                       {t("pages:data_import.skipDuplicates")}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <RadioGroupItem value="overwrite" id="overwrite" />
                     <Label
                       htmlFor="overwrite"

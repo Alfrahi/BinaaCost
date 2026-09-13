@@ -107,7 +107,7 @@ export default function LocationAdjustmentsManager({
             </h2>
             {!isFormOpen && (
               <Button onClick={() => openForm()} size="sm">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 ms-2" />
                 {t("cost_databases.addLocation")}
               </Button>
             )}
@@ -155,7 +155,7 @@ export default function LocationAdjustmentsManager({
                       <td className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
                         {location.multiplier}
                       </td>
-                      <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="px-6 py-3 whitespace-nowrap text-end text-sm font-medium">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="outline"

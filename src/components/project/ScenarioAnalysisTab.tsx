@@ -810,7 +810,7 @@ export function ScenarioAnalysisTab({
                 className="text-sm"
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="is_public"
@@ -844,7 +844,7 @@ export function ScenarioAnalysisTab({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 right-2 h-6 w-6 text-red-500"
+                    className="absolute top-2 end-2 h-6 w-6 text-red-500"
                     onClick={() => handleRemoveRule(index)}
                     aria-label={t("common:remove")}
                   >

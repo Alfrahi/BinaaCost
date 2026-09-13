@@ -61,7 +61,7 @@ export default function OfflineSyncIndicator() {
             ) : (
               <div className="relative">
                 <RefreshCw className="w-3 h-3" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-danger rounded-full animate-pulse" />
+                <span className="absolute -top-1 -end-1 w-2 h-2 bg-danger rounded-full animate-pulse" />
               </div>
             )}
             {t("changesPending", { count: queueCount })}

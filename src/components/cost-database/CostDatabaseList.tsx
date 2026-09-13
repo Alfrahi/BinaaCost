@@ -176,7 +176,7 @@ export default function CostDatabaseList({
         <div className="flex gap-2">
           {selection.hasSelection && (
             <Button variant="destructive" onClick={handleBulkDelete}>
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="ms-2 h-4 w-4" />
               {t("common:delete")}
             </Button>
           )}
@@ -185,16 +185,16 @@ export default function CostDatabaseList({
 
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("common:search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
+            className="ps-8"
           />
         </div>
         <Button onClick={() => setEditingId("new")}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           {t("common:add")}
         </Button>
       </div>
@@ -329,7 +329,7 @@ export default function CostDatabaseList({
                     </p>
                   )}
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Checkbox
                     id="is_public"
                     checked={form.watch("is_public")}
@@ -347,7 +347,7 @@ export default function CostDatabaseList({
                     variant="outline"
                     onClick={() => setEditingId(null)}
                   >
-                    <X className="mr-2 h-4 w-4" />
+                    <X className="ms-2 h-4 w-4" />
                     {t("common:cancel")}
                   </Button>
                   <Button type="submit">
