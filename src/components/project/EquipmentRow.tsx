@@ -170,7 +170,7 @@ export function EquipmentRow({
             onClick={() => onComment(item)}
             title={t("common:comments")}
             aria-label={`${t("common:comments")} ${item.name}`}
-            className="h-11 w-11"
+            className="h-8 w-8"
           >
             <MessageSquare
               className="w-4 h-4 text-text-secondary"
@@ -185,7 +185,7 @@ export function EquipmentRow({
                 onClick={onDuplicate}
                 title={t("common:duplicate")}
                 aria-label={`${t("common:duplicate")} ${item.name}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Copy className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -195,7 +195,7 @@ export function EquipmentRow({
                 onClick={onEdit}
                 title={t("common:edit")}
                 aria-label={`${t("common:edit")} ${item.name}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Edit2 className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -205,7 +205,7 @@ export function EquipmentRow({
                 onClick={onDelete}
                 title={t("common:delete")}
                 aria-label={`${t("common:delete")} ${item.name}`}
-                className="h-11 w-11"
+                className="h-8 w-8"
               >
                 <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>
