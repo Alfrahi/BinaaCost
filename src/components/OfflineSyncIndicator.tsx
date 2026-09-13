@@ -16,17 +16,25 @@ export default function OfflineSyncIndicator() {
   const isOnline = useOnlineStatus();
 
   const [queueCount, setQueueCount] = useState(offlineManager.getQueueSize());
+  const [deadLetterCount, setDeadLetterCount] = useState(
+    offlineManager.getDeadLetterSize(),
+  );
   const [isSyncing, setIsSyncing] = useState(offlineManager.getIsSyncing());
+  const [lastSyncedAt, setLastSyncedAt] = useState(
+    offlineManager.getLastSyncedAt(),
+  );
 
   useEffect(() => {
     const unsubscribe = offlineManager.subscribe(() => {
       setQueueCount(offlineManager.getQueueSize());
+      setDeadLetterCount(offlineManager.getDeadLetterSize());
       setIsSyncing(offlineManager.getIsSyncing());
+      setLastSyncedAt(offlineManager.getLastSyncedAt());
     });
     return () => unsubscribe();
   }, []);
 
-  if (queueCount === 0 && isOnline) return null;
+  if (queueCount === 0 && deadLetterCount === 0 && isOnline) return null;
 
   return (
     <div className="flex items-center gap-2 text-sm">
@@ -80,6 +88,30 @@ export default function OfflineSyncIndicator() {
             </>
           )}
         </div>
+      )}
+
+      {deadLetterCount > 0 && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 px-2 py-1 rounded bg-danger/10 text-danger text-xs font-medium">
+                <CloudOff className="w-3 h-3" />
+                <span>{t("failedChanges", { count: deadLetterCount })}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="text-sm">
+              <p>{t("failedChangesTooltip")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {lastSyncedAt && queueCount === 0 && (
+        <span className="text-xs text-muted-foreground">
+          {t("lastSynced", {
+            time: new Date(lastSyncedAt).toLocaleTimeString(),
+          })}
+        </span>
       )}
     </div>
   );
