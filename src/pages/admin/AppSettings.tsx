@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import { Loader2 } from "lucide-react";
 import { useAppSettings } from "@/hooks/useAppSettings";
 
@@ -36,8 +36,7 @@ export default function AppSettings() {
 
   return (
     <div className="space-y-6 text-sm">
-      <Breadcrumbs />
-      <h1 className="text-2xl font-bold">{t("admin:appSettings.title")}</h1>
+      <PageHeader title={t("admin:appSettings.title")} />
 
       <Card>
         <CardHeader>

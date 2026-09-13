@@ -3,8 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
+import PageHeader from "@/components/PageHeader";
 import LibraryMaterialsManager from "@/components/resources/LibraryMaterialsManager";
 import LibraryLaborManager from "@/components/resources/LibraryLaborManager";
 import LibraryEquipmentManager from "@/components/resources/LibraryEquipmentManager";
@@ -45,10 +44,7 @@ export default function Resources() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <Heading level={1} className="text-2xl">
-        {t("resources:title")}
-      </Heading>
+      <PageHeader title={t("resources:title")} />
 
       <Tabs
         defaultValue="materials"

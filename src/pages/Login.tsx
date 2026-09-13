@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Heading } from "@/components/ui/heading";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -162,13 +163,13 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-4 text-center">
+        <Heading level={1} className="mb-4 text-center">
           {mode === "signup"
             ? t("signUp")
             : signupEnabled
               ? t("signInRegister")
               : t("signIn")}
-        </h1>
+        </Heading>
 
         {settingsError && (
           <Alert variant="destructive" className="mb-4">

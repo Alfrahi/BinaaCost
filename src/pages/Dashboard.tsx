@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
+import PageHeader from "@/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
@@ -91,8 +90,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <Heading level={1}>{t("dashboard:title")}</Heading>
+      <PageHeader title={t("dashboard:title")} />
 
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="flex-1">

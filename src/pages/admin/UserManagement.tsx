@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import { X, Eye, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { Link } from "react-router-dom";
@@ -45,10 +45,7 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("admin:users.title")}</h1>
-      </div>
+      <PageHeader title={t("admin:users.title")} />
 
       {showFallbackWarning && (
         <Alert>

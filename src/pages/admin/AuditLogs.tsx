@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/lib/pb-mapper";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import {
   Table,
   TableBody,
@@ -103,10 +103,7 @@ export default function AuditLogs() {
 
   return (
     <div className="space-y-6 text-sm">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("admin:auditLogs.title")}</h1>
-      </div>
+      <PageHeader title={t("admin:auditLogs.title")} />
 
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1 max-w-md">

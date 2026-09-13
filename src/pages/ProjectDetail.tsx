@@ -3,6 +3,7 @@ import PageLoader from "@/components/PageLoader";
 import ProjectTabs from "@/components/project/ProjectTabs";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { ArrowLeft, Share2, Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/project/useProjectData";
@@ -51,7 +52,7 @@ export default function ProjectDetail() {
               />
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold">{project.name}</h1>
+          <Heading level={1}>{project.name}</Heading>
         </div>
 
         <div className="flex gap-2">
