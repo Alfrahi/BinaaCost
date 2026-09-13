@@ -193,7 +193,7 @@ export default function AssemblyImporter({
             <ScrollArea className="h-48">
               {isLoadingAssemblyItems ? (
                 <div className="flex items-center justify-center h-full text-text-secondary text-sm">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  <Loader2 className="w-5 h-5 animate-spin ms-2" />
                   {t("common:loading")}
                 </div>
               ) : assemblyItems.length === 0 ? (
@@ -238,12 +238,12 @@ export default function AssemblyImporter({
           >
             {isImporting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                 {t("common:importing")}
               </>
             ) : (
               <>
-                <PackagePlus className="w-4 h-4 mr-2" />
+                <PackagePlus className="w-4 h-4 ms-2" />
                 {t("project_detail:assembly_importer.importItems")}
               </>
             )}

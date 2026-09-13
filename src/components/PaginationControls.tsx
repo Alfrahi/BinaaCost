@@ -19,7 +19,7 @@ export function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-end space-x-2 py-4 gap-2 text-sm">
+    <div className="flex items-center justify-end gap-2 py-4 gap-2 text-sm">
       <div className="text-sm text-muted-foreground">
         {t("pageOf", {
           current: currentPage + 1,
