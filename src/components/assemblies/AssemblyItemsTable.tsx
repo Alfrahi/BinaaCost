@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { AssemblyItem } from "@/types/assemblies";
 import { safeAdd, safeMult } from "@/utils/math";
 import {
@@ -13,6 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import React, { useCallback, useMemo } from "react";
+
+// Assemblies are currency-agnostic library items: their unit prices are stored
+// as raw numbers and should render without a currency symbol (the project
+// currency is applied only when the assembly is imported into a project).
+const numberFormatter = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
 interface AssemblyItemsTableProps {
   items: AssemblyItem[];
@@ -60,8 +67,6 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
     "project_tabs",
     "project_additional",
   ]);
-  const { format } = useCurrencyFormatter();
-
   const grandTotal = useMemo(
     () => items.reduce((sum, item) => safeAdd(sum, itemCost(item)), 0),
     [items],
@@ -162,10 +167,10 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                   )}
                 </TableCell>
                 <TableCell className="px-4 py-2 text-start text-sm min-w-[120px]">
-                  {format(item.unit_price, "USD")}
+                  {numberFormatter.format(item.unit_price)}
                 </TableCell>
                 <TableCell className="px-4 py-2 text-end tabular-nums text-sm font-medium min-w-[120px]">
-                  {format(itemCost(item), "USD")}
+                  {numberFormatter.format(itemCost(item))}
                 </TableCell>
                 <TableCell className="px-4 py-2 text-end text-sm min-w-[100px]">
                   <div className="flex justify-end gap-1">
@@ -200,7 +205,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
               {t("common:total")}
             </TableCell>
             <TableCell className="px-4 py-2 text-end text-sm font-bold tabular-nums">
-              {format(grandTotal, "USD")}
+              {numberFormatter.format(grandTotal)}
             </TableCell>
           </TableRow>
         </TableBody>
