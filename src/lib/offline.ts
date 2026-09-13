@@ -60,6 +60,7 @@ class OfflineManager {
   private queryClient: QueryClient | null = null;
   private _isOnline = true;
   private activeUserId: string | null = null;
+  private lastSyncedAt: string | null = null;
 
   private constructor() {}
 
@@ -103,8 +104,16 @@ class OfflineManager {
     return this.queue.length;
   }
 
+  public getDeadLetterSize(): number {
+    return this.deadLetterQueue.length;
+  }
+
   public getIsSyncing(): boolean {
     return this.isSyncing;
+  }
+
+  public getLastSyncedAt(): string | null {
+    return this.lastSyncedAt;
   }
 
   public async init(userId?: string) {
@@ -347,6 +356,10 @@ class OfflineManager {
     this.queue = this.queue
       .filter((q) => !currentQueue.some((cq) => cq.id === q.id))
       .concat(failedAttempts);
+
+    if (successfulMutations > 0) {
+      this.lastSyncedAt = new Date().toISOString();
+    }
 
     await this.saveQueues();
 
