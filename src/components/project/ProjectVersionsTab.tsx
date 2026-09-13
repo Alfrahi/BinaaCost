@@ -26,7 +26,6 @@ import {
   Plus,
   GitCompareArrows,
 } from "lucide-react";
-import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useProjectVersions, ProjectVersion } from "@/hooks/useProjectVersions";
 import { useApplyProjectVersion } from "@/hooks/useApplyProjectVersion";
@@ -581,12 +580,15 @@ export default function ProjectVersionsTab({
         )}
       </Card>
 
-      <DeleteConfirmationDialog
+      <ConfirmDialog
         open={!!versionToDelete}
         onOpenChange={(o) => !o && setVersionToDelete(null)}
         onConfirm={handleDeleteVersion}
-        itemName={versionToDelete?.name}
+        title={t("deleteConfirmTitle")}
+        body={t("deleteConfirmBody", { name: versionToDelete?.name ?? "" })}
+        confirmLabel={t("deleteAction")}
         loading={isDeletingVersion}
+        destructive
       />
 
       <ConfirmDialog
