@@ -1,14 +1,16 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, ArrowLeft } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
+import { Plus, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTranslation } from "react-i18next";
 import { Assembly, AssemblyItem } from "@/types/assemblies";
 import { useAssemblyItems } from "@/hooks/useAssemblyItems";
 import { AssemblyItemForm } from "./AssemblyItemForm";
 import { AssemblyItemsTable } from "./AssemblyItemsTable";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord } from "@/lib/pb-mapper";
@@ -233,9 +235,7 @@ function AssemblyItemManager({
       )}
 
       {items.length === 0 && !itemFormOpen ? (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          {t("common:noItems")}
-        </div>
+        <EmptyState message={t("common:noItems")} />
       ) : (
         <AssemblyItemsTable
           items={items}
@@ -290,27 +290,21 @@ export function AssemblyDetail({ assemblyId, onBack }: AssemblyDetailProps) {
   } = useAssemblyItems(assemblyId || undefined);
 
   if (isLoadingAssembly || isLoadingItems) {
-    return (
-      <div className="flex items-center justify-center h-64 text-sm">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState className="h-64" />;
   }
 
   if (assemblyError) {
     return (
-      <div className="text-destructive text-base">
-        {t("common:error")}: {assemblyError.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{assemblyError.message}</AlertDescription>
+      </Alert>
     );
   }
 
   if (!assembly) {
-    return (
-      <div className="text-center py-8 text-base text-muted-foreground">
-        {t("resources:assemblies.notFound")}
-      </div>
-    );
+    return <EmptyState message={t("resources:assemblies.notFound")} />;
   }
 
   return (

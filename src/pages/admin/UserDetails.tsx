@@ -1,10 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
 import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
-import { Loader2, Calendar, Activity } from "lucide-react";
+import { Loader2, Calendar, Activity, AlertTriangle } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTranslation } from "react-i18next";
 import { RoleBadge } from "@/components/RoleBadge";
 import { Button } from "@/components/ui/button";
@@ -85,27 +88,21 @@ export default function UserDetails() {
   } = useAdminUserAuditLogs(userId);
 
   if (loadingUser) {
-    return (
-      <div className="flex items-center justify-center h-64 text-sm">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState className="h-64" />;
   }
 
   if (userError) {
     return (
-      <div className="text-destructive text-sm">
-        {t("common:error")}: {userError.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{userError.message}</AlertDescription>
+      </Alert>
     );
   }
 
   if (!user) {
-    return (
-      <div className="text-center py-8 text-sm text-muted-foreground">
-        {t("admin:users.userNotFound")}
-      </div>
-    );
+    return <EmptyState message={t("admin:users.userNotFound")} />;
   }
 
   return (
@@ -193,9 +190,11 @@ export default function UserDetails() {
                     <Loader2 className="w-6 h-6 animate-spin" />
                   </div>
                 ) : projectsError ? (
-                  <div className="text-destructive text-sm">
-                    {t("common:error")}: {projectsError.message}
-                  </div>
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+                    <AlertDescription className="text-sm">{projectsError.message}</AlertDescription>
+                  </Alert>
                 ) : projects?.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">
                     {t("admin:users.noProjectsFound")}
@@ -250,9 +249,11 @@ export default function UserDetails() {
                     <Loader2 className="w-6 h-6 animate-spin" />
                   </div>
                 ) : logsError ? (
-                  <div className="text-destructive text-sm">
-                    {t("common:error")}: {logsError.message}
-                  </div>
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+                    <AlertDescription className="text-sm">{logsError.message}</AlertDescription>
+                  </Alert>
                 ) : logs?.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">
                     {t("admin:users.noActivityFound")}

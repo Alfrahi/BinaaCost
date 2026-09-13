@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -208,9 +209,7 @@ export default function LocationAdjustmentsManager({
           </AlertDialog>
         </>
       ) : (
-        <p className="text-center text-muted-foreground">
-          {t("cost_databases.selectDatabaseToManageLocations")}
-        </p>
+        <EmptyState message={t("cost_databases.selectDatabaseToManageLocations")} />
       )}
     </div>
   );

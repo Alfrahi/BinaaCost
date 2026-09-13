@@ -4,6 +4,7 @@ import ProjectTabs from "@/components/project/ProjectTabs";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import EmptyState from "@/components/ui/EmptyState";
 import { ArrowLeft, Share2, Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/project/useProjectData";
@@ -32,11 +33,7 @@ export default function ProjectDetail() {
   }
 
   if (!project) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        {t("project_detail:notFound")}
-      </div>
-    );
+    return <EmptyState message={t("project_detail:notFound")} />;
   }
 
   return (
