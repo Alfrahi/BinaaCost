@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import {
   Select,
   SelectContent,
@@ -197,9 +198,7 @@ export default function AssemblyImporter({
                   {t("common:loading")}
                 </div>
               ) : assemblyItems.length === 0 ? (
-                <div className="text-center text-sm text-muted-foreground py-4">
-                  {t("common:noItems")}
-                </div>
+                <EmptyState message={t("common:noItems")} />
               ) : (
                 <ul className="divide-y divide-border">
                   {assemblyItems.map((item) => (

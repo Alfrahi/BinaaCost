@@ -1,5 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -262,9 +264,7 @@ export default function ProjectVersionsTab({
           </Button>
         </div>
         {loadingVersionSnapshot || isLoadingCurrent ? (
-          <div className="flex items-center justify-center h-[400px]">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          <LoadingState className="h-[400px]" />
         ) : (
           <VersionConflictResolver
             currentData={currentData}
@@ -358,9 +358,7 @@ export default function ProjectVersionsTab({
             currency={currency}
           />
         ) : (
-          <p className="text-center text-muted-foreground py-8 text-sm">
-            {t("compareSelectBoth")}
-          </p>
+          <EmptyState message={t("compareSelectBoth")} />
         )}
       </Card>
     );
@@ -427,9 +425,7 @@ export default function ProjectVersionsTab({
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         ) : timeline.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4 text-sm">
-            {t("noVersionsDescription")}
-          </p>
+          <EmptyState message={t("noVersionsDescription")} />
         ) : (
           <ol className="space-y-3" aria-label={t("restore")}>
             {timeline.map(({ version, summary, delta }, idx) => {

@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import { PackagePlus, Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -154,9 +155,7 @@ export function AssemblyIntegrationRow({
                     <Loader2 className="w-5 h-5 animate-spin" />
                   </div>
                 ) : previewItems.length === 0 ? (
-                  <div className="text-center text-sm text-muted-foreground py-4">
-                    {t("project_detail:assembly_importer.noItemsOfType")}
-                  </div>
+                  <EmptyState message={t("project_detail:assembly_importer.noItemsOfType")} />
                 ) : (
                   <ul className="divide-y divide-border max-h-[250px] overflow-y-auto">
                     {previewItems.map((item) => (

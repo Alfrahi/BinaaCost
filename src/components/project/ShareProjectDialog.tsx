@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import EmptyState from "@/components/ui/EmptyState";
 import {
   Dialog,
   DialogContent,
@@ -164,9 +165,7 @@ export default function ShareProjectDialog({
                   <Loader2 className="w-6 h-6 animate-spin" />
                 </div>
               ) : internalShares.length === 0 ? (
-                <p className="text-center text-muted-foreground text-sm">
-                  {t("project_detail:share.noShares")}
-                </p>
+                <EmptyState message={t("project_detail:share.noShares")} />
               ) : (
                 <div className="border rounded-lg overflow-hidden">
                   <Table>
@@ -217,9 +216,7 @@ export default function ShareProjectDialog({
                 <Loader2 className="w-6 h-6 animate-spin" />
               </div>
             ) : externalLinks.length === 0 ? (
-              <p className="text-center text-muted-foreground text-sm">
-                {t("project_detail:share.external.noLinks")}
-              </p>
+              <EmptyState message={t("project_detail:share.external.noLinks")} />
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <Table>

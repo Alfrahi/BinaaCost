@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/ui/EmptyState";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
@@ -128,17 +129,17 @@ export default function Dashboard() {
               ))}
             </div>
           ) : myProjects?.length === 0 ? (
-            <div className="text-center py-8 space-y-3">
-              <p className="text-muted-foreground text-sm">
-                {t("dashboard:noProjects")}
-              </p>
-              <Button asChild className="text-sm">
-                <Link to="/projects/new">
-                  <Plus className={cn("w-4 h-4", getIconMarginClass())} />
-                  {t("dashboard:createFirstProject")}
-                </Link>
-              </Button>
-            </div>
+            <EmptyState
+              message={t("dashboard:noProjects")}
+              action={
+                <Button asChild className="text-sm">
+                  <Link to="/projects/new">
+                    <Plus className={cn("w-4 h-4", getIconMarginClass())} />
+                    {t("dashboard:createFirstProject")}
+                  </Link>
+                </Button>
+              }
+            />
           ) : (
             <div className="space-y-3">
               {myProjects?.map((project) => (
@@ -181,9 +182,7 @@ export default function Dashboard() {
               ))}
             </div>
           ) : sharedProjects?.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              {t("dashboard:noSharedProjects")}
-            </div>
+            <EmptyState message={t("dashboard:noSharedProjects")} />
           ) : (
             <div className="space-y-3">
               {sharedProjects?.map((project) => (

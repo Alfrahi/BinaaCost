@@ -2,7 +2,10 @@
 
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord } from "@/lib/pb-mapper";
@@ -37,27 +40,21 @@ export default function CostDatabaseDetail({
   });
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64 text-sm">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState className="h-64" />;
   }
 
   if (error) {
     return (
-      <div className="text-destructive text-base">
-        {t("common:error")}: {error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{error.message}</AlertDescription>
+      </Alert>
     );
   }
 
   if (!database) {
-    return (
-      <div className="text-center py-8 text-base text-muted-foreground">
-        {t("pages:cost_databases.notFound")}
-      </div>
-    );
+    return <EmptyState message={t("pages:cost_databases.notFound")} />;
   }
 
   return (

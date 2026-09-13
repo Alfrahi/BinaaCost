@@ -1,7 +1,8 @@
 import PageHeader from "@/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   Select,
   SelectContent,
@@ -30,11 +31,7 @@ export default function Analytics() {
   } = useAnalyticsData();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState className="h-64" />;
   }
 
   if (error) {

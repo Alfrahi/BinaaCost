@@ -9,7 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Eye, Loader2, X } from "lucide-react";
+import { Trash2, Eye, Loader2, X, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PaginationControls } from "@/components/PaginationControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -49,9 +50,11 @@ export default function ProjectManagement() {
 
   if (error) {
     return (
-      <div className="text-destructive text-sm">
-        {t("common:error")}: {error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{error.message}</AlertDescription>
+      </Alert>
     );
   }
 

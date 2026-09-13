@@ -6,6 +6,9 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLoader from "@/components/PageLoader";
+import EmptyState from "@/components/ui/EmptyState";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { useProjectData } from "@/features/project/useProjectData";
 import CommentsDrawer from "@/components/CommentsDrawer";
 import { useProjectComments } from "@/hooks/useProjectComments";
@@ -205,13 +208,16 @@ function ProjectTabsComponent({
   }
 
   if (error) {
-    return <div className="text-destructive">{error.message}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription className="text-sm">{error.message}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (!project) {
-    return (
-      <div className="text-center py-8">{t("project_detail:notFound")}</div>
-    );
+    return <EmptyState message={t("project_detail:notFound")} />;
   }
 
   const getCommentItemName = (
