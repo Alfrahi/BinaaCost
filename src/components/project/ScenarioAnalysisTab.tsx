@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import EmptyState from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -710,9 +711,7 @@ export function ScenarioAnalysisTab({
                 <Loader2 className="w-6 h-6 animate-spin" />
               </div>
             ) : scenarios.length === 0 ? (
-              <p className="text-center text-muted-foreground text-sm">
-                {t("noScenarios")}
-              </p>
+              <EmptyState message={t("noScenarios")} />
             ) : (
               <ScrollArea className="h-64 border rounded-lg">
                 <div className="divide-y divide-border">

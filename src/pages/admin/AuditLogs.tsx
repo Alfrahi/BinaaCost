@@ -14,7 +14,8 @@ import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { sanitizeText } from "@/utils/sanitizeText";
 import { cn } from "@/lib/utils";
@@ -95,9 +96,11 @@ export default function AuditLogs() {
 
   if (error) {
     return (
-      <div className="text-destructive text-sm">
-        {t("common:error")}: {error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{error.message}</AlertDescription>
+      </Alert>
     );
   }
 

@@ -5,6 +5,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { useUpdateProject } from "@/hooks/useUpdateProject";
 import { FormProvider } from "react-hook-form";
 import { CurrencyConversionDialog } from "@/components/project/CurrencyConversionDialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 export default function EditProject() {
   const { t } = useTranslation(["project_form", "common"]);
@@ -33,9 +35,12 @@ export default function EditProject() {
 
   if (fetchError || !initialData) {
     return (
-      <div className="text-destructive text-sm">
-        {fetchError?.message || t("project_form:notFound")}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription className="text-sm">
+          {fetchError?.message || t("project_form:notFound")}
+        </AlertDescription>
+      </Alert>
     );
   }
 

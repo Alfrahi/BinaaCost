@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import { Edit2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AssemblyItem } from "@/types/assemblies";
@@ -100,11 +101,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
   );
 
   if (items.length === 0) {
-    return (
-      <div className="p-4 text-center text-sm text-muted-foreground">
-        {t("common:noItems")}
-      </div>
-    );
+    return <EmptyState message={t("common:noItems")} />;
   }
 
   return (

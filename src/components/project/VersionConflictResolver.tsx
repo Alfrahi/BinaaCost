@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -701,9 +702,7 @@ export default function VersionConflictResolver({
     return (
       <div className="space-y-4">
         {allItems.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4 text-sm">
-            {t("project_versions:noChangesInCategory")}
-          </p>
+          <EmptyState message={t("project_versions:noChangesInCategory")} />
         ) : (
           <div className="overflow-x-auto border rounded-lg">
             <Table>

@@ -4,7 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/PageHeader";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { useAppSettings } from "@/hooks/useAppSettings";
 
 export default function AppSettings() {
@@ -19,18 +21,16 @@ export default function AppSettings() {
   }, [signupEnabled, updateSetting]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64 text-sm">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState className="h-64" />;
   }
 
   if (error) {
     return (
-      <div className="text-destructive text-sm">
-        {t("common:error")}: {error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle className="text-base">{t("common:error")}</AlertTitle>
+        <AlertDescription className="text-sm">{error.message}</AlertDescription>
+      </Alert>
     );
   }
 

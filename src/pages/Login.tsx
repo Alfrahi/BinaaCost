@@ -2,7 +2,8 @@ import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import LoadingState from "@/components/ui/LoadingState";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -153,11 +154,7 @@ export default function Login() {
   );
 
   if (loading || checkingSettings) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingState className="min-h-screen" />;
   }
 
   return (

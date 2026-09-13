@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { Edit2, Trash2, Plus, GripVertical, X } from "lucide-react";
@@ -287,9 +288,7 @@ export default function ProjectGroupsManager({
           </DndContext>
 
           {(groups || []).length === 0 && (
-            <p className="text-center text-sm text-muted-foreground py-4">
-              {t("project_detail:groups.noGroups")}
-            </p>
+            <EmptyState message={t("project_detail:groups.noGroups")} />
           )}
         </div>
       </div>
