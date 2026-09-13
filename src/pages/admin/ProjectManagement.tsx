@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 import {
   Table,
   TableBody,
@@ -57,10 +57,7 @@ export default function ProjectManagement() {
 
   return (
     <div className="space-y-6 text-sm">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("admin:projects.title")}</h1>
-      </div>
+      <PageHeader title={t("admin:projects.title")} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="text-sm">

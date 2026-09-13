@@ -14,6 +14,7 @@ import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import { sanitizeText } from "@/utils/sanitizeText";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 import {
   Table,
   TableBody,
@@ -170,9 +171,9 @@ export default function CostDatabaseList({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
+        <Heading level={1}>
           {t("pages:cost_databases.title")}
-        </h1>
+        </Heading>
         <div className="flex gap-2">
           {selection.hasSelection && (
             <Button variant="destructive" onClick={handleBulkDelete}>

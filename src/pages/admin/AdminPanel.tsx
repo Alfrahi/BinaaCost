@@ -9,7 +9,7 @@ import {
   Settings,
   CreditCard,
 } from "lucide-react";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 
 export default function AdminPanel() {
   const { t } = useTranslation(["admin", "common"]);
@@ -55,8 +55,7 @@ export default function AdminPanel() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <h1 className="text-2xl font-bold">{t("admin:title")}</h1>
+      <PageHeader title={t("admin:title")} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {adminSections.map((section) => (

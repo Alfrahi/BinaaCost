@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileSettings from "@/components/ProfileSettings";
 import ReportOptionsSection from "@/components/ReportOptionsSection";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
+import PageHeader from "@/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { User, FileText, Bell } from "lucide-react";
 import NotificationsSection from "@/components/NotificationsSection";
@@ -42,8 +41,7 @@ export default function Settings() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <Heading level={1}>{t("settings:title")}</Heading>
+      <PageHeader title={t("settings:title")} />
 
       <Tabs
         defaultValue="profile"

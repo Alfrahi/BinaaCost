@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import SettingsSection from "@/components/SettingsSection";
 import { useRole } from "@/hooks/useRole";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import PageHeader from "@/components/PageHeader";
 
 interface SettingsCategory {
   key: string;
@@ -63,11 +63,10 @@ export default function DropdownSettings() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs /> {/* Add Breadcrumbs here */}
-      <h1 className="text-2xl font-bold">{t("admin:dropdowns.title")}</h1>
-      <p className="text-muted-foreground">
-        {t("admin:dropdowns.description")}
-      </p>
+      <PageHeader
+        title={t("admin:dropdowns.title")}
+        description={t("admin:dropdowns.description")}
+      />
       <div className="space-y-8">
         {SETTINGS_CATEGORIES.map((category) => (
           <SettingsSection
