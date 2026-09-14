@@ -171,13 +171,13 @@ export default function ShareProjectDialog({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-start">
+                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           {t("project_detail:share.user")}
                         </TableHead>
-                        <TableHead className="text-start">
+                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           {t("project_detail:share.role")}
                         </TableHead>
-                        <TableHead className="text-end">
+                        <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           {t("common:actions")}
                         </TableHead>
                       </TableRow>
@@ -222,13 +222,13 @@ export default function ShareProjectDialog({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-start">
+                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         {t("project_detail:share.external.link")}
                       </TableHead>
-                      <TableHead className="text-start">
+                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         {t("project_detail:share.external.expires")}
                       </TableHead>
-                      <TableHead className="text-end">
+                      <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         {t("common:actions")}
                       </TableHead>
                     </TableRow>

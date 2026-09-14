@@ -8,6 +8,14 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Edit2, Trash2, Plus } from "lucide-react";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -114,49 +122,49 @@ export default function LocationAdjustmentsManager({
             )}
           </div>
           <div className="border rounded-lg overflow-hidden">
-            <table className="min-w-full bg-card">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <Table className="min-w-full bg-card">
+              <TableHeader className="bg-muted">
+                <TableRow>
+                  <TableHead className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("cost_databases.city")}
-                  </th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("cost_databases.multiplier")}
-                  </th>
-                  <th className="px-6 py-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {t("common:actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="bg-card divide-y divide-border">
                 {isLoading ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-4">
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-4">
                       {t("common:loading")}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : error ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-4 text-destructive">
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-4 text-destructive">
                       {t("common:error")}: {error.message}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : locations.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-4 text-muted-foreground">
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
                       {t("cost_databases.noLocationAdjustments")}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   locations.map((location) => (
-                    <tr key={location.id}>
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
+                    <TableRow key={location.id}>
+                      <TableCell className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
                         {location.city}
-                      </td>
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
+                      </TableCell>
+                      <TableCell className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
                         {location.multiplier}
-                      </td>
-                      <td className="px-6 py-3 whitespace-nowrap text-end text-sm font-medium">
+                      </TableCell>
+                      <TableCell className="px-6 py-3 whitespace-nowrap text-end text-sm font-medium">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="outline"
@@ -173,12 +181,12 @@ export default function LocationAdjustmentsManager({
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
           <AlertDialog
             open={!!deleteTarget}

@@ -1,13 +1,9 @@
 import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/PageHeader";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye, Loader2, X, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -26,7 +22,11 @@ import {
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { cn, getIconMarginClass } from "@/lib/utils";
-import { useAdminProjectManagement } from "@/hooks/useAdminProjectManagement";
+import {
+  useAdminProjectManagement,
+  Project,
+} from "@/hooks/useAdminProjectManagement";
+import { useMemo } from "react";
 
 export default function ProjectManagement() {
   const { t } = useTranslation(["admin", "common"]);
@@ -47,6 +47,27 @@ export default function ProjectManagement() {
     deleteProjectMutation,
     totalPages,
   } = useAdminProjectManagement();
+
+  const activeColumns = useMemo<DataTableColumn<Project>[]>(
+    () => [
+      { key: "name", label: t("admin:projects.name") },
+      { key: "owner", label: t("admin:projects.owner") },
+      { key: "location", label: t("admin:projects.location") },
+      { key: "createdAt", label: t("admin:projects.createdAt") },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
+
+  const deletedColumns = useMemo<DataTableColumn<Project>[]>(
+    () => [
+      { key: "name", label: t("admin:projects.name") },
+      { key: "owner", label: t("admin:projects.owner") },
+      { key: "deletedAt", label: t("admin:projects.deletedAt") },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   if (error) {
     return (
@@ -95,169 +116,84 @@ export default function ProjectManagement() {
         </div>
 
         <TabsContent value="active" className="mt-4">
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.name")}
-                  </TableHead>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.owner")}
-                  </TableHead>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.location")}
-                  </TableHead>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.createdAt")}
-                  </TableHead>
-                  <TableHead className="text-end text-xs">
-                    {t("common:actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-sm">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                    </TableCell>
-                  </TableRow>
-                ) : projects?.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center py-8 text-muted-foreground text-sm"
+          <DataTable
+            columns={activeColumns}
+            data={projects}
+            getRowKey={(project) => project.id}
+            renderRow={(project) => (
+              <TableRow key={project.id}>
+                <TableCell className="font-medium text-sm">
+                  <Link to={`/projects/${project.id}`} className="hover:underline">
+                    {project.name}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-sm">{project.owner_email}</TableCell>
+                <TableCell className="text-sm">
+                  {project.location || t("common:notSpecified")}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {new Date(project.created_at).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild className="text-sm">
+                      <Link to={`/projects/${project.id}`}>
+                        <Eye className={cn("w-4 h-4", getIconMarginClass())} />
+                        {t("common:view")}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(project)}
+                      className="text-sm"
                     >
-                      {t("admin:projects.noProjectsFound")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  projects?.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell className="font-medium text-sm">
-                        <Link
-                          to={`/projects/${project.id}`}
-                          className="hover:underline"
-                        >
-                          {project.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {project.owner_email}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {project.location || t("common:notSpecified")}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {new Date(project.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-end">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="text-sm"
-                          >
-                            <Link to={`/projects/${project.id}`}>
-                              <Eye
-                                className={cn("w-4 h-4", getIconMarginClass())}
-                              />
-                              {t("common:view")}
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(project)}
-                            className="text-sm"
-                          >
-                            <Trash2
-                              className={cn("w-4 h-4", getIconMarginClass())}
-                            />
-                            {t("common:delete")}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      <Trash2 className={cn("w-4 h-4", getIconMarginClass())} />
+                      {t("common:delete")}
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+            isLoading={isLoading}
+            emptyMessage={t("admin:projects.noProjectsFound")}
+            ariaLabel={t("admin:projects.activeProjects")}
+          />
         </TabsContent>
 
         <TabsContent value="deleted" className="mt-4">
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.name")}
-                  </TableHead>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.owner")}
-                  </TableHead>
-                  <TableHead className="text-start text-xs">
-                    {t("admin:projects.deletedAt")}
-                  </TableHead>
-                  <TableHead className="text-end text-xs">
-                    {t("common:actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-sm">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                    </TableCell>
-                  </TableRow>
-                ) : projects?.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center py-8 text-muted-foreground text-sm"
+          <DataTable
+            columns={deletedColumns}
+            data={projects}
+            getRowKey={(project) => project.id}
+            renderRow={(project) => (
+              <TableRow key={project.id}>
+                <TableCell className="font-medium text-sm">{project.name}</TableCell>
+                <TableCell className="text-sm">{project.owner_email}</TableCell>
+                <TableCell className="text-sm">
+                  {project.deleted_at
+                    ? new Date(project.deleted_at).toLocaleDateString()
+                    : t("common:notSpecified")}
+                </TableCell>
+                <TableCell className="text-end">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(project)}
+                      className="text-sm"
                     >
-                      {t("admin:projects.noDeletedProjectsFound")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  projects?.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell className="font-medium text-sm">
-                        {project.name}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {project.owner_email}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {project.deleted_at
-                          ? new Date(project.deleted_at).toLocaleDateString()
-                          : t("common:notSpecified")}
-                      </TableCell>
-                      <TableCell className="text-end">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(project)}
-                            className="text-sm"
-                          >
-                            <Trash2
-                              className={cn("w-4 h-4", getIconMarginClass())}
-                            />
-                            {t("admin:projects.permanentDelete")}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      <Trash2 className={cn("w-4 h-4", getIconMarginClass())} />
+                      {t("admin:projects.permanentDelete")}
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+            isLoading={isLoading}
+            emptyMessage={t("admin:projects.noDeletedProjectsFound")}
+            ariaLabel={t("admin:projects.deletedProjects")}
+          />
         </TabsContent>
       </Tabs>
 

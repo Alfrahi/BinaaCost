@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2, Edit2, ArrowRight, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PaginationControls } from "@/components/PaginationControls";
+import {
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
 import { useDropdownSettingsUI } from "@/hooks/useDropdownSettingsManager";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { GenericOptionForm } from "./admin/dropdowns/GenericOptionForm";
@@ -66,6 +72,26 @@ export default function SettingsSection({
     setSearch("");
     setCurrentPage(0);
   }, [setSearch, setCurrentPage]);
+
+  const columns = useMemo<DataTableColumn<any>[]>(() => {
+    const cols: DataTableColumn<any>[] = [
+      { key: "value", label: t("admin:dropdowns.option") },
+      { key: "translations", label: t("common:translationAr") },
+    ];
+    if (isCurrency) {
+      cols.push({ key: "rate", label: t("common:exchangeRateUSD") });
+    }
+    if (isRiskProbability) {
+      cols.push({
+        key: "numeric_value",
+        label: t("admin:dropdowns.numericValue"),
+      });
+    }
+    if (isAdmin) {
+      cols.push({ key: "actions", label: t("common:actions"), align: "end" });
+    }
+    return cols;
+  }, [t, isCurrency, isRiskProbability, isAdmin]);
 
   return (
     <Card className="p-4 mb-6 text-sm">
@@ -130,166 +156,108 @@ export default function SettingsSection({
           )}
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-card rounded border">
-          <thead>
-            <tr className="bg-muted">
-              <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("admin:dropdowns.option")}
-              </th>
-              <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("common:translationAr")}
-              </th>
-              {isCurrency && (
-                <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("common:exchangeRateUSD")}
-                </th>
-              )}
-              {isRiskProbability && (
-                <th className="px-3 py-2 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("admin:dropdowns.numericValue")}
-                </th>
-              )}
-              {isAdmin && (
-                <th className="px-3 py-2 text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("common:actions")}
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan={
-                    isAdmin
-                      ? isCurrency || isRiskProbability
-                        ? 4
-                        : 3
-                      : isCurrency || isRiskProbability
-                        ? 3
-                        : 2
-                  }
-                  className="text-center py-4 text-muted-foreground text-sm"
-                >
-                  {t("common:loading")}
-                </td>
-              </tr>
-            ) : paginatedOptions.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={
-                    isAdmin
-                      ? isCurrency || isRiskProbability
-                        ? 4
-                        : 3
-                      : isCurrency || isRiskProbability
-                        ? 3
-                        : 2
-                  }
-                  className="text-center py-4 text-muted-foreground text-sm"
-                >
-                  {t("admin:dropdowns.noOptionsFound")}
-                </td>
-              </tr>
-            ) : (
-              paginatedOptions.map((o) => (
-                <tr key={o.id} className="border-t border-border">
-                  {editingItem?.id === o.id ? (
-                    <>
-                      <td className="px-3 py-2 text-start text-sm">
-                        {isCurrency ? (
-                          <CurrencyOptionForm
-                            category={category}
-                            editingItem={o}
-                            setEditingItem={setEditingItem}
-                            onAdd={handleAddOption}
-                            setPendingEdit={setPendingEdit}
-                            isLoading={isLoading}
-                            allOptions={options}
-                          />
-                        ) : isRiskProbability ? (
-                          <RiskProbabilityOptionForm
-                            category={category}
-                            editingItem={o}
-                            setEditingItem={setEditingItem}
-                            onAdd={handleAddOption}
-                            setPendingEdit={setPendingEdit}
-                            isLoading={isLoading}
-                            allOptions={options}
-                          />
-                        ) : (
-                          <GenericOptionForm
-                            category={category}
-                            editingItem={o}
-                            setEditingItem={setEditingItem}
-                            onAdd={handleAddOption}
-                            setPendingEdit={setPendingEdit}
-                            isLoading={isLoading}
-                          />
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-start text-sm"></td>
-                      {(isCurrency || isRiskProbability) && (
-                        <td className="px-3 py-2 text-start text-sm"></td>
-                      )}
-                      <td className="px-3 py-2 text-end flex gap-2 justify-end"></td>
-                    </>
+      <DataTable
+        columns={columns}
+        data={paginatedOptions}
+        getRowKey={(o) => o.id}
+        renderRow={(o) => (
+          <TableRow key={o.id}>
+            {editingItem?.id === o.id ? (
+              <>
+                <TableCell className="px-3 py-2 text-start text-sm">
+                  {isCurrency ? (
+                    <CurrencyOptionForm
+                      category={category}
+                      editingItem={o}
+                      setEditingItem={setEditingItem}
+                      onAdd={handleAddOption}
+                      setPendingEdit={setPendingEdit}
+                      isLoading={isLoading}
+                      allOptions={options}
+                    />
+                  ) : isRiskProbability ? (
+                    <RiskProbabilityOptionForm
+                      category={category}
+                      editingItem={o}
+                      setEditingItem={setEditingItem}
+                      onAdd={handleAddOption}
+                      setPendingEdit={setPendingEdit}
+                      isLoading={isLoading}
+                      allOptions={options}
+                    />
                   ) : (
-                    <>
-                      <td className="px-3 py-2 text-start text-sm text-foreground">
-                        {getDisplayValue(o)}
-                      </td>
-                      <td className="px-3 py-2 text-start text-sm text-muted-foreground">
-                        {o.translations?.ar || ""}
-                      </td>
-                      {isCurrency && (
-                        <td className="px-3 py-2 text-start text-sm text-muted-foreground">
-                          {o.rate ? o.rate.toFixed(4) : "-"}
-                        </td>
-                      )}
-                      {isRiskProbability && (
-                        <td className="px-3 py-2 text-start text-sm text-muted-foreground">
-                          {o.numeric_value !== undefined
-                            ? o.numeric_value.toFixed(2)
-                            : "-"}
-                        </td>
-                      )}
-                      {isAdmin && (
-                        <td className="px-3 py-2 text-end flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setEditingItem(o)}
-                            aria-label={`${t("common:edit")} ${o.value}`}
-                            className="h-7 w-7"
-                          >
-                            <Edit2 className="w-3 h-3" aria-hidden="true" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => setDeleteTarget(o)}
-                            aria-label={`${t("common:delete")} ${o.value}`}
-                          >
-                            <Trash2 className="w-3 h-3" aria-hidden="true" />
-                          </Button>
-                        </td>
-                      )}
-                    </>
+                    <GenericOptionForm
+                      category={category}
+                      editingItem={o}
+                      setEditingItem={setEditingItem}
+                      onAdd={handleAddOption}
+                      setPendingEdit={setPendingEdit}
+                      isLoading={isLoading}
+                    />
                   )}
-                </tr>
-              ))
+                </TableCell>
+                <TableCell className="px-3 py-2 text-start text-sm"></TableCell>
+                {(isCurrency || isRiskProbability) && (
+                  <TableCell className="px-3 py-2 text-start text-sm"></TableCell>
+                )}
+                {isAdmin && (
+                  <TableCell className="px-3 py-2 text-end flex gap-2 justify-end"></TableCell>
+                )}
+              </>
+            ) : (
+              <>
+                <TableCell className="px-3 py-2 text-start text-sm text-foreground">
+                  {getDisplayValue(o)}
+                </TableCell>
+                <TableCell className="px-3 py-2 text-start text-sm text-muted-foreground">
+                  {o.translations?.ar || ""}
+                </TableCell>
+                {isCurrency && (
+                  <TableCell className="px-3 py-2 text-start text-sm text-muted-foreground">
+                    {o.rate ? o.rate.toFixed(4) : "-"}
+                  </TableCell>
+                )}
+                {isRiskProbability && (
+                  <TableCell className="px-3 py-2 text-start text-sm text-muted-foreground">
+                    {o.numeric_value !== undefined
+                      ? o.numeric_value.toFixed(2)
+                      : "-"}
+                  </TableCell>
+                )}
+                {isAdmin && (
+                  <TableCell className="px-3 py-2 text-end flex gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditingItem(o)}
+                      aria-label={`${t("common:edit")} ${o.value}`}
+                      className="h-7 w-7"
+                    >
+                      <Edit2 className="w-3 h-3" aria-hidden="true" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setDeleteTarget(o)}
+                      aria-label={`${t("common:delete")} ${o.value}`}
+                    >
+                      <Trash2 className="w-3 h-3" aria-hidden="true" />
+                    </Button>
+                  </TableCell>
+                )}
+              </>
             )}
-          </tbody>
-        </table>
-      </div>
-
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
+          </TableRow>
+        )}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+        }}
+        isLoading={isLoading}
+        emptyMessage={t("admin:dropdowns.noOptionsFound")}
+        ariaLabel={label}
       />
 
       <Dialog open={!!pendingEdit} onOpenChange={() => setPendingEdit(null)}>

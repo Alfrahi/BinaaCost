@@ -7,6 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -523,24 +531,24 @@ export function ScenarioAnalysisTab({
                 {t("financialSummary")}
               </h4>
               <div className="overflow-x-auto border rounded-lg">
-                <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="px-4 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <Table className="min-w-full divide-y divide-border">
+                  <TableHeader className="bg-muted">
+                    <TableRow>
+                      <TableHead className="px-4 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("category")}
-                      </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      </TableHead>
+                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("original")}
-                      </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      </TableHead>
+                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("simulated")}
-                      </th>
-                      <th className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      </TableHead>
+                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {t("difference")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-card divide-y divide-border">
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-card divide-y divide-border">
                     {[
                       {
                         label: t("project_tabs:materials"),
@@ -616,7 +624,7 @@ export function ScenarioAnalysisTab({
                         isPrimary: true,
                       },
                     ].map((row, index) => (
-                      <tr
+                      <TableRow
                         key={index}
                         className={cn(
                           row.isPrimary
@@ -627,7 +635,7 @@ export function ScenarioAnalysisTab({
                             : row.isBold && "font-semibold",
                         )}
                       >
-                        <td
+                        <TableCell
                           className={cn(
                             "px-4 py-2 text-sm",
                             row.isBold && "font-semibold",
@@ -635,14 +643,14 @@ export function ScenarioAnalysisTab({
                           )}
                         >
                           {row.label}
-                        </td>
-                        <td className="px-4 py-2 text-end text-sm">
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-end text-sm">
                           {format(row.original, currency)}
-                        </td>
-                        <td className="px-4 py-2 text-end text-sm">
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-end text-sm">
                           {format(row.simulated, currency)}
-                        </td>
-                        <td
+                        </TableCell>
+                        <TableCell
                           className={cn(
                             "px-4 py-2 text-end text-sm",
                             row.simulated - row.original > 0
@@ -653,11 +661,11 @@ export function ScenarioAnalysisTab({
                           {format(row.simulated - row.original, currency, {
                             showSign: true,
                           })}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </div>
 

@@ -9,20 +9,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleBadge } from "@/components/RoleBadge";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { format } from "date-fns";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
-import { useAdminSubscriptionManagement } from "@/hooks/useAdminSubscriptionManagement";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
+import {
+  useAdminSubscriptionManagement,
+  User,
+} from "@/hooks/useAdminSubscriptionManagement";
+import { useMemo } from "react";
 
 export default function SubscriptionManagement() {
   const { t } = useTranslation(["admin", "common"]);
@@ -47,6 +50,21 @@ export default function SubscriptionManagement() {
     totalPages,
     PLANS,
   } = useAdminSubscriptionManagement();
+
+  const columns = useMemo<DataTableColumn<User>[]>(
+    () => [
+      { key: "user", label: t("admin:subscriptionManagement.user") },
+      { key: "role", label: t("admin:subscriptionManagement.role") },
+      { key: "plan", label: t("admin:subscriptionManagement.plan") },
+      {
+        key: "projectLimit",
+        label: t("admin:subscriptionManagement.projectLimit"),
+      },
+      { key: "expires", label: t("admin:subscriptionManagement.expires") },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   return (
     <div className="space-y-6 text-sm">
@@ -84,156 +102,111 @@ export default function SubscriptionManagement() {
       </Card>
 
       <Card>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-start text-sm min-w-[180px]">
-                  {t("admin:subscriptionManagement.user")}
-                </TableHead>
-                <TableHead className="text-start text-sm min-w-[100px]">
-                  {t("admin:subscriptionManagement.role")}
-                </TableHead>
-                <TableHead className="text-start text-sm min-w-[120px]">
-                  {t("admin:subscriptionManagement.plan")}
-                </TableHead>
-                <TableHead className="text-start text-sm min-w-[120px]">
-                  {t("admin:subscriptionManagement.projectLimit")}
-                </TableHead>
-                <TableHead className="text-start text-sm min-w-[150px]">
-                  {t("admin:subscriptionManagement.expires")}
-                </TableHead>
-                <TableHead className="text-end text-sm min-w-[120px]">
-                  {t("common:actions")}
-                </TableHead>
+        <DataTable
+          columns={columns}
+          data={paginatedUsers}
+          getRowKey={(user) => user.id}
+          renderRow={(user) => {
+            const isEditing = editingUserId === user.id;
+            return (
+              <TableRow key={user.id}>
+                <TableCell className="text-start min-w-[180px]">
+                  <div className="font-medium text-sm">
+                    {user.first_name} {user.last_name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {user.email}
+                  </div>
+                </TableCell>
+                <TableCell className="text-start text-sm min-w-[100px]">
+                  <RoleBadge role={user.role} />
+                </TableCell>
+                <TableCell className="text-start min-w-[120px]">
+                  {isEditing ? (
+                    <Select value={editingPlan} onValueChange={setEditingPlan}>
+                      <SelectTrigger className="w-[120px] text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PLANS.map((plan) => (
+                          <SelectItem key={plan.value} value={plan.value} className="text-sm">
+                            {t(plan.labelKey)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className="capitalize text-sm">
+                      {t(
+                        `admin:subscriptionManagement.plan${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}`,
+                      )}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="text-start text-sm min-w-[120px]">
+                  {user.max_active_projects === null
+                    ? t("admin:subscriptionManagement.unlimited")
+                    : user.max_active_projects}
+                </TableCell>
+                <TableCell className="text-start min-w-[150px]">
+                  {isEditing ? (
+                    <Input
+                      type="date"
+                      value={
+                        editingExpiry
+                          ? format(new Date(editingExpiry), "yyyy-MM-dd")
+                          : ""
+                      }
+                      onChange={(e) => setEditingExpiry(e.target.value)}
+                      className="w-[150px] text-sm"
+                    />
+                  ) : user.subscription_expires_at ? (
+                    formatDate(user.subscription_expires_at, "short")
+                  ) : (
+                    t("admin:subscriptionManagement.never")
+                  )}
+                </TableCell>
+                <TableCell className="text-end min-w-[120px]">
+                  {isEditing ? (
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSave}
+                        disabled={updateSubscriptionMutation.isPending}
+                        className="text-sm"
+                      >
+                        {updateSubscriptionMutation.isPending
+                          ? t("common:saving")
+                          : t("common:save")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancel}
+                        className="text-sm"
+                      >
+                        {t("common:cancel")}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(user)}
+                      disabled={!isSuperAdmin}
+                      className="text-sm"
+                    >
+                      {t("common:edit")}
+                    </Button>
+                  )}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                  </TableCell>
-                </TableRow>
-              ) : paginatedUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground text-sm"
-                  >
-                    {t("admin:subscriptionManagement.noUsersFound")}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedUsers.map((user) => {
-                  const isEditing = editingUserId === user.id;
-
-                  return (
-                    <TableRow key={user.id}>
-                      <TableCell className="text-start min-w-[180px]">
-                        <div className="font-medium text-sm">
-                          {user.first_name} {user.last_name}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {user.email}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-start text-sm min-w-[100px]">
-                        <RoleBadge role={user.role} />
-                      </TableCell>
-                      <TableCell className="text-start min-w-[120px]">
-                        {isEditing ? (
-                          <Select
-                            value={editingPlan}
-                            onValueChange={setEditingPlan}
-                          >
-                            <SelectTrigger className="w-[120px] text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {PLANS.map((plan) => (
-                                <SelectItem
-                                  key={plan.value}
-                                  value={plan.value}
-                                  className="text-sm"
-                                >
-                                  {t(plan.labelKey)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <span className="capitalize text-sm">
-                            {t(
-                              `admin:subscriptionManagement.plan${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}`,
-                            )}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-start text-sm min-w-[120px]">
-                        {user.max_active_projects === null
-                          ? t("admin:subscriptionManagement.unlimited")
-                          : user.max_active_projects}
-                      </TableCell>
-                      <TableCell className="text-start min-w-[150px]">
-                        {isEditing ? (
-                          <Input
-                            type="date"
-                            value={
-                              editingExpiry
-                                ? format(new Date(editingExpiry), "yyyy-MM-dd")
-                                : ""
-                            }
-                            onChange={(e) => setEditingExpiry(e.target.value)}
-                            className="w-[150px] text-sm"
-                          />
-                        ) : user.subscription_expires_at ? (
-                          formatDate(user.subscription_expires_at, "short")
-                        ) : (
-                          t("admin:subscriptionManagement.never")
-                        )}
-                      </TableCell>
-                      <TableCell className="text-end min-w-[120px]">
-                        {isEditing ? (
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              onClick={handleSave}
-                              disabled={updateSubscriptionMutation.isPending}
-                              className="text-sm"
-                            >
-                              {updateSubscriptionMutation.isPending
-                                ? t("common:saving")
-                                : t("common:save")}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleCancel}
-                              className="text-sm"
-                            >
-                              {t("common:cancel")}
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(user)}
-                            disabled={!isSuperAdmin}
-                            className="text-sm"
-                          >
-                            {t("common:edit")}
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
+            );
+          }}
+          isLoading={isLoading}
+          emptyMessage={t("admin:subscriptionManagement.noUsersFound")}
+          ariaLabel={t("admin:subscriptionManagement.searchTitle")}
+        />
 
         <div className="p-4 border-t">
           <PaginationControls
