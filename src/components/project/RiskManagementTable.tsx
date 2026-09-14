@@ -1,7 +1,14 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
@@ -155,90 +162,128 @@ export default function RiskManagementTable({
         )}
       </div>
       {showForm && canEdit && (
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="p-4 border rounded bg-card space-y-3 mb-6"
-        >
-          <h3 className="font-semibold mb-2 text-lg">
-            {editingItem ? t("edit") : t("add")}
-          </h3>
-          <div>
-            <Label className="text-sm">{t("fields.description")}</Label>
-            <Input {...form.register("description")} className="text-sm" />
-            {form.formState.errors.description && (
-              <p className="text-destructive text-sm mt-1">
-                {t(form.formState.errors.description.message!)}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label className="text-sm">{t("fields.probability")}</Label>
-            <TranslatedSelect
-              value={form.watch("probability")}
-              onValueChange={(value) => form.setValue("probability", value)}
-              options={riskProbabilities}
-              isLoading={isLoadingRiskProbabilities}
-              placeholder={t("common:selectOption")}
-              className="text-sm"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="p-4 border rounded bg-card space-y-3 mb-6"
+          >
+            <h3 className="font-semibold mb-2 text-lg">
+              {editingItem ? t("edit") : t("add")}
+            </h3>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("fields.description")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} className="text-sm" />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-            {form.formState.errors.probability && (
-              <p className="text-destructive text-sm mt-1">
-                {t(form.formState.errors.probability.message!)}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label className="text-sm">{t("fields.impactAmount")}</Label>
-            <Input
-              type="number"
-              {...form.register("impact_amount")}
-              className="text-sm"
+            <FormField
+              control={form.control}
+              name="probability"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("fields.probability")}
+                  </FormLabel>
+                  <FormControl>
+                    <TranslatedSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      options={riskProbabilities}
+                      isLoading={isLoadingRiskProbabilities}
+                      placeholder={t("common:selectOption")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-            {form.formState.errors.impact_amount && (
-              <p className="text-destructive text-sm mt-1">
-                {t(form.formState.errors.impact_amount.message!)}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label className="text-sm">{t("fields.mitigationPlan")}</Label>
-            <Input {...form.register("mitigation_plan")} className="text-sm" />
-          </div>
-          <div>
-            <Label className="text-sm">{t("fields.riskContingency")}</Label>
-            <Input
-              type="number"
-              {...form.register("contingency_amount")}
-              readOnly
-              className="bg-muted text-muted-foreground cursor-not-allowed"
+            <FormField
+              control={form.control}
+              name="impact_amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("fields.impactAmount")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} className="text-sm" />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {t("common:riskAutoCalc")}
-            </p>
-            {form.formState.errors.contingency_amount && (
-              <p className="text-destructive text-sm mt-1">
-                {t(form.formState.errors.contingency_amount.message!)}
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={resetForm}
-              className="text-sm"
-            >
-              {t("common:cancel")}
-            </Button>
-            <Button
-              type="submit"
-              disabled={isAdding || isUpdating}
-              className="text-sm"
-            >
-              {t("common:save")}
-            </Button>
-          </div>
-        </form>
+            <FormField
+              control={form.control}
+              name="mitigation_plan"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("fields.mitigationPlan")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="contingency_amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("fields.riskContingency")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      readOnly
+                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t("common:riskAutoCalc")}
+                  </p>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={resetForm}
+                className="text-sm"
+              >
+                {t("common:cancel")}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isAdding || isUpdating}
+                className="text-sm"
+              >
+                {t("common:save")}
+              </Button>
+            </div>
+          </form>
+        </Form>
       )}
       <div className="overflow-x-auto border rounded-lg bg-card">
         <Table>

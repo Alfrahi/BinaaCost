@@ -5,7 +5,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,12 +79,6 @@ export default function ProjectForm({
   const { options: currencies, isLoading: isLoadingCurrencies } =
     useSettingsOptions("currency");
 
-  const typeValue = form.watch("type") || projectTypes[0]?.value || "";
-  const sizeUnitValue = form.watch("size_unit") || sizeUnits[0]?.value || "";
-  const durationUnitValue =
-    form.watch("duration_unit") || durationUnits[0]?.value || "";
-  const currencyValue = form.watch("currency") || currencies[0]?.value || "USD";
-
   useEffect(() => {
     if (!form.getValues("type") && projectTypes.length > 0) {
       form.setValue("type", projectTypes[0].value);
@@ -141,203 +141,249 @@ export default function ProjectForm({
             )}
 
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="name" className="text-sm">
-                  {t("project_form:name")}
-                </Label>
-                <Input
-                  id="name"
-                  {...form.register("name")}
-                  placeholder={t("project_form:namePlaceholder")}
-                  aria-label={t("project_form:name")}
-                  aria-invalid={!!form.formState.errors.name}
-                  aria-describedby={
-                    form.formState.errors.name ? "name-error" : undefined
-                  }
-                  className="text-sm"
-                />
-                {form.formState.errors.name && (
-                  <p
-                    id="name-error"
-                    role="alert"
-                    className="text-destructive text-sm mt-1"
-                  >
-                    {t(form.formState.errors.name.message!)}
-                  </p>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("project_form:name")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("project_form:namePlaceholder")}
+                        aria-label={t("project_form:name")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
                 )}
-              </div>
+              />
 
-              <div>
-                <Label htmlFor="description" className="text-sm">
-                  {t("project_form:description")}
-                </Label>
-                <Textarea
-                  id="description"
-                  {...form.register("description")}
-                  placeholder={t("project_form:descriptionPlaceholder")}
-                  rows={3}
-                  aria-label={t("project_form:description")}
-                  className="text-sm"
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("project_form:description")}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder={t("project_form:descriptionPlaceholder")}
+                        rows={3}
+                        aria-label={t("project_form:description")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm">{t("project_form:type")}</Label>
-                  <TranslatedSelect
-                    value={typeValue}
-                    onValueChange={(value) => form.setValue("type", value)}
-                    options={projectTypes}
-                    isLoading={isLoadingProjectTypes}
-                    placeholder={t("project_form:typePlaceholder")}
-                    aria-label={t("project_form:type")}
-                    className="text-sm"
-                  />
-                  {form.formState.errors.type && (
-                    <p role="alert" className="text-destructive text-sm mt-1">
-                      {t(form.formState.errors.type.message!)}
-                    </p>
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">
+                        {t("project_form:type")}
+                      </FormLabel>
+                      <FormControl>
+                        <TranslatedSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={projectTypes}
+                          isLoading={isLoadingProjectTypes}
+                          placeholder={t("project_form:typePlaceholder")}
+                          aria-label={t("project_form:type")}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-sm" />
+                    </FormItem>
                   )}
-                </div>
+                />
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-sm">{t("project_form:size")}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      {...form.register("size")}
-                      placeholder={t("project_form:sizePlaceholder")}
-                      aria-label={t("project_form:size")}
-                      aria-invalid={!!form.formState.errors.size}
-                      aria-describedby={
-                        form.formState.errors.size ? "size-error" : undefined
-                      }
-                      className="text-sm"
-                    />
-                    {form.formState.errors.size && (
-                      <p
-                        id="size-error"
-                        role="alert"
-                        className="text-destructive text-sm mt-1"
-                      >
-                        {t(form.formState.errors.size.message!)}
-                      </p>
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">
+                          {t("project_form:size")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            {...field}
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            placeholder={t("project_form:sizePlaceholder")}
+                            aria-label={t("project_form:size")}
+                            className="text-sm"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
                     )}
-                  </div>
-                  <div>
-                    <Label className="text-sm">
-                      {t("project_form:sizeUnit")}
-                    </Label>
-                    <TranslatedSelect
-                      value={sizeUnitValue}
-                      onValueChange={(value) =>
-                        form.setValue("size_unit", value)
-                      }
-                      options={sizeUnits}
-                      isLoading={isLoadingSizeUnits}
-                      placeholder={t("project_form:sizeUnitPlaceholder")}
-                      aria-label={t("project_form:sizeUnit")}
-                      className="text-sm"
-                    />
-                    {form.formState.errors.size_unit && (
-                      <p role="alert" className="text-destructive text-sm mt-1">
-                        {t(form.formState.errors.size_unit.message!)}
-                      </p>
+                  />
+                  <FormField
+                    control={form.control}
+                    name="size_unit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">
+                          {t("project_form:sizeUnit")}
+                        </FormLabel>
+                        <FormControl>
+                          <TranslatedSelect
+                            value={field.value || ""}
+                            onValueChange={field.onChange}
+                            options={sizeUnits}
+                            isLoading={isLoadingSizeUnits}
+                            placeholder={t("project_form:sizeUnitPlaceholder")}
+                            aria-label={t("project_form:sizeUnit")}
+                            className="text-sm"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
                     )}
-                  </div>
+                  />
                 </div>
               </div>
 
-              <div>
-                <Label className="text-sm">{t("project_form:location")}</Label>
-                <Input
-                  {...form.register("location")}
-                  placeholder={t("project_form:locationPlaceholder")}
-                  aria-label={t("project_form:location")}
-                  className="text-sm"
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("project_form:location")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder={t("project_form:locationPlaceholder")}
+                        aria-label={t("project_form:location")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
 
-              <div>
-                <Label className="text-sm">
-                  {t("project_form:clientRequirements")}
-                </Label>
-                <Textarea
-                  {...form.register("client_requirements")}
-                  placeholder={t(
-                    "project_form:clientRequirementsPlaceholder",
-                  )}
-                  rows={3}
-                  aria-label={t("project_form:clientRequirements")}
-                  className="text-sm"
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="client_requirements"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("project_form:clientRequirements")}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder={t(
+                          "project_form:clientRequirementsPlaceholder",
+                        )}
+                        rows={3}
+                        aria-label={t("project_form:clientRequirements")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm">
-                    {t("project_form:duration")}
-                  </Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    {...form.register("duration_days")}
-                    placeholder={t("project_form:durationPlaceholder")}
-                    aria-label={t("project_form:duration")}
-                    aria-invalid={!!form.formState.errors.duration_days}
-                    aria-describedby={
-                      form.formState.errors.duration_days
-                        ? "duration-error"
-                        : undefined
-                    }
-                    className="text-sm"
-                  />
-                  {form.formState.errors.duration_days && (
-                    <p
-                      id="duration-error"
-                      role="alert"
-                      className="text-destructive text-sm mt-1"
-                    >
-                      {t(form.formState.errors.duration_days.message!)}
-                    </p>
+                <FormField
+                  control={form.control}
+                  name="duration_days"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">
+                        {t("project_form:duration")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          placeholder={t("project_form:durationPlaceholder")}
+                          aria-label={t("project_form:duration")}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-sm" />
+                    </FormItem>
                   )}
-                </div>
-                <div>
-                  <Label className="text-sm">
-                    {t("project_form:durationUnit")}
-                  </Label>
-                  <TranslatedSelect
-                    value={durationUnitValue}
-                    onValueChange={(value) =>
-                      form.setValue("duration_unit", value)
-                    }
-                    options={durationUnits}
-                    isLoading={isLoadingDurationUnits}
-                    placeholder={t("project_form:durationUnitPlaceholder")}
-                    aria-label={t("project_form:durationUnit")}
-                    className="text-sm"
-                  />
-                </div>
+                />
+                <FormField
+                  control={form.control}
+                  name="duration_unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">
+                        {t("project_form:durationUnit")}
+                      </FormLabel>
+                      <FormControl>
+                        <TranslatedSelect
+                          value={field.value || ""}
+                          onValueChange={field.onChange}
+                          options={durationUnits}
+                          isLoading={isLoadingDurationUnits}
+                          placeholder={t("project_form:durationUnitPlaceholder")}
+                          aria-label={t("project_form:durationUnit")}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-sm" />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div>
-                <Label className="text-sm">{t("project_form:currency")}</Label>
-                <TranslatedSelect
-                  value={currencyValue}
-                  onValueChange={(value) => form.setValue("currency", value)}
-                  options={currencies}
-                  isLoading={isLoadingCurrencies}
-                  placeholder={t("project_form:currencyPlaceholder")}
-                  aria-label={t("project_form:currency")}
-                  className="text-sm"
-                />
-                {form.formState.errors.currency && (
-                  <p role="alert" className="text-destructive text-sm mt-1">
-                    {t(form.formState.errors.currency.message!)}
-                  </p>
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("project_form:currency")}
+                    </FormLabel>
+                    <FormControl>
+                      <TranslatedSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={currencies}
+                        isLoading={isLoadingCurrencies}
+                        placeholder={t("project_form:currencyPlaceholder")}
+                        aria-label={t("project_form:currency")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
                 )}
-              </div>
+              />
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

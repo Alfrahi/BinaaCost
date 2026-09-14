@@ -8,7 +8,14 @@ import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Heading } from "@/components/ui/heading";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,16 +23,16 @@ import { z } from "zod";
 import { ClientResponseError } from "pocketbase";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().min(1, "auth:emailRequired").email("auth:emailInvalid"),
+  password: z.string().min(1, "auth:passwordRequired"),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
 
 const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  email: z.string().min(1, "auth:emailRequired").email("auth:emailInvalid"),
+  password: z.string().min(8, "auth:passwordMin"),
+  confirmPassword: z.string().min(8, "auth:passwordMin"),
 });
 
 type SignupValues = z.infer<typeof signupSchema>;
@@ -124,7 +131,7 @@ export default function Login() {
     async (values: SignupValues) => {
       if (values.password !== values.confirmPassword) {
         signupForm.setError("confirmPassword", {
-          message: "Passwords do not match",
+          message: "auth:confirmPasswordMismatch",
         });
         return;
       }
@@ -188,137 +195,112 @@ export default function Login() {
         )}
 
         {mode === "signin" ? (
-          <form
-            onSubmit={loginForm.handleSubmit(onLogin)}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("emailLabel")}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t("emailPlaceholder")}
-                aria-invalid={!!loginForm.formState.errors.email}
-                aria-describedby={
-                  loginForm.formState.errors.email ? "email-error" : undefined
-                }
-                {...loginForm.register("email")}
+          <Form {...loginForm}>
+            <form
+              onSubmit={loginForm.handleSubmit(onLogin)}
+              className="space-y-4"
+            >
+              <FormField
+                control={loginForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>{t("emailLabel")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder={t("emailPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              {loginForm.formState.errors.email && (
-                <p id="email-error" role="alert" className="text-destructive text-xs">
-                  {loginForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("passwordLabel")}</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={t("passwordPlaceholder")}
-                aria-invalid={!!loginForm.formState.errors.password}
-                aria-describedby={
-                  loginForm.formState.errors.password
-                    ? "password-error"
-                    : undefined
-                }
-                {...loginForm.register("password")}
+              <FormField
+                control={loginForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>{t("passwordLabel")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder={t("passwordPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              {loginForm.formState.errors.password && (
-                <p
-                  id="password-error"
-                  role="alert"
-                  className="text-destructive text-xs"
-                >
-                  {loginForm.formState.errors.password.message}
-                </p>
-              )}
-            </div>
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? t("signingIn") : t("signInButton")}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? t("signingIn") : t("signInButton")}
+              </Button>
+            </form>
+          </Form>
         ) : (
-          <form
-            onSubmit={signupForm.handleSubmit(onSignup)}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="signup-email">{t("emailLabel")}</Label>
-              <Input
-                id="signup-email"
-                type="email"
-                placeholder={t("emailPlaceholder")}
-                aria-invalid={!!signupForm.formState.errors.email}
-                aria-describedby={
-                  signupForm.formState.errors.email
-                    ? "signup-email-error"
-                    : undefined
-                }
-                {...signupForm.register("email")}
+          <Form {...signupForm}>
+            <form
+              onSubmit={signupForm.handleSubmit(onSignup)}
+              className="space-y-4"
+            >
+              <FormField
+                control={signupForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>{t("emailLabel")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder={t("emailPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.email && (
-                <p
-                  id="signup-email-error"
-                  role="alert"
-                  className="text-destructive text-xs"
-                >
-                  {signupForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-password">{t("passwordLabel")}</Label>
-              <Input
-                id="signup-password"
-                type="password"
-                placeholder={t("passwordPlaceholder")}
-                aria-invalid={!!signupForm.formState.errors.password}
-                aria-describedby={
-                  signupForm.formState.errors.password
-                    ? "signup-password-error"
-                    : undefined
-                }
-                {...signupForm.register("password")}
+              <FormField
+                control={signupForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>{t("passwordLabel")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder={t("passwordPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.password && (
-                <p
-                  id="signup-password-error"
-                  role="alert"
-                  className="text-destructive text-xs"
-                >
-                  {signupForm.formState.errors.password.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-confirm">{t("passwordLabel")}</Label>
-              <Input
-                id="signup-confirm"
-                type="password"
-                placeholder={t("passwordPlaceholder")}
-                aria-invalid={!!signupForm.formState.errors.confirmPassword}
-                aria-describedby={
-                  signupForm.formState.errors.confirmPassword
-                    ? "signup-confirm-error"
-                    : undefined
-                }
-                {...signupForm.register("confirmPassword")}
+              <FormField
+                control={signupForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>{t("passwordLabel")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder={t("passwordPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.confirmPassword && (
-                <p
-                  id="signup-confirm-error"
-                  role="alert"
-                  className="text-destructive text-xs"
-                >
-                  {signupForm.formState.errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? t("signingUp") : t("signUpButton")}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? t("signingUp") : t("signUpButton")}
+              </Button>
+            </form>
+          </Form>
         )}
 
         {signupEnabled && (
