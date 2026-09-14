@@ -3,7 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useEffect, useCallback } from "react";
@@ -164,227 +171,280 @@ export function EquipmentForm({
   );
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-sm">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm">
-            {t("columns.name")}
-          </Label>
-          <Input
-            id="name"
-            {...form.register("name")}
-            onChange={handleNameChange}
-            list="equipment-names"
-            autoComplete="off"
-            placeholder={t("columns.namePlaceholder")}
-            aria-label={t("columns.name")}
-            className="text-sm"
-          />
-          <datalist id="equipment-names">
-            {libraryItems.map((e) => {
-              const isPurchaseItem = e.rental_or_purchase === "Purchase";
-              const periodUnitLabel =
-                periodUnits.find((u) => u.value === e.period_unit)?.label ||
-                e.period_unit;
-              const displayValue = isPurchaseItem
-                ? e.name
-                : `${e.name} (${periodUnitLabel})`;
-              return <option key={e.id} value={displayValue} />;
-            })}
-          </datalist>
-          {form.formState.errors.name && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.name.message!)}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="type" className="text-sm">
-            {t("columns.type")}
-          </Label>
-          <Input
-            id="type"
-            {...form.register("type")}
-            placeholder={t("columns.typePlaceholder")}
-            aria-label={t("columns.type")}
-            className="text-sm"
-            value={form.watch("type") || ""}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-sm">{t("columns.rentalPurchase")}</Label>
-          <TranslatedSelect
-            value={rentalOrPurchase}
-            onValueChange={(value) =>
-              form.setValue("rental_or_purchase", value)
-            }
-            options={rentalOptions}
-            isLoading={isLoadingRentalOptions}
-            placeholder={t("columns.rentalPurchasePlaceholder")}
-            aria-label={t("columns.rentalPurchase")}
-            className="text-sm"
-          />
-          {form.formState.errors.rental_or_purchase && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.rental_or_purchase.message!)}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="quantity" className="text-sm">
-            {t("columns.quantity")}
-          </Label>
-          <Input
-            id="quantity"
-            type="number"
-            min="1"
-            {...form.register("quantity")}
-            aria-label={t("columns.quantity")}
-            className="text-sm"
-          />
-          {form.formState.errors.quantity && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.quantity.message!)}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="cost_per_period" className="text-sm">
-            {isPurchase
-              ? t("columns.purchaseCost")
-              : t("columns.costPerPeriod")}{" "}
-            ({currency})
-          </Label>
-          <Input
-            id="cost_per_period"
-            type="number"
-            step="0.01"
-            {...form.register("cost_per_period")}
-            aria-label={
-              isPurchase
-                ? t("columns.purchaseCost")
-                : t("columns.costPerPeriod")
-            }
-            className="text-sm"
-          />
-          {form.formState.errors.cost_per_period && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.cost_per_period.message!)}
-            </p>
-          )}
-        </div>
-
-        {!isPurchase && (
-          <div className="space-y-2">
-            <Label className="text-sm">{t("columns.periodUnit")}</Label>
-            <TranslatedSelect
-              value={form.watch("period_unit")}
-              onValueChange={handlePeriodUnitChange}
-              options={periodUnits}
-              isLoading={isLoadingPeriodUnits}
-              placeholder={t("columns.periodUnitPlaceholder")}
-              aria-label={t("columns.periodUnit")}
-              className="text-sm"
-            />
-            {form.formState.errors.period_unit && (
-              <p className="text-destructive text-sm">
-                {t(form.formState.errors.period_unit.message!)}
-              </p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">{t("columns.name")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    onChange={handleNameChange}
+                    list="equipment-names"
+                    autoComplete="off"
+                    placeholder={t("columns.namePlaceholder")}
+                    aria-label={t("columns.name")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <datalist id="equipment-names">
+                  {libraryItems.map((e) => {
+                    const isPurchaseItem = e.rental_or_purchase === "Purchase";
+                    const periodUnitLabel =
+                      periodUnits.find((u) => u.value === e.period_unit)
+                        ?.label || e.period_unit;
+                    const displayValue = isPurchaseItem
+                      ? e.name
+                      : `${e.name} (${periodUnitLabel})`;
+                    return <option key={e.id} value={displayValue} />;
+                  })}
+                </datalist>
+                <FormMessage className="text-sm" />
+              </FormItem>
             )}
-          </div>
-        )}
+          />
 
-        {!isPurchase && (
-          <div className="space-y-2">
-            <Label htmlFor="usage_duration" className="text-sm">
-              {t("columns.usageDuration")}
-            </Label>
-            <Input
-              id="usage_duration"
-              type="number"
-              min="1"
-              {...form.register("usage_duration")}
-              aria-label={t("columns.usageDuration")}
-              className="text-sm"
-            />
-            {form.formState.errors.usage_duration && (
-              <p className="text-destructive text-sm">
-                {t(form.formState.errors.usage_duration.message!)}
-              </p>
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">{t("columns.type")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder={t("columns.typePlaceholder")}
+                    aria-label={t("columns.type")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
             )}
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <Label htmlFor="maintenance_cost" className="text-sm">
-            {t("columns.maintenance")} ({currency})
-          </Label>
-          <Input
-            id="maintenance_cost"
-            type="number"
-            step="0.01"
-            {...form.register("maintenance_cost")}
-            aria-label={t("columns.maintenance")}
-            className="text-sm"
-            value={form.watch("maintenance_cost") ?? ""}
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="fuel_cost" className="text-sm">
-            {t("columns.fuel")} ({currency})
-          </Label>
-          <Input
-            id="fuel_cost"
-            type="number"
-            step="0.01"
-            {...form.register("fuel_cost")}
-            aria-label={t("columns.fuel")}
-            className="text-sm"
-            value={form.watch("fuel_cost") ?? ""}
+          <FormField
+            control={form.control}
+            name="rental_or_purchase"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.rentalPurchase")}
+                </FormLabel>
+                <FormControl>
+                  <TranslatedSelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={rentalOptions}
+                    isLoading={isLoadingRentalOptions}
+                    placeholder={t("columns.rentalPurchasePlaceholder")}
+                    aria-label={t("columns.rentalPurchase")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-        </div>
 
-        {enableGroups && (
-          <div className="space-y-2">
-            <Label className="text-sm">
-              {t("project_detail:groups.assignGroup")}
-            </Label>
-            <TranslatedSelect
-              value={form.watch("group_id")}
-              onValueChange={(value) => form.setValue("group_id", value)}
-              options={[
-                {
-                  value: "ungrouped",
-                  label: t("project_detail:groups.ungrouped"),
-                },
-                ...groups.map((g) => ({ value: g.id, label: g.name })),
-              ]}
-              placeholder={t("project_detail:groups.selectGroup")}
-              aria-label={t("project_detail:groups.assignGroup")}
-              className="text-sm"
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.quantity")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="1"
+                    {...field}
+                    aria-label={t("columns.quantity")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="cost_per_period"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {isPurchase
+                    ? t("columns.purchaseCost")
+                    : t("columns.costPerPeriod")}{" "}
+                  ({currency})
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    aria-label={
+                      isPurchase
+                        ? t("columns.purchaseCost")
+                        : t("columns.costPerPeriod")
+                    }
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          {!isPurchase && (
+            <FormField
+              control={form.control}
+              name="period_unit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("columns.periodUnit")}
+                  </FormLabel>
+                  <FormControl>
+                    <TranslatedSelect
+                      value={field.value}
+                      onValueChange={handlePeriodUnitChange}
+                      options={periodUnits}
+                      isLoading={isLoadingPeriodUnits}
+                      placeholder={t("columns.periodUnitPlaceholder")}
+                      aria-label={t("columns.periodUnit")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-          </div>
-        )}
-      </div>
+          )}
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          className="text-sm"
-        >
-          {t("common:cancel")}
-        </Button>
-        <Button type="submit" disabled={isSubmitting} className="text-sm">
-          {isSubmitting ? t("common:saving") : t("common:save")}
-        </Button>
-      </div>
-    </form>
+          {!isPurchase && (
+            <FormField
+              control={form.control}
+              name="usage_duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("columns.usageDuration")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      {...field}
+                      aria-label={t("columns.usageDuration")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="maintenance_cost"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.maintenance")} ({currency})
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    value={field.value ?? ""}
+                    aria-label={t("columns.maintenance")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fuel_cost"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.fuel")} ({currency})
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    value={field.value ?? ""}
+                    aria-label={t("columns.fuel")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          {enableGroups && (
+            <FormField
+              control={form.control}
+              name="group_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("project_detail:groups.assignGroup")}
+                  </FormLabel>
+                  <FormControl>
+                    <TranslatedSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      options={[
+                        {
+                          value: "ungrouped",
+                          label: t("project_detail:groups.ungrouped"),
+                        },
+                        ...groups.map((g) => ({ value: g.id, label: g.name })),
+                      ]}
+                      placeholder={t("project_detail:groups.selectGroup")}
+                      aria-label={t("project_detail:groups.assignGroup")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="text-sm"
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="text-sm">
+            {isSubmitting ? t("common:saving") : t("common:save")}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

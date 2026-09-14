@@ -3,7 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useEffect } from "react";
@@ -144,142 +151,175 @@ export function MaterialForm({
   );
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-sm">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm">
-            {t("columns.name")}
-          </Label>
-          <Input
-            id="name"
-            {...form.register("name")}
-            onChange={handleNameChange}
-            list="material-names"
-            autoComplete="off"
-            placeholder={t("columns.namePlaceholder")}
-            aria-label={t("columns.name")}
-            className="text-sm"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">{t("columns.name")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    onChange={handleNameChange}
+                    list="material-names"
+                    autoComplete="off"
+                    placeholder={t("columns.namePlaceholder")}
+                    aria-label={t("columns.name")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <datalist id="material-names">
+                  {libraryItems.map((m) => {
+                    const unitLabel =
+                      materialUnits.find((u) => u.value === m.unit)?.label ||
+                      m.unit;
+                    return (
+                      <option key={m.id} value={`${m.name} (${unitLabel})`} />
+                    );
+                  })}
+                </datalist>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          <datalist id="material-names">
-            {libraryItems.map((m) => {
-              const unitLabel =
-                materialUnits.find((u) => u.value === m.unit)?.label || m.unit;
-              return <option key={m.id} value={`${m.name} (${unitLabel})`} />;
-            })}
-          </datalist>
-          {form.formState.errors.name && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.name.message!)}
-            </p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm">
-            {t("columns.description")}
-          </Label>
-          <Input
-            id="description"
-            {...form.register("description")}
-            placeholder={t("common:columns.descriptionPlaceholder")}
-            aria-label={t("columns.description")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.description")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder={t("common:columns.descriptionPlaceholder")}
+                    aria-label={t("columns.description")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="quantity" className="text-sm">
-            {t("columns.quantity")}
-          </Label>
-          <Input
-            id="quantity"
-            type="number"
-            min="0"
-            {...form.register("quantity")}
-            placeholder={t("columns.quantityPlaceholder")}
-            aria-label={t("columns.quantity")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.quantity")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="0"
+                    {...field}
+                    placeholder={t("columns.quantityPlaceholder")}
+                    aria-label={t("columns.quantity")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.quantity && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.quantity.message!)}
-            </p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label className="text-sm">{t("columns.unit")}</Label>
-          <TranslatedSelect
-            value={form.watch("unit")}
-            onValueChange={handleUnitChange}
-            options={materialUnits}
-            isLoading={isLoadingMaterialUnits}
-            placeholder={t("columns.unitPlaceholder")}
-            aria-label={t("columns.unit")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="unit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">{t("columns.unit")}</FormLabel>
+                <FormControl>
+                  <TranslatedSelect
+                    value={field.value}
+                    onValueChange={handleUnitChange}
+                    options={materialUnits}
+                    isLoading={isLoadingMaterialUnits}
+                    placeholder={t("columns.unitPlaceholder")}
+                    aria-label={t("columns.unit")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.unit && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.unit.message!)}
-            </p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="unit_price" className="text-sm">
-            {t("columns.unitPrice")} ({currency})
-          </Label>
-          <Input
-            id="unit_price"
-            type="number"
-            step="0.01"
-            {...form.register("unit_price")}
-            aria-label={t("columns.unitPrice")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="unit_price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.unitPrice")} ({currency})
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    aria-label={t("columns.unitPrice")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.unit_price && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.unit_price.message!)}
-            </p>
-          )}
-        </div>
 
-        {enableGroups && (
-          <div className="space-y-2">
-            <Label className="text-sm">
-              {t("project_detail:groups.assignGroup")}
-            </Label>
-            <TranslatedSelect
-              value={form.watch("group_id")}
-              onValueChange={(value) => form.setValue("group_id", value)}
-              options={[
-                {
-                  value: "ungrouped",
-                  label: t("project_detail:groups.ungrouped"),
-                },
-                ...groups.map((g) => ({ value: g.id, label: g.name })),
-              ]}
-              placeholder={t("project_detail:groups.selectGroup")}
-              aria-label={t("project_detail:groups.assignGroup")}
-              className="text-sm"
+          {enableGroups && (
+            <FormField
+              control={form.control}
+              name="group_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("project_detail:groups.assignGroup")}
+                  </FormLabel>
+                  <FormControl>
+                    <TranslatedSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      options={[
+                        {
+                          value: "ungrouped",
+                          label: t("project_detail:groups.ungrouped"),
+                        },
+                        ...groups.map((g) => ({ value: g.id, label: g.name })),
+                      ]}
+                      placeholder={t("project_detail:groups.selectGroup")}
+                      aria-label={t("project_detail:groups.assignGroup")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          className="text-sm"
-        >
-          {t("common:cancel")}
-        </Button>
-        <Button type="submit" disabled={isSubmitting} className="text-sm">
-          {isSubmitting ? t("common:saving") : t("common:save")}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="text-sm"
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="text-sm">
+            {isSubmitting ? t("common:saving") : t("common:save")}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

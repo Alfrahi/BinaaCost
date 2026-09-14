@@ -5,7 +5,14 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import { CostDatabase } from "@/types/cost-databases";
@@ -83,62 +90,82 @@ export function CostDatabaseForm({
           <X className="w-4 h-4" aria-hidden="true" />
         </Button>
       </div>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <Label htmlFor="db-name" className="text-sm font-medium">
-            {t("common:name")}
-          </Label>
-          <Input id="db-name" {...form.register("name")} className="text-sm" />
-          {form.formState.errors.name && (
-            <p className="text-destructive text-xs mt-1">
-              {t(form.formState.errors.name.message!)}
-            </p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="db-description" className="text-sm font-medium">
-            {t("common:description")}
-          </Label>
-          <Input
-            id="db-description"
-            {...form.register("description")}
-            className="text-sm"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  {t("common:name")}
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} className="text-sm" />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="db-currency" className="text-sm font-medium">
-            {t("common:currency")}
-          </Label>
-          <TranslatedSelect
-            value={form.watch("currency")}
-            onValueChange={(val) => form.setValue("currency", val)}
-            options={currencies}
-            isLoading={isLoadingCurrencies}
-            placeholder={t("pages:cost_databases.selectCurrency")}
-            aria-label={t("common:currency")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  {t("common:description")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.currency && (
-            <p className="text-destructive text-xs mt-1">
-              {t(form.formState.errors.currency.message!)}
-            </p>
-          )}
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="text-sm"
-            disabled={isSubmitting}
-          >
-            {t("common:cancel")}
-          </Button>
-          <Button type="submit" className="text-sm" disabled={isSubmitting}>
-            {isSubmitting ? t("common:saving") : t("common:save")}
-          </Button>
-        </div>
-      </form>
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  {t("common:currency")}
+                </FormLabel>
+                <FormControl>
+                  <TranslatedSelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={currencies}
+                    isLoading={isLoadingCurrencies}
+                    placeholder={t("pages:cost_databases.selectCurrency")}
+                    aria-label={t("common:currency")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="text-sm"
+              disabled={isSubmitting}
+            >
+              {t("common:cancel")}
+            </Button>
+            <Button type="submit" className="text-sm" disabled={isSubmitting}>
+              {isSubmitting ? t("common:saving") : t("common:save")}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
