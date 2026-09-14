@@ -1,10 +1,11 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +16,7 @@ interface Props {
   title: string;
   body: React.ReactNode;
   confirmLabel: string;
+  cancelLabel?: string;
   loading?: boolean;
   destructive?: boolean;
 }
@@ -26,26 +28,31 @@ export default function ConfirmDialog({
   title,
   body,
   confirmLabel,
+  cancelLabel,
   loading = false,
   destructive = false,
 }: Props) {
   const { t } = useTranslation("common");
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
-          <p className="text-base text-muted-foreground pt-2">{body}</p>
-        </DialogHeader>
-        <DialogFooter>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-xl font-semibold">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-base pt-2">
+            {body}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
             className="text-sm"
           >
-            {t("cancel")}
+            {cancelLabel ?? t("cancel")}
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
@@ -55,8 +62,8 @@ export default function ConfirmDialog({
           >
             {confirmLabel}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
