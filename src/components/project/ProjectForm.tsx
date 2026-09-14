@@ -12,16 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
@@ -407,29 +398,18 @@ export default function ProjectForm({
         </CardContent>
       </Card>
 
-      <AlertDialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("project_form:discardTitle")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("project_form:discardDescription")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("project_form:keepEditing")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                form.reset();
-                navigate("/");
-              }}
-            >
-              {t("project_form:discardChanges")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={showDiscardDialog}
+        onOpenChange={setShowDiscardDialog}
+        onConfirm={() => {
+          form.reset();
+          navigate("/");
+        }}
+        title={t("project_form:discardTitle")}
+        body={t("project_form:discardDescription")}
+        confirmLabel={t("project_form:discardChanges")}
+        cancelLabel={t("project_form:keepEditing")}
+      />
     </FormProvider>
   );
 }

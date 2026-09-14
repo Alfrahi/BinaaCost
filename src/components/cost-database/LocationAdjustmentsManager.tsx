@@ -15,16 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
-} from "@/components/ui/alert-dialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/components/AuthProvider";
 import { LocationAdjustment } from "@/types/cost-databases";
@@ -188,33 +179,19 @@ export default function LocationAdjustmentsManager({
               </TableBody>
             </Table>
           </div>
-          <AlertDialog
+          <ConfirmDialog
             open={!!deleteTarget}
-            onOpenChange={() => setDeleteTarget(null)}
-          >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t("common:areYouSure")}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t("cost_databases.deleteLocationConfirmation")}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setDeleteTarget(null)}>
-                  {t("common:cancel")}
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    if (deleteTarget) {
-                      handleDeleteLocation(deleteTarget.id);
-                    }
-                  }}
-                >
-                  {t("common:delete")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            onOpenChange={(o) => !o && setDeleteTarget(null)}
+            onConfirm={() => {
+              if (deleteTarget) {
+                handleDeleteLocation(deleteTarget.id);
+              }
+            }}
+            title={t("common:areYouSure")}
+            body={t("cost_databases.deleteLocationConfirmation")}
+            confirmLabel={t("common:delete")}
+            destructive
+          />
         </>
       ) : (
         <EmptyState message={t("cost_databases.selectDatabaseToManageLocations")} />
