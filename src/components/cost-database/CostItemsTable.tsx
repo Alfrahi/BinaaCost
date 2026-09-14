@@ -16,7 +16,13 @@ import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { BulkActionBar } from "@/components/BulkActionBar";
-import { PaginationControls } from "@/components/PaginationControls";
+import {
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
 import {
   Select,
   SelectContent,
@@ -135,12 +141,24 @@ export default function CostItemsTable({
     }
   };
 
-  if (itemsQuery.isLoading) {
-    return <div className="text-sm">{t("common:loading")}...</div>;
-  }
-
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
+  const columns = useMemo<DataTableColumn<CostDatabaseItem>[]>(() => {
+    const cols: DataTableColumn<CostDatabaseItem>[] = [
+      { key: "csi_code", label: t("project_costs:csiCode") },
+      { key: "description", label: t("common:description") },
+      { key: "unit", label: t("common:unit") },
+      { key: "unit_price", label: t("common:price") },
+    ];
+    if (selectedLocation) {
+      cols.push({
+        key: "adjusted_price",
+        label: t("pages:cost_databases.adjustedPrice"),
+      });
+    }
+    if (canEdit) {
+      cols.push({ key: "actions", label: t("common:actions"), align: "end" });
+    }
+    return cols;
+  }, [t, selectedLocation, canEdit]);
 
   return (
     <div className="space-y-4 text-sm">
@@ -266,128 +284,84 @@ export default function CostItemsTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto border rounded">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              {canEdit && (
-                <th className={`w-[40px] ${headerClass}`}>
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                    aria-label={t("common:selectAll")}
-                  />
-                </th>
-              )}
-              <th className={`${headerClass} text-start min-w-[100px]`}>
-                {t("project_costs:csiCode")}
-              </th>
-              <th className={`${headerClass} text-start min-w-[200px]`}>
-                {t("common:description")}
-              </th>
-              <th className={`${headerClass} text-start min-w-[80px]`}>
-                {t("common:unit")}
-              </th>
-              <th className={`${headerClass} text-start min-w-[120px]`}>
-                {t("common:price")}
-              </th>
-              {selectedLocation && (
-                <th className={`${headerClass} text-start min-w-[120px]`}>
-                  {t("pages:cost_databases.adjustedPrice")}
-                </th>
-              )}
-              {canEdit && (
-                <th className={`${headerClass} text-end min-w-[100px]`}>
-                  {t("common:actions")}
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-t">
-                {canEdit && (
-                  <td className="px-3 py-2 w-[40px]">
-                    <Checkbox
-                      checked={selection.isSelected(item.id)}
-                      onCheckedChange={() => selection.toggle(item.id)}
-                      aria-label={`${t("common:select")} ${item.description}`}
-                    />
-                  </td>
-                )}
-                <td className="px-3 py-2 text-start text-sm min-w-[100px]">
-                  {item.csi_code}
-                </td>
-                <td className="px-3 py-2 text-start text-sm min-w-[200px]">
-                  {item.description}
-                </td>
-                <td className="px-3 py-2 text-start text-sm min-w-[80px]">
-                  {item.unit}
-                </td>
-                <td className="px-3 py-2 text-start text-sm min-w-[120px]">
-                  {format(item.unit_price, database.currency)}
-                </td>
-                {selectedLocation && (
-                  <td className="px-3 py-2 text-start text-sm font-medium min-w-[120px]">
-                    {format(
-                      getAdjustedPrice(item.unit_price),
-                      database.currency,
-                    )}
-                  </td>
-                )}
-                {canEdit && (
-                  <td className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingItem(item);
-                        setShowForm(true);
-                      }}
-                      aria-label={`${t("common:edit")} ${item.description}`}
-                      className="h-7 w-7"
-                    >
-                      <Edit2 className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={() => setDeleteTarget(item)}
-                      aria-label={`${t("common:delete")} ${item.description}`}
-                      className="h-7 w-7"
-                    >
-                      <Trash2 className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                  </td>
-                )}
-              </tr>
-            ))}
-            {items.length === 0 && (
-              <tr>
-                <td
-                  colSpan={
-                    canEdit
-                      ? selectedLocation
-                        ? 7
-                        : 6
-                      : selectedLocation
-                        ? 6
-                        : 5
-                  }
-                  className="text-center py-8 text-muted-foreground text-sm"
-                >
-                  {t("common:noItems")}
-                </td>
-              </tr>
+      <DataTable
+        columns={columns}
+        data={items}
+        getRowKey={(item) => item.id}
+        selection={
+          canEdit
+            ? {
+                selectedIds: selection.selectedIds,
+                allSelected: selection.allSelected,
+                onToggle: selection.toggle,
+                onToggleAll: selection.toggleAll,
+                selectAllLabel: t("common:selectAll"),
+              }
+            : undefined
+        }
+        renderRow={(item) => (
+          <TableRow key={item.id}>
+            {canEdit && (
+              <TableCell className="px-3 py-2 w-[40px]">
+                <Checkbox
+                  checked={selection.isSelected(item.id)}
+                  onCheckedChange={() => selection.toggle(item.id)}
+                  aria-label={`${t("common:select")} ${item.description}`}
+                />
+              </TableCell>
             )}
-          </tbody>
-        </table>
-      </div>
-
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
+            <TableCell className="px-3 py-2 text-start text-sm min-w-[100px]">
+              {item.csi_code}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start text-sm min-w-[200px]">
+              {item.description}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start text-sm min-w-[80px]">
+              {item.unit}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start text-sm min-w-[120px]">
+              {format(item.unit_price, database.currency)}
+            </TableCell>
+            {selectedLocation && (
+              <TableCell className="px-3 py-2 text-start text-sm font-medium min-w-[120px]">
+                {format(getAdjustedPrice(item.unit_price), database.currency)}
+              </TableCell>
+            )}
+            {canEdit && (
+              <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingItem(item);
+                    setShowForm(true);
+                  }}
+                  aria-label={`${t("common:edit")} ${item.description}`}
+                  className="h-7 w-7"
+                >
+                  <Edit2 className="w-3 h-3" aria-hidden="true" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={() => setDeleteTarget(item)}
+                  aria-label={`${t("common:delete")} ${item.description}`}
+                  className="h-7 w-7"
+                >
+                  <Trash2 className="w-3 h-3" aria-hidden="true" />
+                </Button>
+              </TableCell>
+            )}
+          </TableRow>
+        )}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+        }}
+        isLoading={itemsQuery.isLoading}
+        emptyMessage={t("common:noItems")}
+        ariaLabel={t("common:items")}
       />
 
       <BulkActionBar count={selection.count} onClear={selection.clear}>

@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Edit2, Trash2, Package, Eye, Loader2, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Package, Eye, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -20,13 +20,12 @@ import { useAssemblies, PAGE_SIZE_OPTIONS } from "@/hooks/useAssemblies";
 import { AssemblyForm } from "./AssemblyForm";
 import { useAuth } from "@/components/AuthProvider";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
 
 interface AssemblyFormDialogProps {
   onOpenChange: (open: boolean) => void;
@@ -150,8 +149,16 @@ export function AssemblyList({
     setIsFormOpen(true);
   }, []);
 
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
+  const columns = useMemo<DataTableColumn<Assembly>[]>(
+    () => [
+      { key: "name", label: t("resources:assemblies.name") },
+      { key: "description", label: t("common:description") },
+      { key: "category", label: t("resources:assemblies.category") },
+      { key: "items", label: t("resources:assemblies.items"), align: "end" },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   return (
     <div className="space-y-4 text-sm">
@@ -206,107 +213,70 @@ export function AssemblyList({
         />
       )}
 
-      <div className="overflow-x-auto border border-border rounded-lg bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={`${headerClass} text-start`}>
-                {t("resources:assemblies.name")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start`}>
-                {t("common:description")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start`}>
-                {t("resources:assemblies.category")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-end`}>
-                {t("resources:assemblies.items")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-end`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-                </TableCell>
-              </TableRow>
-            ) : assemblies.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center py-8 text-muted-foreground text-sm"
+      <DataTable
+        columns={columns}
+        data={assemblies}
+        getRowKey={(assembly) => assembly.id}
+        renderRow={(assembly) => (
+          <TableRow key={assembly.id}>
+            <TableCell className="font-medium text-start text-sm text-foreground">
+              <div className="flex items-center gap-2">
+                <Package className="w-4 h-4 text-primary" aria-hidden="true" />
+                {assembly.name}
+              </div>
+            </TableCell>
+            <TableCell className="text-start text-sm text-foreground">
+              {assembly.description || t("common:noDescription")}
+            </TableCell>
+            <TableCell className="text-start text-sm text-foreground">
+              {assembly.category || t("common:notSpecified")}
+            </TableCell>
+            <TableCell className="text-end text-sm tabular-nums text-foreground">
+              {itemCounts[assembly.id] ?? 0}
+            </TableCell>
+            <TableCell className="text-end text-sm">
+              <div className="flex justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onSelectAssembly(assembly.id)}
+                  aria-label={`${t("common:view")} ${assembly.name}`}
+                  className="h-7 w-7"
                 >
-                  {t("common:noItems")}
-                </TableCell>
-              </TableRow>
-            ) : (
-              assemblies.map((assembly) => (
-                <TableRow key={assembly.id} className="border-t border-border">
-                  <TableCell className="font-medium text-start text-sm text-foreground">
-                    <div className="flex items-center gap-2">
-                      <Package
-                        className="w-4 h-4 text-primary"
-                        aria-hidden="true"
-                      />
-                      {assembly.name}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-start text-sm text-foreground">
-                    {assembly.description || t("common:noDescription")}
-                  </TableCell>
-                  <TableCell className="text-start text-sm text-foreground">
-                    {assembly.category || t("common:notSpecified")}
-                  </TableCell>
-                  <TableCell className="text-end text-sm tabular-nums text-foreground">
-                    {itemCounts[assembly.id] ?? 0}
-                  </TableCell>
-                  <TableCell className="text-end text-sm">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onSelectAssembly(assembly.id)}
-                        aria-label={`${t("common:view")} ${assembly.name}`}
-                        className="h-7 w-7"
-                      >
-                        <Eye className="w-4 h-4" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openForm(assembly);
-                        }}
-                        aria-label={`${t("common:edit")} ${assembly.name}`}
-                        className="h-7 w-7"
-                      >
-                        <Edit2 className="w-4 h-4" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteTarget(assembly);
-                        }}
-                        aria-label={`${t("common:delete")} ${assembly.name}`}
-                      >
-                        <Trash2 className="w-4 h-4" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  <Eye className="w-4 h-4" aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openForm(assembly);
+                  }}
+                  aria-label={`${t("common:edit")} ${assembly.name}`}
+                  className="h-7 w-7"
+                >
+                  <Edit2 className="w-4 h-4" aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(assembly);
+                  }}
+                  aria-label={`${t("common:delete")} ${assembly.name}`}
+                >
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+        isLoading={isLoading}
+        emptyMessage={t("common:noItems")}
+        ariaLabel={t("resources:assemblies.assembly")}
+      />
 
       <PaginationControls
         currentPage={currentPage}

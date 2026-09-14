@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { PaginationControls } from "@/components/PaginationControls";
 import { useTranslation } from "react-i18next";
-import { ArrowUp, ArrowDown, ChevronsUpDown, Search, X } from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronsUpDown, Search, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -47,7 +47,7 @@ export interface DataTableProps<T> {
   grandTotal?: React.ReactNode;
   grandTotalLabel?: string;
   grandTotalColSpan?: number;
-  emptyMessage?: string;
+  emptyMessage?: React.ReactNode;
   emptyMessageKey?: string;
   pagination?: {
     currentPage: number;
@@ -77,6 +77,8 @@ export interface DataTableProps<T> {
   getSearchText?: (row: T) => string;
   /** Enable sortable column headers. */
   sortable?: boolean;
+  /** Show a centered loading spinner row instead of the empty state. */
+  isLoading?: boolean;
 }
 
 type SortState = { key: string; dir: "asc" | "desc" } | null;
@@ -100,6 +102,7 @@ function DataTable<T>({
   searchPlaceholder,
   getSearchText,
   sortable = false,
+  isLoading = false,
   t,
 }: Omit<DataTableProps<T>, "getRowKey"> & { t: (key: string, options?: any) => string }) {
   const hasSelection = !!selection;
@@ -267,7 +270,19 @@ function DataTable<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={totalColSpan}
+                  className="text-center h-24"
+                >
+                  <Loader2
+                    className="w-6 h-6 animate-spin mx-auto"
+                    aria-hidden="true"
+                  />
+                </TableCell>
+              </TableRow>
+            ) : filteredData.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={totalColSpan}

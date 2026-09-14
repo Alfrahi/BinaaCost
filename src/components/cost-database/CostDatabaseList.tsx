@@ -16,18 +16,17 @@ import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Edit2, Trash2, Plus, Search, X } from "lucide-react";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { PaginationControls } from "@/components/PaginationControls";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
+import { CostDatabase } from "@/types/cost-databases";
 
 const costDatabaseSchema = z.object({
   name: z.string().min(1, "pages:cost_databases.nameRequired"),
@@ -168,6 +167,17 @@ export default function CostDatabaseList({
     }
   }, [selection, t]);
 
+  const columns = useMemo<DataTableColumn<CostDatabase>[]>(
+    () => [
+      { key: "name", label: t("common:name") },
+      { key: "description", label: t("common:description") },
+      { key: "currency", label: t("common:currency") },
+      { key: "public", label: t("pages:cost_databases.public") },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -200,85 +210,67 @@ export default function CostDatabaseList({
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10">
-                  <Checkbox
-                    checked={selection.allSelected}
-                    onCheckedChange={selection.toggleAll}
-                  />
-                </TableHead>
-                <TableHead>{t("common:name")}</TableHead>
-                <TableHead>{t("common:description")}</TableHead>
-                <TableHead>{t("common:currency")}</TableHead>
-                <TableHead>{t("pages:cost_databases.public")}</TableHead>
-                <TableHead className="w-24">{t("common:actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedDatabases.map((db) => (
-                <TableRow key={db.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selection.isSelected(db.id)}
-                      onCheckedChange={() => selection.toggle(db.id)}
-                    />
-                  </TableCell>
-                  <TableCell>{db.name}</TableCell>
-                  <TableCell>
-                    {db.description || t("common:notSpecified")}
-                  </TableCell>
-                  <TableCell>{db.currency}</TableCell>
-                  <TableCell>
-                    <Checkbox checked={db.is_public} disabled />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onViewDatabase(db.id)}
-                      >
-                        {t("common:view")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setEditingId(db.id)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive"
-                        onClick={() => setDeleteTarget(db.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {paginatedDatabases.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    {t("common:noItems")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
+      <DataTable
+        columns={columns}
+        data={paginatedDatabases}
+        getRowKey={(db) => db.id}
+        selection={{
+          selectedIds: selection.selectedIds,
+          allSelected: selection.allSelected,
+          onToggle: selection.toggle,
+          onToggleAll: selection.toggleAll,
+          selectAllLabel: t("common:selectAll"),
+        }}
+        renderRow={(db) => (
+          <TableRow key={db.id}>
+            <TableCell className="w-[40px]">
+              <Checkbox
+                checked={selection.isSelected(db.id)}
+                onCheckedChange={() => selection.toggle(db.id)}
+                aria-label={`${t("common:select")} ${db.name}`}
+              />
+            </TableCell>
+            <TableCell>{db.name}</TableCell>
+            <TableCell>{db.description || t("common:notSpecified")}</TableCell>
+            <TableCell>{db.currency}</TableCell>
+            <TableCell>
+              <Checkbox checked={db.is_public} disabled />
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onViewDatabase(db.id)}
+                >
+                  {t("common:view")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditingId(db.id)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive"
+                  onClick={() => setDeleteTarget(db.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+        }}
+        emptyMessage={t("common:noItems")}
+        ariaLabel={t("pages:cost_databases.title")}
       />
 
       {editingId && (
