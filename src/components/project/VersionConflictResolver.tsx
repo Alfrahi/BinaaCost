@@ -708,16 +708,16 @@ export default function VersionConflictResolver({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-1/4 text-start">
+                  <TableHead className="w-1/4 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {t("project_versions:currentProject")}
                   </TableHead>
-                  <TableHead className="w-1/4 text-start">
+                  <TableHead className="w-1/4 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {t("project_versions:currentDetails")}
                   </TableHead>
-                  <TableHead className="w-1/4 text-start">
+                  <TableHead className="w-1/4 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {t("project_versions:changeType")}
                   </TableHead>
-                  <TableHead className="w-1/4 text-start">
+                  <TableHead className="w-1/4 text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {t("project_versions:versionDetails")}
                   </TableHead>
                 </TableRow>

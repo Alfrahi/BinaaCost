@@ -141,16 +141,16 @@ export default function AuditLogs() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start text-xs min-w-[150px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[150px]">
                   {t("admin:auditLogs.date")}
                 </TableHead>
-                <TableHead className="text-start text-xs min-w-[120px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[120px]">
                   {t("admin:auditLogs.user")}
                 </TableHead>
-                <TableHead className="text-start text-xs min-w-[100px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[100px]">
                   {t("admin:auditLogs.action")}
                 </TableHead>
-                <TableHead className="text-start text-xs min-w-[150px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[150px]">
                   {t("admin:auditLogs.resource")}
                 </TableHead>
               </TableRow>

@@ -100,10 +100,10 @@ export default function VersionComparison({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start">{t("common:item")}</TableHead>
-                <TableHead className="text-end">{versionA.name}</TableHead>
-                <TableHead className="text-end">{versionB.name}</TableHead>
-                <TableHead className="text-end">{t("delta")}</TableHead>
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common:item")}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{versionA.name}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{versionB.name}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("delta")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

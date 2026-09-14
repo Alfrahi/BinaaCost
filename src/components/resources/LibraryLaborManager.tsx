@@ -3,18 +3,14 @@ import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Edit2, Trash2, Trash, X, Loader2, Copy } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Edit2, Trash2, Trash, X, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { PaginationControls } from "@/components/PaginationControls";
@@ -40,6 +36,9 @@ import { useLibrarySyncManager } from "@/hooks/useLibrarySyncManager";
 import { handleError } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
 
 const laborSchema = z.object({
   worker_type: z.string().min(1, "resources:fields.workerTypeRequired"),
@@ -169,8 +168,17 @@ export default function LibraryLaborManager() {
     }
   }, [deleteItems, selection, t]);
 
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
+  const columns = useMemo<DataTableColumn<any>[]>(
+    () => [
+      { key: "worker_type", label: t("resources:fields.workerType") },
+      {
+        key: "daily_rate",
+        label: `${t("resources:fields.dailyRate")} (USD)`,
+      },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   return (
     <div className="space-y-4 text-sm">
@@ -311,93 +319,66 @@ export default function LibraryLaborManager() {
         </div>
       </div>
 
-      <div className="overflow-x-auto border rounded-lg bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={`w-[40px] ${headerClass}`}>
-                <Checkbox
-                  checked={selection.allSelected}
-                  onCheckedChange={selection.toggleAll}
-                  aria-label={t("common:selectAllLabor")}
-                />
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[200px]`}>
-                {t("resources:fields.workerType")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[150px]`}>
-                {t("resources:fields.dailyRate")} (USD)
-              </TableHead>
-              <TableHead className={`${headerClass} text-end min-w-[100px]`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-sm py-8">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                </TableCell>
-              </TableRow>
-            ) : items.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center text-muted-foreground text-sm"
-                >
-                  {t("common:noItems")}
-                </TableCell>
-              </TableRow>
-            ) : (
-              items.map((item: any) => (
-                <TableRow key={item.id} className="border-t border-border">
-                  <TableCell className="px-3 py-2 w-[40px]">
-                    <Checkbox
-                      checked={selection.isSelected(item.id)}
-                      onCheckedChange={() => selection.toggle(item.id)}
-                      aria-label={`${t("common:select")} ${item.worker_type}`}
-                    />
-                  </TableCell>
-                  <TableCell className="px-3 py-2 font-medium text-start text-sm min-w-[200px] text-foreground">
-                    {item.worker_type}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 text-start text-sm min-w-[150px] text-foreground">
-                    {format(item.daily_rate, "USD")}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleDuplicate(item)}
-                      aria-label={`${t("common:duplicate")} ${item.worker_type}`}
-                      className="h-7 w-7"
-                    >
-                      <Copy className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => openForm(item)}
-                      className="h-7 w-7"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => setDeleteTarget(item)}
-                      className="h-7 w-7"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={items}
+        getRowKey={(item) => item.id}
+        selection={{
+          selectedIds: selection.selectedIds,
+          allSelected: selection.allSelected,
+          onToggle: selection.toggle,
+          onToggleAll: selection.toggleAll,
+          selectAllLabel: t("common:selectAllLabor"),
+        }}
+        renderRow={(item) => (
+          <TableRow key={item.id}>
+            <TableCell className="px-3 py-2 w-[40px]">
+              <Checkbox
+                checked={selection.isSelected(item.id)}
+                onCheckedChange={() => selection.toggle(item.id)}
+                aria-label={`${t("common:select")} ${item.worker_type}`}
+              />
+            </TableCell>
+            <TableCell className="px-3 py-2 font-medium text-start text-sm min-w-[200px] text-foreground">
+              {item.worker_type}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start text-sm min-w-[150px] text-foreground">
+              {format(item.daily_rate, "USD")}
+            </TableCell>
+            <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => handleDuplicate(item)}
+                aria-label={`${t("common:duplicate")} ${item.worker_type}`}
+                className="h-7 w-7"
+              >
+                <Copy className="w-3 h-3" aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => openForm(item)}
+                className="h-7 w-7"
+              >
+                <Edit2 className="w-3 h-3" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setDeleteTarget(item)}
+                className="h-7 w-7"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
+            </TableCell>
+          </TableRow>
+        )}
+        isLoading={isLoading}
+        emptyMessage={t("common:noItems")}
+        ariaLabel={t("resources:labor")}
+      />
+
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}

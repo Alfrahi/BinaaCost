@@ -3,22 +3,18 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import PageHeader from "@/components/PageHeader";
-import { X, Eye, Trash2, Loader2, AlertTriangle } from "lucide-react";
-import { PaginationControls } from "@/components/PaginationControls";
+import { X, Eye, Trash2, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RoleBadge } from "@/components/RoleBadge";
 import EditRoleModal from "@/components/EditRoleModal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { cn, getIconMarginClass } from "@/lib/utils";
-import { useAdminUserManagement } from "@/hooks/useAdminUserManagement";
+import { useAdminUserManagement, UserProfile } from "@/hooks/useAdminUserManagement";
+import { useMemo } from "react";
 
 export default function UserManagement() {
   const { t } = useTranslation(["admin", "common", "roles"]);
@@ -42,6 +38,18 @@ export default function UserManagement() {
     handleDelete,
     totalPages,
   } = useAdminUserManagement();
+
+  const columns = useMemo<DataTableColumn<UserProfile>[]>(
+    () => [
+      { key: "email", label: t("admin:users.email") },
+      { key: "name", label: t("admin:users.name") },
+      { key: "role", label: t("admin:users.role") },
+      { key: "plan", label: t("admin:users.plan") },
+      { key: "createdAt", label: t("admin:users.createdAt") },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   return (
     <div className="space-y-6">
@@ -78,115 +86,72 @@ export default function UserManagement() {
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
-        <div className="bg-background">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-muted">
-              <TableRow>
-                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("admin:users.email")}
-                </TableHead>
-                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("admin:users.name")}
-                </TableHead>
-                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("admin:users.role")}
-                </TableHead>
-                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("admin:users.plan")}
-                </TableHead>
-                <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("admin:users.createdAt")}
-                </TableHead>
-                <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common:actions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="px-4 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                  </TableCell>
-                </TableRow>
-              ) : users.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    {error ? (
-                      <>
-                        {t("admin:users.errorLoadingUsers")}
-                        <div className="text-destructive mt-2">
-                          {error.message}
-                        </div>
-                      </>
-                    ) : (
-                      t("admin:users.noUsersFound")
-                    )}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-foreground">
-                      {user.email}
-                    </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-foreground">
-                      {user.first_name} {user.last_name}
-                    </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm">
-                      <RoleBadge role={user.role} />
-                    </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {user.plan}
-                    </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="px-4 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/admin/users/${user.id}`}>
-                            <Eye
-                              className={cn("w-4 h-4", getIconMarginClass())}
-                            />
-                            {t("common:view")}
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingUser(user)}
-                        >
-                          {t("common:edit")}
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          <Trash2
-                            className={cn("w-4 h-4", getIconMarginClass())}
-                          />
-                          {t("common:delete")}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
+      <DataTable
+        columns={columns}
+        data={users}
+        getRowKey={(user) => user.id}
+        renderRow={(user) => (
+          <TableRow key={user.id}>
+            <TableCell className="whitespace-nowrap text-sm text-foreground">
+              {user.email}
+            </TableCell>
+            <TableCell className="whitespace-nowrap text-sm text-foreground">
+              {user.first_name} {user.last_name}
+            </TableCell>
+            <TableCell className="whitespace-nowrap text-sm">
+              <RoleBadge role={user.role} />
+            </TableCell>
+            <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+              {user.plan}
+            </TableCell>
+            <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+              {new Date(user.created_at).toLocaleDateString()}
+            </TableCell>
+            <TableCell className="whitespace-nowrap text-end text-sm font-medium">
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={`/admin/users/${user.id}`}>
+                    <Eye className={cn("w-4 h-4", getIconMarginClass())} />
+                    {t("common:view")}
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditingUser(user)}
+                >
+                  {t("common:edit")}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(user.id)}
+                >
+                  <Trash2 className={cn("w-4 h-4", getIconMarginClass())} />
+                  {t("common:delete")}
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+        }}
+        stickyHeader
+        isLoading={isLoading}
+        emptyMessage={
+          error ? (
+            <>
+              {t("admin:users.errorLoadingUsers")}
+              <div className="text-destructive mt-2">{error.message}</div>
+            </>
+          ) : (
+            t("admin:users.noUsersFound")
+          )
+        }
+        ariaLabel={t("admin:users.title")}
       />
 
       {/* Edit Role Modal */}

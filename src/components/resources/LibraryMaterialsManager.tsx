@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Edit2, Trash2, Copy, Trash, X, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Copy, Trash, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
@@ -25,14 +25,13 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import DataTable, {
+  DataTableColumn,
+} from "@/components/ui/data-table";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { handleError } from "@/utils/toast";
 
@@ -87,6 +86,20 @@ export default function LibraryMaterialsManager() {
   );
   const selection = useBulkSelection(allVisibleIds);
   const [showBulkDelete, setShowBulkDelete] = useState(false);
+
+  const columns = useMemo<DataTableColumn<any>[]>(
+    () => [
+      { key: "name", label: t("resources:materials.name") },
+      { key: "description", label: t("common:description") },
+      { key: "unit", label: t("resources:materials.unit") },
+      {
+        key: "unit_price",
+        label: `${t("resources:materials.unitPrice")} (USD)`,
+      },
+      { key: "actions", label: t("common:actions"), align: "end" },
+    ],
+    [t],
+  );
 
   const form = useForm<LibraryMaterialFormValues>({
     resolver: zodResolver(libraryMaterialSchema),
@@ -182,9 +195,6 @@ export default function LibraryMaterialsManager() {
       handleError(e);
     }
   }, [deleteItems, selection, t]);
-
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3 py-2";
 
   return (
     <div className="space-y-4 text-sm">
@@ -341,111 +351,77 @@ export default function LibraryMaterialsManager() {
         </div>
       </div>
 
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={`w-[40px] ${headerClass}`}>
-                <Checkbox
-                  checked={selection.allSelected}
-                  onCheckedChange={selection.toggleAll}
-                  aria-label={t("common:selectAllMaterials")}
-                />
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[150px]`}>
-                {t("resources:materials.name")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[200px]`}>
-                {t("common:description")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[80px]`}>
-                {t("resources:materials.unit")}
-              </TableHead>
-              <TableHead className={`${headerClass} text-start min-w-[120px]`}>
-                {t("resources:materials.unitPrice")} (USD)
-              </TableHead>
-              <TableHead className={`${headerClass} text-end min-w-[100px]`}>
-                {t("common:actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-                </TableCell>
-              </TableRow>
-            ) : items.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center py-8 text-muted-foreground"
-                >
-                  {t("common:noItems")}
-                </TableCell>
-              </TableRow>
-            ) : (
-              items.map((item: any) => (
-                <TableRow key={item.id} className="border-t border-border">
-                  <TableCell className="px-3 py-2 w-[40px]">
-                    <Checkbox
-                      checked={selection.isSelected(item.id)}
-                      onCheckedChange={() => selection.toggle(item.id)}
-                      aria-label={`${t("common:select")} ${item.name}`}
-                    />
-                  </TableCell>
-                  <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-foreground">
-                    {item.name}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[200px] text-foreground">
-                    {item.description || t("common:noDescription")}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[80px] text-foreground">
-                    {materialUnits.find((u) => u.value === item.unit)?.label ||
-                      item.unit}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 text-start min-w-[120px] text-foreground">
-                    {format(item.unit_price, "USD")}
-                  </TableCell>
-                  <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleDuplicate(item)}
-                      aria-label={`${t("common:duplicate")} ${item.name}`}
-                      className="h-7 w-7"
-                    >
-                      <Copy className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingItem(item);
-                        setIsFormOpen(true);
-                      }}
-                      aria-label={`${t("common:edit")} ${item.name}`}
-                      className="h-7 w-7"
-                    >
-                      <Edit2 className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={() => setDeleteTarget(item)}
-                      aria-label={`${t("common:delete")} ${item.name}`}
-                      className="h-7 w-7"
-                    >
-                      <Trash2 className="w-3 h-3" aria-hidden="true" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={items}
+        getRowKey={(item) => item.id}
+        selection={{
+          selectedIds: selection.selectedIds,
+          allSelected: selection.allSelected,
+          onToggle: selection.toggle,
+          onToggleAll: selection.toggleAll,
+          selectAllLabel: t("common:selectAllMaterials"),
+        }}
+        renderRow={(item) => (
+          <TableRow key={item.id}>
+            <TableCell className="px-3 py-2 w-[40px]">
+              <Checkbox
+                checked={selection.isSelected(item.id)}
+                onCheckedChange={() => selection.toggle(item.id)}
+                aria-label={`${t("common:select")} ${item.name}`}
+              />
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start font-medium min-w-[150px] text-foreground">
+              {item.name}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start min-w-[200px] text-foreground">
+              {item.description || t("common:noDescription")}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start min-w-[80px] text-foreground">
+              {materialUnits.find((u) => u.value === item.unit)?.label ||
+                item.unit}
+            </TableCell>
+            <TableCell className="px-3 py-2 text-start min-w-[120px] text-foreground">
+              {format(item.unit_price, "USD")}
+            </TableCell>
+            <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => handleDuplicate(item)}
+                aria-label={`${t("common:duplicate")} ${item.name}`}
+                className="h-7 w-7"
+              >
+                <Copy className="w-3 h-3" aria-hidden="true" />
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => {
+                  setEditingItem(item);
+                  setIsFormOpen(true);
+                }}
+                aria-label={`${t("common:edit")} ${item.name}`}
+                className="h-7 w-7"
+              >
+                <Edit2 className="w-3 h-3" aria-hidden="true" />
+              </Button>
+              <Button
+                size="icon"
+                variant="destructive"
+                onClick={() => setDeleteTarget(item)}
+                aria-label={`${t("common:delete")} ${item.name}`}
+                className="h-7 w-7"
+              >
+                <Trash2 className="w-3 h-3" aria-hidden="true" />
+              </Button>
+            </TableCell>
+          </TableRow>
+        )}
+        isLoading={isLoading}
+        emptyMessage={t("common:noItems")}
+        ariaLabel={t("resources:materials")}
+      />
 
       <PaginationControls
         currentPage={currentPage}

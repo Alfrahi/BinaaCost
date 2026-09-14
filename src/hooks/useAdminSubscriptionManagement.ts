@@ -8,7 +8,7 @@ import { useRole } from "@/hooks/useRole";
 
 const PAGE_SIZE = 10;
 
-interface User {
+export interface User {
   id: string;
   email: string;
   first_name: string;
