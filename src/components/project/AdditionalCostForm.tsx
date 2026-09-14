@@ -2,7 +2,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { useEffect, useCallback } from "react";
@@ -73,92 +80,120 @@ export function AdditionalCostForm({
   ];
 
   return (
-    <form
-      onSubmit={form.handleSubmit(handleSubmit)}
-      className="space-y-4 text-sm"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label className="text-sm">{t("columns.category")}</Label>
-          <TranslatedSelect
-            value={form.watch("category")}
-            onValueChange={(value) => form.setValue("category", value)}
-            options={additionalCategories}
-            isLoading={isLoadingAdditionalCategories}
-            placeholder={t("columns.categoryPlaceholder")}
-            aria-label={t("columns.category")}
-            className="text-sm"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4 text-sm"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.category")}
+                </FormLabel>
+                <FormControl>
+                  <TranslatedSelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={additionalCategories}
+                    isLoading={isLoadingAdditionalCategories}
+                    placeholder={t("columns.categoryPlaceholder")}
+                    aria-label={t("columns.category")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.category && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.category.message!)}
-            </p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm">
-            {t("columns.description")}
-          </Label>
-          <Input
-            id="description"
-            {...form.register("description")}
-            placeholder={t("common:columns.descriptionPlaceholder")}
-            aria-label={t("columns.description")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.description")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder={t("common:columns.descriptionPlaceholder")}
+                    aria-label={t("columns.description")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="amount" className="text-sm">
-            {t("columns.amount")} ({currency})
-          </Label>
-          <Input
-            id="amount"
-            type="number"
-            step="0.01"
-            {...form.register("amount")}
-            aria-label={t("columns.amount")}
-            className="text-sm"
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("columns.amount")} ({currency})
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    aria-label={t("columns.amount")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.amount && (
-            <p className="text-destructive text-sm">
-              {t(form.formState.errors.amount.message!)}
-            </p>
-          )}
-        </div>
 
-        {enableGroups && (
-          <div className="space-y-2">
-            <Label className="text-sm">
-              {t("project_detail:groups.assignGroup")}
-            </Label>
-            <TranslatedSelect
-              value={form.watch("group_id")}
-              onValueChange={(value) => form.setValue("group_id", value)}
-              options={groupOptions}
-              placeholder={t("project_detail:groups.selectGroup")}
-              aria-label={t("project_detail:groups.assignGroup")}
-              className="text-sm"
+          {enableGroups && (
+            <FormField
+              control={form.control}
+              name="group_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">
+                    {t("project_detail:groups.assignGroup")}
+                  </FormLabel>
+                  <FormControl>
+                    <TranslatedSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      options={groupOptions}
+                      placeholder={t("project_detail:groups.selectGroup")}
+                      aria-label={t("project_detail:groups.assignGroup")}
+                      className="text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
             />
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSubmitting}
-          className="text-sm"
-        >
-          {t("common:cancel")}
-        </Button>
-        <Button type="submit" disabled={isSubmitting} className="text-sm">
-          {isSubmitting ? t("common:saving") : t("common:save")}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="text-sm"
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="text-sm">
+            {isSubmitting ? t("common:saving") : t("common:save")}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

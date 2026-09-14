@@ -227,8 +227,8 @@ export async function parseAndValidateProjectCsv(
                 (f) => f.key === issue.path[0],
               );
               return field
-                ? `${i18n.t(field.labelKey)}: ${issue.message}`
-                : issue.message;
+                ? `${i18n.t(field.labelKey)}: ${i18n.t(issue.message)}`
+                : i18n.t(issue.message);
             });
             invalidRows.push({ row: index + 2, errors });
           }
