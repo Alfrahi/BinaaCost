@@ -4,6 +4,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { Edit2, Trash2, Plus, GripVertical, X } from "lucide-react";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 import {
   DndContext,
@@ -123,7 +124,7 @@ function SortableGroupItem({
   editingGroup,
   setEditingGroup,
   updateGroup,
-  deleteGroup,
+  onRequestDelete,
   t,
   isUpdating,
 }: {
@@ -131,7 +132,7 @@ function SortableGroupItem({
   editingGroup: ProjectGroup | null;
   setEditingGroup: (g: ProjectGroup | null) => void;
   updateGroup: (g: ProjectGroup) => void;
-  deleteGroup: (id: string) => void;
+  onRequestDelete: (g: ProjectGroup) => void;
   t: any;
   isUpdating: boolean;
 }) {
@@ -194,11 +195,7 @@ function SortableGroupItem({
               size="icon"
               variant="ghost"
               className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => {
-                if (confirm(t("common:areYouSure"))) {
-                  deleteGroup(group.id);
-                }
-              }}
+              onClick={() => onRequestDelete(group)}
               aria-label={`${t("common:delete")} ${group.name}`}
             >
               <Trash2 className="w-4 h-4" aria-hidden="true" />
@@ -221,6 +218,7 @@ export default function ProjectGroupsManager({
 }) {
   const { t } = useTranslation(["common", "project_detail"]);
   const [editingGroup, setEditingGroup] = useState<ProjectGroup | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProjectGroup | null>(null);
 
   const {
     groups,
@@ -230,6 +228,7 @@ export default function ProjectGroupsManager({
     handleDragEnd,
     isAddingGroup,
     isUpdatingGroup,
+    isDeletingGroup,
   } = useProjectGroupsManager(projectId, initialGroups);
 
   const sensors = useSensors(
@@ -279,7 +278,7 @@ export default function ProjectGroupsManager({
                   editingGroup={editingGroup}
                   setEditingGroup={setEditingGroup}
                   updateGroup={(g) => updateGroup(g)}
-                  deleteGroup={(id) => deleteGroup(id)}
+                  onRequestDelete={setDeleteTarget}
                   t={t}
                   isUpdating={isUpdatingGroup}
                 />
@@ -298,6 +297,19 @@ export default function ProjectGroupsManager({
           {t("common:close")}
         </Button>
       </div>
+
+      <DeleteConfirmationDialog
+        open={!!deleteTarget}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteGroup(deleteTarget.id);
+            setDeleteTarget(null);
+          }
+        }}
+        itemName={deleteTarget?.name}
+        loading={isDeletingGroup}
+      />
     </div>
   );
 }

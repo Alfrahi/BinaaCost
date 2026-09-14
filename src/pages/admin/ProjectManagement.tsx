@@ -5,20 +5,11 @@ import DataTable, {
 } from "@/components/ui/data-table";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Eye, Loader2, X, AlertTriangle } from "lucide-react";
+import { Trash2, Eye, X, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PaginationControls } from "@/components/PaginationControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { cn, getIconMarginClass } from "@/lib/utils";
@@ -204,54 +195,30 @@ export default function ProjectManagement() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
+      <ConfirmDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">
-              {t("admin:projects.deleteConfirmationTitle")}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm">
-              {deleteTarget?.deleted_at
-                ? t("admin:projects.permanentDeleteWarning", {
-                    projectName: deleteTarget.name,
-                  })
-                : t("admin:projects.deleteWarning", {
-                    projectName: deleteTarget?.name,
-                  })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="text-sm">
-              {t("common:cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                deleteTarget && deleteProjectMutation.mutate(deleteTarget.id)
-              }
-              disabled={deleteProjectMutation.isPending}
-              className="text-sm"
-            >
-              {deleteProjectMutation.isPending ? (
-                <>
-                  <Loader2
-                    className={cn(
-                      "w-4 h-4",
-                      getIconMarginClass(),
-                      "animate-spin",
-                    )}
-                  />
-                  {t("common:deleting")}
-                </>
-              ) : (
-                t("common:delete")
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onConfirm={() =>
+          deleteTarget && deleteProjectMutation.mutate(deleteTarget.id)
+        }
+        title={t("admin:projects.deleteConfirmationTitle")}
+        body={
+          deleteTarget?.deleted_at
+            ? t("admin:projects.permanentDeleteWarning", {
+                projectName: deleteTarget.name,
+              })
+            : t("admin:projects.deleteWarning", {
+                projectName: deleteTarget?.name,
+              })
+        }
+        confirmLabel={
+          deleteProjectMutation.isPending
+            ? t("common:deleting")
+            : t("common:delete")
+        }
+        loading={deleteProjectMutation.isPending}
+        destructive
+      />
     </div>
   );
 }
