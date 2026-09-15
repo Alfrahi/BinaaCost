@@ -546,7 +546,7 @@ export function EquipmentTable({
         onConfirm={() =>
           handleBulkDeleteEquipment(Array.from(selection.selectedIds))
         }
-        itemName={`${selection.count} items`}
+        itemName={t("common:item", { count: selection.count })}
         loading={isBulkDeletingEquipment}
       />
       <BulkMoveDialog

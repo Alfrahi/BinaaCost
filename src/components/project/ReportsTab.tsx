@@ -16,6 +16,7 @@ import {
 } from "./FinancialAssumptions";
 import { Loader2, FileText, Users, DollarSign } from "lucide-react";
 import { cn, getIconMarginClass } from "@/lib/utils";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   MaterialItem,
   LaborItem,
@@ -313,7 +314,7 @@ export default function ReportsTab({
                   <Suspense
                     fallback={
                       <div className="flex items-center justify-center h-40">
-                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <LoadingState className="py-0" />
                       </div>
                     }
                   >

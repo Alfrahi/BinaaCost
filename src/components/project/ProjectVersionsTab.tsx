@@ -422,9 +422,7 @@ export default function ProjectVersionsTab({
           )}
         </div>
         {isLoadingVersions ? (
-          <div className="flex items-center justify-center py-4">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
+          <LoadingState />
         ) : timeline.length === 0 ? (
           <EmptyState message={t("noVersionsDescription")} />
         ) : (

@@ -166,7 +166,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
+      <div className="max-w-md w-full bg-card rounded-lg shadow p-8">
         <Heading level={1} className="mb-4 text-center">
           {mode === "signup"
             ? t("signUp")
@@ -306,27 +306,29 @@ export default function Login() {
         {signupEnabled && (
           <div className="mt-4 text-center text-sm">
             {mode === "signin" ? (
-              <button
+              <Button
                 type="button"
-                className="text-primary hover:underline"
+                variant="link"
+                size="sm"
                 onClick={() => {
                   setMode("signup");
                   setSubmitError(null);
                 }}
               >
                 {t("signUpLink")}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 type="button"
-                className="text-primary hover:underline"
+                variant="link"
+                size="sm"
                 onClick={() => {
                   setMode("signin");
                   setSubmitError(null);
                 }}
               >
                 {t("alreadyHaveAccountLink")}
-              </button>
+              </Button>
             )}
           </div>
         )}

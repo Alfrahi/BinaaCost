@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Heading } from "@/components/ui/heading";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { FinancialSummary } from "@/logic/financials";
 import { calculateItemCost, calculateCategoryTotal } from "@/logic/shared";
@@ -258,9 +259,7 @@ export const ProjectCostReport = React.forwardRef<
                 className="h-12 mb-2"
               />
             )}
-            <h1 className="text-2xl font-bold text-foreground">
-              {companyInfo.name}
-            </h1>
+            <Heading level={1}>{companyInfo.name}</Heading>
             <p className="text-sm text-muted-foreground">{companyInfo.website}</p>
             <p className="text-sm text-muted-foreground">{companyInfo.email}</p>
           </div>

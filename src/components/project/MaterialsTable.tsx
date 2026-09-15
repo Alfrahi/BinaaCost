@@ -426,7 +426,7 @@ export function MaterialsTable({
         onConfirm={() =>
           handleBulkDeleteMaterials(Array.from(selection.selectedIds))
         }
-        itemName={`${selection.count} items`}
+        itemName={t("common:item", { count: selection.count })}
         loading={isBulkDeletingMaterials}
       />
       <BulkMoveDialog

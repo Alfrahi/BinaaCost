@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import ReactECharts from "echarts-for-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Loader2 } from "lucide-react";
+import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -14,6 +14,7 @@ import { ProjectCostData } from "../types";
 import { cn } from "@/lib/utils";
 import { COST_CATEGORY_COLORS } from "@/logic/chartPalette";
 import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
+import LoadingState from "@/components/ui/LoadingState";
 
 const LazyChartContainer = React.lazy(
   () => import("@/components/ChartContainer"),
@@ -63,7 +64,7 @@ export default function ProjectComparisonChart({
                 "flex items-center justify-center",
               )}
             >
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <LoadingState className="py-0" />
             </div>
           }
         >

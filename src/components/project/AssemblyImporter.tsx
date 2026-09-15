@@ -2,6 +2,7 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   Select,
   SelectContent,
@@ -193,10 +194,7 @@ export default function AssemblyImporter({
             </div>
             <ScrollArea className="h-48">
               {isLoadingAssemblyItems ? (
-                <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                  <Loader2 className="w-5 h-5 animate-spin ms-2" />
-                  {t("common:loading")}
-                </div>
+                <LoadingState label={t("common:loading")} />
               ) : assemblyItems.length === 0 ? (
                 <EmptyState message={t("common:noItems")} />
               ) : (
