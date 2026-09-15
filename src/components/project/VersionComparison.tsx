@@ -93,7 +93,7 @@ export default function VersionComparison({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">{t("compareTitle")}</CardTitle>
+        <CardTitle>{t("compareTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

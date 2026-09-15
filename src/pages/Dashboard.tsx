@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
@@ -111,18 +111,18 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
+        <Card>
+          <CardHeader className="flex-row justify-between items-center space-y-0">
+            <CardTitle className="flex items-center gap-2">
               <Folder className="w-5 h-5" />
               {t("dashboard:myProjects")}
-            </h2>
+            </CardTitle>
             <span className="text-sm text-muted-foreground">
               {totalMyProjectsCount} {t("dashboard:projects")}
             </span>
-          </div>
-
-          {isLoadingMyProjects ? (
+          </CardHeader>
+          <CardContent>
+            {isLoadingMyProjects ? (
             <div className="space-y-3">
               {[...Array(itemsPerPage)].map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
@@ -162,20 +162,21 @@ export default function Dashboard() {
               onPageChange={setMyProjectsCurrentPage}
             />
           )}
+          </CardContent>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
+        <Card>
+          <CardHeader className="flex-row justify-between items-center space-y-0">
+            <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
               {t("dashboard:sharedWithMe")}
-            </h2>
+            </CardTitle>
             <span className="text-sm text-muted-foreground">
               {totalSharedProjectsCount} {t("dashboard:projects")}
             </span>
-          </div>
-
-          {isLoadingSharedProjects ? (
+          </CardHeader>
+          <CardContent>
+            {isLoadingSharedProjects ? (
             <div className="space-y-3">
               {[...Array(itemsPerPage)].map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
@@ -208,6 +209,7 @@ export default function Dashboard() {
               onPageChange={setSharedProjectsCurrentPage}
             />
           )}
+          </CardContent>
         </Card>
       </div>
     </div>

@@ -156,7 +156,7 @@ function SortableGroupItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center justify-between p-2 border border-border rounded bg-card mb-2 text-sm"
+      className="flex items-center justify-between p-2 border border-border rounded-sm bg-card mb-2 text-sm"
     >
       {editingGroup?.id === group.id ? (
         <EditGroupForm
@@ -171,7 +171,7 @@ function SortableGroupItem({
             <button
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded touch-none"
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded-sm touch-none"
               aria-label={`${t("common:move")} ${group.name}`}
             >
               <GripVertical

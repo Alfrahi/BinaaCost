@@ -63,8 +63,8 @@ import { useScenarioManager } from "@/hooks/useScenarioManager";
 import { useProjectSimulator } from "@/hooks/useProjectSimulator";
 import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { FinancialSummary } from "@/logic/financials";
-
-const COLORS = ["#60A5FA", "#34D399"];
+import { SCENARIO_COLORS } from "@/logic/chartPalette";
+import ChartContainer from "@/components/ChartContainer";
 
 export function ScenarioAnalysisTab({
   projectId,
@@ -315,14 +315,14 @@ export function ScenarioAnalysisTab({
           type: "bar",
           stack: "total",
           data: originalData,
-          itemStyle: { color: COLORS[0] },
+          itemStyle: { color: SCENARIO_COLORS.original },
         },
         {
           name: t("simulated"),
           type: "bar",
           stack: "total",
           data: simulatedData,
-          itemStyle: { color: COLORS[1] },
+          itemStyle: { color: SCENARIO_COLORS.simulated },
         },
       ],
     };
@@ -513,9 +513,9 @@ export function ScenarioAnalysisTab({
       </Card>
 
       {simulationResult && originalFinancials && simulatedFinancials && (
-        <Card className="p-4 sm:p-6 border-2 border-border shadow-md">
+        <Card className="border-2 border-border shadow-md">
           <CardHeader className="flex-row items-center justify-between pb-4">
-            <CardTitle className="text-lg">{t("simulationResults")}</CardTitle>
+            <CardTitle>{t("simulationResults")}</CardTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -673,19 +673,19 @@ export function ScenarioAnalysisTab({
               <h4 className="font-semibold text-base mb-2">
                 {t("costComparison")}
               </h4>
-              <div className="h-[400px] w-full">
+              <ChartContainer>
                 {/* Force LTR on chart canvas; ECharts has no native RTL support.
                     Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
                     Axis labels and legend use translated keys, so they render correctly.
                     Y-axis rotation for RTL is handled inside chartOptions. */}
-                <div dir="ltr">
+                <div dir="ltr" className="h-full w-full">
                   <ReactECharts
                     option={chartOptions}
                     style={{ height: "100%", width: "100%" }}
                     opts={{ renderer: "canvas" }}
                   />
                 </div>
-              </div>
+              </ChartContainer>
             </div>
           </CardContent>
         </Card>
@@ -822,7 +822,7 @@ export function ScenarioAnalysisTab({
                 type="checkbox"
                 id="is_public"
                 {...scenarioForm.register("is_public")}
-                className="h-4 w-4 text-primary border-input rounded focus:ring-primary"
+                className="h-4 w-4 text-primary border-input rounded-sm focus:ring-primary"
               />
               <Label htmlFor="is_public" className="text-sm">
                 {t("makePublic")}

@@ -169,7 +169,7 @@ export default function ProfitPricingSummaryCard({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-sm">
       <Card className="lg:col-span-1 shadow-sm border-border h-fit">
         <CardHeader className="bg-muted py-4 border-b">
-          <CardTitle className="text-lg flex justify-between items-center m-0">
+          <CardTitle className="flex justify-between items-center m-0">
             {t("project_detail:profit_pricing.loadingsMarkups")}
             {isDirty && (
               <Button

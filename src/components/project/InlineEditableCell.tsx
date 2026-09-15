@@ -88,7 +88,7 @@ export function InlineEditableCell({
         onBlur={commit}
         onKeyDown={handleKeyDown}
         aria-label={ariaLabel}
-        className="w-24 rounded border border-input bg-background px-2 py-1 text-end text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="w-24 rounded-sm border border-input bg-background px-2 py-1 text-end text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       />
     );
   }
@@ -101,7 +101,7 @@ export function InlineEditableCell({
       title={disabled ? undefined : "Click to edit"}
       aria-label={ariaLabel}
       className={cn(
-        "rounded px-1 py-0.5 text-end tabular-nums text-sm transition-colors",
+        "rounded-sm px-1 py-0.5 text-end tabular-nums text-sm transition-colors",
         !disabled &&
           !isSaving &&
           "hover:bg-muted hover:ring-1 hover:ring-ring cursor-text",

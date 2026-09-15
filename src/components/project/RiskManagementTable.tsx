@@ -165,7 +165,7 @@ export default function RiskManagementTable({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="p-4 border rounded bg-card space-y-3 mb-6"
+            className="p-4 border rounded-sm bg-card space-y-3 mb-6"
           >
             <h3 className="font-semibold mb-2 text-lg">
               {editingItem ? t("edit") : t("add")}
@@ -379,7 +379,7 @@ export default function RiskManagementTable({
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 bg-accent border-s-4 border-primary p-4 rounded space-y-2">
+      <div className="mt-4 bg-accent border-s-4 border-primary p-4 rounded-sm space-y-2">
         <div className="font-semibold text-accent-foreground text-base">
           {t("totalRiskContingency")}:{" "}
           <span className="text-primary">
