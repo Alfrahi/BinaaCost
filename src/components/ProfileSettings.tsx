@@ -37,6 +37,7 @@ const passwordSchema = z
   });
 
 type ProfileForm = z.infer<typeof profileSchema>;
+type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function ProfileSettings() {
   const { t } = useTranslation(["settings", "common"]);
@@ -47,14 +48,21 @@ export default function ProfileSettings() {
 
   const [email, setEmail] = useState(user?.email ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       first_name: "",
       last_name: "",
+    },
+  });
+
+  const passwordForm = useForm<PasswordForm>({
+    mode: "onChange",
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      newPassword: "",
+      confirmNewPassword: "",
     },
   });
 
@@ -89,24 +97,13 @@ export default function ProfileSettings() {
     await updateEmailMutation.mutateAsync(email);
   };
 
-  const handleUpdatePassword = async () => {
-    const result = passwordSchema.safeParse({
-      newPassword,
-      confirmNewPassword: confirmPassword,
-    });
-    if (!result.success) {
-      const errorMsg = result.error.errors[0].message;
-      toast.error(t(errorMsg));
-      return;
-    }
-
+  const handleUpdatePassword = async (values: PasswordForm) => {
     await updatePasswordMutation.mutateAsync({
       oldPassword: currentPassword,
-      newPassword,
+      newPassword: values.newPassword,
     });
     setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    passwordForm.reset();
   };
 
   return (
@@ -196,87 +193,80 @@ export default function ProfileSettings() {
 
       <Separator />
 
-      <div className="space-y-4 max-w-md">
-        <Label className="text-sm">{t("settings:profile.passwordTitle")}</Label>
-
-        <div className="space-y-2">
-          <Label htmlFor="currentPassword" className="text-sm">
-            {t("settings:profile.currentPassword")}
-          </Label>
-          <Input
-            id="currentPassword"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            aria-label={t("settings:profile.currentPassword")}
-            className="text-sm"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="newPassword" className="text-sm">
-            {t("settings:profile.newPassword")}
-          </Label>
-          <Input
-            id="newPassword"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            aria-label={t("settings:profile.newPassword")}
-            className="text-sm"
-          />
-          {passwordSchema.safeParse({
-            newPassword,
-            confirmNewPassword: newPassword,
-          }).error?.errors[0]?.message && (
-            <p className="text-sm font-medium text-destructive mt-1">
-              {t(
-                passwordSchema.safeParse({
-                  newPassword,
-                  confirmNewPassword: newPassword,
-                }).error?.errors[0]?.message ?? "",
-              )}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-sm">
-            {t("settings:profile.confirmNewPassword")}
-          </Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            aria-label={t("settings:profile.confirmNewPassword")}
-            className="text-sm"
-          />
-          {passwordSchema.safeParse({
-            newPassword,
-            confirmNewPassword: confirmPassword,
-          }).error?.errors[0]?.message && (
-            <p className="text-sm font-medium text-destructive mt-1">
-              {t(
-                passwordSchema.safeParse({
-                  newPassword,
-                  confirmNewPassword: confirmPassword,
-                }).error?.errors[0]?.message ?? "",
-              )}
-            </p>
-          )}
-        </div>
-
-        <Button
-          onClick={handleUpdatePassword}
-          disabled={updatePasswordMutation.isPending}
-          className="text-sm"
+      <Form {...passwordForm}>
+        <form
+          onSubmit={passwordForm.handleSubmit(handleUpdatePassword)}
+          className="space-y-4 max-w-md"
         >
-          {updatePasswordMutation.isPending
-            ? t("common:saving")
-            : t("settings:profile.updatePasswordButton")}
-        </Button>
-      </div>
+          <Label className="text-sm">{t("settings:profile.passwordTitle")}</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="currentPassword" className="text-sm">
+              {t("settings:profile.currentPassword")}
+            </Label>
+            <Input
+              id="currentPassword"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              aria-label={t("settings:profile.currentPassword")}
+              className="text-sm"
+            />
+          </div>
+
+          <FormField
+            control={passwordForm.control}
+            name="newPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("settings:profile.newPassword")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    aria-label={t("settings:profile.newPassword")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={passwordForm.control}
+            name="confirmNewPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("settings:profile.confirmNewPassword")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    aria-label={t("settings:profile.confirmNewPassword")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            disabled={updatePasswordMutation.isPending}
+            className="text-sm"
+          >
+            {updatePasswordMutation.isPending
+              ? t("common:saving")
+              : t("settings:profile.updatePasswordButton")}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
