@@ -59,7 +59,12 @@ export default function AdminPanel() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {adminSections.map((section) => (
-          <Link key={section.path} to={section.path} className="block">
+          <Link
+            key={section.path}
+            to={section.path}
+            className="block"
+            aria-label={section.title}
+          >
             <Card className="h-full hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">

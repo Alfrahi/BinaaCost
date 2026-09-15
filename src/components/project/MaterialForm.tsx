@@ -162,6 +162,7 @@ export function MaterialForm({
                 <FormLabel className="text-sm">{t("columns.name")}</FormLabel>
                 <FormControl>
                   <Input
+                    id="name"
                     {...field}
                     onChange={handleNameChange}
                     list="material-names"
@@ -217,6 +218,7 @@ export function MaterialForm({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    id="quantity"
                     type="number"
                     min="0"
                     {...field}
@@ -262,6 +264,7 @@ export function MaterialForm({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    id="unit_price"
                     type="number"
                     step="0.01"
                     {...field}
