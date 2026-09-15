@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit2, Trash2, Upload, ArrowLeft, Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -177,9 +178,7 @@ export default function CostItemsTable({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold">{database.name}</h2>
-            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-              {database.currency}
-            </span>
+            <Badge variant="muted">{database.currency}</Badge>
           </div>
           <p className="text-sm text-muted-foreground">{database.description}</p>
         </div>

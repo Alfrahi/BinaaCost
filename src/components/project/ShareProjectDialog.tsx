@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import EmptyState from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -144,9 +145,9 @@ export default function ShareProjectDialog({
               <h3 className="font-semibold text-lg">
                 {t("project_detail:share.internalSharing")}
               </h3>
-              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              <Badge variant="muted">
                 {t("project_detail:share.external.internal")}
-              </span>
+              </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
               {t("project_detail:share.internalSharingDescription")}

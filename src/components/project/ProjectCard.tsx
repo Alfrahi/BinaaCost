@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock, FileText, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { useProjectCardSummary } from "@/hooks/useProjectCardSummary";
@@ -51,12 +52,12 @@ export function ProjectCard({
         <div className="flex items-center justify-between gap-2">
           <div className="font-medium text-sm truncate">{name}</div>
           {isShared && (
-            <span className="inline-flex items-center gap-1 shrink-0 px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">
+            <Badge variant="muted">
               <Users className="w-3 h-3" aria-hidden="true" />
               {sharedRole
                 ? t(`roles:${sharedRole}_display`)
                 : t("dashboard:shared")}
-            </span>
+            </Badge>
           )}
         </div>
 
@@ -67,13 +68,10 @@ export function ProjectCard({
               : format(summary?.grandTotal ?? 0, currency)}
           </div>
           {summary?.isFinalized && (
-            <span
-              className="inline-flex items-center gap-1 shrink-0 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium"
-              aria-label={t("dashboard:finalized")}
-            >
+            <Badge aria-label={t("dashboard:finalized")}>
               <Lock className="w-3 h-3" aria-hidden="true" />
               {t("dashboard:finalized")}
-            </span>
+            </Badge>
           )}
         </div>
 

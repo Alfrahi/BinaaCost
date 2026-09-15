@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn, getIconMarginClass } from "@/lib/utils";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
@@ -186,7 +187,7 @@ export function LaborTable({
               className="h-11 text-sm"
               aria-label={t("common:importCsv")}
             >
-              <Upload className="w-4 h-4 me-2" aria-hidden="true" />
+              <Upload className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
               {t("common:importCsv")}
             </Button>
             <Button
@@ -194,7 +195,7 @@ export function LaborTable({
               className="h-11 text-sm"
               aria-label={t("add")}
             >
-              <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+              <Plus className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
               {t("add")}
             </Button>
           </div>

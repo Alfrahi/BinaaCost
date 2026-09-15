@@ -113,7 +113,7 @@ export default function SettingsSection({
               <Button
                 variant="ghost"
                 onClick={clearFilters}
-                className="px-3 -ml-8 text-sm"
+                className="px-3 -ms-8 text-sm"
                 aria-label={t("common:clearFilters")}
               >
                 <X className="w-4 h-4" aria-hidden="true" />

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn, getIconMarginClass } from "@/lib/utils";
 import { X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -29,7 +30,7 @@ export function BulkActionBar({
           exit={{ y: 100, opacity: 0 }}
           className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-xl px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4"
         >
-          <div className="flex items-center gap-3 border-r border-border pr-4 mr-2">
+          <div className="flex items-center gap-3 border-e border-border pe-4 me-2">
             <span className="font-semibold text-sm whitespace-nowrap">
               {count} {t("selected", "selected")}
             </span>
@@ -54,8 +55,8 @@ export function BulkActionBar({
                 className="h-11 text-sm whitespace-nowrap"
               >
                 {isSelectMode
-                  ? <Check className="w-4 h-4 me-2" />
-                  : <Check className="w-4 h-4 me-2 opacity-0" />}
+                  ? <Check className={cn("w-4 h-4", getIconMarginClass())} />
+                  : <Check className={cn("w-4 h-4 opacity-0", getIconMarginClass())} />}
                 {isSelectMode
                   ? t("project_detail:selectModeOn")
                   : t("project_detail:selectModeOff")}
