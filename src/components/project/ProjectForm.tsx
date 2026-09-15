@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useFormContext, FormProvider, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,18 +109,18 @@ export default function ProjectForm({
 
   return (
     <FormProvider {...form}>
-      <Card className="p-6">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl">
+          <CardTitle>
             {isEditing
               ? t("project_form:editProject")
               : t("project_form:createProject")}
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <CardDescription>
             {isEditing
               ? t("project_form:editProjectDescription")
               : t("project_form:createProjectDescription")}
-          </p>
+          </CardDescription>
         </CardHeader>
 
         <CardContent>

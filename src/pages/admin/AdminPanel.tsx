@@ -62,7 +62,7 @@ export default function AdminPanel() {
           <Link key={section.path} to={section.path} className="block">
             <Card className="h-full hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-lg">
+                <CardTitle className="flex items-center gap-3">
                   <section.icon className="w-6 h-6" />
                   <span>{section.title}</span>
                 </CardTitle>

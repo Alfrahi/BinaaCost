@@ -12,12 +12,12 @@ import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { ProjectCostData } from "../types";
 import { cn } from "@/lib/utils";
+import { COST_CATEGORY_COLORS } from "@/logic/chartPalette";
+import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
 
 const LazyChartContainer = React.lazy(
   () => import("@/components/ChartContainer"),
 );
-
-const CHART_COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function ProjectComparisonChart({
   projects,
@@ -38,7 +38,7 @@ export default function ProjectComparisonChart({
   return (
     <Card className={cn(className)}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
+        <CardTitle className="flex items-center gap-2">
           {t("pages:analytics.projectCost")}
           <TooltipProvider>
             <Tooltip>
@@ -55,19 +55,23 @@ export default function ProjectComparisonChart({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="max-h-[70vh] min-h-[50vh] w-full">
-          <Suspense
-            fallback={
-              <div className="h-full flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin" />
-              </div>
-            }
-          >
-            <LazyChartContainer>
+        <Suspense
+          fallback={
+            <div
+              className={cn(
+                CHART_CONTAINER_HEIGHT_CLASSES,
+                "flex items-center justify-center",
+              )}
+            >
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          }
+        >
+          <LazyChartContainer>
               {/* Force LTR on chart canvas; ECharts has no native RTL support.
                   Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
                   Axis labels and legend use translated keys, so they render correctly. */}
-              <div dir="ltr">
+              <div dir="ltr" className="h-full w-full">
                 <ReactECharts
                 option={{
                   tooltip: {
@@ -128,37 +132,36 @@ export default function ProjectComparisonChart({
                       type: "bar",
                       stack: "total",
                       data: sortedProjects.map((p) => p.materials_cost),
-                      itemStyle: { color: CHART_COLORS[0] },
+                      itemStyle: { color: COST_CATEGORY_COLORS[0] },
                     },
                     {
                       name: t("project_tabs:labor"),
                       type: "bar",
                       stack: "total",
                       data: sortedProjects.map((p) => p.labor_cost),
-                      itemStyle: { color: CHART_COLORS[1] },
+                      itemStyle: { color: COST_CATEGORY_COLORS[1] },
                     },
                     {
                       name: t("project_tabs:equipment"),
                       type: "bar",
                       stack: "total",
                       data: sortedProjects.map((p) => p.equipment_cost),
-                      itemStyle: { color: CHART_COLORS[2] },
+                      itemStyle: { color: COST_CATEGORY_COLORS[2] },
                     },
                     {
                       name: t("project_tabs:additional"),
                       type: "bar",
                       stack: "total",
                       data: sortedProjects.map((p) => p.additional_cost),
-                      itemStyle: { color: CHART_COLORS[3] },
+                      itemStyle: { color: COST_CATEGORY_COLORS[3] },
                     },
                   ],
                 }}
                 style={{ height: "100%", width: "100%" }}
               />
-              </div>
-            </LazyChartContainer>
-          </Suspense>
-        </div>
+            </div>
+          </LazyChartContainer>
+        </Suspense>
       </CardContent>
     </Card>
   );

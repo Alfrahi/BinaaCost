@@ -145,7 +145,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
                     {format(cat.value, project.currency)}
                   </span>
                 </div>
-                <div className="h-2 w-full rounded bg-muted overflow-hidden">
+                <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
                   <div
                     className="h-full bg-primary"
                     style={{

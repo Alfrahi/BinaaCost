@@ -42,7 +42,7 @@ export default function OfflineSyncIndicator() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 px-2 py-1 rounded bg-muted text-muted-foreground text-xs font-medium">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-sm bg-muted text-muted-foreground text-xs font-medium">
                 <CloudOff className="w-3 h-3" />
                 <span>{t("offlineLabel")}</span>
               </div>
@@ -94,7 +94,7 @@ export default function OfflineSyncIndicator() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 px-2 py-1 rounded bg-destructive/10 text-destructive text-xs font-medium">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-sm bg-destructive/10 text-destructive text-xs font-medium">
                 <CloudOff className="w-3 h-3" />
                 <span>{t("failedChanges", { count: deadLetterCount })}</span>
               </div>

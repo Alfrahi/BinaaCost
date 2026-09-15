@@ -272,7 +272,7 @@ export default function SettingsSection({
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-destructive/10 p-3 rounded border border-destructive/20">
+              <div className="bg-destructive/10 p-3 rounded-sm border border-destructive/20">
                 <div className="font-semibold text-destructive mb-1">
                   {t("admin:dropdowns.oldValue")}
                 </div>
@@ -303,7 +303,7 @@ export default function SettingsSection({
                 />
               </div>
 
-              <div className="bg-muted p-3 rounded border border-border">
+              <div className="bg-muted p-3 rounded-sm border border-border">
                 <div className="font-semibold text-foreground mb-1">
                   {t("admin:dropdowns.newValue")}
                 </div>
