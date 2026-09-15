@@ -165,7 +165,7 @@ export default function CommentsDrawer({
         <SheetHeader
           className={cn(
             "p-6 border-b border-border",
-            isRtl ? "sm:text-right" : "sm:text-left",
+            "sm:text-start",
           )}
         >
           <SheetTitle className="flex items-center gap-2 text-xl font-semibold text-foreground">
@@ -175,7 +175,7 @@ export default function CommentsDrawer({
           <SheetDescription
             className={cn(
               "text-sm text-muted-foreground pt-2",
-              isRtl ? "sm:text-right" : "sm:text-left",
+              "sm:text-start",
             )}
           >
             {t("common:commentCount", { count: comments.length })}
@@ -293,7 +293,7 @@ export default function CommentsDrawer({
           {showScrollToBottom && (
             <Button
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 rounded-full shadow-lg text-sm"
+              className="absolute bottom-4 end-4 rounded-full shadow-lg text-sm"
               size="sm"
             >
               <ArrowDownCircle className="w-4 h-4 ms-2" />

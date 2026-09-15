@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -172,22 +173,23 @@ export default function ReportsTab({
   const sanitizedTerms = useMemo(() => sanitizeText(terms) || "", [terms]);
 
   const reportTabItems = useMemo(
-    () => [
-      {
-        value: "project-cost",
-        labelKey: "project_reports:detailedCostReport",
-        icon: DollarSign,
-        badgeKey: "project_reports:internalLabel",
-        badgeClass: "bg-muted text-muted-foreground",
-      },
-      {
-        value: "client-proposal",
-        labelKey: "project_reports:clientProposal",
-        icon: Users,
-        badgeKey: "project_reports:clientFacingLabel",
-        badgeClass: "bg-primary/10 text-primary",
-      },
-    ],
+    () =>
+      [
+        {
+          value: "project-cost",
+          labelKey: "project_reports:detailedCostReport",
+          icon: DollarSign,
+          badgeKey: "project_reports:internalLabel",
+          badgeVariant: "muted",
+        },
+        {
+          value: "client-proposal",
+          labelKey: "project_reports:clientProposal",
+          icon: Users,
+          badgeKey: "project_reports:clientFacingLabel",
+          badgeVariant: "default",
+        },
+      ] as const,
     [],
   );
 
@@ -252,14 +254,9 @@ export default function ReportsTab({
                     >
                       <item.icon className="w-4 h-4" />
                       {t(item.labelKey)}
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                          item.badgeClass,
-                        )}
-                      >
+                      <Badge variant={item.badgeVariant}>
                         {t(item.badgeKey)}
-                      </span>
+                      </Badge>
                     </TabsTrigger>
                   ))}
                 </TabsList>

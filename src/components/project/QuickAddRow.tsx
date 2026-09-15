@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, getIconMarginClass } from "@/lib/utils";
 
 export interface QuickAddField {
   key: string;
@@ -141,7 +141,7 @@ export function QuickAddRow({
           className="h-11 px-4 text-sm"
           aria-label={ariaLabel}
         >
-          <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+          <Plus className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
           {submitLabel}
         </Button>
         <Button

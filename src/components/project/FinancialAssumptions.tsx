@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   FinancialSettings,
@@ -45,12 +46,9 @@ export function FinancialAssumptionsStrip({ settings, className }: StripProps) {
         {t("project_detail:profit_pricing.assumptions")}:
       </span>
       {items.map((item) => (
-        <span
-          key={item.label}
-          className="rounded-full bg-muted px-2 py-1 tabular-nums text-muted-foreground"
-        >
+        <Badge key={item.label} variant="muted" className="tabular-nums">
           {item.label} {item.value ?? 0}%
-        </span>
+        </Badge>
       ))}
     </div>
   );

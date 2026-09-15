@@ -11,6 +11,7 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { FinancialSummary } from "@/logic/financials";
 import { calculateItemCost, calculateCategoryTotal } from "@/logic/shared";
@@ -267,9 +268,9 @@ export const ProjectCostReport = React.forwardRef<
             <h2 className="text-3xl font-extrabold text-primary mb-2">
               {t("project_reports:projectCostReport")}
             </h2>
-            <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground mb-2">
+            <Badge variant="muted" className="mb-2">
               {t("project_reports:internalLabel")}
-            </span>
+            </Badge>
             <p className="text-lg font-semibold text-foreground">
               {project.name}
             </p>

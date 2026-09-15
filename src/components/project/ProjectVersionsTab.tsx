@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
@@ -37,7 +38,7 @@ import {
   computeVersionDelta,
 } from "@/logic/versionCosts";
 import VersionComparison from "./VersionComparison";
-import { cn } from "@/lib/utils";
+import { cn, getIconMarginClass } from "@/lib/utils";
 
 export default function ProjectVersionsTab({
   projectId,
@@ -390,9 +391,9 @@ export default function ProjectVersionsTab({
               aria-label={t("create")}
             >
               {isCreatingVersion ? (
-                <Loader2 className="w-4 h-4 animate-spin me-2" />
+                <Loader2 className={cn("w-4 h-4 animate-spin", getIconMarginClass())} />
               ) : (
-                <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+                <Plus className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
               )}
               {t("create")}
             </Button>
@@ -415,7 +416,7 @@ export default function ProjectVersionsTab({
               className="h-9 text-sm"
               aria-label={t("compare")}
             >
-              <GitCompareArrows className="w-4 h-4 me-2" aria-hidden="true" />
+              <GitCompareArrows className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
               {t("compare")}
             </Button>
           )}
@@ -451,21 +452,18 @@ export default function ProjectVersionsTab({
                           {version.name}
                         </span>
                         {isCurrent && (
-                          <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium"
+                          <Badge
+                            variant="success"
                             aria-label={t("currentBadge")}
                           >
                             {t("currentBadge")}
-                          </span>
+                          </Badge>
                         )}
                         {version.is_final && (
-                          <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium"
-                            aria-label={t("finalizedBadge")}
-                          >
+                          <Badge aria-label={t("finalizedBadge")}>
                             <Lock className="w-3 h-3" aria-hidden="true" />
                             {t("finalizedBadge")}
-                          </span>
+                          </Badge>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">

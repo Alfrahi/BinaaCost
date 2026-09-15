@@ -75,22 +75,6 @@
        ================================ */
 
     @layer components {
-      input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']) {
-        /* Removed fixed height to allow for more flexible sizing */
-        padding-top: 0.625rem !important; /* py-2.5 */
-        padding-bottom: 0.625rem !important;
-      }
-
-      button[role="combobox"] {
-        /* Removed fixed height to allow for more flexible sizing */
-        padding-top: 0.625rem !important; /* py-2.5 */
-        padding-bottom: 0.625rem !important;
-        padding-left: 0.75rem !important; /* px-3 */
-        padding-right: 0.75rem !important;
-        font-size: 0.875rem !important; /* text-sm */
-        line-height: 1.25rem !important;
-      }
-
       table th,
       table td {
         @apply align-middle numeric;

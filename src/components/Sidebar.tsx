@@ -21,7 +21,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { useAuth } from "./AuthProvider";
 import { useRole } from "@/hooks/useRole";
-import { cn } from "@/lib/utils";
+import { cn, getIconMarginClass } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useMobile";
 
 interface SidebarProps {
@@ -256,12 +256,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                 isCollapsed ? (
                   <ChevronLeft className="h-5 w-5" />
                 ) : (
-                  <ChevronRight className="h-5 w-5 me-2" />
+                  <ChevronRight className={cn("h-5 w-5", getIconMarginClass())} />
                 )
               ) : isCollapsed ? (
                 <ChevronRight className="h-5 w-5" />
               ) : (
-                <ChevronLeft className="h-5 w-5 me-2" />
+                <ChevronLeft className={cn("h-5 w-5", getIconMarginClass())} />
               )}
               {!isCollapsed && (
                 <span className="whitespace-nowrap">
