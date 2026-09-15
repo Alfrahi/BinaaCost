@@ -70,7 +70,7 @@ export default function SubscriptionManagement() {
     <div className="space-y-6 text-sm">
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle>
             {t("admin:subscriptionManagement.searchTitle")}
           </CardTitle>
         </CardHeader>

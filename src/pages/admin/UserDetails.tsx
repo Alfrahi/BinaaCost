@@ -119,7 +119,7 @@ export default function UserDetails() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle className="text-lg">
+            <CardTitle>
               {t("admin:users.userDetails")}
             </CardTitle>
           </CardHeader>
@@ -180,7 +180,7 @@ export default function UserDetails() {
 
             <TabsContent value="projects" className="mt-4">
               <CardHeader>
-                <CardTitle className="text-lg">
+                <CardTitle>
                   {t("admin:users.projects")}
                 </CardTitle>
               </CardHeader>
@@ -239,7 +239,7 @@ export default function UserDetails() {
 
             <TabsContent value="activity" className="mt-4">
               <CardHeader>
-                <CardTitle className="text-lg">
+                <CardTitle>
                   {t("admin:users.activity")}
                 </CardTitle>
               </CardHeader>

@@ -1,4 +1,8 @@
 import { safeAdd } from "@/utils/math";
+import {
+  COST_CATEGORY_COLORS,
+  CHART_EMPHASIS_SHADOW,
+} from "@/logic/chartPalette";
 
 export interface CostCategoryTotals {
   materialsTotal: number;
@@ -11,8 +15,6 @@ export interface ChartDataItem {
   name: string;
   value: number;
 }
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export function prepareProjectChartData(
   totals: CostCategoryTotals,
@@ -60,7 +62,7 @@ export function getPieChartOptions(
           itemStyle: {
             shadowBlur: 10,
             shadowOffsetX: 0,
-            shadowColor: "rgba(0, 0, 0, 0.5)",
+            shadowColor: CHART_EMPHASIS_SHADOW,
           },
         },
       },
@@ -110,7 +112,10 @@ export function getBarChartOptions(
         type: "bar",
         data: chartData.map((item) => item.value),
         itemStyle: {
-          color: (params: any) => COLORS[params.dataIndex % COLORS.length],
+          color: (params: any) =>
+            COST_CATEGORY_COLORS[
+              params.dataIndex % COST_CATEGORY_COLORS.length
+            ],
         },
       },
     ],

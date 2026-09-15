@@ -245,7 +245,7 @@ export function AdditionalCostsTable({
         />
       )}
       {isFormOpen && (
-        <div className="p-4 border rounded bg-card mb-4">
+        <div className="p-4 border rounded-sm bg-card mb-4">
           <h3 className="text-lg font-semibold mb-4">
             {editingItem ? t("edit") : t("add")}
           </h3>

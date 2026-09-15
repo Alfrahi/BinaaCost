@@ -40,7 +40,7 @@ export default function AppSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle>
             {t("admin:appSettings.userSignup")}
           </CardTitle>
         </CardHeader>

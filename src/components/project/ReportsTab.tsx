@@ -205,7 +205,7 @@ export default function ReportsTab({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle>
             {t("project_reports:tabTitle")}
           </CardTitle>
         </CardHeader>

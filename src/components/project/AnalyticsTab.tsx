@@ -15,6 +15,8 @@ import {
   getPieChartOptions,
   getBarChartOptions,
 } from "@/logic/analytics";
+import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
+import { cn } from "@/lib/utils";
 
 const LazyChartContainer = React.lazy(
   () => import("@/components/ChartContainer"),
@@ -59,7 +61,7 @@ export default function AnalyticsTab({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2">
             {t("project_detail:analytics.costBreakdown")}
             <TooltipProvider>
               <Tooltip>
@@ -109,14 +111,14 @@ export default function AnalyticsTab({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle>
             {t("project_detail:analytics.costDistribution")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Suspense
             fallback={
-              <div className="h-[320px] sm:h-[360px] lg:h-[400px] flex items-center justify-center">
+              <div className={cn(CHART_CONTAINER_HEIGHT_CLASSES,"flex items-center justify-center")}>
                 <Loader2 className="w-6 h-6 animate-spin" />
               </div>
             }
@@ -125,7 +127,7 @@ export default function AnalyticsTab({
               {/* Force LTR on chart canvas; ECharts has no native RTL support.
                   Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
                   Axis labels and legend use translated keys, so they render correctly. */}
-              <div dir="ltr">
+              <div dir="ltr" className="h-full w-full">
                 <ReactECharts
                   option={pieChartOptions}
                   style={{ height: "100%", width: "100%" }}
@@ -138,14 +140,14 @@ export default function AnalyticsTab({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle>
             {t("project_detail:analytics.totalCost")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Suspense
             fallback={
-              <div className="h-[320px] sm:h-[360px] lg:h-[400px] flex items-center justify-center">
+              <div className={cn(CHART_CONTAINER_HEIGHT_CLASSES,"flex items-center justify-center")}>
                 <Loader2 className="w-6 h-6 animate-spin" />
               </div>
             }
@@ -154,7 +156,7 @@ export default function AnalyticsTab({
               {/* Force LTR on chart canvas; ECharts has no native RTL support.
                   Wrapping in dir="ltr" prevents browser RTL mirroring of the canvas.
                   Axis labels and legend use translated keys, so they render correctly. */}
-              <div dir="ltr">
+              <div dir="ltr" className="h-full w-full">
                 <ReactECharts
                   option={barChartOptions}
                   style={{ height: "100%", width: "100%" }}
