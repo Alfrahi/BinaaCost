@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import { PackagePlus, Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -152,9 +153,7 @@ export function AssemblyIntegrationRow({
                   {t("project_detail:assembly_importer.itemsInAssembly")}: {totalItems}
                 </div>
                 {isLoadingItems ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  </div>
+                  <LoadingState />
                 ) : previewItems.length === 0 ? (
                   <EmptyState message={t("project_detail:assembly_importer.noItemsOfType")} />
                 ) : (

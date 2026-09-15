@@ -33,6 +33,7 @@ import {
   Settings,
 } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
+import LoadingState from "@/components/ui/LoadingState";
 import { useAuth } from "@/components/AuthProvider";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import {
@@ -715,9 +716,7 @@ export function ScenarioAnalysisTab({
               {t("existingScenarios")}
             </h4>
             {isLoadingScenarios ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="w-6 h-6 animate-spin" />
-              </div>
+              <LoadingState />
             ) : scenarios.length === 0 ? (
               <EmptyState message={t("noScenarios")} />
             ) : (
@@ -800,7 +799,7 @@ export function ScenarioAnalysisTab({
                 className="text-sm"
               />
               {scenarioForm.formState.errors.name && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(scenarioForm.formState.errors.name.message!)}
                 </p>
               )}
@@ -840,7 +839,7 @@ export function ScenarioAnalysisTab({
             </div>
             <h4 className="font-semibold text-base mt-6">{t("impactRules")}</h4>
             {scenarioForm.formState.errors.impact_rules && (
-              <p className="text-destructive text-xs mt-1">
+              <p className="text-sm font-medium text-destructive mt-1">
                 {t(scenarioForm.formState.errors.impact_rules.message!)}
               </p>
             )}
@@ -912,7 +911,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.item_type && (
-                        <p className="text-destructive text-xs mt-1">
+                        <p className="text-sm font-medium text-destructive mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.item_type?.message ?? "",
@@ -954,7 +953,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.field && (
-                        <p className="text-destructive text-xs mt-1">
+                        <p className="text-sm font-medium text-destructive mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.field?.message ?? "",
@@ -995,7 +994,7 @@ export function ScenarioAnalysisTab({
                       </Select>
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.adjustment_type && (
-                        <p className="text-destructive text-xs mt-1">
+                        <p className="text-sm font-medium text-destructive mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.adjustment_type?.message ?? "",
@@ -1032,7 +1031,7 @@ export function ScenarioAnalysisTab({
                       )}
                       {scenarioForm.formState.errors.impact_rules?.[index]
                         ?.value && (
-                        <p className="text-destructive text-xs mt-1">
+                        <p className="text-sm font-medium text-destructive mt-1">
                           {t(
                             scenarioForm.formState.errors.impact_rules[index]
                               ?.value?.message ?? "",

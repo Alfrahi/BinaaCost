@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Loader2, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useOfflinePb } from "@/hooks/useOfflinePb";
 import { sanitizeText } from "@/utils/sanitizeText";
@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import React from "react";
 
 interface AuditLog {
@@ -159,16 +161,13 @@ export default function AuditLogs() {
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-8 text-sm">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+                    <LoadingState />
                   </TableCell>
                 </TableRow>
               ) : logs?.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center py-8 text-muted-foreground text-sm"
-                  >
-                    {t("admin:auditLogs.noLogsFound")}
+                  <TableCell colSpan={4}>
+                    <EmptyState message={t("admin:auditLogs.noLogsFound")} />
                   </TableCell>
                 </TableRow>
               ) : (

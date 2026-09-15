@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface MobileItemCardProps {
   name: string;
@@ -24,6 +25,7 @@ export function MobileItemCard({
   isOwner,
   actions,
 }: MobileItemCardProps) {
+  const { t } = useTranslation("common");
   return (
     <div
       className={cn(
@@ -36,7 +38,7 @@ export function MobileItemCard({
           <Checkbox
             checked={selected}
             onCheckedChange={onToggle}
-            aria-label={`Select ${name}`}
+            aria-label={`${t("select")} ${name}`}
             className="mt-1"
           />
         )}

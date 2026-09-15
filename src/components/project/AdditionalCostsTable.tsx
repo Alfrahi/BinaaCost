@@ -375,7 +375,7 @@ export function AdditionalCostsTable({
         onConfirm={() =>
           handleBulkDeleteAdditionalCosts(Array.from(selection.selectedIds))
         }
-        itemName={`${selection.count} items`}
+        itemName={t("common:item", { count: selection.count })}
         loading={isBulkDeletingAdditionalCosts}
       />
       <BulkMoveDialog

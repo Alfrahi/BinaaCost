@@ -257,7 +257,7 @@ export default function LibraryEquipmentManager() {
               </Label>
               <Input id="name" {...form.register("name")} className="text-sm" />
               {form.formState.errors.name && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.name.message!)}
                 </p>
               )}
@@ -286,7 +286,7 @@ export default function LibraryEquipmentManager() {
                 className="text-sm"
               />
               {form.formState.errors.rental_or_purchase && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.rental_or_purchase.message!)}
                 </p>
               )}
@@ -306,7 +306,7 @@ export default function LibraryEquipmentManager() {
                 className="text-sm"
               />
               {form.formState.errors.cost_per_period && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.cost_per_period.message!)}
                 </p>
               )}
@@ -325,7 +325,7 @@ export default function LibraryEquipmentManager() {
                   className="text-sm"
                 />
                 {form.formState.errors.period_unit && (
-                  <p className="text-destructive text-xs mt-1">
+                  <p className="text-sm font-medium text-destructive mt-1">
                     {t(form.formState.errors.period_unit.message!)}
                   </p>
                 )}

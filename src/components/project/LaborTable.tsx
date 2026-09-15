@@ -399,7 +399,7 @@ export function LaborTable({
         onConfirm={() =>
           handleBulkDeleteLabor(Array.from(selection.selectedIds))
         }
-        itemName={`${selection.count} items`}
+        itemName={t("common:item", { count: selection.count })}
         loading={isBulkDeletingLabor}
       />
       <BulkMoveDialog
