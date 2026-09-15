@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/ui/heading";
 
 const NotFound = () => {
   const location = useLocation();
@@ -16,7 +17,9 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
+        <Heading level={1} className="mb-4">
+          404
+        </Heading>
         <p className="text-xl text-muted-foreground mb-4">
           {t("pageNotFound")}
         </p>

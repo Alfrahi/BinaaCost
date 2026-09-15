@@ -56,7 +56,7 @@ export default function Breadcrumbs() {
   };
 
   return (
-    <nav className="text-sm text-muted-foreground mb-2" aria-label="Breadcrumb">
+    <nav className="text-sm text-muted-foreground mb-2" aria-label={t("common:breadcrumb")}>
       <ol className="flex flex-wrap gap-1 items-center">
         <li>
           <Link to="/" className="hover:underline">

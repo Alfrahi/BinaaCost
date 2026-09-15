@@ -235,7 +235,7 @@ export default function LibraryMaterialsManager() {
               </Label>
               <Input id="name" {...form.register("name")} className="text-sm" />
               {form.formState.errors.name && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.name.message!)}
                 </p>
               )}
@@ -263,7 +263,7 @@ export default function LibraryMaterialsManager() {
                 className="text-sm"
               />
               {form.formState.errors.unit && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.unit.message!)}
                 </p>
               )}
@@ -280,7 +280,7 @@ export default function LibraryMaterialsManager() {
                 className="text-sm"
               />
               {form.formState.errors.unit_price && (
-                <p className="text-destructive text-xs mt-1">
+                <p className="text-sm font-medium text-destructive mt-1">
                   {t(form.formState.errors.unit_price.message!)}
                 </p>
               )}

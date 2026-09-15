@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn, getIconMarginClass } from "@/lib/utils";
 
 export interface QuickAddField {
@@ -156,9 +157,9 @@ export function QuickAddRow({
         </Button>
       </div>
       {error && (
-        <p role="alert" className="text-sm text-destructive mt-2">
-          {error}
-        </p>
+        <Alert variant="destructive" className="mt-2">
+          <AlertDescription className="text-sm">{error}</AlertDescription>
+        </Alert>
       )}
     </div>
   );

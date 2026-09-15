@@ -28,6 +28,7 @@ import {
 import { calculateRiskContingency } from "@/logic/risk";
 import { calculateCategoryTotal } from "@/logic/shared";
 import { Risk } from "@/types/project-items";
+import EmptyState from "@/components/ui/EmptyState";
 import { useProjectRisks } from "@/hooks/useProjectRisks";
 
 const riskSchema = z.object({
@@ -368,11 +369,8 @@ export default function RiskManagementTable({
             ))}
             {risks.length === 0 && (
               <TableRow>
-                <TableCell
-                  colSpan={canEdit ? 6 : 5}
-                  className="text-center py-8 text-muted-foreground text-sm"
-                >
-                  {t("noItems")}
+                <TableCell colSpan={canEdit ? 6 : 5}>
+                  <EmptyState message={t("noItems")} />
                 </TableCell>
               </TableRow>
             )}

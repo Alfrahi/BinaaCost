@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Heading } from "@/components/ui/heading";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { FinancialSummary } from "@/logic/financials";
 import { sanitizeHtml } from "@/utils/sanitizeText";
@@ -52,9 +53,7 @@ export const ClientProposalReport = React.forwardRef<
                 className="h-12 mb-2"
               />
             )}
-            <h1 className="text-2xl font-bold text-foreground">
-              {companyInfo.name}
-            </h1>
+            <Heading level={1}>{companyInfo.name}</Heading>
             <p className="text-sm text-muted-foreground">{companyInfo.website}</p>
             <p className="text-sm text-muted-foreground">{companyInfo.email}</p>
           </div>

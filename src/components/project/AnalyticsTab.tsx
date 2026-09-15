@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactECharts from "echarts-for-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { useTranslation } from "react-i18next";
-import { Info, Loader2 } from "lucide-react";
+import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -17,6 +17,7 @@ import {
 } from "@/logic/analytics";
 import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
 import { cn } from "@/lib/utils";
+import LoadingState from "@/components/ui/LoadingState";
 
 const LazyChartContainer = React.lazy(
   () => import("@/components/ChartContainer"),
@@ -119,7 +120,7 @@ export default function AnalyticsTab({
           <Suspense
             fallback={
               <div className={cn(CHART_CONTAINER_HEIGHT_CLASSES,"flex items-center justify-center")}>
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <LoadingState className="py-0" />
               </div>
             }
           >
@@ -148,7 +149,7 @@ export default function AnalyticsTab({
           <Suspense
             fallback={
               <div className={cn(CHART_CONTAINER_HEIGHT_CLASSES,"flex items-center justify-center")}>
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <LoadingState className="py-0" />
               </div>
             }
           >

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -18,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
 import {
@@ -162,9 +163,7 @@ export default function ShareProjectDialog({
                 {t("project_detail:share.existingShares")}
               </h4>
               {isLoadingInternalShares ? (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                </div>
+                <LoadingState />
               ) : internalShares.length === 0 ? (
                 <EmptyState message={t("project_detail:share.noShares")} />
               ) : (
@@ -213,9 +212,7 @@ export default function ShareProjectDialog({
               {t("project_detail:share.external.existingLinks")}
             </h4>
             {isLoadingExternalLinks ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="w-6 h-6 animate-spin" />
-              </div>
+              <LoadingState />
             ) : externalLinks.length === 0 ? (
               <EmptyState message={t("project_detail:share.external.noLinks")} />
             ) : (

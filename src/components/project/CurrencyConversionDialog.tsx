@@ -1,16 +1,5 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
-import { cn, getIconMarginClass } from "@/lib/utils";
 
 interface CurrencyConversionDialogProps {
   open: boolean;
@@ -34,41 +23,27 @@ export function CurrencyConversionDialog({
   const { t } = useTranslation(["common"]);
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t("currencyConversionWarningTitle")}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {t("currencyConversionWarningDescription", {
-              oldCurrency: originalCurrency,
-              newCurrency: pendingNewCurrency,
-            })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel} disabled={isConverting}>
-            {t("common:cancel")}
-          </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={isConverting}>
-            {isConverting ? (
-              <>
-                <Loader2
-                  className={cn(
-                    "w-4 h-4",
-                    getIconMarginClass(),
-                    "animate-spin",
-                  )}
-                />
-                {t("common:converting")}
-              </>
-            ) : (
-              t("common:continue")
-            )}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onCancel();
+        onOpenChange(nextOpen);
+      }}
+      onConfirm={onConfirm}
+      title={t("currencyConversionWarningTitle")}
+      body={
+        <p>
+          {t("currencyConversionWarningDescription", {
+            oldCurrency: originalCurrency,
+            newCurrency: pendingNewCurrency,
+          })}
+        </p>
+      }
+      confirmLabel={
+        isConverting ? t("common:converting") : t("common:continue")
+      }
+      cancelLabel={t("common:cancel")}
+      loading={isConverting}
+    />
   );
 }
