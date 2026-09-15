@@ -208,6 +208,7 @@ export default function Login() {
                     <FormLabel>{t("emailLabel")}</FormLabel>
                     <FormControl>
                       <Input
+                        id="email"
                         type="email"
                         placeholder={t("emailPlaceholder")}
                         {...field}
@@ -225,6 +226,7 @@ export default function Login() {
                     <FormLabel>{t("passwordLabel")}</FormLabel>
                     <FormControl>
                       <Input
+                        id="password"
                         type="password"
                         placeholder={t("passwordPlaceholder")}
                         {...field}
@@ -253,6 +255,7 @@ export default function Login() {
                     <FormLabel>{t("emailLabel")}</FormLabel>
                     <FormControl>
                       <Input
+                        id="signup-email"
                         type="email"
                         placeholder={t("emailPlaceholder")}
                         {...field}
@@ -270,6 +273,7 @@ export default function Login() {
                     <FormLabel>{t("passwordLabel")}</FormLabel>
                     <FormControl>
                       <Input
+                        id="signup-password"
                         type="password"
                         placeholder={t("passwordPlaceholder")}
                         {...field}
@@ -287,6 +291,7 @@ export default function Login() {
                     <FormLabel>{t("passwordLabel")}</FormLabel>
                     <FormControl>
                       <Input
+                        id="signup-confirm"
                         type="password"
                         placeholder={t("passwordPlaceholder")}
                         {...field}
