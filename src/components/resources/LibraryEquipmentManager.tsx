@@ -1,8 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Plus, Edit2, Trash2, Copy, Trash, X } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
@@ -250,105 +257,126 @@ export default function LibraryEquipmentManager() {
               <X className="w-4 h-4" aria-hidden="true" />
             </Button>
           </div>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-sm font-medium">
-                {t("resources:equipment.name")}
-              </Label>
-              <Input id="name" {...form.register("name")} className="text-sm" />
-              {form.formState.errors.name && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.name.message!)}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="type" className="text-sm font-medium">
-                {t("resources:equipment.type")}
-              </Label>
-              <Input id="type" {...form.register("type")} className="text-sm" />
-            </div>
-            <div>
-              <Label
-                htmlFor="rental_or_purchase"
-                className="text-sm font-medium"
-              >
-                {t("resources:equipment.rentalPurchase")}
-              </Label>
-              <TranslatedSelect
-                value={rentalOrPurchase}
-                onValueChange={(value) =>
-                  form.setValue("rental_or_purchase", value)
-                }
-                options={rentalOptions}
-                isLoading={isLoadingRentalOptions}
-                placeholder={t("resources:equipment.rentalPurchasePlaceholder")}
-                className="text-sm"
-              />
-              {form.formState.errors.rental_or_purchase && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.rental_or_purchase.message!)}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="cost_per_period" className="text-sm font-medium">
-                {isPurchase
-                  ? t("resources:equipment.purchaseCost")
-                  : t("resources:equipment.costPerPeriod")}{" "}
-                (USD)
-              </Label>
-              <Input
-                id="cost_per_period"
-                type="number"
-                step="0.01"
-                {...form.register("cost_per_period")}
-                className="text-sm"
-              />
-              {form.formState.errors.cost_per_period && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.cost_per_period.message!)}
-                </p>
-              )}
-            </div>
-            {!isPurchase && (
-              <div>
-                <Label htmlFor="period_unit" className="text-sm font-medium">
-                  {t("resources:equipment.periodUnit")}
-                </Label>
-                <TranslatedSelect
-                  value={form.watch("period_unit")}
-                  onValueChange={(value) => form.setValue("period_unit", value)}
-                  options={periodUnits}
-                  isLoading={isLoadingPeriodUnits}
-                  placeholder={t("resources:equipment.periodUnitPlaceholder")}
-                  className="text-sm"
-                />
-                {form.formState.errors.period_unit && (
-                  <p className="text-sm font-medium text-destructive mt-1">
-                    {t(form.formState.errors.period_unit.message!)}
-                  </p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:equipment.name")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} className="text-sm" />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:equipment.type")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} className="text-sm" />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="rental_or_purchase"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:equipment.rentalPurchase")}
+                    </FormLabel>
+                    <FormControl>
+                      <TranslatedSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={rentalOptions}
+                        isLoading={isLoadingRentalOptions}
+                        placeholder={t("resources:equipment.rentalPurchasePlaceholder")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cost_per_period"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {isPurchase
+                        ? t("resources:equipment.purchaseCost")
+                        : t("resources:equipment.costPerPeriod")}{" "}
+                      (USD)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        step="0.01"
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
+              {!isPurchase && (
+                <FormField
+                  control={form.control}
+                  name="period_unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        {t("resources:equipment.periodUnit")}
+                      </FormLabel>
+                      <FormControl>
+                        <TranslatedSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={periodUnits}
+                          isLoading={isLoadingPeriodUnits}
+                          placeholder={t("resources:equipment.periodUnitPlaceholder")}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-sm" />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  className="text-sm"
+                >
+                  {t("common:cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createItem.isPending || updateItem.isPending}
+                  className="text-sm"
+                >
+                  {t("common:save")}
+                </Button>
               </div>
-            )}
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="text-sm"
-              >
-                {t("common:cancel")}
-              </Button>
-              <Button
-                type="submit"
-                disabled={createItem.isPending || updateItem.isPending}
-                className="text-sm"
-              >
-                {t("common:save")}
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </div>
       )}
 

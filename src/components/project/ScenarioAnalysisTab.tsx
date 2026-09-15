@@ -47,6 +47,14 @@ import { useForm } from "react-hook-form";
 import ReactECharts from "echarts-for-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -784,48 +792,70 @@ export function ScenarioAnalysisTab({
               {editingScenario ? t("editScenario") : t("createScenario")}
             </DialogTitle>
           </DialogHeader>
-          <form
-            onSubmit={scenarioForm.handleSubmit(handleScenarioFormSubmit)}
-            className="space-y-4 py-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="scenario-name" className="text-sm">
-                {t("name")}
-              </Label>
-              <Input
-                id="scenario-name"
-                {...scenarioForm.register("name")}
-                placeholder={t("namePlaceholder")}
-                className="text-sm"
+          <Form {...scenarioForm}>
+            <form
+              onSubmit={scenarioForm.handleSubmit(handleScenarioFormSubmit)}
+              className="space-y-4 py-4"
+            >
+              <FormField
+                control={scenarioForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("name")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("namePlaceholder")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
               />
-              {scenarioForm.formState.errors.name && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(scenarioForm.formState.errors.name.message!)}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="scenario-description" className="text-sm">
-                {t("description")}
-              </Label>
-              <Textarea
-                id="scenario-description"
-                {...scenarioForm.register("description")}
-                placeholder={t("descriptionPlaceholder")}
-                rows={3}
-                className="text-sm"
+              <FormField
+                control={scenarioForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">
+                      {t("description")}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value ?? ""}
+                        placeholder={t("descriptionPlaceholder")}
+                        rows={3}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="is_public"
-                {...scenarioForm.register("is_public")}
-                className="h-4 w-4 text-primary border-input rounded-sm focus:ring-primary"
+              <FormField
+                control={scenarioForm.control}
+                name="is_public"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-2">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        className="h-4 w-4 text-primary border-input rounded-sm focus:ring-primary"
+                      />
+                    </FormControl>
+                    <FormLabel className="text-sm">
+                      {t("makePublic")}
+                    </FormLabel>
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="is_public" className="text-sm">
-                {t("makePublic")}
-              </Label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -836,7 +866,6 @@ export function ScenarioAnalysisTab({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </div>
             <h4 className="font-semibold text-base mt-6">{t("impactRules")}</h4>
             {scenarioForm.formState.errors.impact_rules && (
               <p className="text-sm font-medium text-destructive mt-1">
@@ -1119,6 +1148,7 @@ export function ScenarioAnalysisTab({
               </Button>
             </DialogFooter>
           </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

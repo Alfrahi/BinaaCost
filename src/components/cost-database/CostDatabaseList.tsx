@@ -9,6 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useCostDatabases } from "@/hooks/useCostDatabases";
 import { useSettingsOptions } from "@/hooks/useSettingsOptions";
 import { sanitizeText } from "@/utils/sanitizeText";
@@ -282,72 +290,98 @@ export default function CostDatabaseList({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="space-y-4"
-              >
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("common:name")}
-                  </label>
-                  <Input {...form.register("name")} />
-                  {form.formState.errors.name && (
-                    <p className="text-sm font-medium text-destructive mt-1">
-                      {t(form.formState.errors.name.message!)}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("common:description")}
-                  </label>
-                  <Textarea {...form.register("description")} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("common:currency")}
-                  </label>
-                  <TranslatedSelect
-                    value={form.watch("currency")}
-                    onValueChange={(val) => form.setValue("currency", val)}
-                    options={currencies}
-                    isLoading={isLoadingCurrencies}
-                    placeholder={t("pages:cost_databases.selectCurrency")}
-                    aria-label={t("common:currency")}
-                    className="text-sm"
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">
+                          {t("common:name")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
                   />
-                  {form.formState.errors.currency && (
-                    <p className="text-sm font-medium text-destructive mt-1">
-                      {t(form.formState.errors.currency.message!)}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="is_public"
-                    checked={form.watch("is_public")}
-                    onCheckedChange={(checked) =>
-                      form.setValue("is_public", Boolean(checked))
-                    }
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">
+                          {t("common:description")}
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
                   />
-                  <label htmlFor="is_public" className="text-sm">
-                    {t("pages:cost_databases.public")}
-                  </label>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEditingId(null)}
-                  >
-                    <X className="ms-2 h-4 w-4" />
-                    {t("common:cancel")}
-                  </Button>
-                  <Button type="submit">
-                    {editingId === "new" ? t("common:add") : t("common:update")}
-                  </Button>
-                </div>
-              </form>
+                  <FormField
+                    control={form.control}
+                    name="currency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">
+                          {t("common:currency")}
+                        </FormLabel>
+                        <FormControl>
+                          <TranslatedSelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            options={currencies}
+                            isLoading={isLoadingCurrencies}
+                            placeholder={t("pages:cost_databases.selectCurrency")}
+                            aria-label={t("common:currency")}
+                            className="text-sm"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="is_public"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center gap-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm">
+                          {t("pages:cost_databases.public")}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setEditingId(null)}
+                    >
+                      <X className="ms-2 h-4 w-4" />
+                      {t("common:cancel")}
+                    </Button>
+                    <Button type="submit">
+                      {editingId === "new"
+                        ? t("common:add")
+                        : t("common:update")}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </div>
