@@ -1,8 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Plus, Edit2, Trash2, Copy, Trash, X } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
@@ -228,81 +235,99 @@ export default function LibraryMaterialsManager() {
               <X className="w-4 h-4" aria-hidden="true" />
             </Button>
           </div>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-sm font-medium">
-                {t("resources:materials.name")}
-              </Label>
-              <Input id="name" {...form.register("name")} className="text-sm" />
-              {form.formState.errors.name && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.name.message!)}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="description" className="text-sm font-medium">
-                {t("common:description")}
-              </Label>
-              <Input
-                id="description"
-                {...form.register("description")}
-                className="text-sm"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:materials.name")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} className="text-sm" />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <Label htmlFor="unit" className="text-sm font-medium">
-                {t("resources:materials.unit")}
-              </Label>
-              <TranslatedSelect
-                value={form.watch("unit")}
-                onValueChange={(value) => form.setValue("unit", value)}
-                options={materialUnits}
-                isLoading={isLoadingMaterialUnits}
-                placeholder={t("resources:materials.unitPlaceholder")}
-                className="text-sm"
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("common:description")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} className="text-sm" />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
               />
-              {form.formState.errors.unit && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.unit.message!)}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="unit_price" className="text-sm font-medium">
-                {t("resources:materials.unitPrice")} (USD)
-              </Label>
-              <Input
-                id="unit_price"
-                type="number"
-                step="0.01"
-                {...form.register("unit_price")}
-                className="text-sm"
+              <FormField
+                control={form.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:materials.unit")}
+                    </FormLabel>
+                    <FormControl>
+                      <TranslatedSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={materialUnits}
+                        isLoading={isLoadingMaterialUnits}
+                        placeholder={t("resources:materials.unitPlaceholder")}
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
               />
-              {form.formState.errors.unit_price && (
-                <p className="text-sm font-medium text-destructive mt-1">
-                  {t(form.formState.errors.unit_price.message!)}
-                </p>
-              )}
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="text-sm"
-              >
-                {t("common:cancel")}
-              </Button>
-              <Button
-                type="submit"
-                disabled={createItem.isPending || updateItem.isPending}
-                className="text-sm"
-              >
-                {t("common:save")}
-              </Button>
-            </div>
-          </form>
+              <FormField
+                control={form.control}
+                name="unit_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      {t("resources:materials.unitPrice")} (USD)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        step="0.01"
+                        className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  className="text-sm"
+                >
+                  {t("common:cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createItem.isPending || updateItem.isPending}
+                  className="text-sm"
+                >
+                  {t("common:save")}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       )}
 

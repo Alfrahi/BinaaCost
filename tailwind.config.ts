@@ -31,7 +31,6 @@ export default {
           DEFAULT: "#15803D",
           foreground: "#FFFFFF",
         },
-        danger: "#EF4444",
         destructive: {
           DEFAULT: "#EF4444",
           foreground: "#FFFFFF",
@@ -64,9 +63,6 @@ export default {
         input: "#D1D5DB",
         // Use primary for focus rings
         ring: "#1E3A8A",
-        green: {
-          600: "#16A34A",
-        },
       },
       borderRadius: {
         lg: "0.5rem",
