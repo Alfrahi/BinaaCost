@@ -12,6 +12,14 @@ import { useProfile } from "@/hooks/useProfile";
 import { Separator } from "@/components/ui/separator";
 import { useUserEmailUpdate } from "@/hooks/useUserEmailUpdate";
 import { useUserPasswordUpdate } from "@/hooks/useUserPasswordUpdate";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const profileSchema = z.object({
   first_name: z.string().min(1, "settings:profile.firstNameRequired"),
@@ -103,54 +111,62 @@ export default function ProfileSettings() {
 
   return (
     <div className="space-y-8 text-sm">
-      <form
-        onSubmit={profileForm.handleSubmit(saveProfile)}
-        className="space-y-4 max-w-md"
-      >
-        <div className="space-y-2">
-          <Label htmlFor="first_name" className="text-sm">
-            {t("settings:profile.firstName")}
-          </Label>
-          <Input
-            id="first_name"
-            {...profileForm.register("first_name")}
-            aria-label={t("settings:profile.firstName")}
-            className="text-sm"
-          />
-          {profileForm.formState.errors.first_name && (
-            <p className="text-sm font-medium text-destructive mt-1">
-              {t(profileForm.formState.errors.first_name.message!)}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="last_name" className="text-sm">
-            {t("settings:profile.lastName")}
-          </Label>
-          <Input
-            id="last_name"
-            {...profileForm.register("last_name")}
-            aria-label={t("settings:profile.lastName")}
-            className="text-sm"
-          />
-          {profileForm.formState.errors.last_name && (
-            <p className="text-sm font-medium text-destructive mt-1">
-              {t(profileForm.formState.errors.last_name.message!)}
-            </p>
-          )}
-        </div>
-
-        <Button
-          type="submit"
-          disabled={updateProfile.isPending}
-          className="text-sm"
+      <Form {...profileForm}>
+        <form
+          onSubmit={profileForm.handleSubmit(saveProfile)}
+          className="space-y-4 max-w-md"
         >
-          {updateProfile.isPending
-            ? t("common:saving")
-            : t("settings:profile.saveButton")}
-        </Button>
-      </form>
+          <FormField
+            control={profileForm.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("settings:profile.firstName")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    aria-label={t("settings:profile.firstName")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={profileForm.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">
+                  {t("settings:profile.lastName")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    aria-label={t("settings:profile.lastName")}
+                    className="text-sm"
+                  />
+                </FormControl>
+                <FormMessage className="text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            disabled={updateProfile.isPending}
+            className="text-sm"
+          >
+            {updateProfile.isPending
+              ? t("common:saving")
+              : t("settings:profile.saveButton")}
+          </Button>
+        </form>
+      </Form>
 
       <Separator />
 
