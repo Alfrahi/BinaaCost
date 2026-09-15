@@ -43,7 +43,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Control, type FieldPath } from "react-hook-form";
 import ReactECharts from "echarts-for-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -74,6 +74,35 @@ import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { FinancialSummary } from "@/logic/financials";
 import { SCENARIO_COLORS } from "@/logic/chartPalette";
 import ChartContainer from "@/components/ChartContainer";
+
+function DynamicRuleField({
+  control,
+  name,
+  label,
+  children,
+}: {
+  control: Control<ScenarioFormValues>;
+  name: FieldPath<ScenarioFormValues>;
+  label: string;
+  children: (field: {
+    value: any;
+    onChange: (...event: any[]) => void;
+  }) => React.ReactNode;
+}) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="space-y-2">
+          <FormLabel className="text-sm">{label}</FormLabel>
+          <FormControl>{children(field)}</FormControl>
+          <FormMessage className="text-sm" />
+        </FormItem>
+      )}
+    />
+  );
+}
 
 export function ScenarioAnalysisTab({
   projectId,
@@ -867,11 +896,15 @@ export function ScenarioAnalysisTab({
                 </Tooltip>
               </TooltipProvider>
             <h4 className="font-semibold text-base mt-6">{t("impactRules")}</h4>
-            {scenarioForm.formState.errors.impact_rules && (
-              <p className="text-sm font-medium text-destructive mt-1">
-                {t(scenarioForm.formState.errors.impact_rules.message!)}
-              </p>
-            )}
+            <FormField
+              control={scenarioForm.control}
+              name="impact_rules"
+              render={() => (
+                <FormItem>
+                  <FormMessage className="text-sm" />
+                </FormItem>
+              )}
+            />
             <div className="space-y-4 border p-3 rounded-md bg-muted">
               {scenarioForm.watch("impact_rules").map((rule, index) => (
                 <Card key={index} className="p-3 space-y-3 relative">
@@ -886,127 +919,112 @@ export function ScenarioAnalysisTab({
                     <X className="w-3 h-3" />
                   </Button>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label className="text-sm">{t("itemType")}</Label>
-                      <Select
-                        value={rule.item_type}
-                        onValueChange={(
-                          val: ScenarioRuleFormValues["item_type"],
-                        ) => {
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.item_type`,
-                            val,
-                          );
-                          const fieldOptions = getFieldOptions(val);
-                          const defaultField = fieldOptions[0]?.value || "";
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.field`,
-                            defaultField,
-                          );
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.adjustment_type`,
-                            (getAdjustmentTypeOptions(val, defaultField)[0]
-                              ?.value as ScenarioRuleFormValues["adjustment_type"]) ||
-                              "percentage_increase",
-                          );
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.filter_name_contains`,
-                            "",
-                          );
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.filter_category_is`,
-                            "",
-                          );
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.filter_worker_type_contains`,
-                            "",
-                          );
-                        }}
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {itemTypeOptions.map((opt) => (
-                            <SelectItem
-                              key={opt.value}
-                              value={opt.value}
-                              className="text-sm"
-                            >
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {scenarioForm.formState.errors.impact_rules?.[index]
-                        ?.item_type && (
-                        <p className="text-sm font-medium text-destructive mt-1">
-                          {t(
-                            scenarioForm.formState.errors.impact_rules[index]
-                              ?.item_type?.message ?? "",
-                          )}
-                        </p>
+                    <DynamicRuleField
+                      control={scenarioForm.control}
+                      name={`impact_rules.${index}.item_type`}
+                      label={t("itemType")}
+                    >
+                      {({ value, onChange }) => (
+                        <Select
+                          value={value}
+                          onValueChange={(
+                            val: ScenarioRuleFormValues["item_type"],
+                          ) => {
+                            onChange(val);
+                            const fieldOptions = getFieldOptions(val);
+                            const defaultField = fieldOptions[0]?.value || "";
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.field`,
+                              defaultField,
+                            );
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.adjustment_type`,
+                              (getAdjustmentTypeOptions(val, defaultField)[0]
+                                ?.value as ScenarioRuleFormValues["adjustment_type"]) ||
+                                "percentage_increase",
+                            );
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.filter_name_contains`,
+                              "",
+                            );
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.filter_category_is`,
+                              "",
+                            );
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.filter_worker_type_contains`,
+                              "",
+                            );
+                          }}
+                        >
+                          <SelectTrigger className="text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {itemTypeOptions.map((opt) => (
+                              <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="text-sm"
+                              >
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm">{t("field")}</Label>
-                      <Select
-                        value={rule.field}
-                        onValueChange={(val) => {
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.field`,
-                            val,
-                          );
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.adjustment_type`,
-                            (getAdjustmentTypeOptions(rule.item_type, val)[0]
-                              ?.value as ScenarioRuleFormValues["adjustment_type"]) ||
-                              "percentage_increase",
-                          );
-                        }}
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getFieldOptions(rule.item_type).map((opt) => (
-                            <SelectItem
-                              key={opt.value}
-                              value={opt.value}
-                              className="text-sm"
-                            >
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {scenarioForm.formState.errors.impact_rules?.[index]
-                        ?.field && (
-                        <p className="text-sm font-medium text-destructive mt-1">
-                          {t(
-                            scenarioForm.formState.errors.impact_rules[index]
-                              ?.field?.message ?? "",
-                          )}
-                        </p>
+                    </DynamicRuleField>
+                    <DynamicRuleField
+                      control={scenarioForm.control}
+                      name={`impact_rules.${index}.field`}
+                      label={t("field")}
+                    >
+                      {({ value, onChange }) => (
+                        <Select
+                          value={value}
+                          onValueChange={(val) => {
+                            onChange(val);
+                            scenarioForm.setValue(
+                              `impact_rules.${index}.adjustment_type`,
+                              (getAdjustmentTypeOptions(rule.item_type, val)[0]
+                                ?.value as ScenarioRuleFormValues["adjustment_type"]) ||
+                                "percentage_increase",
+                            );
+                          }}
+                        >
+                          <SelectTrigger className="text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getFieldOptions(rule.item_type).map((opt) => (
+                              <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="text-sm"
+                              >
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm">{t("adjustmentType")}</Label>
-                      <Select
-                        value={rule.adjustment_type}
-                        onValueChange={(
-                          val: ScenarioRuleFormValues["adjustment_type"],
-                        ) =>
-                          scenarioForm.setValue(
-                            `impact_rules.${index}.adjustment_type`,
-                            val,
-                          )
-                        }
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
+                    </DynamicRuleField>
+                    <DynamicRuleField
+                      control={scenarioForm.control}
+                      name={`impact_rules.${index}.adjustment_type`}
+                      label={t("adjustmentType")}
+                    >
+                      {({ value, onChange }) => (
+                        <Select
+                          value={value}
+                          onValueChange={(
+                            val: ScenarioRuleFormValues["adjustment_type"],
+                          ) => onChange(val)}
+                        >
+                          <SelectTrigger className="text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
                           {getAdjustmentTypeOptions(
                             rule.item_type,
                             rule.field,
@@ -1021,53 +1039,34 @@ export function ScenarioAnalysisTab({
                           ))}
                         </SelectContent>
                       </Select>
-                      {scenarioForm.formState.errors.impact_rules?.[index]
-                        ?.adjustment_type && (
-                        <p className="text-sm font-medium text-destructive mt-1">
-                          {t(
-                            scenarioForm.formState.errors.impact_rules[index]
-                              ?.adjustment_type?.message ?? "",
-                          )}
-                        </p>
                       )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm">{t("value")}</Label>
-                      {rule.item_type === "risks" &&
-                      rule.field === "realize_risk_impact" ? (
-                        <TranslatedSelect
-                          value={rule.value as string}
-                          onValueChange={(val) =>
-                            scenarioForm.setValue(
-                              `impact_rules.${index}.value`,
-                              val,
-                            )
-                          }
-                          options={projectRiskOptions}
-                          placeholder={t("selectRisk")}
-                          className="text-sm"
-                        />
-                      ) : (
-                        <Input
-                          type="number"
-                          step="0.01"
-                          {...scenarioForm.register(
-                            `impact_rules.${index}.value`,
-                            { valueAsNumber: true },
-                          )}
-                          className="text-sm"
-                        />
-                      )}
-                      {scenarioForm.formState.errors.impact_rules?.[index]
-                        ?.value && (
-                        <p className="text-sm font-medium text-destructive mt-1">
-                          {t(
-                            scenarioForm.formState.errors.impact_rules[index]
-                              ?.value?.message ?? "",
-                          )}
-                        </p>
-                      )}
-                    </div>
+                    </DynamicRuleField>
+                    <DynamicRuleField
+                      control={scenarioForm.control}
+                      name={`impact_rules.${index}.value`}
+                      label={t("value")}
+                    >
+                      {({ value, onChange }) =>
+                        rule.item_type === "risks" &&
+                        rule.field === "realize_risk_impact" ? (
+                          <TranslatedSelect
+                            value={value as string}
+                            onValueChange={onChange}
+                            options={projectRiskOptions}
+                            placeholder={t("selectRisk")}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={Number.isNaN(value) ? "" : value ?? ""}
+                            onChange={(e) => onChange(e.target.valueAsNumber)}
+                            className="text-sm"
+                          />
+                        )
+                      }
+                    </DynamicRuleField>
                     {(rule.item_type === "materials" ||
                       rule.item_type === "equipment") && (
                       <div className="space-y-2 md:col-span-2">
