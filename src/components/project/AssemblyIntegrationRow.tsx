@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { cn, getIconMarginClass } from "@/lib/utils";
 import EmptyState from "@/components/ui/EmptyState";
 import { PackagePlus, Loader2 } from "lucide-react";
 import {
@@ -97,7 +98,7 @@ export function AssemblyIntegrationRow({
         className="h-11 text-sm"
         aria-label={t("project_detail:assembly_importer.addFromAssembly")}
       >
-        <PackagePlus className="w-4 h-4 me-2" aria-hidden="true" />
+        <PackagePlus className={cn("w-4 h-4", getIconMarginClass())} aria-hidden="true" />
         {t("project_detail:assembly_importer.addFromAssembly")}
       </Button>
 
@@ -188,12 +189,12 @@ export function AssemblyIntegrationRow({
             >
               {isImporting ? (
                 <>
-                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
+                  <Loader2 className={cn("w-4 h-4 animate-spin", getIconMarginClass())} />
                   {t("common:importing")}
                 </>
               ) : (
                 <>
-                  <PackagePlus className="w-4 h-4 me-2" />
+                  <PackagePlus className={cn("w-4 h-4", getIconMarginClass())} />
                   {t("project_detail:assembly_importer.importItems")} ({totalItems})
                 </>
               )}

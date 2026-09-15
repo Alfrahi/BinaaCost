@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/hooks/useDateFormatter";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { FinancialSummary } from "@/logic/financials";
@@ -61,9 +62,9 @@ export const ClientProposalReport = React.forwardRef<
             <h2 className="text-3xl font-extrabold text-primary mb-2">
               {t("project_reports:clientProposal")}
             </h2>
-            <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary mb-2">
+            <Badge className="mb-2">
               {t("project_reports:clientFacingLabel")}
-            </span>
+            </Badge>
             <p className="text-lg font-semibold text-foreground">
               {project.name}
             </p>
