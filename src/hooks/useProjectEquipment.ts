@@ -4,166 +4,44 @@ import { callRoute } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { handleError } from "@/utils/toast";
+import { useEntityCrud, EntityCrud } from "@/hooks/useEntityCrud";
 import { calculateItemCost } from "@/logic/shared";
 import { EquipmentItem } from "@/types/project-items";
 import { EquipmentFormValues } from "@/types/schemas";
 import { useCurrencyConverter } from "./useCurrencyConverter";
 import { sanitizeText } from "@/utils/sanitizeText";
 
-export function useProjectEquipment(projectId: string) {
+export function useProjectEquipment(
+  projectId: string,
+): EntityCrud<EquipmentItem> {
   const { t } = useTranslation(["project_equipment", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflinePb();
   const { convert, getMissingRates } = useCurrencyConverter();
 
-  const queryKey = ["equipment_items", projectId];
-
-  const calculateOptimisticTotalCost = useCallback((item: any) => {
-    return calculateItemCost.equipment({
-      quantity: item.quantity || 0,
-      costPerPeriod: item.cost_per_period || 0,
-      usageDuration: item.usage_duration || 0,
-      maintenanceCost: item.maintenance_cost,
-      fuelCost: item.fuel_cost,
-    }).totalCost;
-  }, []);
-
-  const optimisticSingleUpdater = useCallback(
-    (old: EquipmentItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "INSERT") {
-        return [
-          ...oldData,
-          {
-            ...variables,
-            id: variables.id || crypto.randomUUID(),
-            total_cost: calculateOptimisticTotalCost(variables),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ];
-      }
-      if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                total_cost: calculateOptimisticTotalCost(variables),
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      if (operation === "DELETE") {
-        return oldData.filter((item) => item.id !== variables.id);
-      }
-      return oldData;
-    },
-    [calculateOptimisticTotalCost],
-  );
-
-  const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
-    any,
-    EquipmentItem[]
-  >({
-    queryKey,
+  const {
+    addItem,
+    updateItem,
+    deleteItem,
+    bulkDeleteMutation,
+    bulkMoveMutation,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
+  } = useEntityCrud<EquipmentItem>({
     table: "equipment_items",
-    operation: "INSERT",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
+    projectId,
+    calculateOptimisticTotalCost: (item) =>
+      calculateItemCost.equipment({
+        quantity: item.quantity || 0,
+        costPerPeriod: item.cost_per_period || 0,
+        usageDuration: item.usage_duration || 0,
+        maintenanceCost: item.maintenance_cost,
+        fuelCost: item.fuel_cost,
+      }).totalCost,
   });
-
-  const { mutate: updateItem, isPending: isUpdating } = useOfflineMutation<
-    any,
-    EquipmentItem[]
-  >({
-    queryKey,
-    table: "equipment_items",
-    operation: "UPDATE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const { mutate: deleteItem, isPending: isDeleting } = useOfflineMutation<
-    any,
-    EquipmentItem[]
-  >({
-    queryKey,
-    table: "equipment_items",
-    operation: "DELETE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const optimisticBulkUpdater = useCallback(
-    (old: EquipmentItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "BULK_DELETE") {
-        const idsToDelete = variables as string[];
-        return oldData.filter((item) => !idsToDelete.includes(item.id));
-      }
-      if (operation === "BULK_UPDATE") {
-        const { ids, data } = variables as { ids: string[]; data: any };
-        return oldData.map((item) =>
-          ids.includes(item.id)
-            ? {
-                ...item,
-                ...data,
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      return oldData;
-    },
-    [],
-  );
-
-  const { mutate: bulkDeleteMutation, isPending: isBulkDeleting } =
-    useOfflineMutation<string[], EquipmentItem[]>({
-      queryKey,
-      table: "equipment_items",
-      operation: "BULK_DELETE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
-
-  const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
-    useOfflineMutation<{ ids: string[]; data: any }, EquipmentItem[]>({
-      queryKey,
-      table: "equipment_items",
-      operation: "BULK_UPDATE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
 
   const syncEquipmentToLibrary = useCallback(
     async (
@@ -219,10 +97,10 @@ export function useProjectEquipment(projectId: string) {
     [user?.id, t, getMissingRates, convert],
   );
 
-  const handleAddOrUpdateEquipment = useCallback(
+  const handleAddOrUpdate = useCallback(
     async (
       data: EquipmentFormValues,
-      currentCurrency: string,
+      currentCurrency?: string,
       editingEquipmentId?: string,
     ) => {
       const payload = {
@@ -252,7 +130,9 @@ export function useProjectEquipment(projectId: string) {
         });
       }
 
-      await syncEquipmentToLibrary(payload, currentCurrency);
+      if (currentCurrency) {
+        await syncEquipmentToLibrary(payload, currentCurrency);
+      }
       queryClient.invalidateQueries({ queryKey: ["library_equipment"] });
     },
     [
@@ -265,7 +145,7 @@ export function useProjectEquipment(projectId: string) {
     ],
   );
 
-  const handleDuplicateEquipment = useCallback(
+  const handleDuplicate = useCallback(
     (item: EquipmentItem) => {
       const payload: Partial<EquipmentItem> = { ...item };
       delete payload.id;
@@ -280,28 +160,28 @@ export function useProjectEquipment(projectId: string) {
     [addItem, projectId, user?.id],
   );
 
-  const handleDeleteEquipment = useCallback(
+  const handleDelete = useCallback(
     async (id: string) => {
       await deleteItem({ id });
     },
     [deleteItem],
   );
 
-  const handleUpdateEquipmentField = useCallback(
+  const handleUpdateField = useCallback(
     async (id: string, field: Partial<EquipmentItem>) => {
       await updateItem({ id, ...field });
     },
     [updateItem],
   );
 
-  const handleBulkDeleteEquipment = useCallback(
+  const handleBulkDelete = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
     },
     [bulkDeleteMutation],
   );
 
-  const handleBulkMoveEquipment = useCallback(
+  const handleBulkMove = useCallback(
     async (ids: string[], groupId: string | null) => {
       await bulkMoveMutation({ ids, data: { group_id: groupId } });
     },
@@ -309,16 +189,16 @@ export function useProjectEquipment(projectId: string) {
   );
 
   return {
-    handleAddOrUpdateEquipment,
-    handleDuplicateEquipment,
-    handleDeleteEquipment,
-    handleUpdateEquipmentField,
-    handleBulkDeleteEquipment,
-    handleBulkMoveEquipment,
-    isAddingEquipment: isAdding,
-    isUpdatingEquipment: isUpdating,
-    isDeletingEquipment: isDeleting,
-    isBulkDeletingEquipment: isBulkDeleting,
-    isBulkMovingEquipment: isBulkMoving,
+    handleAddOrUpdate,
+    handleDuplicate,
+    handleDelete,
+    handleUpdateField,
+    handleBulkDelete,
+    handleBulkMove,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
   };
 }

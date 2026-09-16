@@ -26,10 +26,13 @@ export function useAssemblyImport(projectId: string) {
   const { project, isLoading: isLoadingProject } = useProjectData(projectId);
   const queryClient = useQueryClient();
 
-  const { handleAddOrUpdateMaterial } = useProjectMaterials(projectId);
-  const { handleAddOrUpdateLabor } = useProjectLabor(projectId);
-  const { handleAddOrUpdateEquipment } = useProjectEquipment(projectId);
-  const { handleAddOrUpdateAdditionalCost } =
+  const { handleAddOrUpdate: handleAddOrUpdateMaterial } =
+    useProjectMaterials(projectId);
+  const { handleAddOrUpdate: handleAddOrUpdateLabor } =
+    useProjectLabor(projectId);
+  const { handleAddOrUpdate: handleAddOrUpdateEquipment } =
+    useProjectEquipment(projectId);
+  const { handleAddOrUpdate: handleAddOrUpdateAdditionalCost } =
     useProjectAdditionalCosts(projectId);
 
   const { mutateAsync: importAssemblyItemsFn, isPending: isImporting } =

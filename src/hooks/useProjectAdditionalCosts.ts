@@ -1,165 +1,35 @@
 import { useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { handleError } from "@/utils/toast";
+import { useEntityCrud, EntityCrud } from "@/hooks/useEntityCrud";
 import { AdditionalCostItem } from "@/types/project-items";
 import { AdditionalCostFormValues } from "@/types/schemas";
 import { sanitizeText } from "@/utils/sanitizeText";
 
-export function useProjectAdditionalCosts(projectId: string) {
-  const { t } = useTranslation(["project_additional", "common"]);
-  const queryClient = useQueryClient();
+export function useProjectAdditionalCosts(
+  projectId: string,
+): EntityCrud<AdditionalCostItem> {
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflinePb();
 
-  const queryKey = ["additional_costs", projectId];
-
-  const optimisticSingleUpdater = useCallback(
-    (
-      old: AdditionalCostItem[] | undefined,
-      variables: any,
-      operation: string,
-    ) => {
-      const oldData = old ?? [];
-      if (operation === "INSERT") {
-        return [
-          ...oldData,
-          {
-            ...variables,
-            id: variables.id || crypto.randomUUID(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ];
-      }
-      if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      if (operation === "DELETE") {
-        return oldData.filter((item) => item.id !== variables.id);
-      }
-      return oldData;
-    },
-    [],
-  );
-
-  const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
-    any,
-    AdditionalCostItem[]
-  >({
-    queryKey,
+  const {
+    addItem,
+    updateItem,
+    deleteItem,
+    bulkDeleteMutation,
+    bulkMoveMutation,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
+  } = useEntityCrud<AdditionalCostItem>({
     table: "additional_costs",
-    operation: "INSERT",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
+    projectId,
   });
 
-  const { mutate: updateItem, isPending: isUpdating } = useOfflineMutation<
-    any,
-    AdditionalCostItem[]
-  >({
-    queryKey,
-    table: "additional_costs",
-    operation: "UPDATE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const { mutate: deleteItem, isPending: isDeleting } = useOfflineMutation<
-    any,
-    AdditionalCostItem[]
-  >({
-    queryKey,
-    table: "additional_costs",
-    operation: "DELETE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const optimisticBulkUpdater = useCallback(
-    (
-      old: AdditionalCostItem[] | undefined,
-      variables: any,
-      operation: string,
-    ) => {
-      const oldData = old ?? [];
-      if (operation === "BULK_DELETE") {
-        const idsToDelete = variables as string[];
-        return oldData.filter((item) => !idsToDelete.includes(item.id));
-      }
-      if (operation === "BULK_UPDATE") {
-        const { ids, data } = variables as { ids: string[]; data: any };
-        return oldData.map((item) =>
-          ids.includes(item.id)
-            ? {
-                ...item,
-                ...data,
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      return oldData;
-    },
-    [],
-  );
-
-  const { mutate: bulkDeleteMutation, isPending: isBulkDeleting } =
-    useOfflineMutation<string[], AdditionalCostItem[]>({
-      queryKey,
-      table: "additional_costs",
-      operation: "BULK_DELETE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
-
-  const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
-    useOfflineMutation<{ ids: string[]; data: any }, AdditionalCostItem[]>({
-      queryKey,
-      table: "additional_costs",
-      operation: "BULK_UPDATE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
-
-  const handleAddOrUpdateAdditionalCost = useCallback(
+  const handleAddOrUpdate = useCallback(
     async (
       data: AdditionalCostFormValues,
+      _currency?: string,
       editingAdditionalCostId?: string,
     ) => {
       const payload = {
@@ -186,7 +56,7 @@ export function useProjectAdditionalCosts(projectId: string) {
     [addItem, updateItem, projectId, user?.id],
   );
 
-  const handleDuplicateAdditionalCost = useCallback(
+  const handleDuplicate = useCallback(
     (item: AdditionalCostItem) => {
       const payload: Partial<AdditionalCostItem> = { ...item };
       delete payload.id;
@@ -200,28 +70,28 @@ export function useProjectAdditionalCosts(projectId: string) {
     [addItem, projectId, user?.id],
   );
 
-  const handleDeleteAdditionalCost = useCallback(
+  const handleDelete = useCallback(
     async (id: string) => {
       await deleteItem({ id });
     },
     [deleteItem],
   );
 
-  const handleUpdateAdditionalCostField = useCallback(
+  const handleUpdateField = useCallback(
     async (id: string, field: Partial<AdditionalCostItem>) => {
       await updateItem({ id, ...field });
     },
     [updateItem],
   );
 
-  const handleBulkDeleteAdditionalCosts = useCallback(
+  const handleBulkDelete = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
     },
     [bulkDeleteMutation],
   );
 
-  const handleBulkMoveAdditionalCosts = useCallback(
+  const handleBulkMove = useCallback(
     async (ids: string[], groupId: string | null) => {
       await bulkMoveMutation({ ids, data: { group_id: groupId } });
     },
@@ -229,16 +99,16 @@ export function useProjectAdditionalCosts(projectId: string) {
   );
 
   return {
-    handleAddOrUpdateAdditionalCost,
-    handleDuplicateAdditionalCost,
-    handleDeleteAdditionalCost,
-    handleUpdateAdditionalCostField,
-    handleBulkDeleteAdditionalCosts,
-    handleBulkMoveAdditionalCosts,
-    isAddingAdditionalCost: isAdding,
-    isUpdatingAdditionalCost: isUpdating,
-    isDeletingAdditionalCost: isDeleting,
-    isBulkDeletingAdditionalCosts: isBulkDeleting,
-    isBulkMovingAdditionalCosts: isBulkMoving,
+    handleAddOrUpdate,
+    handleDuplicate,
+    handleDelete,
+    handleUpdateField,
+    handleBulkDelete,
+    handleBulkMove,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
   };
 }
