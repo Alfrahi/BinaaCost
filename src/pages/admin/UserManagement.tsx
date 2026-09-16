@@ -44,7 +44,6 @@ export default function UserManagement() {
       { key: "email", label: t("admin:users.email") },
       { key: "name", label: t("admin:users.name") },
       { key: "role", label: t("admin:users.role") },
-      { key: "plan", label: t("admin:users.plan") },
       { key: "createdAt", label: t("admin:users.createdAt") },
       { key: "actions", label: t("common:actions"), align: "end" },
     ],
@@ -100,9 +99,6 @@ export default function UserManagement() {
             </TableCell>
             <TableCell className="whitespace-nowrap text-sm">
               <RoleBadge role={user.role} />
-            </TableCell>
-            <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-              {user.plan}
             </TableCell>
             <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
               {new Date(user.created_at).toLocaleDateString()}
