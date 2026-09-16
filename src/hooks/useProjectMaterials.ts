@@ -4,160 +4,36 @@ import { callRoute } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { handleError } from "@/utils/toast";
+import { useEntityCrud, EntityCrud } from "@/hooks/useEntityCrud";
 import { calculateItemCost } from "@/logic/shared";
 import { MaterialItem } from "@/types/project-items";
 import { MaterialFormValues } from "@/types/schemas";
 import { useCurrencyConverter } from "./useCurrencyConverter";
 import { sanitizeText } from "@/utils/sanitizeText";
 
-export function useProjectMaterials(projectId: string) {
+export function useProjectMaterials(projectId: string): EntityCrud<MaterialItem> {
   const { t } = useTranslation(["project_materials", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflinePb();
   const { convert, getMissingRates } = useCurrencyConverter();
 
-  const queryKey = ["materials", projectId];
-
-  const calculateOptimisticTotalCost = useCallback((item: any) => {
-    return calculateItemCost.material(item.quantity || 0, item.unit_price || 0);
-  }, []);
-
-  const optimisticSingleUpdater = useCallback(
-    (old: MaterialItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "INSERT") {
-        return [
-          ...oldData,
-          {
-            ...variables,
-            id: variables.id || crypto.randomUUID(),
-            total_cost: calculateOptimisticTotalCost(variables),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ];
-      }
-      if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                total_cost: calculateOptimisticTotalCost(variables),
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      if (operation === "DELETE") {
-        return oldData.filter((item) => item.id !== variables.id);
-      }
-      return oldData;
-    },
-    [calculateOptimisticTotalCost],
-  );
-
-  const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
-    any,
-    MaterialItem[]
-  >({
-    queryKey,
+  const {
+    addItem,
+    updateItem,
+    deleteItem,
+    bulkDeleteMutation,
+    bulkMoveMutation,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
+  } = useEntityCrud<MaterialItem>({
     table: "materials",
-    operation: "INSERT",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
+    projectId,
+    calculateOptimisticTotalCost: (item) =>
+      calculateItemCost.material(item.quantity || 0, item.unit_price || 0),
   });
-
-  const { mutate: updateItem, isPending: isUpdating } = useOfflineMutation<
-    any,
-    MaterialItem[]
-  >({
-    queryKey,
-    table: "materials",
-    operation: "UPDATE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const { mutate: deleteItem, isPending: isDeleting } = useOfflineMutation<
-    any,
-    MaterialItem[]
-  >({
-    queryKey,
-    table: "materials",
-    operation: "DELETE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const optimisticBulkUpdater = useCallback(
-    (old: MaterialItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "BULK_DELETE") {
-        const idsToDelete = variables as string[];
-        return oldData.filter((item) => !idsToDelete.includes(item.id));
-      }
-      if (operation === "BULK_UPDATE") {
-        const { ids, data } = variables as { ids: string[]; data: any };
-        return oldData.map((item) =>
-          ids.includes(item.id)
-            ? {
-                ...item,
-                ...data,
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      return oldData;
-    },
-    [],
-  );
-
-  const { mutate: bulkDeleteMutation, isPending: isBulkDeleting } =
-    useOfflineMutation<string[], MaterialItem[]>({
-      queryKey,
-      table: "materials",
-      operation: "BULK_DELETE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
-
-  const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
-    useOfflineMutation<{ ids: string[]; data: any }, MaterialItem[]>({
-      queryKey,
-      table: "materials",
-      operation: "BULK_UPDATE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
 
   const syncMaterialToLibrary = useCallback(
     async (
@@ -199,10 +75,10 @@ export function useProjectMaterials(projectId: string) {
     [user?.id, t, getMissingRates, convert],
   );
 
-  const handleAddOrUpdateMaterial = useCallback(
+  const handleAddOrUpdate = useCallback(
     async (
       data: MaterialFormValues,
-      currentCurrency: string,
+      currentCurrency?: string,
       editingMaterialId?: string,
     ) => {
       const payload = {
@@ -228,7 +104,9 @@ export function useProjectMaterials(projectId: string) {
         });
       }
 
-      await syncMaterialToLibrary(payload, currentCurrency);
+      if (currentCurrency) {
+        await syncMaterialToLibrary(payload, currentCurrency);
+      }
       queryClient.invalidateQueries({ queryKey: ["library_materials"] });
     },
     [
@@ -241,7 +119,7 @@ export function useProjectMaterials(projectId: string) {
     ],
   );
 
-  const handleDuplicateMaterial = useCallback(
+  const handleDuplicate = useCallback(
     (item: MaterialItem) => {
       const payload: Omit<
         MaterialItem,
@@ -257,28 +135,28 @@ export function useProjectMaterials(projectId: string) {
     [addItem, projectId, user?.id],
   );
 
-  const handleDeleteMaterial = useCallback(
+  const handleDelete = useCallback(
     async (id: string) => {
       await deleteItem({ id });
     },
     [deleteItem],
   );
 
-  const handleUpdateMaterialField = useCallback(
+  const handleUpdateField = useCallback(
     async (id: string, field: Partial<MaterialItem>) => {
       await updateItem({ id, ...field });
     },
     [updateItem],
   );
 
-  const handleBulkDeleteMaterials = useCallback(
+  const handleBulkDelete = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
     },
     [bulkDeleteMutation],
   );
 
-  const handleBulkMoveMaterials = useCallback(
+  const handleBulkMove = useCallback(
     async (ids: string[], groupId: string | null) => {
       await bulkMoveMutation({ ids, data: { group_id: groupId } });
     },
@@ -286,16 +164,16 @@ export function useProjectMaterials(projectId: string) {
   );
 
   return {
-    handleAddOrUpdateMaterial,
-    handleDuplicateMaterial,
-    handleDeleteMaterial,
-    handleUpdateMaterialField,
-    handleBulkDeleteMaterials,
-    handleBulkMoveMaterials,
-    isAddingMaterial: isAdding,
-    isUpdatingMaterial: isUpdating,
-    isDeletingMaterial: isDeleting,
-    isBulkDeletingMaterials: isBulkDeleting,
-    isBulkMovingMaterials: isBulkMoving,
+    handleAddOrUpdate,
+    handleDuplicate,
+    handleDelete,
+    handleUpdateField,
+    handleBulkDelete,
+    handleBulkMove,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
   };
 }
