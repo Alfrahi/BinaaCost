@@ -4,164 +4,40 @@ import { callRoute } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/AuthProvider";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { handleError } from "@/utils/toast";
+import { useEntityCrud, EntityCrud } from "@/hooks/useEntityCrud";
 import { calculateItemCost } from "@/logic/shared";
 import { LaborItem } from "@/types/project-items";
 import { LaborFormValues } from "@/types/schemas";
 import { useCurrencyConverter } from "./useCurrencyConverter";
 import { sanitizeText } from "@/utils/sanitizeText";
 
-export function useProjectLabor(projectId: string) {
+export function useProjectLabor(projectId: string): EntityCrud<LaborItem> {
   const { t } = useTranslation(["project_labor", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflinePb();
   const { convert, getMissingRates } = useCurrencyConverter();
 
-  const queryKey = ["labor_items", projectId];
-
-  const calculateOptimisticTotalCost = useCallback((item: any) => {
-    return calculateItemCost.labor(
-      item.number_of_workers || 0,
-      item.daily_rate || 0,
-      item.total_days || 0,
-    );
-  }, []);
-
-  const optimisticSingleUpdater = useCallback(
-    (old: LaborItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "INSERT") {
-        return [
-          ...oldData,
-          {
-            ...variables,
-            id: variables.id || crypto.randomUUID(),
-            total_cost: calculateOptimisticTotalCost(variables),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ];
-      }
-      if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                total_cost: calculateOptimisticTotalCost(variables),
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      if (operation === "DELETE") {
-        return oldData.filter((item) => item.id !== variables.id);
-      }
-      return oldData;
-    },
-    [calculateOptimisticTotalCost],
-  );
-
-  const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
-    any,
-    LaborItem[]
-  >({
-    queryKey,
+  const {
+    addItem,
+    updateItem,
+    deleteItem,
+    bulkDeleteMutation,
+    bulkMoveMutation,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
+  } = useEntityCrud<LaborItem>({
     table: "labor_items",
-    operation: "INSERT",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
+    projectId,
+    calculateOptimisticTotalCost: (item) =>
+      calculateItemCost.labor(
+        item.number_of_workers || 0,
+        item.daily_rate || 0,
+        item.total_days || 0,
+      ),
   });
-
-  const { mutate: updateItem, isPending: isUpdating } = useOfflineMutation<
-    any,
-    LaborItem[]
-  >({
-    queryKey,
-    table: "labor_items",
-    operation: "UPDATE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const { mutate: deleteItem, isPending: isDeleting } = useOfflineMutation<
-    any,
-    LaborItem[]
-  >({
-    queryKey,
-    table: "labor_items",
-    operation: "DELETE",
-    optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {
-      toast.success(t("common:success"));
-      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-    },
-    onError: (err: any) => handleError(err),
-  });
-
-  const optimisticBulkUpdater = useCallback(
-    (old: LaborItem[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "BULK_DELETE") {
-        const idsToDelete = variables as string[];
-        return oldData.filter((item) => !idsToDelete.includes(item.id));
-      }
-      if (operation === "BULK_UPDATE") {
-        const { ids, data } = variables as { ids: string[]; data: any };
-        return oldData.map((item) =>
-          ids.includes(item.id)
-            ? {
-                ...item,
-                ...data,
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
-      }
-      return oldData;
-    },
-    [],
-  );
-
-  const { mutate: bulkDeleteMutation, isPending: isBulkDeleting } =
-    useOfflineMutation<string[], LaborItem[]>({
-      queryKey,
-      table: "labor_items",
-      operation: "BULK_DELETE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
-
-  const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
-    useOfflineMutation<{ ids: string[]; data: any }, LaborItem[]>({
-      queryKey,
-      table: "labor_items",
-      operation: "BULK_UPDATE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess: () => {
-        toast.success(t("common:success"));
-        queryClient.invalidateQueries({
-          queryKey: ["analytics_projects_data"],
-        });
-      },
-      onError: (err: any) => handleError(err),
-    });
 
   const syncLaborToLibrary = useCallback(
     async (
@@ -202,10 +78,10 @@ export function useProjectLabor(projectId: string) {
     [user?.id, t, getMissingRates, convert],
   );
 
-  const handleAddOrUpdateLabor = useCallback(
+  const handleAddOrUpdate = useCallback(
     async (
       data: LaborFormValues,
-      currentCurrency: string,
+      currentCurrency?: string,
       editingLaborId?: string,
     ) => {
       const payload = {
@@ -231,13 +107,22 @@ export function useProjectLabor(projectId: string) {
         });
       }
 
-      await syncLaborToLibrary(payload, currentCurrency);
+      if (currentCurrency) {
+        await syncLaborToLibrary(payload, currentCurrency);
+      }
       queryClient.invalidateQueries({ queryKey: ["library_labor"] });
     },
-    [addItem, updateItem, projectId, user?.id, syncLaborToLibrary, queryClient],
+    [
+      addItem,
+      updateItem,
+      projectId,
+      user?.id,
+      syncLaborToLibrary,
+      queryClient,
+    ],
   );
 
-  const handleDuplicateLabor = useCallback(
+  const handleDuplicate = useCallback(
     (item: LaborItem) => {
       const payload: Partial<LaborItem> = { ...item };
       delete payload.id;
@@ -252,28 +137,28 @@ export function useProjectLabor(projectId: string) {
     [addItem, projectId, user?.id],
   );
 
-  const handleDeleteLabor = useCallback(
+  const handleDelete = useCallback(
     async (id: string) => {
       await deleteItem({ id });
     },
     [deleteItem],
   );
 
-  const handleUpdateLaborField = useCallback(
+  const handleUpdateField = useCallback(
     async (id: string, field: Partial<LaborItem>) => {
       await updateItem({ id, ...field });
     },
     [updateItem],
   );
 
-  const handleBulkDeleteLabor = useCallback(
+  const handleBulkDelete = useCallback(
     async (ids: string[]) => {
       await bulkDeleteMutation(ids);
     },
     [bulkDeleteMutation],
   );
 
-  const handleBulkMoveLabor = useCallback(
+  const handleBulkMove = useCallback(
     async (ids: string[], groupId: string | null) => {
       await bulkMoveMutation({ ids, data: { group_id: groupId } });
     },
@@ -281,16 +166,16 @@ export function useProjectLabor(projectId: string) {
   );
 
   return {
-    handleAddOrUpdateLabor,
-    handleDuplicateLabor,
-    handleDeleteLabor,
-    handleUpdateLaborField,
-    handleBulkDeleteLabor,
-    handleBulkMoveLabor,
-    isAddingLabor: isAdding,
-    isUpdatingLabor: isUpdating,
-    isDeletingLabor: isDeleting,
-    isBulkDeletingLabor: isBulkDeleting,
-    isBulkMovingLabor: isBulkMoving,
+    handleAddOrUpdate,
+    handleDuplicate,
+    handleDelete,
+    handleUpdateField,
+    handleBulkDelete,
+    handleBulkMove,
+    isAdding,
+    isUpdating,
+    isDeleting,
+    isBulkDeleting,
+    isBulkMoving,
   };
 }
