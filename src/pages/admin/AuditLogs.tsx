@@ -143,16 +143,16 @@ export default function AuditLogs() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[150px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
                   {t("admin:auditLogs.date")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[120px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[120px] px-3">
                   {t("admin:auditLogs.user")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[100px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[100px] px-3">
                   {t("admin:auditLogs.action")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[150px]">
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
                   {t("admin:auditLogs.resource")}
                 </TableHead>
               </TableRow>
@@ -160,13 +160,13 @@ export default function AuditLogs() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-sm">
+                  <TableCell colSpan={4} className="text-center h-24 px-3">
                     <LoadingState />
                   </TableCell>
                 </TableRow>
               ) : logs?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4}>
+                  <TableCell colSpan={4} className="text-center h-24 px-3">
                     <EmptyState message={t("admin:auditLogs.noLogsFound")} />
                   </TableCell>
                 </TableRow>
@@ -180,16 +180,16 @@ export default function AuditLogs() {
                         expandedRowId === log.id && "bg-muted",
                       )}
                     >
-                      <TableCell className="whitespace-nowrap text-sm">
+                      <TableCell className="whitespace-nowrap text-sm px-3 py-2">
                         {formatDate(log.created_at, "dateTime")}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm">
+                      <TableCell className="whitespace-nowrap text-sm px-3 py-2">
                         {sanitizeText(log.user_email) || log.user_id}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm">
+                      <TableCell className="whitespace-nowrap text-sm px-3 py-2">
                         {log.action}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm">
+                      <TableCell className="whitespace-nowrap text-sm px-3 py-2">
                         {log.table_name} ({log.record_id})
                       </TableCell>
                     </TableRow>

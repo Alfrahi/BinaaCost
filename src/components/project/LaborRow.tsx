@@ -114,7 +114,7 @@ export function LaborRow({
         </TooltipProvider>
       </TableCell>
       <TableCell className="text-end">
-        <div className="flex justify-end gap-1">
+        <div className="flex gap-2 justify-end">
           <Button
             size="icon"
             variant="ghost"
@@ -123,7 +123,7 @@ export function LaborRow({
             aria-label={`${t("common:viewComments")} ${item.worker_type}`}
             className="h-8 w-8"
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-4 h-4" aria-hidden="true" />
           </Button>
           {isOwner && (
             <>
@@ -135,7 +135,7 @@ export function LaborRow({
                 aria-label={`${t("common:duplicate")} ${item.worker_type}`}
                 className="h-8 w-8"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 size="icon"
@@ -145,7 +145,7 @@ export function LaborRow({
                 aria-label={`${t("common:edit")} ${item.worker_type}`}
                 className="h-8 w-8"
               >
-                <Edit2 className="w-4 h-4" />
+                <Edit2 className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 size="icon"
@@ -155,7 +155,7 @@ export function LaborRow({
                 title={t("common:delete")}
                 aria-label={`${t("common:delete")} ${item.worker_type}`}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}

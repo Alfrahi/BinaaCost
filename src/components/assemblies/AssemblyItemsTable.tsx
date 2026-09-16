@@ -100,12 +100,12 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
 
   const columns = useMemo<DataTableColumn<AssemblyItem>[]>(
     () => [
-      { key: "type", label: t("common:type") },
-      { key: "description", label: t("common:description") },
-      { key: "quantity", label: t("common:quantity") },
-      { key: "price", label: t("common:price") },
-      { key: "cost", label: t("common:cost"), align: "end" },
-      { key: "actions", label: t("common:actions"), align: "end" },
+      { key: "type", label: t("common:type"), minWidth: "100px" },
+      { key: "description", label: t("common:description"), minWidth: "200px" },
+      { key: "quantity", label: t("common:quantity"), minWidth: "120px" },
+      { key: "price", label: t("common:price"), minWidth: "120px" },
+      { key: "cost", label: t("common:cost"), align: "end", minWidth: "120px" },
+      { key: "actions", label: t("common:actions"), align: "end", minWidth: "100px" },
     ],
     [t],
   );
@@ -119,10 +119,8 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
         const itemDetails = item.details;
         return (
           <TableRow key={item.id}>
-            <TableCell className="capitalize text-start text-sm min-w-[100px]">
-              {getTypeLabel(item.item_type)}
-            </TableCell>
-            <TableCell className="text-start text-sm min-w-[200px]">
+            <TableCell className="text-start text-sm">{getTypeLabel(item.item_type)}</TableCell>
+            <TableCell className="text-start text-sm">
               <div className="font-medium">{item.description}</div>
               {item.item_type === "additional" &&
                 itemDetails &&
@@ -134,7 +132,7 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                   </div>
                 )}
             </TableCell>
-            <TableCell className="text-start text-sm min-w-[150px]">
+            <TableCell className="text-start text-sm">
               {item.item_type === "labor" &&
               itemDetails &&
               "total_days" in itemDetails ? (
@@ -148,31 +146,31 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
                 </>
               )}
             </TableCell>
-            <TableCell className="text-start text-sm min-w-[120px]">
+            <TableCell className="text-start text-sm">
               {numberFormatter.format(item.unit_price)}
             </TableCell>
-            <TableCell className="text-end tabular-nums text-sm font-medium min-w-[120px]">
+            <TableCell className="text-end tabular-nums text-sm font-medium">
               {numberFormatter.format(itemCost(item))}
             </TableCell>
-            <TableCell className="text-end text-sm min-w-[100px]">
-              <div className="flex justify-end gap-1">
+            <TableCell className="text-end">
+              <div className="flex gap-2 justify-end">
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-7 w-7"
                   onClick={() => onEdit(item)}
                   aria-label={`${t("common:edit")} ${item.description}`}
+                  className="h-8 w-8"
                 >
-                  <Edit2 className="w-3 h-3" />
+                  <Edit2 className="w-4 h-4" aria-hidden="true" />
                 </Button>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-7 w-7 text-destructive hover:text-destructive"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={() => onDelete(item)}
                   aria-label={`${t("common:delete")} ${item.description}`}
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             </TableCell>

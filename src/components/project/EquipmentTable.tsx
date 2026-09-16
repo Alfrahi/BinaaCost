@@ -134,19 +134,19 @@ export function EquipmentTable({
         key: "name",
         label: t("columns.name"),
         align: "start",
-        minWidth: "150",
+        minWidth: "150px",
       },
       {
         key: "type",
         label: t("columns.type"),
         align: "start",
-        minWidth: "100",
+        minWidth: "100px",
       },
       {
         key: "rental_or_purchase",
         label: t("columns.rentalPurchase"),
         align: "start",
-        minWidth: "120",
+        minWidth: "120px",
         format: (value: string) =>
           rentalOptions.find((opt) => opt.value === value)?.label || value,
       },
@@ -154,14 +154,14 @@ export function EquipmentTable({
         key: "quantity",
         label: t("columns.quantity"),
         align: "end",
-        minWidth: "100",
+        minWidth: "100px",
       },
       {
         key: "cost_per_period",
         label: t("columns.costPerPeriod"),
         align: "end",
         isCurrency: true,
-        minWidth: "120",
+        minWidth: "120px",
         format: (value: number) =>
           format(value, currency) +
           (value &&
@@ -171,7 +171,7 @@ export function EquipmentTable({
         key: "period_unit",
         label: t("columns.periodUnit"),
         align: "start",
-        minWidth: "100",
+        minWidth: "100px",
         format: (value: string) =>
           periodUnits.find((u) => u.value === value)?.label || value,
       },
@@ -179,14 +179,14 @@ export function EquipmentTable({
         key: "usage_duration",
         label: t("columns.usageDuration"),
         align: "end",
-        minWidth: "100",
+        minWidth: "100px",
       },
       {
         key: "maintenance_cost",
         label: t("columns.maintenance"),
         align: "end",
         isCurrency: true,
-        minWidth: "100",
+        minWidth: "100px",
         format: (value: number) => format(value, currency),
       },
       {
@@ -194,14 +194,14 @@ export function EquipmentTable({
         label: t("columns.fuel"),
         align: "end",
         isCurrency: true,
-        minWidth: "100",
+        minWidth: "100px",
         format: (value: number) => format(value, currency),
       },
       {
         key: "total",
         label: t("columns.estTotalCost"),
         align: "end",
-        minWidth: "120",
+        minWidth: "120px",
         format: (_, row: EquipmentItem) =>
           format(
             calculateItemCost.equipment({
