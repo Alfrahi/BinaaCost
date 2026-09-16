@@ -20,12 +20,16 @@ import { Button } from "@/components/ui/button";
 
 const ALIGN_CLASS = { start: "text-start", end: "text-end" } as const;
 const MIN_WIDTH_CLASSES: Record<string, string> = {
+  "60px": "min-w-[60px]",
   "80px": "min-w-[80px]",
   "100px": "min-w-[100px]",
   "120px": "min-w-[120px]",
   "150px": "min-w-[150px]",
   "200px": "min-w-[200px]",
+  "240px": "min-w-[240px]",
 } as const;
+
+type MinWidthToken = keyof typeof MIN_WIDTH_CLASSES;
 
 export interface DataTableColumn<T> {
   key: string;
@@ -34,7 +38,7 @@ export interface DataTableColumn<T> {
   isCurrency?: boolean;
   format?: (value: any, row: T) => React.ReactNode;
   className?: string;
-  minWidth?: keyof typeof MIN_WIDTH_CLASSES;
+  minWidth?: MinWidthToken | string;
   /** Value used for sorting. Defaults to `row[col.key]`. */
   sortValue?: (row: T) => string | number;
 }
@@ -65,6 +69,7 @@ export interface DataTableProps<T> {
   ariaLabel?: string;
   className?: string;
   stickyHeader?: boolean;
+  cellPadding?: "compact" | "comfortable";
   groupRows?: {
     groups: { id: string; name: string }[];
     getGroupId: (row: T) => string | undefined;
@@ -97,6 +102,7 @@ function DataTable<T>({
   ariaLabel,
   className,
   stickyHeader = false,
+  cellPadding = "comfortable",
   groupRows,
   searchable = false,
   searchPlaceholder,
@@ -107,6 +113,8 @@ function DataTable<T>({
 }: Omit<DataTableProps<T>, "getRowKey"> & { t: (key: string, options?: any) => string }) {
   const hasSelection = !!selection;
   const hasGroups = !!groupRows;
+  const paddingClasses = cellPadding === "compact" ? "px-3 py-2" : "p-4";
+  const headerHeightClass = "h-10";
   const [search, setSearch] = React.useState("");
   const [sort, setSort] = React.useState<SortState>(null);
 
@@ -237,7 +245,7 @@ function DataTable<T>({
           <TableHeader>
             <TableRow className={cn(stickyHeader && "sticky top-0 z-10 bg-muted")}>
               {hasSelection && (
-                <TableHead className={cn("w-[40px] text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10", selection?.selectAllLabel && "cursor-pointer")}>
+                <TableHead className={cn("w-[40px] text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted", headerHeightClass, selection?.selectAllLabel && "cursor-pointer")}>
                   <Checkbox
                     checked={selection?.allSelected ?? false}
                     onCheckedChange={selection?.onToggleAll}
@@ -249,9 +257,11 @@ function DataTable<T>({
                 <TableHead
                   key={col.key}
                   className={cn(
-                    `${ALIGN_CLASS[col.align || "start"]} text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums`,
+                    `${ALIGN_CLASS[col.align || "start"]} text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted`,
+                    headerHeightClass,
+                    (col.align === "end" || col.isCurrency) && "tabular-nums",
                     col.className,
-                    col.minWidth && MIN_WIDTH_CLASSES[col.minWidth],
+                    col.minWidth && (MIN_WIDTH_CLASSES[col.minWidth] || `min-w-[${col.minWidth}]`),
                     sortable && "cursor-pointer select-none",
                   )}
                   onClick={sortable ? () => handleSort(col) : undefined}
@@ -274,7 +284,7 @@ function DataTable<T>({
               <TableRow>
                 <TableCell
                   colSpan={totalColSpan}
-                  className="text-center h-24"
+                  className={cn("text-center", paddingClasses)}
                 >
                   <Loader2
                     className="w-6 h-6 animate-spin mx-auto"
@@ -286,7 +296,7 @@ function DataTable<T>({
               <TableRow>
                 <TableCell
                   colSpan={totalColSpan}
-                  className="text-center h-24 text-sm text-muted-foreground"
+                  className={cn("text-center text-sm text-muted-foreground", paddingClasses)}
                 >
                   {emptyMessage || (emptyMessageKey ? t(emptyMessageKey) : t("common:noItems"))}
                 </TableCell>
@@ -298,7 +308,7 @@ function DataTable<T>({
                     <TableRow key={`header-${item.group?.id}`} className="bg-muted hover:bg-muted">
                       <TableCell
                         colSpan={totalColSpan}
-                        className="font-semibold text-foreground text-sm"
+                        className={cn("font-semibold text-foreground text-sm", paddingClasses)}
                       >
                         {item.group?.name}
                       </TableCell>
@@ -313,15 +323,15 @@ function DataTable<T>({
             <TableFooter>
               <TableRow className="bg-muted">
                 <TableCell
-                  colSpan={grandTotalColSpan ?? columns.length - 1}
-                  className="text-end font-semibold uppercase text-foreground"
+                  colSpan={grandTotalColSpan ?? (columns.length + (hasSelection ? 1 : 0) - 1)}
+                  className={cn("text-end font-semibold uppercase text-foreground", paddingClasses)}
                 >
                   {grandTotalLabel || t("common:subtotal")}
                 </TableCell>
-                <TableCell className="text-end font-bold text-foreground tabular-nums">
+                <TableCell className={cn("text-end font-bold text-foreground tabular-nums", paddingClasses)}>
                   {grandTotal}
                 </TableCell>
-                {hasSelection && <TableCell className="bg-muted" />}
+                {hasSelection && <TableCell className={cn("bg-muted", paddingClasses)} />}
               </TableRow>
             </TableFooter>
           )}

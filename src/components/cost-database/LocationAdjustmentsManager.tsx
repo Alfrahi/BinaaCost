@@ -117,13 +117,13 @@ export default function LocationAdjustmentsManager({
             <Table className="min-w-full bg-card">
               <TableHeader className="bg-muted">
                 <TableRow>
-                  <TableHead className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="px-3 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10">
                     {t("cost_databases.city")}
                   </TableHead>
-                  <TableHead className="px-6 py-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="px-3 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10">
                     {t("cost_databases.multiplier")}
                   </TableHead>
-                  <TableHead className="px-6 py-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="px-3 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10">
                     {t("common:actions")}
                   </TableHead>
                 </TableRow>
@@ -131,46 +131,48 @@ export default function LocationAdjustmentsManager({
               <TableBody className="bg-card divide-y divide-border">
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-4">
+                    <TableCell colSpan={3} className="text-center h-24 px-3">
                       {t("common:loading")}
                     </TableCell>
                   </TableRow>
                 ) : error ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-4 text-destructive">
+                    <TableCell colSpan={3} className="text-center h-24 px-3 text-destructive">
                       {t("common:error")}: {error.message}
                     </TableCell>
                   </TableRow>
                 ) : locations.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
+                    <TableCell colSpan={3} className="text-center h-24 px-3 text-muted-foreground">
                       {t("cost_databases.noLocationAdjustments")}
                     </TableCell>
                   </TableRow>
                 ) : (
                   locations.map((location) => (
                     <TableRow key={location.id}>
-                      <TableCell className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
+                      <TableCell className="px-3 py-2 whitespace-nowrap text-sm text-foreground">
                         {location.city}
                       </TableCell>
-                      <TableCell className="px-6 py-3 whitespace-nowrap text-sm text-foreground">
+                      <TableCell className="px-3 py-2 whitespace-nowrap text-sm text-foreground">
                         {location.multiplier}
                       </TableCell>
-                      <TableCell className="px-6 py-3 whitespace-nowrap text-end text-sm font-medium">
-                        <div className="flex justify-end gap-2">
+                      <TableCell className="px-3 py-2 whitespace-nowrap text-end text-sm font-medium">
+                        <div className="flex gap-2 justify-end">
                           <Button
                             variant="outline"
                             size="icon"
                             onClick={() => openForm(location)}
+                            className="h-8 w-8"
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                           <Button
                             variant="destructive"
                             size="icon"
                             onClick={() => setDeleteTarget(location)}
+                            className="h-8 w-8"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </TableCell>

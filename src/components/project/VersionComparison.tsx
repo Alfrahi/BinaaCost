@@ -100,24 +100,18 @@ export default function VersionComparison({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common:item")}</TableHead>
-                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{versionA.name}</TableHead>
-                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{versionB.name}</TableHead>
-                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("delta")}</TableHead>
+                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3">{t("common:item")}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3">{versionA.name}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3">{versionB.name}</TableHead>
+                <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 px-3">{t("delta")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.label}>
-                  <TableCell className="text-start text-sm font-medium">
-                    {row.label}
-                  </TableCell>
-                  <TableCell className="text-end tabular-nums text-sm">
-                    {row.isPercent ? `${row.a}%` : format(row.a, currency)}
-                  </TableCell>
-                  <TableCell className="text-end tabular-nums text-sm">
-                    {row.isPercent ? `${row.b}%` : format(row.b, currency)}
-                  </TableCell>
+                  <TableCell className="text-start text-sm font-medium px-3 py-2">{row.label}</TableCell>
+                  <TableCell className="text-end tabular-nums text-sm px-3 py-2">{row.isPercent ? `${row.a}%` : format(row.a, currency)}</TableCell>
+                  <TableCell className="text-end tabular-nums text-sm px-3 py-2">{row.isPercent ? `${row.b}%` : format(row.b, currency)}</TableCell>
                   <DeltaCell value={row.delta} currency={currency} isPercent={row.isPercent} />
                 </TableRow>
               ))}

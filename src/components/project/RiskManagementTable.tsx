@@ -18,18 +18,14 @@ import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { z } from "zod";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DataTable, { DataTableColumn } from "@/components/ui/data-table";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
+  TableCell,
 } from "@/components/ui/table";
 import { calculateRiskContingency } from "@/logic/risk";
 import { calculateCategoryTotal } from "@/logic/shared";
 import { Risk } from "@/types/project-items";
-import EmptyState from "@/components/ui/EmptyState";
 import { useProjectRisks } from "@/hooks/useProjectRisks";
 
 const riskSchema = z.object({
@@ -140,12 +136,21 @@ export default function RiskManagementTable({
     }
   }, [riskProbabilities, form]);
 
-  const headerClass =
-    "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10";
-
   const totalContingency = useMemo(
     () => calculateCategoryTotal.risks(risks),
     [risks],
+  );
+
+  const columns = useMemo<DataTableColumn<Risk>[]>(
+    () => [
+      { key: "description", label: t("fields.description"), minWidth: "150px" },
+      { key: "probability", label: t("fields.probability"), minWidth: "100px" },
+      { key: "impact_amount", label: t("fields.impactAmount"), align: "end", isCurrency: true, minWidth: "120px" },
+      { key: "mitigation_plan", label: t("fields.mitigationPlan"), minWidth: "150px" },
+      { key: "contingency_amount", label: t("fields.riskContingency"), align: "end", isCurrency: true, minWidth: "120px" },
+      { key: "actions", label: t("common:actions"), align: "end", minWidth: "80px" },
+    ],
+    [t],
   );
 
   return (
@@ -287,97 +292,65 @@ export default function RiskManagementTable({
           </form>
         </Form>
       )}
-      <div className="overflow-x-auto border rounded-lg bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("fields.description")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[100px]`}>
-                {t("fields.probability")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
-                {t("fields.impactAmount")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[150px]`}>
-                {t("fields.mitigationPlan")}
-              </TableHead>
-              <TableHead className={`text-start ${headerClass} min-w-[120px]`}>
-                {t("fields.riskContingency")}
-              </TableHead>
-              {canEdit && (
-                <TableHead className={`text-end ${headerClass} min-w-[80px]`}>
-                  {t("common:actions")}
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {risks.map((risk) => (
-              <TableRow key={risk.id}>
-                <TableCell className="text-start text-sm min-w-[150px]">
-                  {risk.description}
-                </TableCell>
-                <TableCell className="text-start text-sm min-w-[100px]">
-                  {riskProbabilities.find((o) => o.value === risk.probability)
-                    ?.label || risk.probability}
-                </TableCell>
-                <TableCell className="text-start text-sm min-w-[120px]">
-                  {format(risk.impact_amount, currency)}
-                </TableCell>
-                <TableCell className="text-start text-sm min-w-[150px]">
-                  {risk.mitigation_plan || t("common:notSpecified")}
-                </TableCell>
-                <TableCell className="text-start text-sm min-w-[120px]">
-                  {format(risk.contingency_amount, currency)}
-                </TableCell>
-                {canEdit && (
-                  <TableCell className="text-end min-w-[80px]">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setEditingItem(risk);
-                          form.reset({
-                            description: risk.description,
-                            probability: risk.probability,
-                            impact_amount: risk.impact_amount,
-                            mitigation_plan: risk.mitigation_plan || "",
-                            contingency_amount: risk.contingency_amount,
-                          });
-                          setShowForm(true);
-                        }}
-                        aria-label={t("common:edit")}
-                        className="h-7 w-7"
-                      >
-                        <Edit2 className="w-3 h-3" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => setDeleteTarget(risk)}
-                        aria-label={t("common:delete")}
-                        className="h-7 w-7"
-                      >
-                        <Trash2 className="w-3 h-3" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-            {risks.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={canEdit ? 6 : 5}>
-                  <EmptyState message={t("noItems")} />
-                </TableCell>
-              </TableRow>
+      <DataTable
+        columns={columns}
+        data={risks}
+        getRowKey={(risk) => risk.id}
+        renderRow={(risk) => (
+          <TableRow key={risk.id}>
+            <TableCell className="text-start text-sm">{risk.description}</TableCell>
+            <TableCell className="text-start text-sm">
+              {riskProbabilities.find((o) => o.value === risk.probability)
+                ?.label || risk.probability}
+            </TableCell>
+            <TableCell className="text-end tabular-nums text-sm">
+              {format(risk.impact_amount, currency)}
+            </TableCell>
+            <TableCell className="text-start text-sm">
+              {risk.mitigation_plan || t("common:notSpecified")}
+            </TableCell>
+            <TableCell className="text-end tabular-nums text-sm">
+              {format(risk.contingency_amount, currency)}
+            </TableCell>
+            {canEdit && (
+              <TableCell className="text-end">
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      setEditingItem(risk);
+                      form.reset({
+                        description: risk.description,
+                        probability: risk.probability,
+                        impact_amount: risk.impact_amount,
+                        mitigation_plan: risk.mitigation_plan || "",
+                        contingency_amount: risk.contingency_amount,
+                      });
+                      setShowForm(true);
+                    }}
+                    aria-label={t("common:edit")}
+                    className="h-8 w-8"
+                  >
+                    <Edit2 className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => setDeleteTarget(risk)}
+                    aria-label={t("common:delete")}
+                    className="h-8 w-8"
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </div>
+              </TableCell>
             )}
-          </TableBody>
-        </Table>
-      </div>
+          </TableRow>
+        )}
+        emptyMessage={t("noItems")}
+        ariaLabel={t("project_risk:tableLabel")}
+      />
       <div className="mt-4 bg-accent border-s-4 border-primary p-4 rounded-sm space-y-2">
         <div className="font-semibold text-accent-foreground text-base">
           {t("totalRiskContingency")}:{" "}

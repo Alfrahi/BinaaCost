@@ -145,19 +145,21 @@ export default function CostItemsTable({
 
   const columns = useMemo<DataTableColumn<CostDatabaseItem>[]>(() => {
     const cols: DataTableColumn<CostDatabaseItem>[] = [
-      { key: "csi_code", label: t("project_costs:csiCode") },
-      { key: "description", label: t("common:description") },
-      { key: "unit", label: t("common:unit") },
-      { key: "unit_price", label: t("common:price") },
+      { key: "csi_code", label: t("project_costs:csiCode"), minWidth: "100px" },
+      { key: "description", label: t("common:description"), minWidth: "200px" },
+      { key: "unit", label: t("common:unit"), minWidth: "80px" },
+      { key: "unit_price", label: t("common:price"), align: "end", minWidth: "120px" },
     ];
     if (selectedLocation) {
       cols.push({
         key: "adjusted_price",
         label: t("pages:cost_databases.adjustedPrice"),
+        align: "end",
+        minWidth: "120px",
       });
     }
     if (canEdit) {
-      cols.push({ key: "actions", label: t("common:actions"), align: "end" });
+      cols.push({ key: "actions", label: t("common:actions"), align: "end", minWidth: "100px" });
     }
     return cols;
   }, [t, selectedLocation, canEdit]);
@@ -302,7 +304,7 @@ export default function CostItemsTable({
         renderRow={(item) => (
           <TableRow key={item.id}>
             {canEdit && (
-              <TableCell className="px-3 py-2 w-[40px]">
+              <TableCell className="w-[40px]">
                 <Checkbox
                   checked={selection.isSelected(item.id)}
                   onCheckedChange={() => selection.toggle(item.id)}
@@ -310,46 +312,42 @@ export default function CostItemsTable({
                 />
               </TableCell>
             )}
-            <TableCell className="px-3 py-2 text-start text-sm min-w-[100px]">
-              {item.csi_code}
-            </TableCell>
-            <TableCell className="px-3 py-2 text-start text-sm min-w-[200px]">
-              {item.description}
-            </TableCell>
-            <TableCell className="px-3 py-2 text-start text-sm min-w-[80px]">
-              {item.unit}
-            </TableCell>
-            <TableCell className="px-3 py-2 text-start text-sm min-w-[120px]">
+            <TableCell className="text-start text-sm">{item.csi_code}</TableCell>
+            <TableCell className="text-start text-sm">{item.description}</TableCell>
+            <TableCell className="text-start text-sm">{item.unit}</TableCell>
+            <TableCell className="text-end tabular-nums text-sm">
               {format(item.unit_price, database.currency)}
             </TableCell>
             {selectedLocation && (
-              <TableCell className="px-3 py-2 text-start text-sm font-medium min-w-[120px]">
+              <TableCell className="text-end tabular-nums font-medium text-sm">
                 {format(getAdjustedPrice(item.unit_price), database.currency)}
               </TableCell>
             )}
             {canEdit && (
-              <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => {
-                    setEditingItem(item);
-                    setShowForm(true);
-                  }}
-                  aria-label={`${t("common:edit")} ${item.description}`}
-                  className="h-7 w-7"
-                >
-                  <Edit2 className="w-3 h-3" aria-hidden="true" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => setDeleteTarget(item)}
-                  aria-label={`${t("common:delete")} ${item.description}`}
-                  className="h-7 w-7"
-                >
-                  <Trash2 className="w-3 h-3" aria-hidden="true" />
-                </Button>
+              <TableCell className="text-end">
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingItem(item);
+                      setShowForm(true);
+                    }}
+                    aria-label={`${t("common:edit")} ${item.description}`}
+                    className="h-8 w-8"
+                  >
+                    <Edit2 className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => setDeleteTarget(item)}
+                    aria-label={`${t("common:delete")} ${item.description}`}
+                    className="h-8 w-8"
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </div>
               </TableCell>
             )}
           </TableRow>

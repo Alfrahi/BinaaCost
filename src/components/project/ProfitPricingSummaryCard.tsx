@@ -534,7 +534,7 @@ export default function ProfitPricingSummaryCard({
 
           {isMobile && isDirty && (
             <div
-              className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-xl p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+              className="fixed bottom-0 start-0 end-0 z-50 bg-card border-t border-border shadow-xl p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
               role="status"
               aria-live="polite"
             >
