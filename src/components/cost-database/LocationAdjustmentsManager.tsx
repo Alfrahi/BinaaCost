@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import EmptyState from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,11 +89,11 @@ export default function LocationAdjustmentsManager({
         <>
           {isFormOpen && (
             <Card className="p-4">
-              <h3 className="text-lg font-semibold mb-4">
+              <Heading level={3} className="mb-4">
                 {editingLocation
                   ? t("cost_databases.editLocation")
                   : t("cost_databases.addLocationTitle")}
-              </h3>
+              </Heading>
               <LocationForm
                 editingLocation={editingLocation}
                 onAdd={handleAddLocation}
@@ -102,9 +103,9 @@ export default function LocationAdjustmentsManager({
             </Card>
           )}
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">
+            <Heading level={1}>
               {t("cost_databases.locations")}
-            </h2>
+            </Heading>
             {!isFormOpen && (
               <Button onClick={() => openForm()} size="sm">
                 <Plus className="w-4 h-4 ms-2" />

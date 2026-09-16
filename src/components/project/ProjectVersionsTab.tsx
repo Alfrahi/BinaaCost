@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -244,9 +245,9 @@ export default function ProjectVersionsTab({
       <Card className="p-4 sm:p-6 border-2 border-border shadow-md text-sm">
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div>
-            <h3 className="text-lg font-bold text-foreground">
+            <Heading level={3} className="text-foreground">
               {t("restorePreview")}
-            </h3>
+            </Heading>
             <p className="text-sm text-muted-foreground">
               {t("restoreDescription")}
             </p>
@@ -296,9 +297,9 @@ export default function ProjectVersionsTab({
       <Card className="p-4 sm:p-6 border-2 border-border shadow-md text-sm">
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div>
-            <h3 className="text-lg font-bold text-foreground">
+            <Heading level={3} className="text-foreground">
               {t("compareTitle")}
-            </h3>
+            </Heading>
             <p className="text-sm text-muted-foreground">
               {t("compareDescription")}
             </p>
@@ -369,7 +370,7 @@ export default function ProjectVersionsTab({
     <div className="space-y-6 text-sm">
       {canEdit && (
         <Card className="p-4 space-y-2">
-          <h3 className="font-semibold text-lg">{t("create")}</h3>
+          <Heading level={3}>{t("create")}</Heading>
           <div className="flex gap-2">
             <Input
               placeholder={t("namePlaceholder")}
@@ -403,7 +404,7 @@ export default function ProjectVersionsTab({
 
       <Card className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">{t("restore")}</h3>
+          <Heading level={3}>{t("restore")}</Heading>
           {timeline.length >= 2 && (
             <Button
               variant="outline"

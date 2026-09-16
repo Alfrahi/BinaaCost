@@ -3,6 +3,7 @@ import { useState } from "react";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import { Badge } from "@/components/ui/badge";
+import { Heading } from "@/components/ui/heading";
 import {
   Dialog,
   DialogContent,
@@ -143,9 +144,9 @@ export default function ShareProjectDialog({
           </div>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-lg">
+              <Heading level={3}>
                 {t("project_detail:share.internalSharing")}
-              </h3>
+              </Heading>
               <Badge variant="muted">
                 {t("project_detail:share.external.internal")}
               </Badge>

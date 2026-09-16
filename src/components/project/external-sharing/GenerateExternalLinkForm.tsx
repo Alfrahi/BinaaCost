@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Heading } from "@/components/ui/heading";
 import { Loader2, Link as LinkIcon, Copy, AlertTriangle } from "lucide-react";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { format, addDays } from "date-fns";
@@ -63,9 +64,9 @@ export function GenerateExternalLinkForm({
   return (
     <div className="space-y-4 pt-6 border-t border-border">
       <div className="flex items-center gap-2">
-        <h3 className="font-semibold text-lg text-foreground">
+        <Heading level={3} className="text-foreground">
           {t("project_detail:share.external.title")}
-        </h3>
+        </Heading>
         <Badge>{t("project_detail:share.external.clientFacing")}</Badge>
       </div>
       <p className="text-sm text-muted-foreground">

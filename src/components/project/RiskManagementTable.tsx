@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -150,7 +151,7 @@ export default function RiskManagementTable({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">{t("title")}</h2>
+        <Heading level={3}>{t("title")}</Heading>
         {canEdit && !showForm && (
           <Button
             onClick={() => setShowForm(true)}
@@ -168,9 +169,9 @@ export default function RiskManagementTable({
             onSubmit={form.handleSubmit(onSubmit)}
             className="p-4 border rounded-sm bg-card space-y-3 mb-6"
           >
-            <h3 className="font-semibold mb-2 text-lg">
+            <Heading level={3} className="mb-2">
               {editingItem ? t("edit") : t("add")}
-            </h3>
+            </Heading>
             <FormField
               control={form.control}
               name="description"

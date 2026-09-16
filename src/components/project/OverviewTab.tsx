@@ -13,6 +13,7 @@ import {
 } from "@/logic/financials";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { StatCard } from "@/components/ui/stat-card";
+import { Heading } from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { countIncompleteItems } from "@/logic/overview";
@@ -106,9 +107,9 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
       </div>
 
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-base font-semibold mb-3">
+        <Heading level={4} className="mb-3">
           {t("project_overview:costBreakdown")}
-        </h3>
+        </Heading>
         <div className="space-y-2 text-sm">
           {(
             [
@@ -160,9 +161,9 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
       </div>
 
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-base font-semibold mb-2">
+        <Heading level={4} className="mb-2">
           {t("project_overview:attention")}
-        </h3>
+        </Heading>
         {!needsAttention ? (
           <p className="text-sm text-muted-foreground">
             {t("project_overview:allGood")}
@@ -191,9 +192,9 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
       </div>
 
       <div className="bg-card rounded-lg shadow p-4 sm:p-6 text-sm border border-border/60">
-        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
+        <Heading level={5} className="text-muted-foreground mb-2">
           {t("project_overview:details")}
-        </h3>
+        </Heading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div className="font-semibold">{t("project_overview:type")}</div>
