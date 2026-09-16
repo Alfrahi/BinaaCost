@@ -78,7 +78,7 @@
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
-    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/coverage-istanbul": "^1.6.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.0",
