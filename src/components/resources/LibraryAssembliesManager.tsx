@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/ui/heading";
 import { AssemblyDetail, AssemblyList } from "@/components/assemblies";
 
 export default function LibraryAssembliesManager() {
@@ -22,9 +23,9 @@ export default function LibraryAssembliesManager() {
   return (
     <div className="space-y-4 text-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <Heading level={1}>
           {t("resources:assemblies.title")}
-        </h2>
+        </Heading>
       </div>
       <AssemblyList onSelectAssembly={setSelectedAssemblyId} />
     </div>

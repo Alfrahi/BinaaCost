@@ -1,5 +1,6 @@
 import React, { Suspense, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 import ReactECharts from "echarts-for-react";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import { useTranslation } from "react-i18next";
@@ -79,32 +80,32 @@ export default function AnalyticsTab({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">
+              <Heading level={3} className="mb-2">
                 {t("project_tabs:materials")}
-              </h3>
+              </Heading>
               <p className="text-2xl">{format(materialsTotal, currency)}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">
+              <Heading level={3} className="mb-2">
                 {t("project_tabs:labor")}
-              </h3>
+              </Heading>
               <p className="text-2xl">{format(laborTotal, currency)}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">
+              <Heading level={3} className="mb-2">
                 {t("project_tabs:equipment")}
-              </h3>
+              </Heading>
               <p className="text-2xl">{format(equipmentTotal, currency)}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">
+              <Heading level={3} className="mb-2">
                 {t("project_tabs:additional")}
-              </h3>
+              </Heading>
               <p className="text-2xl">{format(additionalTotal, currency)}</p>
             </div>
           </div>
           <div className="mt-6 pt-4 border-t">
-            <h3 className="text-lg font-semibold mb-2">{t("common:total")}</h3>
+            <Heading level={3} className="mb-2">{t("common:total")}</Heading>
             <p className="text-3xl font-bold">{format(totalCost, currency)}</p>
           </div>
         </CardContent>

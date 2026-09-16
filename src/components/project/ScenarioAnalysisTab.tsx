@@ -74,6 +74,7 @@ import { TranslatedSelect } from "@/components/TranslatedSelect";
 import { FinancialSummary } from "@/logic/financials";
 import { SCENARIO_COLORS } from "@/logic/chartPalette";
 import ChartContainer from "@/components/ChartContainer";
+import { Heading } from "@/components/ui/heading";
 
 function DynamicRuleField({
   control,
@@ -482,7 +483,7 @@ export function ScenarioAnalysisTab({
     <div className="space-y-6 text-sm">
       <Card className="p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-lg">{t("title")}</h3>
+          <Heading level={3}>{t("title")}</Heading>
           {canEdit && (
             <Button
               variant="ghost"

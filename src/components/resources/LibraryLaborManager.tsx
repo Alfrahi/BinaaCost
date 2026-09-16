@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
   TableCell,
@@ -183,7 +184,7 @@ export default function LibraryLaborManager() {
   return (
     <div className="space-y-4 text-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">{t("resources:labor")}</h2>
+        <Heading level={1}>{t("resources:labor")}</Heading>
         {!isFormOpen && (
           <Button
             onClick={() => openForm()}
@@ -197,10 +198,10 @@ export default function LibraryLaborManager() {
       {isFormOpen && (
         <div className="border rounded-lg p-4 bg-muted space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg">
+            <Heading level={3}>
               {editingItem ? t("common:edit") : t("common:add")}{" "}
               {t("resources:labor.laborItem")}
-            </h3>
+            </Heading>
             <Button
               type="button"
               variant="ghost"

@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { Heading } from "./ui/heading";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { useAuth } from "./AuthProvider";
@@ -182,9 +183,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             <>
               <Separator className="my-4 bg-border" />
               {!isCollapsed && (
-                <h3 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                <Heading level={6} className="px-4 uppercase tracking-wider text-muted-foreground mb-2">
                   {t("navigation:adminPanel")}
-                </h3>
+                </Heading>
               )}
               <nav className="space-y-1 px-4">
                 {adminNavigation.map((item) => (

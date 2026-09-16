@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 import EmptyState from "@/components/ui/EmptyState";
 import { Plus, ArrowLeft, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -201,9 +202,9 @@ function AssemblyItemManager({
   return (
     <Card className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-foreground">
+        <Heading level={3} className="text-foreground">
           {t("resources:assemblies.itemsList")} ({items.length})
-        </h3>
+        </Heading>
         {!itemFormOpen && (
           <Button
             onClick={() => openItemForm("material")}
@@ -322,9 +323,9 @@ export function AssemblyDetail({ assemblyId, onBack }: AssemblyDetailProps) {
           />
         </Button>
         <div>
-          <h2 className="text-xl font-bold text-foreground">
+          <Heading level={2} className="text-foreground">
             {assembly.name}
-          </h2>
+          </Heading>
           <p className="text-sm text-muted-foreground">
             {assembly.description || t("common:noDescription")}
           </p>

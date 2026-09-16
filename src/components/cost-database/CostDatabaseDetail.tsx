@@ -2,6 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import EmptyState from "@/components/ui/EmptyState";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import LoadingState from "@/components/ui/LoadingState";
@@ -72,9 +73,9 @@ export default function CostDatabaseDetail({
           />
         </Button>
         <div>
-          <h2 className="text-xl font-bold text-foreground">
+          <Heading level={2} className="text-foreground">
             {database.name}
-          </h2>
+          </Heading>
           <p className="text-sm text-muted-foreground">
             {database.description || t("common:noDescription")}
           </p>

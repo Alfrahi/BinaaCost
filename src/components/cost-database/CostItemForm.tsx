@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import {
@@ -79,9 +80,9 @@ export function CostItemForm({
   return (
     <div className="border rounded-lg p-4 bg-muted space-y-3">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg">
+        <Heading level={3}>
           {initialData ? t("common:edit") : t("pages:cost_databases.add")}
-        </h3>
+        </Heading>
         <Button
           type="button"
           variant="ghost"

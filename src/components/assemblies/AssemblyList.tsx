@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { Plus, Edit2, Trash2, Package, Eye, X } from "lucide-react";
 import { toast } from "sonner";
@@ -52,10 +53,10 @@ function AssemblyFormDialog({
   return (
     <div className="border border-border rounded-lg p-4 bg-muted space-y-3">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-foreground">
+        <Heading level={3} className="text-foreground">
           {initialData ? t("common:edit") : t("common:add")}{" "}
           {t("resources:assemblies.assembly")}
-        </h3>
+        </Heading>
         <Button
           type="button"
           variant="ghost"
