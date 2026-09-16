@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import {
@@ -132,9 +133,9 @@ export default function AssemblyImporter({
   return (
     <div className="border rounded-lg p-4 bg-muted mb-4 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-foreground">
+        <Heading level={3} className="text-foreground">
           {t("project_detail:assembly_importer.importFromAssembly")}
-        </h3>
+        </Heading>
         <Button
           variant="ghost"
           size="icon"

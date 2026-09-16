@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import EmptyState from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -245,9 +246,9 @@ export default function ProjectGroupsManager({
   return (
     <div className="border border-border rounded-lg p-4 bg-muted mb-4 shadow-sm text-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-foreground">
+        <Heading level={3} className="text-foreground">
           {t("project_detail:groups.manageGroups")}
-        </h3>
+        </Heading>
         <Button
           variant="ghost"
           size="icon"

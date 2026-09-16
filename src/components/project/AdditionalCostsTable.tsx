@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Layers, Trash, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { cn, getIconMarginClass } from "@/lib/utils";
 import { useCurrencyFormatter } from "@/utils/formatCurrency";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
@@ -165,7 +166,7 @@ export function AdditionalCostsTable({
   return (
     <div>
       <div className="flex items-center justify-between mb-4 gap-2">
-        <h2 className="text-lg font-semibold">{t("title")}</h2>
+        <Heading level={3}>{t("title")}</Heading>
         {canEdit && !isFormOpen && (
           <div className="flex items-center gap-2">
             <Button
@@ -246,9 +247,9 @@ export function AdditionalCostsTable({
       )}
       {isFormOpen && (
         <div className="p-4 border rounded-sm bg-card mb-4">
-          <h3 className="text-lg font-semibold mb-4">
+          <Heading level={3} className="mb-4">
             {editingItem ? t("edit") : t("add")}
-          </h3>
+          </Heading>
           <AdditionalCostForm
             editingItem={editingItem}
             onSubmit={onSubmit}

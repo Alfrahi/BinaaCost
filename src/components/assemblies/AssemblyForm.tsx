@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { Assembly } from "@/types/assemblies";
@@ -78,10 +79,10 @@ export function AssemblyForm({
         className="border rounded-lg p-4 bg-muted space-y-3"
       >
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-lg">
+          <Heading level={3}>
             {initialData ? t("common:edit") : t("common:add")}{" "}
             {t("resources:assemblies.assembly")}
-          </h3>
+          </Heading>
         </div>
 
         <FormField

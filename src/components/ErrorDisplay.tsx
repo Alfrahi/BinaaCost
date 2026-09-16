@@ -1,5 +1,6 @@
 import { AlertCircle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { useTranslation } from "react-i18next";
 import { getFriendlyErrorMessage } from "@/utils/error-handling";
 
@@ -23,9 +24,9 @@ const ErrorContent = ({
     <div className="bg-destructive/10 p-4 rounded-full mb-4">
       <AlertCircle className="w-8 h-8 text-destructive" />
     </div>
-    <h2 className="text-xl font-bold text-foreground mb-2">
+    <Heading level={2} className="text-foreground mb-2">
       {t("boundaryTitle")}
-    </h2>
+    </Heading>
     <p className="text-base text-muted-foreground mb-6">{displayMessage}</p>
 
     <div className="flex gap-3 justify-center">
