@@ -125,25 +125,25 @@ export function MaterialsTable({
         key: "name",
         label: t("columns.name"),
         align: "start",
-        minWidth: "150",
+        minWidth: "150px",
       },
       {
         key: "description",
         label: t("columns.description"),
         align: "start",
-        minWidth: "200",
+        minWidth: "200px",
       },
       {
         key: "quantity",
         label: t("columns.quantity"),
         align: "end",
-        minWidth: "100",
+        minWidth: "100px",
       },
       {
         key: "unit",
         label: t("columns.unit"),
         align: "start",
-        minWidth: "80",
+        minWidth: "80px",
         format: (value: string) =>
           materialUnits.find((u) => u.value === value)?.label || value,
       },
@@ -152,14 +152,14 @@ export function MaterialsTable({
         label: t("columns.unitPrice"),
         align: "end",
         isCurrency: true,
-        minWidth: "120",
+        minWidth: "120px",
         format: (value: number) => format(value, currency),
       },
       {
         key: "total",
         label: t("columns.estTotalCost"),
         align: "end",
-        minWidth: "120",
+        minWidth: "120px",
         format: (_, row: MaterialItem) =>
           format(
             calculateItemCost.material(row.quantity, row.unit_price) *

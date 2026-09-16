@@ -71,7 +71,9 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
           className="text-sm font-medium text-foreground"
           aria-label={t("common:switchLanguage")}
         >
-          {i18n.language === "en" ? "العربية" : "English"}
+          {i18n.language === "en"
+            ? t("common:languageNameAr")
+            : t("common:languageNameEn")}
         </Button>
 
         <DropdownMenu>

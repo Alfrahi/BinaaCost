@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface InlineEditableCellProps {
@@ -33,6 +34,7 @@ export function InlineEditableCell({
   className,
   ariaLabel,
 }: InlineEditableCellProps) {
+  const { t } = useTranslation(["common"]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +100,7 @@ export function InlineEditableCell({
       type="button"
       onClick={startEdit}
       disabled={disabled || isSaving}
-      title={disabled ? undefined : "Click to edit"}
+      title={disabled ? undefined : t("common:clickToEdit")}
       aria-label={ariaLabel}
       className={cn(
         "rounded-sm px-1 py-0.5 text-end tabular-nums text-sm transition-colors",

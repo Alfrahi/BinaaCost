@@ -573,16 +573,16 @@ export function ScenarioAnalysisTab({
                 <Table className="min-w-full divide-y divide-border">
                   <TableHeader className="bg-muted">
                     <TableRow>
-                      <TableHead className="px-4 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="px-3 py-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10">
                         {t("category")}
                       </TableHead>
-                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="px-3 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums">
                         {t("original")}
                       </TableHead>
-                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="px-3 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums">
                         {t("simulated")}
                       </TableHead>
-                      <TableHead className="px-4 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="px-3 py-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted h-10 tabular-nums">
                         {t("difference")}
                       </TableHead>
                     </TableRow>
@@ -676,22 +676,22 @@ export function ScenarioAnalysisTab({
                       >
                         <TableCell
                           className={cn(
-                            "px-4 py-2 text-sm",
+                            "px-3 py-2 text-sm",
                             row.isBold && "font-semibold",
                             "text-start",
                           )}
                         >
                           {row.label}
                         </TableCell>
-                        <TableCell className="px-4 py-2 text-end text-sm">
+                        <TableCell className="px-3 py-2 text-end text-sm tabular-nums">
                           {format(row.original, currency)}
                         </TableCell>
-                        <TableCell className="px-4 py-2 text-end text-sm">
+                        <TableCell className="px-3 py-2 text-end text-sm tabular-nums">
                           {format(row.simulated, currency)}
                         </TableCell>
                         <TableCell
                           className={cn(
-                            "px-4 py-2 text-end text-sm",
+                            "px-3 py-2 text-end text-sm tabular-nums",
                             row.simulated - row.original > 0
                               ? "text-destructive"
                               : "text-success",

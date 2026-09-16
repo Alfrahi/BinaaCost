@@ -172,13 +172,13 @@ export default function ShareProjectDialog({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
                           {t("project_detail:share.user")}
                         </TableHead>
-                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[100px] px-3">
                           {t("project_detail:share.role")}
                         </TableHead>
-                        <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[80px] px-3">
                           {t("common:actions")}
                         </TableHead>
                       </TableRow>
@@ -221,13 +221,13 @@ export default function ShareProjectDialog({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
                         {t("project_detail:share.external.link")}
                       </TableHead>
-                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[120px] px-3">
                         {t("project_detail:share.external.expires")}
                       </TableHead>
-                      <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[80px] px-3">
                         {t("common:actions")}
                       </TableHead>
                     </TableRow>
@@ -238,7 +238,7 @@ export default function ShareProjectDialog({
                           new Date(link.expires_at) < new Date();
                         return (
                           <TableRow key={link.id}>
-                            <TableCell className="whitespace-nowrap text-sm">
+                            <TableCell className="whitespace-nowrap text-sm px-3 py-2">
                               <span
                                 className={
                                   isExpired
@@ -254,18 +254,18 @@ export default function ShareProjectDialog({
                                 {t("project_detail:share.external.linkHiddenNote")}
                               </span>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-sm text-foreground">
+                            <TableCell className="whitespace-nowrap text-sm text-foreground px-3 py-2">
                               {formatDate(link.expires_at, "short")}
                             </TableCell>
-                            <TableCell className="whitespace-nowrap text-end text-sm font-medium">
+                            <TableCell className="whitespace-nowrap text-end text-sm font-medium px-3 py-2">
                               <Button
                                 variant="destructive"
                                 size="icon"
                                 onClick={() => setDeleteTargetExternal(link)}
-                                className="h-7 w-7"
+                                className="h-8 w-8"
                                 aria-label={t("common:delete")}
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </TableCell>
                           </TableRow>

@@ -28,7 +28,7 @@ export function BulkActionBar({
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-xl px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4"
+          className="fixed bottom-0 start-0 end-0 z-50 bg-card border-t border-border shadow-xl px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4"
         >
           <div className="flex items-center gap-3 border-e border-border pe-4 me-2">
             <span className="font-semibold text-sm whitespace-nowrap">

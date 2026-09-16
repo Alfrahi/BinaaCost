@@ -160,5 +160,8 @@
   "currency": "Currency",
   "exchangeRateUSD": "Exchange Rate USD",
   "of": "of",
-  "offlineOperationNotAllowed": "This operation is not allowed while offline. Please connect to the internet to proceed."
+  "offlineOperationNotAllowed": "This operation is not allowed while offline. Please connect to the internet to proceed.",
+  "languageNameEn": "English",
+  "languageNameAr": "Arabic",
+  "clickToEdit": "Click to edit"
 }

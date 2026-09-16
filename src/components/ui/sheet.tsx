@@ -69,9 +69,9 @@ const SheetContent = React.forwardRef<
       <SheetPrimitive.Close
         className={cn(
           "absolute top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
-          side === "right" && "right-4",
-          side === "left" && "left-4",
-          (side === "top" || side === "bottom") && "right-4",
+          side === "right" && "end-4",
+          side === "left" && "start-4",
+          (side === "top" || side === "bottom") && "end-4",
         )}
       >
         <X className="h-4 w-4" />
