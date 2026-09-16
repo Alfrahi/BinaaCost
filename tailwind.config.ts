@@ -35,6 +35,11 @@ export default {
           DEFAULT: "#EF4444",
           foreground: "#FFFFFF",
         },
+        warning: {
+          // amber-600 — warnings and caution
+          DEFAULT: "#D97706",
+          foreground: "#FFFFFF",
+        },
         background: {
           DEFAULT: "#FFFFFF",
         },
