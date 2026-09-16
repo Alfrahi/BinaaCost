@@ -89,7 +89,7 @@ test.describe("offline material queue", () => {
 
   async function openCostsTab(page: any) {
     await page.goto(`/projects/${pid}`);
-    await page.getByRole("tab", { name: /costs|التكاليف/i }).click();
+    await page.getByRole("tab", { name: /^costs$|^التكاليف$/i }).click();
     await expect(page.getByRole("heading", { name: /materials|المواد/i }).first()).toBeVisible({ timeout: 10000 });
   }
 
@@ -110,7 +110,7 @@ test.describe("offline material queue", () => {
     await page.getByRole("button", { name: /add material|إضافة مادة/i }).first().click();
     await expect(page.getByText("Select unit")).not.toBeVisible({ timeout: 10000 });
     await page.reload();
-    await page.getByRole("tab", { name: /costs|التكاليف/i }).click();
+    await page.getByRole("tab", { name: /^costs$|^التكاليف$/i }).click();
     await expect(page.getByRole("heading", { name: /materials|المواد/i }).first()).toBeVisible({ timeout: 10000 });
   }
 

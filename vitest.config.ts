@@ -8,6 +8,9 @@ export default mergeConfig(
       globals: true,
       environment: "jsdom",
       setupFiles: [],
+      coverage: {
+        provider: "istanbul",
+      },
       exclude: [
         "**/node_modules/**",
         "**/dist/**",

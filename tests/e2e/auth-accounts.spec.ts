@@ -96,11 +96,11 @@ test.describe("cross-account offline isolation", () => {
     // comments are NOT queued offline (disableOfflineQueue) — use materials,
     // which ARE. Prime the unit dropdown while online (network-backed query),
     // then go offline and add a material so it lands in A's queued queue.
-    await page.getByRole("tab", { name: /costs|التكاليف/i }).click();
+    await page.getByRole("tab", { name: /^costs$|^التكاليف$/i }).click();
     await page.getByRole("button", { name: /add material|إضافة مادة/i }).first().click();
     await expect(page.getByText("Select unit")).not.toBeVisible({ timeout: 10000 });
     await page.reload();
-    await page.getByRole("tab", { name: /costs|التكاليف/i }).click();
+    await page.getByRole("tab", { name: /^costs$|^التكاليف$/i }).click();
     await expect(page.getByRole("heading", { name: /materials|المواد/i }).first()).toBeVisible({ timeout: 10000 });
 
     await context.setOffline(true);
