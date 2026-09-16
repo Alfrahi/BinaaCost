@@ -29,9 +29,6 @@ const DropdownSettings = React.lazy(
 const AppSettings = React.lazy(() => import("./pages/admin/AppSettings"));
 const AuditLogs = React.lazy(() => import("./pages/admin/AuditLogs"));
 const UserDetails = React.lazy(() => import("./pages/admin/UserDetails"));
-const SubscriptionManagement = React.lazy(
-  () => import("./pages/admin/SubscriptionManagement"),
-);
 const PublicShare = React.lazy(() => import("./pages/PublicShare"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
@@ -204,16 +201,6 @@ function AppContent() {
                     <AdminRoute>
                       <LayoutShell>
                         <AuditLogs />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/subscriptions"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <SubscriptionManagement />
                       </LayoutShell>
                     </AdminRoute>
                   }

@@ -16,8 +16,6 @@ export interface Profile {
   company_name: string | null;
   company_website: string | null;
   notification_prefs: Record<string, boolean> | null;
-  subscription_plan: string | null;
-  subscription_expires_at: string | null;
   updated_at?: string;
 }
 

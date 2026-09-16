@@ -7,7 +7,6 @@ import {
   FolderKanban,
   FileText,
   Settings,
-  CreditCard,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 
@@ -44,12 +43,6 @@ export default function AdminPanel() {
       description: t("admin:auditLogs.description"),
       icon: FileText,
       path: "/admin/audit-logs",
-    },
-    {
-      title: t("admin:subscriptionManagement.title"),
-      description: t("admin:subscriptionManagement.description"),
-      icon: CreditCard,
-      path: "/admin/subscriptions",
     },
   ];
 

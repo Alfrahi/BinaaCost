@@ -1,6 +1,6 @@
 /// <reference path="../pb_data/types.d.ts" />
 // H3: undo 1700000003 — the users collection was listable by any
-// authenticated user, exposing email/name/company/subscription of everyone.
+// authenticated user, exposing email/name/company of everyone.
 // Restrict to self + super_admin; collaboration UIs use POST
 // /api/users/minimal for display identity instead.
 migrate((app) => {

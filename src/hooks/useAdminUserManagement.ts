@@ -14,9 +14,6 @@ export interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   role: string;
-  plan: string;
-  subscription_expires_at: string | null;
-  max_active_projects: number | null;
   created_at: string;
 }
 
@@ -58,9 +55,6 @@ export function useAdminUserManagement() {
         first_name: (r.first_name as string) ?? null,
         last_name: (r.last_name as string) ?? null,
         role: (r.role as string) ?? "user",
-        plan: (r.subscription_plan as string) ?? "",
-        subscription_expires_at: (r.subscription_expires_at as string) ?? null,
-        max_active_projects: null,
         created_at: r.created,
       }));
     },

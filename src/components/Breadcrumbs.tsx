@@ -52,7 +52,6 @@ export default function Breadcrumbs() {
     resources: "navigation:resources",
     "app-settings": "admin:appSettings.title",
     "audit-logs": "admin:auditLogs.title",
-    subscriptions: "admin:subscriptionManagement.title",
   };
 
   return (

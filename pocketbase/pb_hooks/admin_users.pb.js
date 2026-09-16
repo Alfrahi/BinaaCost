@@ -27,22 +27,6 @@ routerAdd("POST", "/api/admin/users/{id}/role", (e) => {
   return e.json(200, { id: userId, role });
 });
 
-routerAdd("POST", "/api/admin/users/{id}/subscription", (e) => {
-  const auth = e.auth;
-  if (!auth || !(auth.get("role") === "super_admin")) {
-    throw new ForbiddenError("super_admin only");
-  }
-  const userId = e.request.pathValue("id");
-  const body = e.requestInfo().body;
-  const plan = body.plan || "";
-  const expiresAt = body.expires_at || null;
-  const target = $app.findRecordById("users", userId);
-  target.set("subscription_plan", plan);
-  target.set("subscription_expires_at", expiresAt);
-  $app.saveNoValidate(target);
-  return e.json(200, { id: userId, plan });
-});
-
 routerAdd("POST", "/api/admin/users/{id}/delete", (e) => {
   const auth = e.auth;
   if (!auth || !(auth.get("role") === "super_admin")) {
