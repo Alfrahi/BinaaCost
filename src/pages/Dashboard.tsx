@@ -94,12 +94,12 @@ export default function Dashboard() {
       <PageHeader title={t("dashboard:title")} />
 
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="flex-1">
+        <div className="flex-1 w-full">
           <Input
             placeholder={t("dashboard:searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md text-sm"
+            className="text-sm"
           />
         </div>
         <Button asChild className="text-sm">

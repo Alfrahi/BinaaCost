@@ -10,7 +10,6 @@ import {
   Users,
   SlidersHorizontal,
   LogOut,
-  CreditCard,
   X,
   FileText,
   ChevronLeft,
@@ -63,11 +62,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       icon: Settings,
     },
     { name: t("admin:users.title"), href: "/admin/users", icon: Users },
-    {
-      name: t("admin:subscriptionManagement.title"),
-      href: "/admin/subscriptions",
-      icon: CreditCard,
-    },
     {
       name: t("admin:projects.title"),
       href: "/admin/projects",

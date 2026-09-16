@@ -16,15 +16,13 @@ migrate((app) => {
     new Field({ name: "company_name", type: "text" }),
     new Field({ name: "company_website", type: "text" }),
     new Field({ name: "notification_prefs", type: "json" }),
-    new Field({ name: "subscription_plan", type: "text" }),
-    new Field({ name: "subscription_expires_at", type: "date" }),
   ];
   // Keep existing fields and append custom ones
   users.fields = [...users.fields, ...customFields];
   users.listRule = 'id = @request.auth.id || @request.auth.role = "super_admin"';
   users.viewRule = 'id = @request.auth.id || @request.auth.role = "super_admin"';
   users.createRule = '@request.body.role = "" || @request.body.role = "user"';
-  users.updateRule = 'id = @request.auth.id && @request.body.role:isset = false && @request.body.subscription_plan:isset = false && @request.body.subscription_expires_at:isset = false';
+  users.updateRule = 'id = @request.auth.id && @request.body.role:isset = false';
   console.log("Saving users...");
   app.save(users);
   console.log("Users saved");

@@ -12,6 +12,5 @@
   "permissionDenied": "You do not have permission to perform this action.",
   "resourceNotFound": "The requested resource could not be found.",
   "timeout": "The request timed out. Please try again.",
-  "missingRequiredField": "A required field is missing. Please check your input.",
-  "projectLimitExceeded": "Project limit exceeded. Your {{plan}} plan allows only {{count}} active projects. Upgrade or archive existing projects."
+  "missingRequiredField": "A required field is missing. Please check your input."
 }
