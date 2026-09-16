@@ -148,7 +148,12 @@ class OfflineManager {
           MUTATION_QUEUE_KEY,
         );
         if (legacy && legacy.length > 0) {
-          this.queue = this.queue.concat(legacy);
+          // Update userId for all legacy mutations to current user
+          const migratedLegacy = legacy.map(mutation => ({
+            ...mutation,
+            userId: userId
+          }));
+          this.queue = this.queue.concat(migratedLegacy);
           await localforage.removeItem(MUTATION_QUEUE_KEY);
         }
       }
