@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { pb } from "@/integrations/pocketbase/client";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { safeAdd } from "@/shared/lib/math";

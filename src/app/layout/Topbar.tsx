@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { useProfile } from "@/features/settings/hooks/useProfile";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 

@@ -16,10 +16,10 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { PaginationControls } from "@/shared/components/PaginationControls";
-import { Assembly } from "@/types/assemblies";
+import { Assembly } from "@/features/cost-library/assemblies/types/assemblies";
 import { useAssemblies, PAGE_SIZE_OPTIONS } from "@/features/cost-library/hooks/useAssemblies";
 import { AssemblyForm } from "./AssemblyForm";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import {
   TableCell,
   TableRow,

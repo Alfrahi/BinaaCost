@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { offlineManager } from "@/shared/lib/offline";
 import { executePbMutation } from "@/shared/lib/pb-executor";
 import { ClientResponseError } from "pocketbase";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import i18n from "@/i18n";
 import {
   PbQueryConfig,

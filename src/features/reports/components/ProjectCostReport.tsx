@@ -21,9 +21,8 @@ import {
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
-  Risk,
-  ProjectGroup,
-} from "@/types/project-items";
+} from "@/features/projects/project-costs/types/items";
+import { Risk, ProjectGroup } from "@/features/projects/project-core/types/project";
 
 interface ProjectCostReportProps {
   project: any;

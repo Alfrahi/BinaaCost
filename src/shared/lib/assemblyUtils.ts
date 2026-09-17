@@ -1,4 +1,4 @@
-import { AssemblyItem } from "@/types/assemblies";
+import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
 
 /** Filter assembly items to only include the given item types. */
 export function filterAssemblyItemsByType(

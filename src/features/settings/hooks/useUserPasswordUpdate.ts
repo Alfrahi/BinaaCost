@@ -3,7 +3,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/shared/lib/toast";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 
 export function useUserPasswordUpdate() {
   const { t } = useTranslation(["settings", "common"]);

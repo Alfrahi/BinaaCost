@@ -8,7 +8,7 @@ import { useEffect, useCallback, useMemo } from "react";
 import {
   AssemblyMaterialFormValues,
   assemblyMaterialSchema,
-} from "@/types/assembly-schemas";
+} from "@/features/cost-library/assemblies/types/schemas";
 import {
   Form,
   FormControl,

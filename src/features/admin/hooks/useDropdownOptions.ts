@@ -4,7 +4,7 @@ import { mapRecords } from "@/shared/lib/pb-mapper";
 import { toast } from "sonner";
 import { WORLD_CURRENCIES } from "@/shared/lib/world-currencies";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { handleError } from "@/shared/lib/toast";
 
 export interface Option {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { toast } from "sonner";

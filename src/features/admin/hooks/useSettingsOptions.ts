@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 
 export interface DropdownOption {
   value: string;

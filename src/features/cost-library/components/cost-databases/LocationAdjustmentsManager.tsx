@@ -18,8 +18,8 @@ import {
 } from "@/shared/components/ui/table";
 import ConfirmDialog from "@/shared/components/ConfirmDialog";
 import { Card } from "@/shared/components/ui/card";
-import { useAuth } from "@/app/providers/AuthProvider";
-import { LocationAdjustment } from "@/types/cost-databases";
+import { useAuth } from "@/features/auth";
+import { LocationAdjustment } from "@/features/cost-library/databases/types/databases";
 import { useLocationAdjustments } from "@/features/cost-library/hooks/useLocationAdjustments";
 
 export default function LocationAdjustmentsManager({

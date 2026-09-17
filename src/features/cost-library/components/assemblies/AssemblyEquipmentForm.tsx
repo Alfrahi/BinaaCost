@@ -8,7 +8,7 @@ import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import {
   AssemblyEquipmentFormValues,
   assemblyEquipmentSchema,
-} from "@/types/assembly-schemas";
+} from "@/features/cost-library/assemblies/types/schemas";
 import {
   Form,
   FormControl,

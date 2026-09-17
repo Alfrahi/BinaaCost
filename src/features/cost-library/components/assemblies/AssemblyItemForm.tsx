@@ -24,7 +24,7 @@ import {
   AssemblyLaborDetails,
   AssemblyEquipmentDetails,
   AssemblyAdditionalCostDetails,
-} from "@/types/assemblies";
+} from "@/features/cost-library/assemblies/types/assemblies";
 import {
   AssemblyMaterialForm,
   AssemblyLaborForm,
