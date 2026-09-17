@@ -2,15 +2,15 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
-import LoadingState from "@/components/ui/LoadingState";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useCurrencyFormatter } from "@/utils/formatCurrency";
-import { calculateProjectFinancials } from "@/logic/financials";
-import { calculateItemCost } from "@/logic/shared";
-import { useDateFormatter } from "@/hooks/useDateFormatter";
-import { ProjectCostReport } from "@/components/reports/ProjectCostReport";
-import { useSettingsOptions } from "@/hooks/useSettingsOptions";
+import LoadingState from "@/shared/components/ui/LoadingState";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
+import { calculateProjectFinancials } from "@/shared/logic/financials";
+import { calculateItemCost } from "@/shared/logic/shared";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
+import { ProjectCostReport } from "@/features/reports/components/ProjectCostReport";
+import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
 import {
   MaterialItem,
   LaborItem,
@@ -18,9 +18,9 @@ import {
   AdditionalCostItem,
 } from "@/types/project-items";
 import { PublicShareResponse } from "@/types/project";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import { Input } from "@/shared/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
 
 export default function PublicShare() {
   const { accessToken } = useParams<{ accessToken: string }>();

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import SettingsSection from "@/components/SettingsSection";
-import { useRole } from "@/hooks/useRole";
-import PageHeader from "@/components/PageHeader";
+import SettingsSection from "@/shared/components/SettingsSection";
+import { useRole } from "@/shared/hooks/useRole";
+import PageHeader from "@/shared/components/PageHeader";
 
 interface SettingsCategory {
   key: string;

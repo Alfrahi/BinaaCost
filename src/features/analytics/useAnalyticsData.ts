@@ -1,11 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { pb } from "@/integrations/pocketbase/client";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { safeAdd } from "@/utils/math";
-import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { safeAdd } from "@/shared/lib/math";
+import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { ProjectCostData, AnalyticsData } from "./types";
-import { handleError } from "@/utils/toast";
+import { handleError } from "@/shared/lib/toast";
 
 export function useAnalyticsData() {
   const { user } = useAuth();

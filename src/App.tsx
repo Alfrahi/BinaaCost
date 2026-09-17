@@ -1,14 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./components/AuthProvider";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
-import LayoutShell from "./components/LayoutShell";
-import LanguageProvider from "./components/LanguageProvider";
-import { Toaster } from "./components/ui/sonner";
+import { AuthProvider } from "./app/providers/AuthProvider";
+import ProtectedRoute from "./app/router/ProtectedRoute";
+import AdminRoute from "./app/router/AdminRoute";
+import LayoutShell from "./app/layout/LayoutShell";
+import LanguageProvider from "./app/providers/LanguageProvider";
+import { Toaster } from "./shared/components/ui/sonner";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "./components/ErrorDisplay";
+import ErrorDisplay from "./shared/components/ErrorDisplay";
 import React, { Suspense } from "react";
-import PageLoader from "./components/PageLoader";
+import PageLoader from "./shared/components/PageLoader";
 
 const Login = React.lazy(() => import("./pages/Login"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));

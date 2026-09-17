@@ -1,17 +1,17 @@
 import { useParams, Link } from "react-router-dom";
-import PageLoader from "@/components/PageLoader";
-import ProjectTabs from "@/components/project/ProjectTabs";
-import PageHeader from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
-import EmptyState from "@/components/ui/EmptyState";
+import PageLoader from "@/shared/components/PageLoader";
+import ProjectTabs from "@/features/projects/components/overview/ProjectTabs";
+import PageHeader from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/ui/button";
+import EmptyState from "@/shared/components/ui/EmptyState";
 import { ArrowLeft, Share2, Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useProjectData } from "@/features/project/useProjectData";
+import { useProjectData } from "@/features/projects/hooks/useProjectData";
 import { useState } from "react";
-import { cn, getIconMarginClass } from "@/lib/utils";
-import ShareProjectDialog from "@/components/project/ShareProjectDialog";
-import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { useSoftDeleteProject } from "@/hooks/useSoftDeleteProject";
+import { cn, getIconMarginClass } from "@/shared/lib/utils";
+import ShareProjectDialog from "@/features/projects/components/sharing/ShareProjectDialog";
+import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
+import { useSoftDeleteProject } from "@/features/projects/hooks/useSoftDeleteProject";
 
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation(["project_detail", "common"]);

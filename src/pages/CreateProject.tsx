@@ -1,7 +1,7 @@
 "use client";
-import ProjectForm from "@/components/project/ProjectForm";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { useCreateProject } from "@/hooks/useCreateProject";
+import ProjectForm from "@/features/projects/components/overview/ProjectForm";
+import Breadcrumbs from "@/app/layout/Breadcrumbs";
+import { useCreateProject } from "@/features/projects/hooks/useCreateProject";
 
 export default function CreateProject() {
   const { form, handleSubmit, isPending, error } = useCreateProject();

@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Heading } from "@/components/ui/heading";
+import { Heading } from "@/shared/components/ui/heading";
 
 const NotFound = () => {
   const location = useLocation();

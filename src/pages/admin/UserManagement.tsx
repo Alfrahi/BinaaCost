@@ -1,19 +1,19 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { useTranslation } from "react-i18next";
-import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import PageHeader from "@/components/PageHeader";
+import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
+import PageHeader from "@/shared/components/PageHeader";
 import { X, Eye, Trash2, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RoleBadge } from "@/components/RoleBadge";
-import EditRoleModal from "@/components/EditRoleModal";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RoleBadge } from "@/shared/components/RoleBadge";
+import EditRoleModal from "@/shared/components/EditRoleModal";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import DataTable, {
   DataTableColumn,
-} from "@/components/ui/data-table";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { cn, getIconMarginClass } from "@/lib/utils";
-import { useAdminUserManagement, UserProfile } from "@/hooks/useAdminUserManagement";
+} from "@/shared/components/ui/data-table";
+import { TableCell, TableRow } from "@/shared/components/ui/table";
+import { cn, getIconMarginClass } from "@/shared/lib/utils";
+import { useAdminUserManagement, UserProfile } from "@/features/admin/hooks/useAdminUserManagement";
 import { useMemo } from "react";
 
 export default function UserManagement() {

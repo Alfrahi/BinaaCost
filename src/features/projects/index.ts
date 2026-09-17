@@ -1,0 +1,25 @@
+// Projects feature barrel
+export { useProjectData } from "./hooks/useProjectData";
+export { useProjectMaterials } from "./hooks/useProjectMaterials";
+export { useProjectLabor } from "./hooks/useProjectLabor";
+export { useProjectEquipment } from "./hooks/useProjectEquipment";
+export { useProjectAdditionalCosts } from "./hooks/useProjectAdditionalCosts";
+export { useProjectGroupsManager } from "./hooks/useProjectGroupsManager";
+export { useProjectComments } from "./hooks/useProjectComments";
+export { useProjectCsvImporter } from "./hooks/useProjectCsvImporter";
+export { useProjectRisks } from "./hooks/useProjectRisks";
+export { useProjectSharing } from "./hooks/useProjectSharing";
+export { useProjectSimulator } from "./hooks/useProjectSimulator";
+export { useProjectVersions } from "./hooks/useProjectVersions";
+export { useAssemblyImport } from "./hooks/useAssemblyImport";
+export { useAssemblyItems } from "./hooks/useAssemblyItems";
+export { useUpdateProjectFinancialSettings } from "./hooks/useUpdateProjectFinancialSettings";
+export { useUpdateProject } from "./hooks/useUpdateProject";
+export { useCreateProject } from "./hooks/useCreateProject";
+export { useSoftDeleteProject } from "./hooks/useSoftDeleteProject";
+export { useProjectCardSummary } from "./hooks/useProjectCardSummary";
+export { useCurrencyConversionDialog } from "./hooks/useCurrencyConversionDialog";
+export { useMyProjects } from "./hooks/useMyProjects";
+export { useScenarioManager } from "./hooks/useScenarioManager";
+export { useSharedProjects } from "./hooks/useSharedProjects";
+export { useApplyProjectVersion } from "./hooks/useApplyProjectVersion";

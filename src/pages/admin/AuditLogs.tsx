@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/lib/pb-mapper";
-import PageHeader from "@/components/PageHeader";
+import { mapRecords } from "@/shared/lib/pb-mapper";
+import PageHeader from "@/shared/components/PageHeader";
 import {
   Table,
   TableBody,
@@ -9,25 +9,25 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/shared/components/ui/table";
 import { useTranslation } from "react-i18next";
-import { useDateFormatter } from "@/hooks/useDateFormatter";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
+import { Input } from "@/shared/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
 import { X, AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { sanitizeText } from "@/utils/sanitizeText";
-import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { cn } from "@/shared/lib/utils";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import EmptyState from "@/components/ui/EmptyState";
-import LoadingState from "@/components/ui/LoadingState";
+} from "@/shared/components/ui/select";
+import EmptyState from "@/shared/components/ui/EmptyState";
+import LoadingState from "@/shared/components/ui/LoadingState";
 import React from "react";
 
 interface AuditLog {
