@@ -4,6 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import {
   Controller,
   ControllerProps,
+  ControllerRenderProps,
   FieldPath,
   FieldValues,
   FormProvider,
@@ -40,7 +41,7 @@ const FormField = <
   );
 };
 
-export const useFormField = () => {
+const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const { getFieldState, formState } = useFormContext();
@@ -167,6 +168,60 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
+interface FormFieldWrapperProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> {
+  name: TName;
+  label: string;
+  description?: string;
+  children: (props: {
+    field: ControllerRenderProps<TFieldValues, TName>;
+    fieldState: any;
+    formState: any;
+  }) => React.ReactElement;
+  error?: string;
+}
+
+/**
+ * Convenience component that composes FormItem, FormLabel, FormControl,
+ * FormDescription, and FormMessage for common field patterns.
+ */
+export function FormFieldWrapper<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  name,
+  label,
+  description,
+  children,
+  error,
+}: FormFieldWrapperProps<TFieldValues, TName>) {
+  return (
+    <FormField
+      name={name}
+      render={({ field, fieldState, formState }: {
+        field: ControllerRenderProps<TFieldValues, TName>;
+        fieldState: any;
+        formState: any;
+      }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            {React.cloneElement(children({ field, fieldState, formState }) as React.ReactElement<any>, {
+              ...field,
+              onChange: field.onChange,
+              onBlur: field.onBlur,
+            })}
+          </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
+          {error && <FormMessage>{error}</FormMessage>}
+        </FormItem>
+      )}
+    />
+  );
+}
+
 export {
   Form,
   FormItem,
@@ -175,4 +230,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  useFormField,
 };
