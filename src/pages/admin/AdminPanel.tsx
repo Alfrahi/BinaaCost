@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Link } from "react-router-dom";
 import {
   Users,
@@ -8,7 +8,7 @@ import {
   FileText,
   Settings,
 } from "lucide-react";
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/shared/components/PageHeader";
 
 export default function AdminPanel() {
   const { t } = useTranslation(["admin", "common"]);

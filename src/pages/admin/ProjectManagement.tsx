@@ -1,22 +1,22 @@
 import { useTranslation } from "react-i18next";
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/shared/components/PageHeader";
 import DataTable, {
   DataTableColumn,
-} from "@/components/ui/data-table";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@/shared/components/ui/data-table";
+import { TableCell, TableRow } from "@/shared/components/ui/table";
+import { Button } from "@/shared/components/ui/button";
 import { Trash2, Eye, X, AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PaginationControls } from "@/components/PaginationControls";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { PaginationControls } from "@/shared/components/PaginationControls";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+import ConfirmDialog from "@/shared/components/ConfirmDialog";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { cn, getIconMarginClass } from "@/lib/utils";
+import { Input } from "@/shared/components/ui/input";
+import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import {
   useAdminProjectManagement,
   Project,
-} from "@/hooks/useAdminProjectManagement";
+} from "@/features/admin/hooks/useAdminProjectManagement";
 import { useMemo } from "react";
 
 export default function ProjectManagement() {

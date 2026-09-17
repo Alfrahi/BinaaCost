@@ -38,7 +38,7 @@ vi.mock("@/integrations/pocketbase/client", () => ({
   },
 }));
 
-import { AuthProvider, useAuth } from "@/components/AuthProvider";
+import { AuthProvider, useAuth } from "@/app/providers/AuthProvider";
 
 function Probe() {
   const { user, role, loading, signOut } = useAuth();

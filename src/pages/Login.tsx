@@ -1,13 +1,13 @@
 import { pb } from "@/integrations/pocketbase/client";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { AlertCircle } from "lucide-react";
-import LoadingState from "@/components/ui/LoadingState";
+import LoadingState from "@/shared/components/ui/LoadingState";
 import { useTranslation } from "react-i18next";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import {
   Form,
   FormControl,
@@ -15,8 +15,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Heading } from "@/components/ui/heading";
+} from "@/shared/components/ui/form";
+import { Heading } from "@/shared/components/ui/heading";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";

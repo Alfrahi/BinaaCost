@@ -1,13 +1,13 @@
 import { useCallback } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/shared/components/ui/switch";
+import { Label } from "@/shared/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { useTranslation } from "react-i18next";
-import PageHeader from "@/components/PageHeader";
-import LoadingState from "@/components/ui/LoadingState";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import PageHeader from "@/shared/components/PageHeader";
+import LoadingState from "@/shared/components/ui/LoadingState";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { useAppSettings } from "@/hooks/useAppSettings";
+import { useAppSettings } from "@/features/settings/hooks/useAppSettings";
 
 export default function AppSettings() {
   const { t } = useTranslation(["admin", "common"]);

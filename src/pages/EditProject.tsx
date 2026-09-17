@@ -1,11 +1,11 @@
 "use client";
 import { useTranslation } from "react-i18next";
-import ProjectForm from "@/components/project/ProjectForm";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { useUpdateProject } from "@/hooks/useUpdateProject";
+import ProjectForm from "@/features/projects/components/overview/ProjectForm";
+import Breadcrumbs from "@/app/layout/Breadcrumbs";
+import { useUpdateProject } from "@/features/projects/hooks/useUpdateProject";
 import { FormProvider } from "react-hook-form";
-import { CurrencyConversionDialog } from "@/components/project/CurrencyConversionDialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CurrencyConversionDialog } from "@/features/projects/components/costs/CurrencyConversionDialog";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 
 export default function EditProject() {

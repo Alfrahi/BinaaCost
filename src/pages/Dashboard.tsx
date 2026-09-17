@@ -1,22 +1,22 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import PageHeader from "@/components/PageHeader";
-import EmptyState from "@/components/ui/EmptyState";
+import { Card, CardHeader, CardTitle, CardContent } from "@/shared/components/ui/card";
+import { Input } from "@/shared/components/ui/input";
+import PageHeader from "@/shared/components/PageHeader";
+import EmptyState from "@/shared/components/ui/EmptyState";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import { PaginationControls } from "@/components/PaginationControls";
+import { PaginationControls } from "@/shared/components/PaginationControls";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Folder, Users } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Button } from "@/shared/components/ui/button";
 import { Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord, mapRecords } from "@/lib/pb-mapper";
-import { cn, getIconMarginClass } from "@/lib/utils";
-import { useMyProjects } from "@/hooks/useMyProjects";
-import { useSharedProjects } from "@/hooks/useSharedProjects";
-import { ProjectCard } from "@/components/project/ProjectCard";
+import { mapRecord, mapRecords } from "@/shared/lib/pb-mapper";
+import { cn, getIconMarginClass } from "@/shared/lib/utils";
+import { useMyProjects } from "@/features/projects/hooks/useMyProjects";
+import { useSharedProjects } from "@/features/projects/hooks/useSharedProjects";
+import { ProjectCard } from "@/features/projects/components/overview/ProjectCard";
 
 export default function Dashboard() {
   const { t } = useTranslation(["dashboard", "common"]);

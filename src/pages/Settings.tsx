@@ -1,21 +1,21 @@
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ProfileSettings from "@/components/ProfileSettings";
-import ReportOptionsSection from "@/components/ReportOptionsSection";
-import PageHeader from "@/components/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import ProfileSettings from "@/shared/components/ProfileSettings";
+import ReportOptionsSection from "@/shared/components/ReportOptionsSection";
+import PageHeader from "@/shared/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { User, FileText, Bell } from "lucide-react";
-import NotificationsSection from "@/components/NotificationsSection";
-import { useIsMobile } from "@/hooks/useMobile";
+import NotificationsSection from "@/shared/components/NotificationsSection";
+import { useIsMobile } from "@/shared/hooks/useMobile";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/shared/components/ui/select";
+import { ScrollArea } from "@/shared/components/ui/scroll-area";
 
 export default function Settings() {
   const { t } = useTranslation(["settings", "common"]);

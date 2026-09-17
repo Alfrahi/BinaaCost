@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import CostDatabaseList from "@/components/cost-database/CostDatabaseList";
-import CostDatabaseDetail from "@/components/cost-database/CostDatabaseDetail";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import CostDatabaseList from "@/features/cost-library/components/cost-databases/CostDatabaseList";
+import CostDatabaseDetail from "@/features/cost-library/components/cost-databases/CostDatabaseDetail";
+import Breadcrumbs from "@/app/layout/Breadcrumbs";
 
 export default function CostDatabases() {
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string | null>(
