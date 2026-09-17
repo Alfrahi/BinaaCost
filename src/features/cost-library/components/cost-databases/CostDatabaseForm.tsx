@@ -16,7 +16,7 @@ import {
 } from "@/shared/components/ui/form";
 import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
-import { CostDatabase } from "@/types/cost-databases";
+import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import { X } from "lucide-react";
 
 const costDatabaseSchema = z.object({

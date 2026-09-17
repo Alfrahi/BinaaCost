@@ -6,7 +6,7 @@ import { Input } from "@/shared/components/ui/input";
 import {
   AssemblyLaborFormValues,
   assemblyLaborSchema,
-} from "@/types/assembly-schemas";
+} from "@/features/cost-library/assemblies/types/schemas";
 import {
   Form,
   FormControl,

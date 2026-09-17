@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import SettingsSection from "@/shared/components/SettingsSection";
+import SettingsSection from "@/features/admin/components/SettingsSection";
 import { useRole } from "@/shared/hooks/useRole";
 import PageHeader from "@/shared/components/PageHeader";
 

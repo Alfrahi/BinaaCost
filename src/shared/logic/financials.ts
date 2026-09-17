@@ -1,5 +1,20 @@
 import { Decimal } from "@/shared/lib/math";
 
+/**
+ * FinancialSettings — pure calculation input used by shared logic.
+ * 
+ * Distinct from ProjectFinancialSettings (defined in features/projects/project-core/types/project.ts)
+ * which is the *persisted* shape stored on the Project record.
+ * 
+ * Key differences:
+ * - FinancialSettings: used by calculateProjectFinancials(); optional fields have sensible defaults.
+ * - ProjectFinancialSettings: stored in DB; all fields required (no optional), no defaults.
+ * 
+ * Keep them separate so:
+ * 1. Shared logic stays decoupled from project persistence schema.
+ * 2. DB schema can evolve (e.g. add new fields) without breaking calculation API.
+ * 3. Default values live in one place (DEFAULT_FINANCIAL_SETTINGS) not duplicated.
+ */
 export interface FinancialSettings {
   overhead_percent: number;
   markup_percent: number;
@@ -7,7 +22,7 @@ export interface FinancialSettings {
   contingency_percent: number;
   /** Optional location cost multiplier (e.g. 1.15 = +15%) applied to direct costs before any percent loadings. */
   location_factor?: number;
-  /** Human-readable label for the location factor (e.g. "Riyadh". */
+  /** Human-readable label for the location factor (e.g. "Riyadh"). */
   location_label?: string;
 }
 

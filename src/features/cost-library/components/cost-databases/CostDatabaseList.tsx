@@ -34,7 +34,7 @@ import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import DataTable, {
   DataTableColumn,
 } from "@/shared/components/ui/data-table";
-import { CostDatabase } from "@/types/cost-databases";
+import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 
 const costDatabaseSchema = z.object({
   name: z.string().min(1, "pages:cost_databases.nameRequired"),

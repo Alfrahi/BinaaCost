@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import {
   AssemblyAdditionalCostFormValues,
   assemblyAdditionalCostSchema,
-} from "@/types/assembly-schemas";
+} from "@/features/cost-library/assemblies/types/schemas";
 import {
   Form,
   FormControl,

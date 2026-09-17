@@ -1,4 +1,4 @@
-import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
+import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/shared/components/ChartContainer";
 import React, { Suspense } from "react";
 import ReactECharts from "echarts-for-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
@@ -18,7 +18,7 @@ import { COST_CATEGORY_COLORS } from "@/shared/logic/chartPalette";
 import LoadingState from "@/shared/components/ui/LoadingState";
 
 const LazyChartContainer = React.lazy(
-  () => import("@/components/ChartContainer"),
+  () => import("@/shared/components/ChartContainer"),
 );
 
 export default function ProjectComparisonChart({

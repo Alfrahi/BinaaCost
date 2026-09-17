@@ -17,7 +17,7 @@ import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDial
 import { useBulkSelection } from "@/shared/hooks/useBulkSelection";
 import { BulkActionBar } from "@/shared/components/BulkActionBar";
 import { PaginationControls } from "@/shared/components/PaginationControls";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useLibrarySyncManager } from "@/features/cost-library/hooks/useLibrarySyncManager";
 import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";

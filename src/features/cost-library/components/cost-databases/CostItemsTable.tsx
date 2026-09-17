@@ -11,8 +11,8 @@ import {
 } from "@/features/cost-library/hooks/useCostDatabaseItems";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import CostItemsCsvImportDialog from "./CostItemsCsvImportDialog";
-import { CostDatabase } from "@/types/cost-databases";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { CostDatabase } from "@/features/cost-library/databases/types/databases";
+import { useAuth } from "@/features/auth";
 import { useRole } from "@/shared/hooks/useRole";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { Checkbox } from "@/shared/components/ui/checkbox";

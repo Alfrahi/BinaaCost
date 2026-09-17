@@ -3,7 +3,7 @@ import {
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
-} from "@/types/project-items";
+} from "@/features/projects/project-costs/types/items";
 
 interface IncompleteItemsInput {
   materials?: MaterialItem[];

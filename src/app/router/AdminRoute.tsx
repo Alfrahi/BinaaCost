@@ -1,4 +1,4 @@
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
