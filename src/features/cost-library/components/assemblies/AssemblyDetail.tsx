@@ -93,34 +93,33 @@ function AssemblyItemManager({
   >("material");
 
   const handleItemSubmit = useCallback(
-    async (
-      values: Omit<
-        AssemblyItem,
-        "id" | "user_id" | "created_at" | "updated_at" | "assembly_id"
-      >,
-    ) => {
+    async (values: Record<string, any>) => {
       if (!user?.id) {
         handleError(new Error(t("common:mustBeLoggedIn")));
         return;
       }
       try {
+        const itemValues = values as Omit<
+          AssemblyItem,
+          "id" | "user_id" | "created_at" | "updated_at" | "assembly_id"
+        >;
         if (editingItem) {
-          await updateItem.mutateAsync({ id: editingItem.id, ...values });
+          await updateItem.mutateAsync({ id: editingItem.id, ...itemValues });
         } else {
           await createItem.mutateAsync({
-            ...values,
+            ...itemValues,
             assembly_id: assemblyId,
             user_id: user.id,
           });
         }
 
-        switch (values.item_type) {
+        switch (itemValues.item_type) {
           case "material": {
             const itemToSync = {
-              name: values.description,
+              name: itemValues.description,
               description: null,
-              unit: values.unit || "unit",
-              unit_price: values.unit_price,
+              unit: itemValues.unit || "unit",
+              unit_price: itemValues.unit_price,
               user_id: user.id,
             };
             await createLibraryMaterial.mutateAsync(itemToSync);
@@ -128,22 +127,22 @@ function AssemblyItemManager({
           }
           case "labor": {
             const itemToSync = {
-              worker_type: values.description,
-              daily_rate: values.unit_price,
+              worker_type: itemValues.description,
+              daily_rate: itemValues.unit_price,
               user_id: user.id,
             };
             await createLibraryLabor.mutateAsync(itemToSync);
             break;
           }
           case "equipment": {
-            const equipmentDetails = values.details as any;
+            const equipmentDetails = itemValues.details as any;
             const itemToSync = {
-              name: values.description,
+              name: itemValues.description,
               type: equipmentDetails?.type ?? null,
               rental_or_purchase:
                 equipmentDetails?.rental_or_purchase || "Rental",
-              cost_per_period: values.unit_price,
-              period_unit: values.unit || "Day",
+              cost_per_period: itemValues.unit_price,
+              period_unit: itemValues.unit || "Day",
               user_id: user.id,
             };
             await createLibraryEquipment.mutateAsync(itemToSync);

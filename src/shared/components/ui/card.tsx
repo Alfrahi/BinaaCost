@@ -1,14 +1,17 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
 
 const cardVariants = cva(
-  "rounded-lg border bg-card text-card-foreground shadow-sm",
+  "rounded-lg border bg-card text-card-foreground",
   {
     variants: {
       variant: {
-        default: "",
+        default: "shadow-sm",
         outline: "border-2 border-primary",
+        elevated: "shadow-lg border-none",
+        interactive: "shadow-sm transition-shadow hover:shadow-md cursor-pointer",
       },
     },
     defaultVariants: {

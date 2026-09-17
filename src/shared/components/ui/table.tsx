@@ -1,14 +1,43 @@
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
+
+const tableVariants = cva("w-full caption-bottom text-sm", {
+  variants: {
+    variant: {
+      default: "",
+      striped: "[&_tbody_tr:nth-child(even)]:bg-muted/30",
+      bordered: "[&_th,&_td]:border border-border",
+    },
+    size: {
+      sm: "text-xs",
+      default: "text-sm",
+      lg: "text-base",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
+
+export interface ColumnDef<T> {
+  accessorKey: keyof T;
+  header: string;
+  cell?: (value: unknown, row: T) => React.ReactNode;
+  className?: string;
+  headerClassName?: string;
+}
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & VariantProps<typeof tableVariants>
+>(({ className, variant, size, ...props }, ref) => (
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
+      className={cn(tableVariants({ variant, size }), className)}
       {...props}
     />
   </div>
