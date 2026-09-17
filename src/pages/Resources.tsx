@@ -2,22 +2,22 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageHeader from "@/components/PageHeader";
-import LibraryMaterialsManager from "@/components/resources/LibraryMaterialsManager";
-import LibraryLaborManager from "@/components/resources/LibraryLaborManager";
-import LibraryEquipmentManager from "@/components/resources/LibraryEquipmentManager";
-import LibraryAssembliesManager from "@/components/resources/LibraryAssembliesManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import PageHeader from "@/shared/components/PageHeader";
+import LibraryMaterialsManager from "@/features/cost-library/components/resources/LibraryMaterialsManager";
+import LibraryLaborManager from "@/features/cost-library/components/resources/LibraryLaborManager";
+import LibraryEquipmentManager from "@/features/cost-library/components/resources/LibraryEquipmentManager";
+import LibraryAssembliesManager from "@/features/cost-library/components/resources/LibraryAssembliesManager";
 import { Package, Hammer, HardHat, Wrench } from "lucide-react";
-import { useIsMobile } from "@/hooks/useMobile";
+import { useIsMobile } from "@/shared/hooks/useMobile";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/shared/components/ui/select";
+import { ScrollArea } from "@/shared/components/ui/scroll-area";
 
 export default function Resources() {
   const { t } = useTranslation(["resources", "common"]);

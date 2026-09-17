@@ -1,20 +1,21 @@
+import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
 import React, { Suspense } from "react";
 import ReactECharts from "echarts-for-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/shared/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
-import { useCurrencyFormatter } from "@/utils/formatCurrency";
+import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { ProjectCostData } from "../types";
-import { cn } from "@/lib/utils";
-import { COST_CATEGORY_COLORS } from "@/logic/chartPalette";
-import { CHART_CONTAINER_HEIGHT_CLASSES } from "@/components/ChartContainer";
-import LoadingState from "@/components/ui/LoadingState";
+import { cn } from "@/shared/lib/utils";
+import { COST_CATEGORY_COLORS } from "@/shared/logic/chartPalette";
+
+import LoadingState from "@/shared/components/ui/LoadingState";
 
 const LazyChartContainer = React.lazy(
   () => import("@/components/ChartContainer"),

@@ -1,18 +1,18 @@
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/shared/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
-import LoadingState from "@/components/ui/LoadingState";
+import LoadingState from "@/shared/components/ui/LoadingState";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from "@/shared/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
 
 import { useAnalyticsData } from "@/features/analytics/useAnalyticsData";
 import ProjectComparisonChart from "@/features/analytics/components/ProjectComparisonChart";

@@ -1,21 +1,21 @@
 import { useParams, Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
-import PageHeader from "@/components/PageHeader";
-import EmptyState from "@/components/ui/EmptyState";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDateFormatter } from "@/hooks/useDateFormatter";
+import PageHeader from "@/shared/components/PageHeader";
+import EmptyState from "@/shared/components/ui/EmptyState";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 import { Calendar, Activity, AlertTriangle } from "lucide-react";
-import LoadingState from "@/components/ui/LoadingState";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import LoadingState from "@/shared/components/ui/LoadingState";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useTranslation } from "react-i18next";
-import { RoleBadge } from "@/components/RoleBadge";
-import { Button } from "@/components/ui/button";
-import { PaginationControls } from "@/components/PaginationControls";
-import { useOfflinePb } from "@/hooks/useOfflinePb";
-import { sanitizeText } from "@/utils/sanitizeText";
-import { useAdminUserProjects } from "@/hooks/useAdminUserProjects";
-import { useAdminUserAuditLogs } from "@/hooks/useAdminUserAuditLogs";
+import { RoleBadge } from "@/shared/components/RoleBadge";
+import { Button } from "@/shared/components/ui/button";
+import { PaginationControls } from "@/shared/components/PaginationControls";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { useAdminUserProjects } from "@/features/admin/hooks/useAdminUserProjects";
+import { useAdminUserAuditLogs } from "@/features/admin/hooks/useAdminUserAuditLogs";
 
 interface UserDetails {
   id: string;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { useDateFormatter } from "@/hooks/useDateFormatter";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({

@@ -46,9 +46,9 @@ export default tseslint.config(
   {
     // shadcn/ui primitives, app entry, and context provider export non-components by design
     files: [
-      "src/components/ui/**/*.{ts,tsx}",
+      "src/shared/components/ui/**/*.{ts,tsx}",
       "src/main.tsx",
-      "src/components/AuthProvider.tsx",
+      "src/app/providers/AuthProvider.tsx",
     ],
     rules: {
       "react-refresh/only-export-components": "off",
