@@ -1,3 +1,6 @@
+"use client";
+
+import { memo } from "react";
 import { TableRow, TableCell } from "@/shared/components/ui/table";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Button } from "@/shared/components/ui/button";
@@ -32,7 +35,7 @@ interface EquipmentRowProps {
   locationLabel?: string;
 }
 
-export function EquipmentRow({
+export const EquipmentRow = memo(function EquipmentRow({
   item,
   currency,
   isOwner,
@@ -215,4 +218,4 @@ export function EquipmentRow({
       </TableCell>
     </TableRow>
   );
-}
+});
