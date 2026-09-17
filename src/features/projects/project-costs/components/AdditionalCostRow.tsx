@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { TableRow, TableCell } from "@/shared/components/ui/table";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Button } from "@/shared/components/ui/button";
@@ -25,7 +26,7 @@ interface AdditionalCostRowProps {
   locationFactor?: number;
 }
 
-export function AdditionalCostRow({
+export const AdditionalCostRow = memo(function AdditionalCostRow({
   item,
   currency,
   isOwner,
@@ -126,4 +127,4 @@ export function AdditionalCostRow({
       </TableCell>
     </TableRow>
   );
-}
+});

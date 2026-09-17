@@ -1,16 +1,13 @@
-import { useCallback } from "react";
+"use client";
+
+import { useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { Input } from "@/shared/components/ui/input";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { useTranslation } from "react-i18next";
+import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import {
   Form,
   FormControl,
@@ -19,275 +16,226 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import {
-  AssemblyItem,
-  AssemblyLaborDetails,
-  AssemblyEquipmentDetails,
-  AssemblyAdditionalCostDetails,
-} from "@/features/cost-library/assemblies/types/assemblies";
-import {
-  AssemblyMaterialForm,
-  AssemblyLaborForm,
-  AssemblyEquipmentForm,
-  AssemblyAdditionalCostForm,
-  AssemblyMaterialFormValues,
-  AssemblyLaborFormValues,
-  AssemblyEquipmentFormValues,
-  AssemblyAdditionalCostFormValues,
-} from "@/features/cost-library/components/assemblies/index";
-import { X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/shared/lib/pb-mapper";
+import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
+import { z } from "zod";
 
-const itemTypeSchema = z.object({
-  item_type: z.enum(["material", "labor", "equipment", "additional"]),
-});
+type ItemType = "material" | "labor" | "equipment" | "additional";
 
-type ItemTypeFormValues = z.infer<typeof itemTypeSchema>;
+interface AssemblyItemFormConfig {
+  itemType: ItemType;
+  schema: z.ZodTypeAny;
+  libraryQueryKey: string[];
+  libraryCollection: string;
+  defaultValues: Record<string, any>;
+  formFields: AssemblyFormField[];
+  conditionalFields?: (values: any) => AssemblyFormField[];
+  findMatch?: (values: any, libraryItems: any[]) => void;
+  watchFields?: string[];
+}
+
+interface AssemblyFormField {
+  name: string;
+  labelKey: string;
+  placeholderKey?: string;
+  type: "text" | "number" | "select" | "textarea";
+  options?: { value: string; label: string }[];
+  isLoading?: boolean;
+  step?: string;
+  min?: string | number;
+  defaultValue?: any;
+  conditional?: (values: any) => boolean;
+  formatLabel?: (values: any) => string;
+  fullWidth?: boolean;
+  datalistKey?: string;
+  onChange?: (value: string, form: any) => void;
+  itemType?: ItemType;
+}
 
 interface AssemblyItemFormProps {
-  initialData?: AssemblyItem;
-  initialType?: "material" | "labor" | "equipment" | "additional";
-  onSubmit: (
-    values: Omit<
-      AssemblyItem,
-      "id" | "user_id" | "created_at" | "updated_at" | "assembly_id"
-    >,
-  ) => void;
+  config: AssemblyItemFormConfig;
+  initialData?: Record<string, any>;
+  onSubmit: (values: Record<string, any>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
-  materialUnits: { value: string; label: string }[];
-  isLoadingMaterialUnits: boolean;
-  rentalOptions: { value: string; label: string }[];
-  isLoadingRentalOptions: boolean;
-  periodUnits: { value: string; label: string }[];
-  isLoadingPeriodUnits: boolean;
-  additionalCategories: { value: string; label: string }[];
-  isLoadingAdditionalCategories: boolean;
 }
 
 export function AssemblyItemForm({
+  config,
   initialData,
-  initialType = "material",
   onSubmit,
   onCancel,
   isSubmitting,
-  materialUnits,
-  isLoadingMaterialUnits,
-  rentalOptions,
-  isLoadingRentalOptions,
-  periodUnits,
-  isLoadingPeriodUnits,
-  additionalCategories,
-  isLoadingAdditionalCategories,
 }: AssemblyItemFormProps) {
-  const { t } = useTranslation(["common", "project_detail", "resources"]);
+  const { t } = useTranslation(["resources", "common", "project_materials", "project_labor", "project_equipment", "project_additional"]);
+  const { convert: _convert, getMissingRates: _getMissingRates } = useCurrencyConverter();
 
-  const itemTypeForm = useForm<ItemTypeFormValues>({
-    resolver: zodResolver(itemTypeSchema),
+  const { data: libraryItemsData } = useQuery({
+    queryKey: config.libraryQueryKey,
+    queryFn: async () =>
+      mapRecords(await pb.collection(config.libraryCollection).getFullList()),
+  });
+  const libraryItems = useMemo(
+    () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),
+    [libraryItemsData],
+  );
+
+  const form = useForm({
+    resolver: zodResolver(config.schema),
     defaultValues: {
-      item_type: initialData?.item_type || initialType,
+      ...config.defaultValues,
+      ...initialData,
     },
   });
 
-  const itemType = itemTypeForm.watch("item_type");
-
-  const transformAndSubmit = useCallback(
-    (subFormValues: any) => {
-      const transformedItem: Omit<
-        AssemblyItem,
-        "id" | "user_id" | "created_at" | "updated_at" | "assembly_id"
-      > = {
-        item_type: itemType,
-        description: subFormValues.description,
-        quantity: subFormValues.quantity || 1,
-        unit: subFormValues.unit || null,
-        unit_price: subFormValues.unit_price || subFormValues.amount || 0,
-        details: null,
-      };
-
-      switch (transformedItem.item_type) {
-        case "material":
-          break;
-        case "labor":
-          transformedItem.quantity = subFormValues.quantity;
-          transformedItem.unit_price = subFormValues.unit_price;
-          transformedItem.details = { total_days: subFormValues.total_days };
-          break;
-        case "equipment":
-          transformedItem.unit = subFormValues.unit;
-          transformedItem.unit_price = subFormValues.unit_price;
-          transformedItem.details = {
-            type: subFormValues.type,
-            rental_or_purchase: subFormValues.rental_or_purchase,
-            usage_duration: subFormValues.usage_duration,
-            maintenance_cost: subFormValues.maintenance_cost,
-            fuel_cost: subFormValues.fuel_cost,
-          };
-          break;
-        case "additional":
-          transformedItem.quantity = 1;
-          transformedItem.unit = "each";
-          transformedItem.unit_price = subFormValues.amount;
-          transformedItem.details = { category: subFormValues.category };
-          break;
-      }
-      onSubmit(transformedItem);
+  const handleAutoFill = useCallback(
+    (values: any) => {
+      if (!config.findMatch) return;
+      config.findMatch(values, libraryItems);
     },
-    [itemType, onSubmit],
+    [config, libraryItems],
   );
 
-  const getSubFormInitialData = useCallback(() => {
-    if (!initialData) return {};
-
-    switch (initialData.item_type) {
-      case "material":
-        return {
-          description: initialData.description,
-          quantity: initialData.quantity,
-          unit: initialData.unit,
-          unit_price: initialData.unit_price,
-        } as Partial<AssemblyMaterialFormValues>;
-      case "labor":
-        return {
-          description: initialData.description,
-          quantity: initialData.quantity,
-          unit_price: initialData.unit_price,
-          total_days: (initialData.details as AssemblyLaborDetails)?.total_days,
-        } as Partial<AssemblyLaborFormValues>;
-      case "equipment":
-        return {
-          description: initialData.description,
-          type: (initialData.details as AssemblyEquipmentDetails)?.type,
-          rental_or_purchase: (initialData.details as AssemblyEquipmentDetails)
-            ?.rental_or_purchase,
-          quantity: initialData.quantity,
-          unit_price: initialData.unit_price,
-          unit: initialData.unit,
-          usage_duration: (initialData.details as AssemblyEquipmentDetails)
-            ?.usage_duration,
-          maintenance_cost: (initialData.details as AssemblyEquipmentDetails)
-            ?.maintenance_cost,
-          fuel_cost: (initialData.details as AssemblyEquipmentDetails)
-            ?.fuel_cost,
-        } as Partial<AssemblyEquipmentFormValues>;
-      case "additional":
-        return {
-          category: (initialData.details as AssemblyAdditionalCostDetails)
-            ?.category,
-          description: initialData.description,
-          amount: initialData.unit_price,
-        } as Partial<AssemblyAdditionalCostFormValues>;
-      default:
-        return {};
+  useEffect(() => {
+    const watchFields = config.watchFields || [];
+    if (config.findMatch && watchFields.length > 0) {
+      const watchedValues = watchFields.reduce((acc, field) => ({ ...acc, [field]: form.watch(field) }), {});
+      if (Object.keys(watchedValues).length > 0) {
+        handleAutoFill(watchedValues);
+      }
     }
-  }, [initialData]);
+  }, [config.findMatch, config.watchFields, form, handleAutoFill, libraryItems]);
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({ ...config.defaultValues, ...initialData });
+    } else {
+      form.reset(config.defaultValues);
+    }
+  }, [initialData, form, config.defaultValues]);
+
+  const handleSubmit = useCallback(
+    (values: Record<string, any>) => {
+      onSubmit(values);
+    },
+    [onSubmit],
+  );
+
+  const visibleFields = config.formFields.filter((field) =>
+    field.conditional ? field.conditional(form.watch()) : true
+  );
 
   return (
-    <div className="border rounded-lg p-4 bg-card space-y-3 text-sm">
-      <div className="flex justify-between items-center">
-        <h4 className="font-semibold text-lg">
-          {initialData ? t("common:edit") : t("common:add")}{" "}
-          {t("resources:assemblies.item")}
-        </h4>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onCancel}
-          aria-label={t("common:close")}
-        >
-          <X className="w-4 h-4" aria-hidden="true" />
-        </Button>
-      </div>
-      <div className="space-y-4">
-        <Form {...itemTypeForm}>
-          <FormField
-            control={itemTypeForm.control}
-            name="item_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  {t("common:type")}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={!!initialData}
-                >
-                  <FormControl>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="material" className="text-sm">
-                      {t("project_tabs:materials")}
-                    </SelectItem>
-                    <SelectItem value="labor" className="text-sm">
-                      {t("project_tabs:labor")}
-                    </SelectItem>
-                    <SelectItem value="equipment" className="text-sm">
-                      {t("project_tabs:equipment")}
-                    </SelectItem>
-                    <SelectItem value="additional" className="text-sm">
-                      {t("project_tabs:additional")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage className="text-sm" />
-              </FormItem>
-            )}
-          />
-        </Form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {visibleFields.map((field) => (
+            <FormField
+              key={field.name}
+              control={form.control}
+              name={field.name as any}
+              render={({ field: formField }) => {
+                const label = field.formatLabel
+                  ? field.formatLabel(form.watch())
+                  : t(field.labelKey);
+                const placeholder = field.placeholderKey
+                  ? t(field.placeholderKey)
+                  : undefined;
 
-        {itemType === "material" && (
-          <AssemblyMaterialForm
-            initialData={
-              getSubFormInitialData() as Partial<AssemblyMaterialFormValues>
-            }
-            onSubmit={transformAndSubmit}
-            onCancel={onCancel}
-            isSubmitting={isSubmitting}
-            materialUnits={materialUnits}
-            isLoadingMaterialUnits={isLoadingMaterialUnits}
-          />
-        )}
-        {itemType === "labor" && (
-          <AssemblyLaborForm
-            initialData={
-              getSubFormInitialData() as Partial<AssemblyLaborFormValues>
-            }
-            onSubmit={transformAndSubmit}
-            onCancel={onCancel}
-            isSubmitting={isSubmitting}
-          />
-        )}
-        {itemType === "equipment" && (
-          <AssemblyEquipmentForm
-            initialData={
-              getSubFormInitialData() as Partial<AssemblyEquipmentFormValues>
-            }
-            onSubmit={transformAndSubmit}
-            onCancel={onCancel}
-            isSubmitting={isSubmitting}
-            rentalOptions={rentalOptions}
-            isLoadingRentalOptions={isLoadingRentalOptions}
-            periodUnits={periodUnits}
-            isLoadingPeriodUnits={isLoadingPeriodUnits}
-          />
-        )}
-        {itemType === "additional" && (
-          <AssemblyAdditionalCostForm
-            initialData={
-              getSubFormInitialData() as Partial<AssemblyAdditionalCostFormValues>
-            }
-            onSubmit={transformAndSubmit}
-            onCancel={onCancel}
-            isSubmitting={isSubmitting}
-            additionalCategories={additionalCategories}
-            isLoadingAdditionalCategories={isLoadingAdditionalCategories}
-          />
-        )}
-      </div>
-    </div>
+                const renderInput = () => {
+                  switch (field.type) {
+                    case "select":
+                      return (
+                        <TranslatedSelect
+                          value={form.watch(field.name)}
+                          onValueChange={(val) => field.onChange?.(val, form) ?? formField.onChange(val)}
+                          options={field.options || []}
+                          isLoading={field.isLoading}
+                          placeholder={placeholder}
+                          className="text-sm"
+                        />
+                      );
+                    case "number":
+                      return (
+                        <Input
+                          type="number"
+                          step={field.step}
+                          min={field.min}
+                          {...formField}
+                          className="text-sm"
+                          value={formField.value ?? field.defaultValue ?? ""}
+                        />
+                      );
+                    case "textarea":
+                      return (
+                        <Textarea
+                          {...formField}
+                          placeholder={placeholder}
+                          rows={1}
+                          className="text-sm"
+                          value={formField.value || ""}
+                        />
+                      );
+                    default:
+                      return (
+                        <Input
+                          {...formField}
+                          placeholder={placeholder}
+                          list={field.datalistKey ? `${field.datalistKey}` : undefined}
+                          autoComplete="off"
+                          className="text-sm"
+                          value={formField.value ?? field.defaultValue ?? ""}
+                          onChange={(e) => field.onChange?.(e.target.value, form) ?? formField.onChange(e.target.value)}
+                        />
+                      );
+                  }
+                };
+
+                return (
+                  <FormItem className={field.fullWidth ? "md:col-span-2" : undefined}>
+                    <FormLabel className="text-sm font-medium">{label}</FormLabel>
+                    <FormControl>{renderInput()}</FormControl>
+                    <FormMessage className="text-sm" />
+                  </FormItem>
+                );
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={onCancel} className="text-sm" disabled={isSubmitting}>
+            {t("common:cancel")}
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="text-sm">
+            {isSubmitting ? t("common:saving") : t("common:save")}
+          </Button>
+        </div>
+
+        {/* Datalist options for autocomplete fields */}
+        {visibleFields
+          .filter((f) => f.datalistKey)
+          .map((field) => (
+            <datalist key={field.datalistKey} id={field.datalistKey!}>
+              {libraryItems.map((item: any) => {
+                if (field.itemType === "material") {
+                  const unitLabel = field.options?.find((u) => u.value === item.unit)?.label || item.unit;
+                  return <option key={item.id} value={`${item.name} (${unitLabel})`} />;
+                }
+                if (field.itemType === "equipment") {
+                  const periodUnitLabel = field.options?.find((u) => u.value === item.period_unit)?.label || item.period_unit;
+                  return <option key={item.id} value={`${item.name} (${periodUnitLabel})`} />;
+                }
+                if (field.itemType === "labor") {
+                  return <option key={item.id} value={item.worker_type} />;
+                }
+                return null;
+              })}
+            </datalist>
+          ))}
+      </form>
+    </Form>
   );
 }

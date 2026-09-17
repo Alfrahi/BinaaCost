@@ -1,3 +1,6 @@
+"use client";
+
+import { memo } from "react";
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { Button } from "@/shared/components/ui/button";
 import { Edit2, Trash2, MessageSquare, Copy } from "lucide-react";
@@ -30,7 +33,7 @@ interface LaborRowProps {
   locationLabel?: string;
 }
 
-export function LaborRow({
+export const LaborRow = memo(function LaborRow({
   item,
   currency,
   isOwner,
@@ -163,4 +166,4 @@ export function LaborRow({
       </TableCell>
     </TableRow>
   );
-}
+});
