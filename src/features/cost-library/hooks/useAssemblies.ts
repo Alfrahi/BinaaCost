@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/shared/lib/pb-mapper";
-import { useAuth } from "@/app/providers/AuthProvider";
-import { Assembly } from "@/types/assemblies";
+import { useAuth } from "@/features/auth";
+import { Assembly } from "@/features/cost-library/assemblies/types/assemblies";
 import { handleError } from "@/shared/lib/toast";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 

@@ -6,7 +6,7 @@ import PageHeader from "@/shared/components/PageHeader";
 import { X, Eye, Trash2, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RoleBadge } from "@/shared/components/RoleBadge";
-import EditRoleModal from "@/shared/components/EditRoleModal";
+import EditRoleModal from "@/features/admin/components/EditRoleModal";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import DataTable, {
   DataTableColumn,

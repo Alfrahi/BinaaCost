@@ -48,7 +48,7 @@ export default tseslint.config(
     files: [
       "src/shared/components/ui/**/*.{ts,tsx}",
       "src/main.tsx",
-      "src/app/providers/AuthProvider.tsx",
+      "src/features/auth/hooks/useAuth.tsx",
     ],
     rules: {
       "react-refresh/only-export-components": "off",

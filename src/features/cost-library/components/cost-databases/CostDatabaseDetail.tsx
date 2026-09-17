@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/aler
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord } from "@/shared/lib/pb-mapper";
-import { CostDatabase } from "@/types/cost-databases";
+import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import CostItemsTable from "./CostItemsTable";
 import LocationAdjustmentsManager from "./LocationAdjustmentsManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";

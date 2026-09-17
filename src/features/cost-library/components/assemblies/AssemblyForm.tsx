@@ -3,7 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
 import { Input } from "@/shared/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { Assembly } from "@/types/assemblies";
+import { Assembly } from "@/features/cost-library/assemblies/types/assemblies";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";

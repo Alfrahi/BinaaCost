@@ -1,36 +1,36 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./app/providers/AuthProvider";
+import { AuthProvider } from "@/features/auth";
 import ProtectedRoute from "./app/router/ProtectedRoute";
 import AdminRoute from "./app/router/AdminRoute";
 import LayoutShell from "./app/layout/LayoutShell";
 import LanguageProvider from "./app/providers/LanguageProvider";
-import { Toaster } from "./shared/components/ui/sonner";
+import { Toaster } from "@/shared/components/ui/sonner";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorDisplay from "./shared/components/ErrorDisplay";
+import ErrorDisplay from "@/shared/components/ErrorDisplay";
 import React, { Suspense } from "react";
-import PageLoader from "./shared/components/PageLoader";
+import PageLoader from "@/shared/components/PageLoader";
 
-const Login = React.lazy(() => import("./pages/Login"));
-const Dashboard = React.lazy(() => import("./pages/Dashboard"));
-const CreateProject = React.lazy(() => import("./pages/CreateProject"));
-const ProjectDetail = React.lazy(() => import("./pages/ProjectDetail"));
-const EditProject = React.lazy(() => import("./pages/EditProject"));
-const Settings = React.lazy(() => import("./pages/Settings"));
-const CostLibrary = React.lazy(() => import("./pages/CostLibrary"));
-const Analytics = React.lazy(() => import("./pages/Analytics"));
-const AdminPanel = React.lazy(() => import("./pages/admin/AdminPanel"));
-const UserManagement = React.lazy(() => import("./pages/admin/UserManagement"));
+const Login = React.lazy(() => import("@/features/auth/components/Login"));
+const Dashboard = React.lazy(() => import("@/pages/(dashboard)/Dashboard"));
+const CreateProject = React.lazy(() => import("@/pages/(project)/CreateProject"));
+const ProjectDetail = React.lazy(() => import("@/pages/(project)/ProjectDetail"));
+const EditProject = React.lazy(() => import("@/pages/(project)/EditProject"));
+const Settings = React.lazy(() => import("@/pages/(settings)/Settings"));
+const CostLibrary = React.lazy(() => import("@/pages/(cost-library)/CostLibrary"));
+const Analytics = React.lazy(() => import("@/pages/(analytics)/Analytics"));
+const AdminPanel = React.lazy(() => import("@/pages/admin/AdminPanel"));
+const UserManagement = React.lazy(() => import("@/pages/admin/UserManagement"));
 const ProjectManagement = React.lazy(
-  () => import("./pages/admin/ProjectManagement"),
+  () => import("@/pages/admin/ProjectManagement"),
 );
 const DropdownSettings = React.lazy(
-  () => import("./pages/admin/DropdownSettings"),
+  () => import("@/pages/admin/DropdownSettings"),
 );
-const AppSettings = React.lazy(() => import("./pages/admin/AppSettings"));
-const AuditLogs = React.lazy(() => import("./pages/admin/AuditLogs"));
-const UserDetails = React.lazy(() => import("./pages/admin/UserDetails"));
-const PublicShare = React.lazy(() => import("./pages/PublicShare"));
-const NotFound = React.lazy(() => import("./pages/NotFound"));
+const AppSettings = React.lazy(() => import("@/pages/admin/AppSettings"));
+const AuditLogs = React.lazy(() => import("@/pages/admin/AuditLogs"));
+const UserDetails = React.lazy(() => import("@/pages/admin/UserDetails"));
+const PublicShare = React.lazy(() => import("@/pages/PublicShare"));
+const NotFound = React.lazy(() => import("@/pages/NotFound"));
 
 function AppContent() {
   return (

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/shared/lib/pb-mapper";
-import { useAuth } from "@/app/providers/AuthProvider";
-import { CostDatabase } from "@/types/cost-databases";
+import { useAuth } from "@/features/auth";
+import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 
 export function useCostDatabases() {

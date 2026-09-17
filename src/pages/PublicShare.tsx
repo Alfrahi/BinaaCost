@@ -16,8 +16,8 @@ import {
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
-} from "@/types/project-items";
-import { PublicShareResponse } from "@/types/project";
+} from "@/features/projects/project-costs/types/items";
+import { PublicShareResponse } from "@/features/projects/project-core/types/project";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";

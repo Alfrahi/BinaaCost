@@ -1,7 +1,7 @@
 import { Button } from "@/shared/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { AssemblyItem } from "@/types/assemblies";
+import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
 import { safeAdd, safeMult } from "@/shared/lib/math";
 import {
   TableCell,

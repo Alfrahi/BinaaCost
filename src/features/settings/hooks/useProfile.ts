@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";

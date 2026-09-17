@@ -8,7 +8,7 @@ import {
   laborSchema,
   equipmentSchema,
   additionalCostSchema,
-} from "@/types/schemas";
+} from "@/features/projects/project-costs/types/schemas";
 
 export type ProjectItemType =
   | "materials"

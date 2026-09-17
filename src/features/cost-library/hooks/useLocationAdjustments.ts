@@ -1,10 +1,10 @@
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/shared/lib/pb-mapper";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
-import { LocationAdjustment } from "@/types/cost-databases";
+import { LocationAdjustment } from "@/features/cost-library/databases/types/databases";
 
 export function useLocationAdjustments(databaseId?: string) {
   const { t } = useTranslation("pages");

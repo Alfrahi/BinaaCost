@@ -10,4 +10,4 @@ export type {
   AssemblyLaborFormValues,
   AssemblyEquipmentFormValues,
   AssemblyAdditionalCostFormValues,
-} from "@/types/assembly-schemas";
+} from "@/features/cost-library/assemblies/types/schemas";

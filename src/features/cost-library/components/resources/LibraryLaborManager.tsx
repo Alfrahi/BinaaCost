@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
 import { Input } from "@/shared/components/ui/input";
