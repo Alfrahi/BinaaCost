@@ -1,14 +1,35 @@
 import { useCallback } from "react";
 import { useAuth } from "@/features/auth";
 import { useEntityCrud, EntityCrud } from "@/shared/hooks/useEntityCrud";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { AdditionalCostItem } from "@/features/projects/project-costs/types/items";
 import { AdditionalCostFormValues } from "@/features/projects/project-costs/types/schemas";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 
+interface UseProjectAdditionalCostsReturn extends EntityCrud<AdditionalCostItem> {
+  data: AdditionalCostItem[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
 export function useProjectAdditionalCosts(
   projectId: string,
-): EntityCrud<AdditionalCostItem> {
+): UseProjectAdditionalCostsReturn {
   const { user } = useAuth();
+  const { useQuery } = useOfflinePb();
+
+  const { data: additionalCosts = [], isLoading, error } = useQuery<AdditionalCostItem[]>({
+    queryKey: ["additional_costs", projectId],
+    queryFn: async () => {
+      const pb = (await import("@/integrations/pocketbase/client")).pb;
+      const records = await pb.collection("additional_costs").getFullList({
+        filter: `project_id="${projectId}"`,
+      });
+      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
+    },
+    enabled: !!projectId,
+    staleTime: 1000 * 60 * 2,
+  });
 
   const {
     addItem,
@@ -110,5 +131,8 @@ export function useProjectAdditionalCosts(
     isDeleting,
     isBulkDeleting,
     isBulkMoving,
+    data: additionalCosts,
+    isLoading,
+    error,
   };
 }

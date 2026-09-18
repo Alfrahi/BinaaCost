@@ -5,17 +5,38 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";
 import { useEntityCrud, EntityCrud } from "@/shared/hooks/useEntityCrud";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { calculateItemCost } from "@/shared/logic/shared";
 import { MaterialItem } from "@/features/projects/project-costs/types/items";
 import { MaterialFormValues } from "@/features/projects/project-costs/types/schemas";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 
-export function useProjectMaterials(projectId: string): EntityCrud<MaterialItem> {
+interface UseProjectMaterialsReturn extends EntityCrud<MaterialItem> {
+  data: MaterialItem[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useProjectMaterials(projectId: string): UseProjectMaterialsReturn {
   const { t } = useTranslation(["project_materials", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { convert, getMissingRates } = useCurrencyConverter();
+  const { useQuery } = useOfflinePb();
+
+  const { data: materials = [], isLoading, error } = useQuery<MaterialItem[]>({
+    queryKey: ["materials", projectId],
+    queryFn: async () => {
+      const pb = (await import("@/integrations/pocketbase/client")).pb;
+      const records = await pb.collection("materials").getFullList({
+        filter: `project_id="${projectId}"`,
+      });
+      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
+    },
+    enabled: !!projectId,
+    staleTime: 1000 * 60 * 2,
+  });
 
   const {
     addItem,
@@ -175,5 +196,8 @@ export function useProjectMaterials(projectId: string): EntityCrud<MaterialItem>
     isDeleting,
     isBulkDeleting,
     isBulkMoving,
+    data: materials,
+    isLoading,
+    error,
   };
 }

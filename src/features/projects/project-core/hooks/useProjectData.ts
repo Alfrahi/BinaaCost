@@ -6,15 +6,14 @@ import { mapRecord, mapRecords } from "@/shared/lib/pb-mapper";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
 import { useAuth } from "@/features/auth";
-import { calculateCategoryTotal } from "@/shared/logic/shared";
 import type { ProjectGroup } from "@/features/projects/project-core/types/project";
+import { Risk } from "@/features/projects/project-core/types/project";
 import {
   MaterialItem,
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
 } from "@/features/projects/project-costs/types/items";
-import { Risk } from "@/features/projects/project-core/types/project";
 
 const listByProject = (table: string, projectId: string, sort?: string) => () =>
   pb
@@ -99,84 +98,26 @@ export function useProjectData(projectId?: string) {
     ...queryOptions,
   });
 
-  const materialsQuery = useQuery({
-    queryKey: ["materials", projectId],
-    queryFn: listByProject("materials", projectId!),
-    ...queryOptions,
-  });
-
-  const laborQuery = useQuery({
-    queryKey: ["labor_items", projectId],
-    queryFn: listByProject("labor_items", projectId!),
-    ...queryOptions,
-  });
-
-  const equipmentQuery = useQuery({
-    queryKey: ["equipment_items", projectId],
-    queryFn: listByProject("equipment_items", projectId!),
-    ...queryOptions,
-  });
-
-  const additionalQuery = useQuery({
-    queryKey: ["additional_costs", projectId],
-    queryFn: listByProject("additional_costs", projectId!),
-    ...queryOptions,
-  });
-
-  const risksQuery = useQuery({
-    queryKey: ["risks", projectId],
-    queryFn: listByProject("risks", projectId!),
-    ...queryOptions,
-  });
-
-  const commentsQuery = useQuery({
-    queryKey: ["comments", projectId],
-    queryFn: listByProject("comments", projectId!, "created"),
-    ...queryOptions,
-  });
-
   const groups = useMemo(
     () => (groupsQuery.data ?? []) as unknown as ProjectGroup[],
     [groupsQuery.data],
   );
-  const materials = useMemo(
-    () => materialsQuery.data ?? [],
-    [materialsQuery.data],
-  ) as MaterialItem[];
-  const labor = useMemo(
-    () => laborQuery.data ?? [],
-    [laborQuery.data],
-  ) as LaborItem[];
-  const equipment = useMemo(
-    () => equipmentQuery.data ?? [],
-    [equipmentQuery.data],
-  ) as EquipmentItem[];
-  const additional = useMemo(
-    () => additionalQuery.data ?? [],
-    [additionalQuery.data],
-  ) as AdditionalCostItem[];
-  const risks = useMemo(
-    () => risksQuery.data ?? [],
-    [risksQuery.data],
-  ) as Risk[];
-  const comments = useMemo(
-    () => commentsQuery.data ?? [],
-    [commentsQuery.data],
-  );
 
-  const totals = useMemo(() => {
-    const materialsTotal = calculateCategoryTotal.materials(materials);
-    const laborTotal = calculateCategoryTotal.labor(labor);
-    const equipmentTotal = calculateCategoryTotal.equipment(equipment);
-    const additionalTotal = calculateCategoryTotal.additional(additional);
+  // Entity hooks now fetch their own data independently
+  // These are just placeholders for backwards compatibility - consumers should use the entity hooks directly
+  const materials = [] as MaterialItem[];
+  const labor = [] as LaborItem[];
+  const equipment = [] as EquipmentItem[];
+  const additional = [] as AdditionalCostItem[];
+  const risks = [] as Risk[];
+  const comments = [] as any[];
 
-    return {
-      materialsTotal,
-      laborTotal,
-      equipmentTotal,
-      additionalTotal,
-    };
-  }, [materials, labor, equipment, additional]);
+  const totals = useMemo(() => ({
+    materialsTotal: 0,
+    laborTotal: 0,
+    equipmentTotal: 0,
+    additionalTotal: 0,
+  }), []);
 
   const isLoading =
     authLoading ||
@@ -184,12 +125,6 @@ export function useProjectData(projectId?: string) {
     loadingSizeUnits ||
     loadingProjectTypes ||
     groupsQuery.isLoading ||
-    materialsQuery.isLoading ||
-    laborQuery.isLoading ||
-    equipmentQuery.isLoading ||
-    additionalQuery.isLoading ||
-    risksQuery.isLoading ||
-    commentsQuery.isLoading ||
     loadingProjectShare;
 
   return {

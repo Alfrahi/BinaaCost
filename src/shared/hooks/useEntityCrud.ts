@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -50,7 +50,7 @@ export function useEntityCrud<T>({
   const queryClient = useQueryClient();
   const { useMutation: useOfflineMutation } = useOfflinePb();
 
-  const queryKey = [table, projectId];
+  const queryKey = useMemo(() => [table, projectId], [table, projectId]);
 
   const optimisticSingleUpdater = useCallback(
     (old: T[] | undefined, variables: any, operation: string) => {
@@ -116,7 +116,9 @@ export function useEntityCrud<T>({
   const onSuccess = useCallback(() => {
     toast.success(t("common:success"));
     queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
-  }, [t, queryClient]);
+    queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    queryClient.invalidateQueries({ queryKey: queryKey });
+  }, [t, queryClient, projectId, queryKey]);
 
   const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
     any,

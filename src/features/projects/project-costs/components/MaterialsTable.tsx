@@ -13,7 +13,6 @@ import { EntityTable, EntityTableConfig } from "./EntityTable";
 
 export function MaterialsTable({
   projectId,
-  materials,
   groups = [],
   canEdit,
   currency,
@@ -24,7 +23,6 @@ export function MaterialsTable({
   locationLabel,
 }: {
   projectId: string;
-  materials: MaterialItem[];
   groups?: any[];
   canEdit: boolean;
   currency: string;
@@ -41,6 +39,7 @@ export function MaterialsTable({
   ]);
   const { format } = useCurrencyFormatter();
   const crud = useProjectMaterials(projectId);
+  const { data: materials = [] } = crud;
 
   const config = useMemo<EntityTableConfig<MaterialItem>>(
     () => ({

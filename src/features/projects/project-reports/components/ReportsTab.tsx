@@ -17,13 +17,6 @@ import {
 import { Loader2, FileText, Users, DollarSign } from "lucide-react";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import LoadingState from "@/shared/components/ui/LoadingState";
-import {
-  MaterialItem,
-  LaborItem,
-  EquipmentItem,
-  AdditionalCostItem,
-} from "@/features/projects/project-costs/types/items";
-import { Risk, ProjectGroup } from "@/features/projects/project-core/types/project";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 import {
@@ -36,6 +29,12 @@ import {
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { usePdfExport } from "@/features/reports/hooks/usePdfExport";
 import { useProjectVersions } from "@/features/projects/project-versions/hooks/useProjectVersions";
+import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
+import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
+import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
+import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
+import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
+import { ProjectGroup } from "@/features/projects/project-core/types/project";
 
 const LazyClientProposalReport = React.lazy(() =>
   import("@/features/reports/components/ClientProposalReport").then((module) => ({
@@ -54,11 +53,6 @@ export default function ReportsTab({
   laborTotal,
   equipmentTotal,
   additionalTotal,
-  materials,
-  labor,
-  equipment,
-  additional,
-  risks,
   groups,
   materialUnits,
   periodUnits,
@@ -70,11 +64,6 @@ export default function ReportsTab({
   laborTotal: number;
   equipmentTotal: number;
   additionalTotal: number;
-  materials: MaterialItem[];
-  labor: LaborItem[];
-  equipment: EquipmentItem[];
-  additional: AdditionalCostItem[];
-  risks: Risk[];
   groups: ProjectGroup[];
   materialUnits: { value: string; label: string }[];
   periodUnits: { value: string; label: string }[];
@@ -94,6 +83,13 @@ export default function ReportsTab({
   const [activeReportTab, setActiveReportTab] = useState("project-cost");
   const clientProposalRef = useRef<HTMLDivElement>(null);
   const projectCostRef = useRef<HTMLDivElement>(null);
+
+  // Use entity hooks directly for data fetching
+  const { data: materials = [] } = useProjectMaterials(project.id);
+  const { data: labor = [] } = useProjectLabor(project.id);
+  const { data: equipment = [] } = useProjectEquipment(project.id);
+  const { data: additional = [] } = useProjectAdditionalCosts(project.id);
+  const { data: risks = [] } = useProjectRisks(project.id);
 
   const { generatePdf, isGenerating } = usePdfExport();
   const { versions } = useProjectVersions(project.id);

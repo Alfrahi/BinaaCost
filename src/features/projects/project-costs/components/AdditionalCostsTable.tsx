@@ -15,7 +15,6 @@ import { EntityTable, EntityTableConfig } from "./EntityTable";
 
 export function AdditionalCostsTable({
   projectId,
-  additionalCosts,
   groups = [],
   canEdit,
   currency,
@@ -25,7 +24,6 @@ export function AdditionalCostsTable({
   locationFactor = 1,
 }: {
   projectId: string;
-  additionalCosts: AdditionalCostItem[];
   groups?: any[];
   canEdit: boolean;
   currency: string;
@@ -41,6 +39,7 @@ export function AdditionalCostsTable({
   ]);
   const { format } = useCurrencyFormatter();
   const crud = useProjectAdditionalCosts(projectId);
+  const { data: additionalCosts = [] } = crud;
 
   const categoryLabel = useCallback(
     (value: string) =>
