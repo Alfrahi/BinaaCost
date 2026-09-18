@@ -40,6 +40,7 @@ import { handleError } from "@/shared/lib/toast";
 import { cn } from "@/shared/lib/utils";
 import DataTable, {
   DataTableColumn,
+  MIN_WIDTH_CLASSES,
 } from "@/shared/components/ui/data-table";
 import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 
@@ -101,7 +102,7 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
   const safeGetItemName = useCallback((item: any) => {
     if (!item) return "Unnamed Item";
     try {
-      return safeGetItemName(item);
+      return getItemName(item);
     } catch {
       return "Unnamed Item";
     }
@@ -380,9 +381,7 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
                     col.align === "end" && "text-end",
                     col.isCurrency && "tabular-nums",
                     col.className,
-                    col.minWidth && (col.minWidth as string).includes("px")
-                      ? `min-w-[${col.minWidth}]`
-                      : "",
+                    col.minWidth ? MIN_WIDTH_CLASSES[col.minWidth] : "",
                   )}
                 >
                   {col.format

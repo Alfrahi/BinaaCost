@@ -25,7 +25,7 @@ const NotFound = () => {
         </p>
         <a
           href="/"
-          className="text-primary hover:text-secondary underline text-base"
+          className="text-primary hover:text-muted-foreground underline text-base"
         >
           {t("returnToHome")}
         </a>

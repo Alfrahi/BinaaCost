@@ -15,7 +15,7 @@ export function MobileBar({ isMobile, isDirty, currency, grandTotal, format, t }
 
   return (
     <div
-      className="fixed bottom-0 start-0 end-0 z-50 bg-card border-t border-border shadow-xl p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="fixed bottom-0 start-0 end-0 z-modal bg-card border-t border-border shadow-xl p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       role="status"
       aria-live="polite"
     >

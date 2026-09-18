@@ -143,16 +143,16 @@ export default function AuditLogs() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
+                <TableHead variant="data" className="min-w-[150px]">
                   {t("admin:auditLogs.date")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[120px] px-3">
+                <TableHead variant="data" className="min-w-[120px]">
                   {t("admin:auditLogs.user")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[100px] px-3">
+                <TableHead variant="data" className="min-w-[100px]">
                   {t("admin:auditLogs.action")}
                 </TableHead>
-                <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
+                <TableHead variant="data" className="min-w-[150px]">
                   {t("admin:auditLogs.resource")}
                 </TableHead>
               </TableRow>
@@ -200,7 +200,7 @@ export default function AuditLogs() {
                             {log.old_data && (
                               <div className="text-destructive text-xs p-2 border rounded-sm bg-destructive/10">
                                 <strong>{t("admin:auditLogs.oldData")}</strong>
-                                <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
+                                <pre className="whitespace-pre-wrap break-all font-mono text-2xs mt-1">
                                   {formatJsonForDisplay(log.old_data)}
                                 </pre>
                               </div>
@@ -208,7 +208,7 @@ export default function AuditLogs() {
                             {log.new_data && (
                               <div className="text-success text-xs p-2 border rounded-sm bg-success/10">
                                 <strong>{t("admin:auditLogs.newData")}</strong>
-                                <pre className="whitespace-pre-wrap break-all font-mono text-[10px] mt-1">
+                                <pre className="whitespace-pre-wrap break-all font-mono text-2xs mt-1">
                                   {formatJsonForDisplay(log.new_data)}
                                 </pre>
                               </div>
