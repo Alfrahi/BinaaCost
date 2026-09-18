@@ -17,6 +17,25 @@
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-card: var(--shadow-sm);
+  --shadow-dropdown: var(--shadow-md);
+  --shadow-modal: var(--shadow-lg);
+
+  /* Semantic color aliases */
+  --surface: var(--card);
+  --surface-foreground: var(--card-foreground);
+  --danger: var(--destructive);
+  --danger-foreground: var(--destructive-foreground);
+
+  /* Chart palette (themeable) */
+  --chart-1: 195 89% 46%;       /* #0088FE — cyan */
+  --chart-2: 162 100% 41%;      /* #00C49F — emerald */
+  --chart-3: 48 100% 58%;       /* #FFBB28 — amber */
+  --chart-4: 21 100% 63%;       /* #FF8042 — orange */
+  --chart-5: 217 91% 60%;       /* #60A5FA — blue-400 */
+  --chart-6: 142 76% 36%;       /* #34D399 — green-400 */
+  --chart-emphasis-shadow: rgba(0, 0, 0, 0.5);
 
   /* Light theme (default) */
   --background: 0 0% 100%;               /* #FFFFFF */
@@ -97,6 +116,15 @@
   --border: 215 28% 17%;                 /* #1E293B — slate-800 */
   --input: 215 28% 17%;                  /* #1E293B — slate-800 */
   --ring: 217 91% 60%;                   /* #60A5FA — primary */
+
+  /* Chart palette (dark theme) */
+  --chart-1: 195 89% 56%;       /* lighter cyan */
+  --chart-2: 162 100% 51%;      /* lighter emerald */
+  --chart-3: 48 100% 68%;       /* lighter amber */
+  --chart-4: 21 100% 73%;       /* lighter orange */
+  --chart-5: 217 91% 70%;       /* lighter blue-400 */
+  --chart-6: 142 76% 46%;       /* lighter green-400 */
+  --chart-emphasis-shadow: rgba(255, 255, 255, 0.3);
 }
 
 /* ================================
