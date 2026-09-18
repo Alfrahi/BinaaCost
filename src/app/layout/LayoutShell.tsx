@@ -48,7 +48,7 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
         <div
           className={cn(
-            "fixed end-4 z-50",
+            "fixed end-4 z-modal",
             isMobile ? "bottom-20" : "bottom-6",
           )}
         >

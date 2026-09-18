@@ -1,100 +1,227 @@
 @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
-    /* ================================
-        Global Default Font (Noto Sans Arabic)
-       ================================ */
+/* ================================
+    CSS Custom Properties — Design Tokens
+   ================================ */
 
-    @font-face {
-      font-family: "Noto Sans Arabic";
-      src: url("/fonts/noto-sans-arabic/NotoSansArabic-Regular.woff2")
-        format("woff2");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
+:root {
+  /* Radius */
+  --radius-sm: 0.125rem;   /* 2px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
 
-    @font-face {
-      font-family: "Noto Sans Arabic";
-      src: url("/fonts/noto-sans-arabic/NotoSansArabic-Bold.woff2")
-        format("woff2");
-      font-weight: 700;
-      font-style: normal;
-      font-display: swap;
-    }
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-    /*  Application-wide default */
-    html {
-      font-family: "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.7;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-    }
+  /* Light theme (default) */
+  --background: 0 0% 100%;               /* #FFFFFF */
+  --foreground: 0 0% 0%;                 /* #000000 */
 
-    /* Latin (English) uses a Latin-first stack; Arabic uses Noto Sans Arabic. */
-    html[lang="en"] {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Helvetica, Arial, sans-serif;
-    }
+  --card: 0 0% 100%;                     /* #FFFFFF */
+  --card-foreground: 0 0% 0%;            /* #000000 */
 
-    /* ================================
-        Numeric & Data Safety
-       ================================ */
+  --popover: 0 0% 100%;                  /* #FFFFFF */
+  --popover-foreground: 0 0% 0%;         /* #000000 */
 
-    /* Removed Inter font override to ensure consistency */
-    .numeric,
-    .price,
-    .tabular-nums,
-    [data-numeric],
-    table,
-    thead,
-    tbody,
-    tfoot,
-    th,
-    td,
-    input,
-    select,
-    textarea {
-      font-variant-numeric: tabular-nums;
-    }
+  --primary: 222 60% 33%;                /* #1E3A8A — blue-900 */
+  --primary-hover: 221 63% 38%;          /* #1E40AF — blue-800 */
+  --primary-foreground: 0 0% 100%;       /* #FFFFFF */
 
-    /* ================================
-        Utility helpers
-       ================================ */
+  --secondary: 0 0% 20%;                 /* #333333 */
+  --secondary-foreground: 0 0% 100%;     /* #FFFFFF */
 
-    @layer utilities {
-      .numeric {
-        font-variant-numeric: tabular-nums;
-      }
-    }
+  --muted: 0 0% 95.3%;                   /* #F3F4F6 — gray-100 */
+  --muted-foreground: 0 0% 42%;          /* #6B7280 — gray-500 */
 
-    /* ================================
-        Component defaults
-       ================================ */
+  --accent: 0 0% 95.3%;                  /* #F3F4F6 — gray-100 */
+  --accent-foreground: 0 0% 0%;          /* #000000 */
 
-    @layer components {
-      table th,
-      table td {
-        @apply align-middle numeric;
-        word-break: break-word; /* Ensure long text wraps in table cells */
-      }
-    }
+  --destructive: 0 84% 60%;              /* #EF4444 — red-500 */
+  --destructive-foreground: 0 0% 100%;   /* #FFFFFF */
 
-    /* ================================
-        Print Safety
-       ================================ */
+  --success: 142 69% 43%;                /* #15803D — green-700 */
+  --success-foreground: 0 0% 100%;       /* #FFFFFF */
 
-    @media print {
-      table,
-      tr {
-        break-inside: avoid;
-      }
+  --warning: 32 95% 44%;                 /* #D97706 — amber-600 */
+  --warning-foreground: 0 0% 100%;       /* #FFFFFF */
 
-      h1,
-      h2,
-      h3 {
-        break-after: avoid;
-      }
-    }
+  --info: 222 60% 33%;                   /* #1E3A8A — same as primary */
+  --info-foreground: 0 0% 100%;          /* #FFFFFF */
+
+  --border: 0 0% 89.8%;                  /* #E5E7EB — gray-200 */
+  --input: 0 0% 82%;                     /* #D1D5DB — gray-300 */
+  --ring: 222 60% 33%;                   /* #1E3A8A — primary */
+}
+
+.dark {
+  /* Dark theme overrides */
+  --background: 224 71% 4%;              /* #0F172A — slate-950 */
+  --foreground: 0 0% 98%;                /* #FAFAFA — gray-50 */
+
+  --card: 224 71% 4%;                    /* #0F172A */
+  --card-foreground: 0 0% 98%;           /* #FAFAFA */
+
+  --popover: 224 71% 4%;                 /* #0F172A */
+  --popover-foreground: 0 0% 98%;        /* #FAFAFA */
+
+  --primary: 217 91% 60%;                /* #60A5FA — blue-400 */
+  --primary-hover: 217 91% 65%;          /* lighter blue-400 */
+  --primary-foreground: 224 71% 4%;      /* #0F172A */
+
+  --secondary: 215 28% 17%;              /* #1E293B — slate-800 */
+  --secondary-foreground: 0 0% 98%;      /* #FAFAFA */
+
+  --muted: 215 28% 17%;                  /* #1E293B — slate-800 */
+  --muted-foreground: 215 20% 65%;       /* #94A3B8 — slate-400 */
+
+  --accent: 215 28% 17%;                 /* #1E293B — slate-800 */
+  --accent-foreground: 0 0% 98%;         /* #FAFAFA */
+
+  --destructive: 0 72% 51%;              /* #F87171 — red-400 */
+  --destructive-foreground: 224 71% 4%;  /* #0F172A */
+
+  --success: 142 76% 36%;                /* #4ADE80 — green-400 */
+  --success-foreground: 224 71% 4%;      /* #0F172A */
+
+  --warning: 43 96% 56%;                 /* #FBBF24 — amber-400 */
+  --warning-foreground: 224 71% 4%;      /* #0F172A */
+
+  --info: 217 91% 60%;                   /* #60A5FA — blue-400 */
+  --info-foreground: 224 71% 4%;         /* #0F172A */
+
+  --border: 215 28% 17%;                 /* #1E293B — slate-800 */
+  --input: 215 28% 17%;                  /* #1E293B — slate-800 */
+  --ring: 217 91% 60%;                   /* #60A5FA — primary */
+}
+
+/* ================================
+    Global Default Font (Noto Sans Arabic)
+   ================================ */
+
+@font-face {
+  font-family: "Noto Sans Arabic";
+  src: url("/fonts/noto-sans-arabic/NotoSansArabic-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans Arabic";
+  src: url("/fonts/noto-sans-arabic/NotoSansArabic-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Application-wide default */
+html {
+  font-family: "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Latin (English) uses a Latin-first stack; Arabic uses Noto Sans Arabic. */
+html[lang="en"] {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ================================
+    Base layer — apply background/foreground
+   ================================ */
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Selection colors */
+  ::selection {
+    background-color: hsl(var(--primary) / 0.2);
+  }
+}
+
+/* ================================
+    Numeric & Data Safety
+   ================================ */
+
+.numeric,
+.price,
+.tabular-nums,
+[data-numeric],
+table,
+thead,
+tbody,
+tfoot,
+th,
+td,
+input,
+select,
+textarea {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================================
+    Utility helpers
+   ================================ */
+
+@layer utilities {
+  .numeric {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ================================
+    Component defaults
+   ================================ */
+
+@layer components {
+  table th,
+  table td {
+    @apply align-middle numeric;
+    word-break: break-word; /* Ensure long text wraps in table cells */
+  }
+}
+
+/* ================================
+    Print Safety
+   ================================ */
+
+@media print {
+  table,
+  tr {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /* Force light theme for print */
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --muted: 0 0% 95.3%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 0 0% 95.3%;
+    --accent-foreground: 0 0% 0%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 82%;
+  }
+}

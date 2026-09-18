@@ -49,6 +49,7 @@ export default tseslint.config(
       "src/shared/components/ui/**/*.{ts,tsx}",
       "src/main.tsx",
       "src/features/auth/hooks/useAuth.tsx",
+      "src/app/providers/ThemeContext.tsx",
     ],
     rules: {
       "react-refresh/only-export-components": "off",

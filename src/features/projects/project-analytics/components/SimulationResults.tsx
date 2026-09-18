@@ -27,11 +27,18 @@ export function SimulationResults({
   const { t, i18n } = useTranslation(["scenario_analysis", "project_tabs", "project_detail"]);
   const { format } = useCurrencyFormatter();
 
-  const originalFinancials = simulationResult?.original.financials as FinancialSummary;
-  const simulatedFinancials = simulationResult?.simulated.financials as FinancialSummary;
+  const originalFinancials = simulationResult?.original?.financials as FinancialSummary | undefined;
+  const simulatedFinancials = simulationResult?.simulated?.financials as FinancialSummary | undefined;
 
+  const hasData = !!simulationResult && !!originalFinancials && !!simulatedFinancials;
+
+  // Data refs for useMemo (safe because useMemo only accesses them if hasData)
+  const of = originalFinancials;
+  const sf = simulatedFinancials;
+
+  // Always called at top level - returns safe empty object when no data
   const chartOptions = useMemo(() => {
-    if (!simulationResult || !originalFinancials || !simulatedFinancials) return {};
+    if (!hasData || !of || !sf) return {};
 
     const categories = [
       t("project_tabs:materials"),
@@ -45,25 +52,25 @@ export function SimulationResults({
     ];
 
     const originalData = [
-      originalFinancials.materialsTotal,
-      originalFinancials.laborTotal,
-      originalFinancials.equipmentTotal,
-      originalFinancials.additionalTotal,
-      originalFinancials.overheadAmount,
-      originalFinancials.contingencyAmount,
-      originalFinancials.markupAmount,
-      originalFinancials.taxAmount,
+      of.materialsTotal,
+      of.laborTotal,
+      of.equipmentTotal,
+      of.additionalTotal,
+      of.overheadAmount,
+      of.contingencyAmount,
+      of.markupAmount,
+      of.taxAmount,
     ];
 
     const simulatedData = [
-      simulatedFinancials.materialsTotal,
-      simulatedFinancials.laborTotal,
-      simulatedFinancials.equipmentTotal,
-      simulatedFinancials.additionalTotal,
-      simulatedFinancials.overheadAmount,
-      simulatedFinancials.contingencyAmount,
-      simulatedFinancials.markupAmount,
-      simulatedFinancials.taxAmount,
+      sf.materialsTotal,
+      sf.laborTotal,
+      sf.equipmentTotal,
+      sf.additionalTotal,
+      sf.overheadAmount,
+      sf.contingencyAmount,
+      sf.markupAmount,
+      sf.taxAmount,
     ];
 
     return {
@@ -98,22 +105,42 @@ export function SimulationResults({
         { name: t("simulated"), type: "bar", stack: "total", data: simulatedData, itemStyle: { color: SCENARIO_COLORS.simulated } },
       ],
     };
-  }, [simulationResult, originalFinancials, simulatedFinancials, currency, format, t, i18n]);
+  }, [hasData, of, sf, currency, format, t, i18n]);
 
-  const rows = [
-    { label: t("project_tabs:materials"), original: originalFinancials.materialsTotal, simulated: simulatedFinancials.materialsTotal },
-    { label: t("project_tabs:labor"), original: originalFinancials.laborTotal, simulated: simulatedFinancials.laborTotal },
-    { label: t("project_tabs:equipment"), original: originalFinancials.equipmentTotal, simulated: simulatedFinancials.equipmentTotal },
-    { label: t("project_tabs:additional"), original: originalFinancials.additionalTotal, simulated: simulatedFinancials.additionalTotal },
-    { label: t("project_detail:profit_pricing.totalDirectCosts"), original: originalFinancials.directCosts, simulated: simulatedFinancials.directCosts, isBold: true },
-    { label: t("project_detail:profit_pricing.overhead"), original: originalFinancials.overheadAmount, simulated: simulatedFinancials.overheadAmount },
-    { label: t("project_detail:profit_pricing.generalContingency"), original: originalFinancials.contingencyAmount, simulated: simulatedFinancials.contingencyAmount },
-    { label: t("project_detail:profit_pricing.primeCost"), original: originalFinancials.primeCost, simulated: simulatedFinancials.primeCost, isBold: true },
-    { label: t("project_detail:profit_pricing.markup"), original: originalFinancials.markupAmount, simulated: simulatedFinancials.markupAmount },
-    { label: t("project_detail:profit_pricing.subtotalBeforeTax"), original: originalFinancials.bidPrice, simulated: simulatedFinancials.bidPrice, isBold: true },
-    { label: t("project_detail:profit_pricing.taxes"), original: originalFinancials.taxAmount, simulated: simulatedFinancials.taxAmount },
-    { label: t("project_detail:profit_pricing.finalProjectTotal"), original: originalFinancials.grandTotal, simulated: simulatedFinancials.grandTotal, isBold: true, isPrimary: true },
-  ];
+  const rows = useMemo(() => {
+    if (!hasData || !of || !sf) return [];
+
+    return [
+      { label: t("project_tabs:materials"), original: of.materialsTotal, simulated: sf.materialsTotal },
+      { label: t("project_tabs:labor"), original: of.laborTotal, simulated: sf.laborTotal },
+      { label: t("project_tabs:equipment"), original: of.equipmentTotal, simulated: sf.equipmentTotal },
+      { label: t("project_tabs:additional"), original: of.additionalTotal, simulated: sf.additionalTotal },
+      { label: t("project_detail:profit_pricing.totalDirectCosts"), original: of.directCosts, simulated: sf.directCosts, isBold: true },
+      { label: t("project_detail:profit_pricing.overhead"), original: of.overheadAmount, simulated: sf.overheadAmount },
+      { label: t("project_detail:profit_pricing.generalContingency"), original: of.contingencyAmount, simulated: sf.contingencyAmount },
+      { label: t("project_detail:profit_pricing.primeCost"), original: of.primeCost, simulated: sf.primeCost, isBold: true },
+      { label: t("project_detail:profit_pricing.markup"), original: of.markupAmount, simulated: sf.markupAmount },
+      { label: t("project_detail:profit_pricing.subtotalBeforeTax"), original: of.bidPrice, simulated: sf.bidPrice, isBold: true },
+      { label: t("project_detail:profit_pricing.taxes"), original: of.taxAmount, simulated: sf.taxAmount },
+      { label: t("project_detail:profit_pricing.finalProjectTotal"), original: of.grandTotal, simulated: sf.grandTotal, isBold: true, isPrimary: true },
+    ];
+  }, [hasData, of, sf, t]);
+
+  if (!hasData) {
+    return (
+      <Card className="border-2 border-border shadow-md">
+        <CardHeader className="flex-row items-center justify-between pb-4">
+          <CardTitle>{t("simulationResults")}</CardTitle>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("common:close")}>
+            <X className="w-4 h-4" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground py-8">{t("common:noDataAvailable")}</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-2 border-border shadow-md">

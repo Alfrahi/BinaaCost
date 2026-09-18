@@ -38,7 +38,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-border bg-card px-4 sm:px-6">
+    <header className="sticky top-0 z-sticky flex h-16 items-center justify-between gap-4 border-b border-border bg-card px-4 sm:px-6">
       <div className="flex items-center">
         {isMobile && (
           <Button

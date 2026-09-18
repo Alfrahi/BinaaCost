@@ -4,6 +4,7 @@ import ProtectedRoute from "./app/router/ProtectedRoute";
 import AdminRoute from "./app/router/AdminRoute";
 import LayoutShell from "./app/layout/LayoutShell";
 import LanguageProvider from "./app/providers/LanguageProvider";
+import ThemeProvider from "./app/providers/ThemeProvider";
 import { Toaster } from "@/shared/components/ui/sonner";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorDisplay from "@/shared/components/ErrorDisplay";
@@ -35,11 +36,12 @@ const NotFound = React.lazy(() => import("@/pages/NotFound"));
 function AppContent() {
   return (
     <AuthProvider>
-      <LanguageProvider>
-        <Router>
-          <ErrorBoundary FallbackComponent={ErrorDisplay}>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+      <ThemeProvider>
+        <LanguageProvider>
+          <Router>
+            <ErrorBoundary FallbackComponent={ErrorDisplay}>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route
                   path="/public-share/:accessToken"
@@ -209,9 +211,10 @@ function AppContent() {
               </Routes>
             </Suspense>
           </ErrorBoundary>
-          <Toaster />
         </Router>
+        <Toaster />
       </LanguageProvider>
+    </ThemeProvider>
     </AuthProvider>
   );
 }
