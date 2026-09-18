@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
+  darkMode: "class",
   content: [
     "./src/**/*.{ts,tsx}",
   ],
@@ -15,78 +16,77 @@ export default {
     },
     extend: {
       colors: {
+        // Semantic color system using CSS variables
+        // Light values are defaults; dark values overridden in globals.css :root/.dark
         primary: {
-          // blue-900 — passes WCAG 4.5:1 on white (7:1), distinct from text-primary (#000000)
-          DEFAULT: "#1E3A8A",
-          // blue-800 for hover
-          hover: "#1E40AF",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--primary))",
+          hover: "hsl(var(--primary-hover))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#333333",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         success: {
-          // green-700 — passes WCAG 4.5:1 as text on the light background.
-          DEFAULT: "#15803D",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
         },
         destructive: {
-          DEFAULT: "#EF4444",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         warning: {
-          // amber-600 — warnings and caution
-          DEFAULT: "#D97706",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
         },
         background: {
-          DEFAULT: "#FFFFFF",
+          DEFAULT: "hsl(var(--background))",
         },
         card: {
-          DEFAULT: "#FFFFFF",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         popover: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#000000",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         muted: {
-          DEFAULT: "#F3F4F6",
-          foreground: "#6B7280",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#F3F4F6",
-          foreground: "#000000",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
-        text: {
-          primary: "#000000",
-          secondary: "#6B7280",
-        },
+        foreground: "hsl(var(--foreground))",
         border: {
-          DEFAULT: "#E5E7EB",
+          DEFAULT: "hsl(var(--border))",
         },
-        input: "#D1D5DB",
-        // Use primary for focus rings
-        ring: "#1E3A8A",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
       },
       borderRadius: {
-        lg: "0.5rem",
-        md: "0.375rem",
-        sm: "0.25rem",
+        lg: "var(--radius-lg)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
         none: "0px",
       },
       boxShadow: {
         none: "none",
-        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-        DEFAULT:
-          "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
       },
       transitionProperty: {
         all: "all",
       },
       fontSize: {
+        "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
         xs: ["0.75rem", { lineHeight: "1rem" }],
         sm: ["0.875rem", { lineHeight: "1.25rem" }],
         base: ["1rem", { lineHeight: "1.5rem" }],
@@ -97,6 +97,17 @@ export default {
         "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
         "5xl": ["3rem", { lineHeight: "1" }],
         "6xl": ["3.75rem", { lineHeight: "1" }],
+      },
+      zIndex: {
+        base: "0",
+        dropdown: "10",
+        sticky: "20",
+        fixed: "30",
+        "modal-backdrop": "40",
+        modal: "50",
+        popover: "50",
+        tooltip: "60",
+        toast: "70",
       },
     },
   },

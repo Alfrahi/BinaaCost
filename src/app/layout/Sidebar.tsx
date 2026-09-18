@@ -91,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-40 md:hidden"
+          className="fixed inset-0 z-fixed bg-black/40 md:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         ></div>
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <div
         className={cn(
-          "fixed inset-y-0 z-40 bg-card transform transition-all duration-200 ease-in-out",
+          "fixed inset-y-0 z-sticky bg-card transform transition-all duration-200 ease-in-out",
           isMobile ? "w-64" : isCollapsed ? "w-20" : "w-64",
           "start-0 border-e border-border",
           sidebarOpen

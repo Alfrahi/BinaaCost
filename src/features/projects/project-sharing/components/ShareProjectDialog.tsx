@@ -172,13 +172,13 @@ export default function ShareProjectDialog({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
+                        <TableHead variant="data" className="min-w-[150px]">
                           {t("project_detail:share.user")}
                         </TableHead>
-                        <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[100px] px-3">
+                        <TableHead variant="data" className="min-w-[100px]">
                           {t("project_detail:share.role")}
                         </TableHead>
-                        <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[80px] px-3">
+                        <TableHead variant="data" className="min-w-[80px]">
                           {t("common:actions")}
                         </TableHead>
                       </TableRow>
@@ -221,13 +221,13 @@ export default function ShareProjectDialog({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[150px] px-3">
+                      <TableHead variant="data" className="min-w-[150px]">
                         {t("project_detail:share.external.link")}
                       </TableHead>
-                      <TableHead className="text-start text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[120px] px-3">
+                      <TableHead variant="data" className="min-w-[120px]">
                         {t("project_detail:share.external.expires")}
                       </TableHead>
-                      <TableHead className="text-end text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted h-10 min-w-[80px] px-3">
+                      <TableHead variant="data" className="min-w-[80px]">
                         {t("common:actions")}
                       </TableHead>
                     </TableRow>

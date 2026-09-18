@@ -22,6 +22,21 @@ const tableVariants = cva("w-full caption-bottom text-sm", {
   },
 });
 
+const tableHeadVariants = cva(
+  "h-12 px-4 text-start align-middle font-medium text-muted-foreground",
+  {
+    variants: {
+      variant: {
+        default: "",
+        data: "text-xs font-semibold uppercase tracking-wider bg-muted h-10 px-3",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
 export interface ColumnDef<T> {
   accessorKey: keyof T;
   header: string;
@@ -96,14 +111,11 @@ TableRow.displayName = "TableRow";
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  React.ThHTMLAttributes<HTMLTableCellElement> & VariantProps<typeof tableHeadVariants>
+>(({ className, variant, ...props }, ref) => (
   <th
     ref={ref}
-    className={cn(
-      "h-12 px-4 text-start align-middle font-medium text-muted-foreground",
-      className,
-    )}
+    className={cn(tableHeadVariants({ variant }), className)}
     {...props}
   />
 ));

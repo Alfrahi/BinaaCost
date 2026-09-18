@@ -18,8 +18,8 @@ import { ArrowUp, ArrowDown, ChevronsUpDown, Search, X, Loader2 } from "lucide-r
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 
-const ALIGN_CLASS = { start: "text-start", end: "text-end" } as const;
-const MIN_WIDTH_CLASSES: Record<string, string> = {
+export const ALIGN_CLASS = { start: "text-start", end: "text-end" } as const;
+export const MIN_WIDTH_CLASSES: Record<string, string> = {
   "60px": "min-w-[60px]",
   "80px": "min-w-[80px]",
   "100px": "min-w-[100px]",
@@ -29,7 +29,7 @@ const MIN_WIDTH_CLASSES: Record<string, string> = {
   "240px": "min-w-[240px]",
 } as const;
 
-type MinWidthToken = keyof typeof MIN_WIDTH_CLASSES;
+export type MinWidthToken = keyof typeof MIN_WIDTH_CLASSES;
 
 export interface DataTableColumn<T> {
   key: string;
@@ -261,7 +261,7 @@ function DataTable<T>({
                     headerHeightClass,
                     (col.align === "end" || col.isCurrency) && "tabular-nums",
                     col.className,
-                    col.minWidth && (MIN_WIDTH_CLASSES[col.minWidth] || `min-w-[${col.minWidth}]`),
+                    col.minWidth && MIN_WIDTH_CLASSES[col.minWidth],
                     sortable && "cursor-pointer select-none",
                   )}
                   onClick={sortable ? () => handleSort(col) : undefined}

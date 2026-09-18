@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
+import { ALIGN_CLASS } from "@/shared/components/ui/data-table";
 import {
   Table,
   TableHeader,
@@ -124,7 +125,7 @@ export const ProjectCostReport = React.forwardRef<
                 {columns.map((col) => (
                   <TableHead
                     key={col.key}
-                    className={`text-${col.align || "start"} text-xs font-medium text-muted-foreground uppercase`}
+                    className={`${ALIGN_CLASS[col.align || "start"]} text-xs font-medium text-muted-foreground uppercase`}
                   >
                     {col.label}
                   </TableHead>
@@ -185,7 +186,7 @@ export const ProjectCostReport = React.forwardRef<
                         {columns.map((col) => (
                           <TableCell
                             key={col.key}
-                            className={`text-${col.align || "start"} text-foreground`}
+                            className={`${ALIGN_CLASS[col.align || "start"]} text-foreground`}
                           >
                             {col.isCurrency
                               ? formatCurrency(item[col.key], project.currency)
