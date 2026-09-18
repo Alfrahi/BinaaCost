@@ -108,6 +108,28 @@ Used via Tailwind: `p-4`, `m-2`, `gap-3`, `space-y-4`, etc.
 | `shadow-md` | `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)` | Dropdowns, tooltips |
 | `shadow-lg` | `0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)` | Dialogs, sheets |
 | `shadow-xl` | `0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)` | Modals |
+| `--shadow-card` | `var(--shadow-sm)` | Card elevation (CSS variable) |
+| `--shadow-dropdown` | `var(--shadow-md)` | Dropdown elevation (CSS variable) |
+| `--shadow-modal` | `var(--shadow-lg)` | Modal elevation (CSS variable) |
+
+### Semantic Color Aliases (CSS Variables)
+| CSS Variable | Maps To | Usage |
+|--------------|---------|-------|
+| `--surface` | `--card` | Surface/container background |
+| `--surface-foreground` | `--card-foreground` | Surface text |
+| `--danger` | `--destructive` | Danger/error states |
+| `--danger-foreground` | `--destructive-foreground` | On-danger text |
+
+### Chart Palette (CSS Variables)
+| CSS Variable | Light Theme | Dark Theme | Usage |
+|--------------|-------------|------------|-------|
+| `--chart-1` | `195 89% 46%` (#0088FE) | `195 89% 56%` | Cost category 1 (materials) |
+| `--chart-2` | `162 100% 41%` (#00C49F) | `162 100% 51%` | Cost category 2 (labor) |
+| `--chart-3` | `48 100% 58%` (#FFBB28) | `48 100% 68%` | Cost category 3 (equipment) |
+| `--chart-4` | `21 100% 63%` (#FF8042) | `21 100% 73%` | Cost category 4 (additional) |
+| `--chart-5` | `217 91% 60%` (#60A5FA) | `217 91% 70%` | Scenario: original |
+| `--chart-6` | `142 76% 36%` (#34D399) | `142 76% 46%` | Scenario: simulated |
+| `--chart-emphasis-shadow` | `rgba(0, 0, 0, 0.5)` | `rgba(255, 255, 255, 0.3)` | Chart emphasis shadow |
 
 ### Transitions
 | Token | Value | Usage |

@@ -5,10 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Offline</title>
   <style>
+    :root {
+      /* Light theme fallback values (match globals.css light theme) */
+      --background: 0 0% 100%;
+      --foreground: 0 0% 0%;
+      --muted: 0 0% 95.3%;
+      --muted-foreground: 0 0% 42%;
+    }
+    .dark {
+      --background: 224 71% 4%;
+      --foreground: 0 0% 98%;
+      --muted: 215 28% 17%;
+      --muted-foreground: 215 20% 65%;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #F9FAFB;
-      color: #1F2937;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
       display: flex;
       justify-content: center;
       align-items: center;
@@ -25,7 +38,7 @@
       margin-bottom: 0.5rem;
     }
     p {
-      color: #6B7280;
+      color: hsl(var(--muted-foreground));
     }
   </style>
 </head>
