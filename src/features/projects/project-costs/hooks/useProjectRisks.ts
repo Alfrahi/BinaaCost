@@ -9,13 +9,38 @@ import { calculateRiskContingency } from "@/shared/logic/risk";
 import { Risk } from "@/features/projects/project-core/types/project";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 
-export function useProjectRisks(projectId: string) {
+interface UseProjectRisksReturn {
+  data: Risk[];
+  isLoading: boolean;
+  error: Error | null;
+  addRisk: (values: Omit<Risk, "id" | "created_at" | "updated_at" | "user_id" | "project_id">) => Promise<void>;
+  updateRisk: (id: string, values: Omit<Risk, "id" | "created_at" | "updated_at" | "user_id" | "project_id">) => Promise<void>;
+  deleteRisk: (id: string) => Promise<void>;
+  isAdding: boolean;
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
+export function useProjectRisks(projectId: string): UseProjectRisksReturn {
   const { t } = useTranslation(["project_risk", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { useMutation: useOfflineMutation } = useOfflinePb();
+  const { useMutation: useOfflineMutation, useQuery } = useOfflinePb();
 
   const queryKey = ["risks", projectId];
+
+  const { data: risks = [], isLoading, error } = useQuery<Risk[]>({
+    queryKey,
+    queryFn: async () => {
+      const pb = (await import("@/integrations/pocketbase/client")).pb;
+      const records = await pb.collection("risks").getFullList({
+        filter: `project_id="${projectId}"`,
+      });
+      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
+    },
+    enabled: !!projectId,
+    staleTime: 1000 * 60 * 2,
+  });
 
   const calculateOptimisticContingency = useCallback(
     (impact: number, probability: string) => {
@@ -173,5 +198,8 @@ export function useProjectRisks(projectId: string) {
     isAdding: addRisk.isPending,
     isUpdating: updateRisk.isPending,
     isDeleting: deleteRisk.isPending,
+    data: risks,
+    isLoading,
+    error,
   };
 }

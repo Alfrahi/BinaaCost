@@ -47,7 +47,6 @@ type RiskMutationPayload = Omit<
 
 export default function RiskManagementTable({
   projectId,
-  risks,
   currency = "USD",
   canEdit,
   riskProbabilities,
@@ -55,7 +54,6 @@ export default function RiskManagementTable({
   onNavigateToPricing,
 }: {
   projectId: string;
-  risks: Risk[];
   currency?: string;
   canEdit: boolean;
   riskProbabilities: { value: string; label: string }[];
@@ -68,7 +66,7 @@ export default function RiskManagementTable({
   const [editingItem, setEditingItem] = useState<Risk | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Risk | null>(null);
 
-  const { addRisk, updateRisk, deleteRisk, isAdding, isUpdating, isDeleting } =
+  const { addRisk, updateRisk, deleteRisk, isAdding, isUpdating, isDeleting, data: risks = [] } =
     useProjectRisks(projectId);
 
   const form = useForm<FormValues>({
