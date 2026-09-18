@@ -41,6 +41,11 @@ import {
 } from "@/features/projects/project-costs/types/items";
 import { Risk } from "@/features/projects/project-core/types/project";
 import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
+import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
+import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
+import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
+import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 
 const LazyOverviewTab = React.lazy(() => import("./OverviewTab"));
 const LazyCostsTab = React.lazy(() => import("../../project-costs/components/CostsTab"));
@@ -105,15 +110,30 @@ function ProjectTabsComponent({
     sizeUnits,
     projectTypes,
     groups,
-    materials,
-    labor,
-    equipment,
-    additional,
-    risks,
-    totals,
     isLoading,
     error,
   } = useProjectData(projectId);
+
+  // Use entity hooks directly for data fetching
+  const { data: materials = [], isLoading: isLoadingMaterials } = useProjectMaterials(projectId);
+  const { data: labor = [], isLoading: isLoadingLabor } = useProjectLabor(projectId);
+  const { data: equipment = [], isLoading: isLoadingEquipment } = useProjectEquipment(projectId);
+  const { data: additional = [], isLoading: isLoadingAdditional } = useProjectAdditionalCosts(projectId);
+  const { isLoading: isLoadingRisks } = useProjectRisks(projectId);
+
+  const totals = useMemo(() => {
+    const materialsTotal = calculateCategoryTotal.materials(materials);
+    const laborTotal = calculateCategoryTotal.labor(labor);
+    const equipmentTotal = calculateCategoryTotal.equipment(equipment);
+    const additionalTotal = calculateCategoryTotal.additional(additional);
+
+    return {
+      materialsTotal,
+      laborTotal,
+      equipmentTotal,
+      additionalTotal,
+    };
+  }, [materials, labor, equipment, additional]);
 
   const {
     itemComments,
@@ -143,6 +163,8 @@ function ProjectTabsComponent({
   const { options: riskProbabilities, isLoading: isLoadingRiskProbabilities } =
     useSettingsOptions("risk_probability");
   const { options: durationUnits } = useSettingsOptions("duration_unit");
+
+  const isLoadingEntities = isLoadingMaterials || isLoadingLabor || isLoadingEquipment || isLoadingAdditional || isLoadingRisks;
 
   const tabGroups = useMemo(
     () => [
@@ -203,7 +225,7 @@ function ProjectTabsComponent({
     [tabGroups],
   );
 
-  if (isLoading) {
+  if (isLoading || isLoadingEntities) {
     return <PageLoader />;
   }
 
@@ -319,10 +341,6 @@ function ProjectTabsComponent({
               <TabsContent value="costs" className="mt-4">
                 <LazyCostsTab
                   projectId={projectId}
-                  materials={materials}
-                  labor={labor}
-                  equipment={equipment}
-                  additional={additional}
                   groups={groups}
                   canEdit={canEdit}
                   currency={project.currency}
@@ -343,7 +361,6 @@ function ProjectTabsComponent({
               <TabsContent value="risks" className="mt-4">
                 <LazyRiskManagementTable
                   projectId={projectId}
-                  risks={risks}
                   currency={project.currency}
                   canEdit={canEdit}
                   riskProbabilities={riskProbabilities}
@@ -355,7 +372,6 @@ function ProjectTabsComponent({
               <TabsContent value="scenario-analysis" className="mt-4">
                 <LazyScenarioAnalysisTab
                   projectId={projectId}
-                  risks={risks}
                   currency={project.currency}
                   canEdit={canEdit}
                   additionalCategories={additionalCategories}
@@ -373,7 +389,6 @@ function ProjectTabsComponent({
                   currency={project.currency}
                   initialSettings={project.financial_settings}
                   settingsConfirmed={project.financial_settings_confirmed}
-                  riskContingency={calculateCategoryTotal.risks(risks)}
                   scenarioCount={scenarios.length}
                   onNavigateToRisks={() => setActiveTab("risks")}
                 />
@@ -396,11 +411,6 @@ function ProjectTabsComponent({
                   laborTotal={totals.laborTotal}
                   equipmentTotal={totals.equipmentTotal}
                   additionalTotal={totals.additionalTotal}
-                  materials={materials}
-                  labor={labor}
-                  equipment={equipment}
-                  additional={additional}
-                  risks={risks}
                   groups={groups}
                   materialUnits={materialUnits}
                   periodUnits={periodUnits}

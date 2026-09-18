@@ -12,7 +12,6 @@ import { EntityTable, EntityTableConfig } from "./EntityTable";
 
 export function LaborTable({
   projectId,
-  labor,
   groups = [],
   canEdit,
   currency,
@@ -21,7 +20,6 @@ export function LaborTable({
   locationLabel,
 }: {
   projectId: string;
-  labor: LaborItem[];
   groups?: any[];
   canEdit: boolean;
   currency: string;
@@ -32,6 +30,7 @@ export function LaborTable({
   const { t } = useTranslation(["project_labor", "project_detail", "common"]);
   const { format } = useCurrencyFormatter();
   const crud = useProjectLabor(projectId);
+  const { data: labor = [] } = crud;
 
   const config = useMemo<EntityTableConfig<LaborItem>>(
     () => ({

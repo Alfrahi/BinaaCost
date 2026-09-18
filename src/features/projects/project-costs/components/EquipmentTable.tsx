@@ -13,7 +13,6 @@ import { EntityTable, EntityTableConfig } from "./EntityTable";
 
 export function EquipmentTable({
   projectId,
-  equipment,
   groups = [],
   canEdit,
   currency,
@@ -26,7 +25,6 @@ export function EquipmentTable({
   locationLabel,
 }: {
   projectId: string;
-  equipment: EquipmentItem[];
   groups?: any[];
   canEdit: boolean;
   currency: string;
@@ -45,6 +43,7 @@ export function EquipmentTable({
   ]);
   const { format } = useCurrencyFormatter();
   const crud = useProjectEquipment(projectId);
+  const { data: equipment = [] } = crud;
 
   const config = useMemo<EntityTableConfig<EquipmentItem>>(
     () => ({

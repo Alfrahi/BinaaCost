@@ -12,6 +12,8 @@ import {
 import { FinancialInputs } from "./FinancialInputs";
 import { FinancialSummaryTable } from "./FinancialSummaryTable";
 import { MobileBar } from "./ProfitPricingMobileBar";
+import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
+import { calculateCategoryTotal } from "@/shared/logic/shared";
 
 interface ProfitPricingSummaryCardProps {
   projectId: string;
@@ -21,7 +23,6 @@ interface ProfitPricingSummaryCardProps {
   additionalTotal: number;
   currency?: string;
   initialSettings?: FinancialSettings;
-  riskContingency?: number;
   scenarioCount?: number;
   settingsConfirmed?: boolean;
   onNavigateToRisks?: () => void;
@@ -35,7 +36,6 @@ export default function ProfitPricingSummaryCard({
   additionalTotal,
   currency = "USD",
   initialSettings,
-  riskContingency,
   scenarioCount,
   settingsConfirmed,
   onNavigateToRisks,
@@ -43,6 +43,9 @@ export default function ProfitPricingSummaryCard({
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
   const { format } = useCurrencyFormatter();
   const isMobile = useIsMobile();
+
+  const { data: risks = [] } = useProjectRisks(projectId);
+  const riskContingency = useMemo(() => calculateCategoryTotal.risks(risks), [risks]);
 
   const settings = initialSettings || DEFAULT_FINANCIAL_SETTINGS;
 

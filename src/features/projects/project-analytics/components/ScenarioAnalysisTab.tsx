@@ -4,28 +4,30 @@ import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useScenarioManager } from "@/features/projects/project-analytics/hooks/useScenarioManager";
 import { useProjectSimulator } from "@/features/projects/project-analytics/hooks/useProjectSimulator";
+import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 import { ScenarioSelector } from "./ScenarioSelector";
 import { SimulationResults } from "./SimulationResults";
 import { ManageScenariosDialog } from "./ManageScenariosDialog";
 import { ScenarioFormDialog } from "./ScenarioFormDialog";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
+import { toast } from "sonner";
 
 export function ScenarioAnalysisTab({
   projectId,
-  risks: projectRisks,
   currency,
   canEdit,
   additionalCategories,
   riskProbabilities,
 }: {
   projectId: string;
-  risks: any[];
   currency: string;
   canEdit: boolean;
   additionalCategories: { value: string; label: string }[];
   riskProbabilities: { value: string; label: string }[];
 }) {
   const { t } = useTranslation(["scenario_analysis", "common"]);
+
+  const { data: projectRisks = [] } = useProjectRisks(projectId);
 
   const {
     scenarios,
@@ -142,5 +144,3 @@ export function ScenarioAnalysisTab({
     </div>
   );
 }
-
-import { toast } from "sonner";

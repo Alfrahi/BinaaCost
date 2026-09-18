@@ -20,13 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { useProjectMaterials } from "../hooks/useProjectMaterials";
+import { useProjectLabor } from "../hooks/useProjectLabor";
+import { useProjectEquipment } from "../hooks/useProjectEquipment";
+import { useProjectAdditionalCosts } from "../hooks/useProjectAdditionalCosts";
 
 interface CostsTabProps {
   projectId: string;
-  materials: any[];
-  labor: any[];
-  equipment: any[];
-  additional: any[];
   groups: any[];
   canEdit: boolean;
   currency: string;
@@ -45,10 +45,6 @@ interface CostsTabProps {
 
 export default function CostsTab({
   projectId,
-  materials,
-  labor,
-  equipment,
-  additional,
   groups,
   canEdit,
   currency,
@@ -69,6 +65,12 @@ export default function CostsTab({
   const [showGroupsManager, setShowGroupsManager] = useState(false);
   const [showAssemblyImporter, setShowAssemblyImporter] = useState(false);
   const [activeCostTab, setActiveCostTab] = useState("materials");
+
+  // Use entity hooks directly for data fetching (tables fetch their own data)
+  useProjectMaterials(projectId);
+  useProjectLabor(projectId);
+  useProjectEquipment(projectId);
+  useProjectAdditionalCosts(projectId);
 
   const costTabItems = useMemo(
     () => [
@@ -159,7 +161,6 @@ export default function CostsTab({
         <TabsContent value="materials" className="mt-4">
           <MaterialsTable
             projectId={projectId}
-            materials={materials}
             groups={groups}
             canEdit={canEdit}
             currency={currency}
@@ -174,7 +175,6 @@ export default function CostsTab({
         <TabsContent value="labor" className="mt-4">
           <LaborTable
             projectId={projectId}
-            labor={labor}
             groups={groups}
             canEdit={canEdit}
             currency={currency}
@@ -187,7 +187,6 @@ export default function CostsTab({
         <TabsContent value="equipment" className="mt-4">
           <EquipmentTable
             projectId={projectId}
-            equipment={equipment}
             groups={groups}
             canEdit={canEdit}
             currency={currency}
@@ -204,7 +203,6 @@ export default function CostsTab({
         <TabsContent value="additional" className="mt-4">
           <AdditionalCostsTable
             projectId={projectId}
-            additionalCosts={additional}
             groups={groups}
             canEdit={canEdit}
             currency={currency}

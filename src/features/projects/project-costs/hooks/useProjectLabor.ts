@@ -5,17 +5,38 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";
 import { useEntityCrud, EntityCrud } from "@/shared/hooks/useEntityCrud";
+import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { calculateItemCost } from "@/shared/logic/shared";
 import { LaborItem } from "@/features/projects/project-costs/types/items";
 import { LaborFormValues } from "@/features/projects/project-costs/types/schemas";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 
-export function useProjectLabor(projectId: string): EntityCrud<LaborItem> {
+interface UseProjectLaborReturn extends EntityCrud<LaborItem> {
+  data: LaborItem[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useProjectLabor(projectId: string): UseProjectLaborReturn {
   const { t } = useTranslation(["project_labor", "common"]);
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { convert, getMissingRates } = useCurrencyConverter();
+  const { useQuery } = useOfflinePb();
+
+  const { data: labor = [], isLoading, error } = useQuery<LaborItem[]>({
+    queryKey: ["labor_items", projectId],
+    queryFn: async () => {
+      const pb = (await import("@/integrations/pocketbase/client")).pb;
+      const records = await pb.collection("labor_items").getFullList({
+        filter: `project_id="${projectId}"`,
+      });
+      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
+    },
+    enabled: !!projectId,
+    staleTime: 1000 * 60 * 2,
+  });
 
   const {
     addItem,
@@ -177,5 +198,8 @@ export function useProjectLabor(projectId: string): EntityCrud<LaborItem> {
     isDeleting,
     isBulkDeleting,
     isBulkMoving,
+    data: labor,
+    isLoading,
+    error,
   };
 }
