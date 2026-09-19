@@ -16,8 +16,6 @@ export function useUserEmailUpdate() {
       return { pendingConfirmation: true };
     },
     onSuccess: () => {
-      // Reset to re-check email after confirmation
-      pb.authStore.clear();
       toast.success(t("settings:profile.info_email_update"));
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
