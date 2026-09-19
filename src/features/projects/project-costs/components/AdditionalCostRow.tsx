@@ -127,4 +127,16 @@ export const AdditionalCostRow = memo(function AdditionalCostRow({
       </TableCell>
     </TableRow>
   );
+}, (prev, next) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.category === next.item.category &&
+    prev.item.description === next.item.description &&
+    prev.item.amount === next.item.amount &&
+    prev.selected === next.selected &&
+    prev.isOwner === next.isOwner &&
+    prev.currency === next.currency &&
+    prev.locationFactor === next.locationFactor &&
+    prev.additionalCategories === next.additionalCategories
+  );
 });

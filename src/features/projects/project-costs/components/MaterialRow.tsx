@@ -161,4 +161,18 @@ export const MaterialRow = React.memo(function MaterialRow({
       </TableCell>
     </TableRow>
   );
+}, (prev, next) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.name === next.item.name &&
+    prev.item.description === next.item.description &&
+    prev.item.quantity === next.item.quantity &&
+    prev.item.unit === next.item.unit &&
+    prev.item.unit_price === next.item.unit_price &&
+    prev.selected === next.selected &&
+    prev.isOwner === next.isOwner &&
+    prev.currency === next.currency &&
+    prev.locationFactor === next.locationFactor &&
+    prev.locationLabel === next.locationLabel
+  );
 });

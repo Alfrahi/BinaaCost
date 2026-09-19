@@ -7,6 +7,7 @@ import { Heading } from "@/shared/components/ui/heading";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { FinancialSummary } from "@/shared/logic/financials";
 import { sanitizeHtml } from "@/shared/lib/sanitizeText";
+import { ReportFinancialSummary } from "./ReportFinancialSummary";
 
 interface ClientProposalReportProps {
   project: any;
@@ -134,107 +135,12 @@ export const ClientProposalReport = React.forwardRef<
         <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:proposedCost")}
         </h3>
-        <div className="mb-3 text-sm text-muted-foreground">
-          <span className="font-semibold">
-            {t("project_detail:profit_pricing.assumptions")}:{" "}
-          </span>
-          {t("project_detail:profit_pricing.overhead")}{" "}
-          {project.financial_settings.overhead_percent}% ·{" "}
-          {t("project_detail:profit_pricing.generalContingency")}{" "}
-          {project.financial_settings.contingency_percent}% ·{" "}
-          {t("project_detail:profit_pricing.markup")}{" "}
-          {project.financial_settings.markup_percent}% ·{" "}
-          {t("project_detail:profit_pricing.taxes")}{" "}
-          {project.financial_settings.tax_percent}%
-          {!project.financial_settings_confirmed && (
-            <span className="block text-xs text-muted-foreground mt-1">
-              {t(
-                "project_detail:profit_pricing.defaultAssumptionsWarning",
-              )}
-            </span>
-          )}
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm mb-8">
-            <tbody>
-              <tr className="bg-muted">
-                <td className="font-semibold uppercase text-foreground">
-                  {t("project_detail:profit_pricing.totalDirectCosts")}
-                </td>
-                <td className="text-end font-bold text-foreground">
-                  {formatCurrency(financials.directCosts, project.currency)}
-                </td>
-              </tr>
-              <tr className="border-t border-border">
-                <td className="text-foreground">
-                  {t("project_detail:profit_pricing.overheadWithPercent", {
-                    percent: project.financial_settings.overhead_percent,
-                  })}
-                </td>
-                <td className="text-end text-foreground">
-                  {formatCurrency(financials.overheadAmount, project.currency)}
-                </td>
-              </tr>
-              <tr className="border-t border-border">
-                <td className="text-foreground">
-                  {t("project_detail:profit_pricing.generalContingencyWithPercent", {
-                    percent: project.financial_settings.contingency_percent,
-                  })}
-                </td>
-                <td className="text-end text-foreground">
-                  {formatCurrency(
-                    financials.contingencyAmount,
-                    project.currency,
-                  )}
-                </td>
-              </tr>
-              <tr className="bg-muted border-t border-border">
-                <td className="font-semibold uppercase text-foreground">
-                  {t("project_detail:profit_pricing.primeCost")}
-                </td>
-                <td className="text-end font-bold text-foreground">
-                  {formatCurrency(financials.primeCost, project.currency)}
-                </td>
-              </tr>
-              <tr className="border-t border-border">
-                <td className="text-foreground">
-                  {t("project_detail:profit_pricing.markupWithPercent", {
-                    percent: project.financial_settings.markup_percent,
-                  })}
-                </td>
-                <td className="text-end text-foreground">
-                  {formatCurrency(financials.markupAmount, project.currency)}
-                </td>
-              </tr>
-              <tr className="bg-muted border-t border-border">
-                <td className="font-semibold uppercase text-foreground">
-                  {t("project_detail:profit_pricing.subtotalBeforeTax")}
-                </td>
-                <td className="text-end font-bold text-foreground">
-                  {formatCurrency(financials.bidPrice, project.currency)}
-                </td>
-              </tr>
-              <tr className="border-t border-border">
-                <td className="text-foreground">
-                  {t("project_detail:profit_pricing.taxesWithPercent", {
-                    percent: project.financial_settings.tax_percent,
-                  })}
-                </td>
-                <td className="text-end text-foreground">
-                  {formatCurrency(financials.taxAmount, project.currency)}
-                </td>
-              </tr>
-              <tr className="bg-primary text-primary-foreground">
-                <td className="text-lg font-bold uppercase">
-                  {t("project_detail:profit_pricing.finalProjectTotal")}
-                </td>
-                <td className="text-end text-lg font-bold">
-                  {formatCurrency(financials.grandTotal, project.currency)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ReportFinancialSummary
+          financials={financials}
+          project={project}
+          formatCurrency={formatCurrency}
+          t={t}
+        />
 
         <Separator className="my-6 bg-border" />
 

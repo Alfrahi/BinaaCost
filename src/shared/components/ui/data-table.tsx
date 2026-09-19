@@ -47,7 +47,7 @@ export interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
   getRowKey: (row: T) => string;
-  renderRow: (row: T) => React.ReactNode;
+  renderRow: (row: T, state: { isSelected: boolean; onToggle: () => void }) => React.ReactNode;
   grandTotal?: React.ReactNode;
   grandTotalLabel?: string;
   grandTotalColSpan?: number;
@@ -88,9 +88,32 @@ export interface DataTableProps<T> {
 
 type SortState = { key: string; dir: "asc" | "desc" } | null;
 
+interface MemoizedRowProps<T> {
+  row: T;
+  rowKey: string;
+  isSelected: boolean;
+  onToggle: () => void;
+  renderRow: (row: T, state: { isSelected: boolean; onToggle: () => void }) => React.ReactNode;
+}
+
+const MemoizedRow = React.memo(
+  function MemoizedRow<T>({ row, rowKey, isSelected, onToggle, renderRow }: MemoizedRowProps<T>) {
+    return <>{renderRow(row, { isSelected, onToggle })}</>;
+  },
+  (prev, next) => {
+    return (
+      prev.rowKey === next.rowKey &&
+      prev.isSelected === next.isSelected &&
+      prev.row === next.row &&
+      prev.renderRow === next.renderRow
+    );
+  }
+) as <T>(props: MemoizedRowProps<T>) => React.ReactElement;
+
 function DataTable<T>({
   columns,
   data,
+  getRowKey,
   renderRow,
   grandTotal,
   grandTotalLabel,
@@ -110,7 +133,7 @@ function DataTable<T>({
   sortable = false,
   isLoading = false,
   t,
-}: Omit<DataTableProps<T>, "getRowKey"> & { t: (key: string, options?: any) => string }) {
+}: DataTableProps<T> & { t: (key: string, options?: any) => string }) {
   const hasSelection = !!selection;
   const hasGroups = !!groupRows;
   const paddingClasses = cellPadding === "compact" ? "px-3 py-2" : "p-4";
@@ -302,7 +325,7 @@ function DataTable<T>({
                 </TableCell>
               </TableRow>
             ) : (
-              displayData.map((item) => {
+              displayData.map((item, index) => {
                 if (item.type === "header") {
                   return (
                     <TableRow key={`header-${item.group?.id}`} className="bg-muted hover:bg-muted">
@@ -315,7 +338,20 @@ function DataTable<T>({
                     </TableRow>
                   );
                 }
-                return renderRow(item.row!);
+                const rowKey = getRowKey ? getRowKey(item.row!) : (item.row as any).id || index;
+                const isSelected = selection?.selectedIds.has(rowKey) ?? false;
+                const onToggle = () => selection?.onToggle(rowKey);
+                
+                return (
+                  <MemoizedRow
+                    key={rowKey}
+                    row={item.row!}
+                    rowKey={rowKey}
+                    isSelected={isSelected}
+                    onToggle={onToggle}
+                    renderRow={renderRow}
+                  />
+                );
               })
             )}
           </TableBody>

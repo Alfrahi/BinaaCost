@@ -218,4 +218,24 @@ export const EquipmentRow = memo(function EquipmentRow({
       </TableCell>
     </TableRow>
   );
+}, (prev, next) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.name === next.item.name &&
+    prev.item.type === next.item.type &&
+    prev.item.rental_or_purchase === next.item.rental_or_purchase &&
+    prev.item.quantity === next.item.quantity &&
+    prev.item.cost_per_period === next.item.cost_per_period &&
+    prev.item.period_unit === next.item.period_unit &&
+    prev.item.usage_duration === next.item.usage_duration &&
+    prev.item.maintenance_cost === next.item.maintenance_cost &&
+    prev.item.fuel_cost === next.item.fuel_cost &&
+    prev.item.total_cost === next.item.total_cost &&
+    prev.selected === next.selected &&
+    prev.isOwner === next.isOwner &&
+    prev.currency === next.currency &&
+    prev.locationFactor === next.locationFactor &&
+    prev.locationLabel === next.locationLabel &&
+    prev.rentalOptions === next.rentalOptions
+  );
 });
