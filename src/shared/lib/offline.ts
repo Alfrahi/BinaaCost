@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { executePbMutation } from "@/shared/lib/pb-executor";
+import { executePbMutation } from "@/integrations/pocketbase/executor";
 import { QueryClient, QueryKey } from "@tanstack/react-query";
 
 // ---------------------------------------------------------------------------

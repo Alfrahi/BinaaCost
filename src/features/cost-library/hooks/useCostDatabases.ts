@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export function useCostDatabases() {
   const { user } = useAuth();

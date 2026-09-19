@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/features/auth";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import {
   MaterialItem,
   LaborItem,
@@ -11,7 +11,7 @@ import {
 import { Risk } from "@/features/projects/project-core/types/project";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { handleError } from "@/shared/lib/toast";
-import { fetchMinimalUsers } from "@/shared/lib/usersMinimal";
+import { fetchMinimalUsers } from "@/integrations/pocketbase/users";
 
 interface Comment {
   id: string;

@@ -7,7 +7,7 @@ import {
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { handleError } from "@/shared/lib/toast";
-import { fetchMinimalUsers } from "@/shared/lib/usersMinimal";
+import { fetchMinimalUsers } from "@/integrations/pocketbase/users";
 
 export interface ProjectShare {
   share_id: string;

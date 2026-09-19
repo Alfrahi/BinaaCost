@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord, mapRecords } from "@/shared/lib/pb-mapper";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { mapRecord, mapRecords } from "@/integrations/pocketbase/mappers";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useAuth } from "@/features/auth";
 import type { ProjectGroup } from "@/features/projects/project-core/types/project";

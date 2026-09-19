@@ -22,7 +22,7 @@ import {
   AssemblyIntegrationRow,
   ImportItemOverrides,
 } from "./AssemblyIntegrationRow";
-import { EntityCrud } from "@/shared/hooks/useEntityCrud";
+import { EntityCrud } from "@/features/projects/project-costs/hooks/useEntityCrud";
 
 const PAGE_SIZE = 50;
 

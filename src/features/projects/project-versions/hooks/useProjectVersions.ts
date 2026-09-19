@@ -3,7 +3,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { handleError } from "@/shared/lib/toast";
 
 export interface ProjectVersion {

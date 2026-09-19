@@ -9,7 +9,7 @@ import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord } from "@/shared/lib/pb-mapper";
+import { mapRecord } from "@/integrations/pocketbase/mappers";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import CostItemsTable from "./CostItemsTable";
 import LocationAdjustmentsManager from "./LocationAdjustmentsManager";

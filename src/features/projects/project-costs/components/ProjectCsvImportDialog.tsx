@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useProjectCsvImporter } from "@/features/projects/project-costs/hooks/useProjectCsvImporter";
-import { ProjectItemType } from "@/shared/lib/projectCsv";
+import { ProjectItemType } from "@/features/projects/project-costs/utils/projectCsv";
 
 export default function ProjectCsvImportDialog({
   open,

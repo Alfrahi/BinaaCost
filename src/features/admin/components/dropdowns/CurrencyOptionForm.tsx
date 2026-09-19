@@ -4,7 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Option } from "@/features/admin/hooks/useDropdownOptions";
-import { WORLD_CURRENCIES } from "@/shared/lib/world-currencies";
+import { WORLD_CURRENCIES } from "@/features/admin/utils/world-currencies";
 import { toast } from "sonner";
 
 interface CurrencyOptionFormProps {

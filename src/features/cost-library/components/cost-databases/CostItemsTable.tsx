@@ -13,7 +13,7 @@ import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDial
 import CostItemsCsvImportDialog from "./CostItemsCsvImportDialog";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import { useAuth } from "@/features/auth";
-import { useRole } from "@/shared/hooks/useRole";
+import { useRole } from "@/features/auth";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { useBulkSelection } from "@/shared/hooks/useBulkSelection";

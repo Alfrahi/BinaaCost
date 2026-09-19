@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useAuth } from "@/features/auth";
 import { pb } from "@/integrations/pocketbase/client";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { safeAdd } from "@/shared/lib/math";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { calculateItemCost } from "@/shared/logic/shared";

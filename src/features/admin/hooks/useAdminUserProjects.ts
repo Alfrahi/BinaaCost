@@ -1,6 +1,6 @@
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useState } from "react";
 
 const PAGE_SIZE = 5;

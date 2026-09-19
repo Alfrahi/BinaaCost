@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import {
   parseAndValidateCostItemsCsv,
   escapeCsvCell,
-} from "@/shared/lib/csv";
+} from "../csv";
 
 function makeCsvFile(content: string): File {
   return new File([content], "items.csv", { type: "text/csv" });

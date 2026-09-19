@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
 import PageHeader from "@/shared/components/PageHeader";
 import {
   Table,
@@ -16,7 +14,6 @@ import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { X, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -29,19 +26,7 @@ import {
 import EmptyState from "@/shared/components/ui/EmptyState";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import React from "react";
-
-interface AuditLog {
-  id: string;
-  user_id: string;
-  user_email: string;
-  action: string;
-  table_name: string;
-  record_id: string;
-  old_data: any;
-  new_data: any;
-  created_at: string;
-  total_rows: number;
-}
+import { useAdminAuditLogs } from "@/features/admin/hooks/useAdminAuditLogs";
 
 const formatJsonForDisplay = (data: any) => {
   if (!data) return null;
@@ -59,38 +44,12 @@ export default function AuditLogs() {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const { useQuery: useOfflineQuery } = useOfflinePb();
 
-  const queryKey = ["audit_logs", search, currentPage, pageSize];
-
-  const {
-    data: logsData = [],
-    isLoading,
-    error,
-  } = useOfflineQuery<AuditLog[]>({
-    queryKey,
-    queryFn: async () => {
-      const term = search.trim().replace(/"/g, '\\"');
-      const filter = term
-        ? `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`
-        : "";
-      const result = await pb.collection("audit_logs").getList(
-        currentPage,
-        pageSize,
-        { filter, sort: "-created", expand: "user_id" },
-      );
-      return mapRecords<any>(result.items).map((r) => ({
-        ...r,
-        user_email: r.expand?.user_id?.email ?? "",
-        total_rows: result.totalItems,
-      }));
-    },
-    staleTime: 1000 * 30,
-  });
-
-  const logs = logsData;
-  const totalLogs = logs.length > 0 ? logs[0].total_rows : 0;
-  const totalPages = Math.ceil(totalLogs / pageSize);
+  const { logs, totalPages, isLoading, error } = useAdminAuditLogs(
+    search,
+    currentPage,
+    pageSize,
+  );
 
   const toggleRowExpansion = (id: string) => {
     setExpandedRowId(expandedRowId === id ? null : id);
