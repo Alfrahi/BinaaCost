@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState } from "react";
 import CostDatabaseList from "@/features/cost-library/components/cost-databases/CostDatabaseList";

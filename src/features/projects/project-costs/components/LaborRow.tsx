@@ -1,4 +1,4 @@
-"use client";
+
 
 import { memo } from "react";
 import { TableCell, TableRow } from "@/shared/components/ui/table";

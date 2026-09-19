@@ -8,6 +8,7 @@ import ErrorDisplay from "@/shared/components/ErrorDisplay";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { offlineManager } from "@/shared/lib/offline";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
+import { useOfflineSyncNotifications } from "@/shared/hooks/useOfflineSyncNotifications";
 import { createRoot } from "react-dom/client";
 
 const queryClient = new QueryClient({
@@ -35,6 +36,10 @@ function AppInitializer() {
       initializedRef.current = true;
     }
   }, []);
+
+  // Wire sync event notifications (toast/i18n) here so OfflineManager
+  // stays decoupled from UI concerns and can be unit-tested in isolation.
+  useOfflineSyncNotifications();
 
   return <App />;
 }

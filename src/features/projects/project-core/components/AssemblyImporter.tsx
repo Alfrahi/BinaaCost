@@ -1,4 +1,4 @@
-"use client";
+
 import { useState, useCallback } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
@@ -22,7 +22,7 @@ import {
 import { Label } from "@/shared/components/ui/label";
 import { useAssemblies } from "@/features/cost-library/hooks/useAssemblies";
 import { useAssemblyItems } from "@/features/projects/project-costs/hooks/useAssemblyItems";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useAssemblyImport } from "@/features/projects/project-costs/hooks/useAssemblyImport";
 

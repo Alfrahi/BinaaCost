@@ -72,14 +72,15 @@ vi.mock("@/features/projects/project-core/hooks/useProjectData", () => ({
   useProjectData: () => ({
     project: { id: "p1", currency: "USD" },
     groups: [],
-    materials: [],
-    labor: [],
-    equipment: [],
-    additional: [],
-    risks: [],
     isLoading: false,
   }),
 }));
+
+vi.mock("@/features/projects/project-costs/hooks/useProjectMaterials", () => ({ useProjectMaterials: () => ({ data: [], isLoading: false, error: null }) }));
+vi.mock("@/features/projects/project-costs/hooks/useProjectLabor", () => ({ useProjectLabor: () => ({ data: [], isLoading: false, error: null }) }));
+vi.mock("@/features/projects/project-costs/hooks/useProjectEquipment", () => ({ useProjectEquipment: () => ({ data: [], isLoading: false, error: null }) }));
+vi.mock("@/features/projects/project-costs/hooks/useProjectAdditionalCosts", () => ({ useProjectAdditionalCosts: () => ({ data: [], isLoading: false, error: null }) }));
+vi.mock("@/features/projects/project-costs/hooks/useProjectRisks", () => ({ useProjectRisks: () => ({ data: [], isLoading: false, error: null }) }));
 
 vi.mock("./VersionConflictResolver", () => ({
   default: () => <div>conflict-resolver</div>,

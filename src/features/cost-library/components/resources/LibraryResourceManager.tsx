@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAuth } from "@/features/auth";

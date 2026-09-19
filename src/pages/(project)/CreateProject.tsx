@@ -1,4 +1,4 @@
-"use client";
+
 import ProjectForm from "@/features/projects/project-core/components/ProjectForm";
 import Breadcrumbs from "@/app/layout/Breadcrumbs";
 import { useCreateProject } from "@/features/projects/project-core/hooks/useCreateProject";

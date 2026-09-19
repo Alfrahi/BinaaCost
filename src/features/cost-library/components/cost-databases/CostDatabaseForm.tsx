@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import { X } from "lucide-react";
 

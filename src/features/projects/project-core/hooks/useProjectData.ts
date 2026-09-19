@@ -1,19 +1,10 @@
-"use client";
-
 import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord, mapRecords } from "@/shared/lib/pb-mapper";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useAuth } from "@/features/auth";
 import type { ProjectGroup } from "@/features/projects/project-core/types/project";
-import { Risk } from "@/features/projects/project-core/types/project";
-import {
-  MaterialItem,
-  LaborItem,
-  EquipmentItem,
-  AdditionalCostItem,
-} from "@/features/projects/project-costs/types/items";
 
 const listByProject = (table: string, projectId: string, sort?: string) => () =>
   pb
@@ -24,6 +15,13 @@ const listByProject = (table: string, projectId: string, sort?: string) => () =>
     })
     .then((records) => mapRecords(records));
 
+/**
+ * Core project hook — fetches the project record, access control,
+ * dropdown settings, and project groups.
+ *
+ * Cost line items (materials, labor, equipment, additional, risks) are
+ * fetched by their dedicated entity hooks. Do NOT add cost data here.
+ */
 export function useProjectData(projectId?: string) {
   const { user, role: userRole, loading: authLoading } = useAuth();
   const { useQuery } = useOfflinePb();
@@ -103,22 +101,6 @@ export function useProjectData(projectId?: string) {
     [groupsQuery.data],
   );
 
-  // Entity hooks now fetch their own data independently
-  // These are just placeholders for backwards compatibility - consumers should use the entity hooks directly
-  const materials = [] as MaterialItem[];
-  const labor = [] as LaborItem[];
-  const equipment = [] as EquipmentItem[];
-  const additional = [] as AdditionalCostItem[];
-  const risks = [] as Risk[];
-  const comments = [] as any[];
-
-  const totals = useMemo(() => ({
-    materialsTotal: 0,
-    laborTotal: 0,
-    equipmentTotal: 0,
-    additionalTotal: 0,
-  }), []);
-
   const isLoading =
     authLoading ||
     loadingProject ||
@@ -136,13 +118,6 @@ export function useProjectData(projectId?: string) {
     sizeUnits,
     projectTypes,
     groups,
-    materials,
-    labor,
-    equipment,
-    additional,
-    risks,
-    comments,
-    totals,
     isLoading,
     error: projectError,
   };

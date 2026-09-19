@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/shared/lib/pb-mapper";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { handleError } from "@/shared/lib/toast";
@@ -31,13 +33,9 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
 
   const { data: risks = [], isLoading, error } = useQuery<Risk[]>({
     queryKey,
-    queryFn: async () => {
-      const pb = (await import("@/integrations/pocketbase/client")).pb;
-      const records = await pb.collection("risks").getFullList({
-        filter: `project_id="${projectId}"`,
-      });
-      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
-    },
+    queryFn: async () => mapRecords<Risk>(
+      await pb.collection("risks").getFullList({ filter: `project_id="${projectId}"` }),
+    ),
     enabled: !!projectId,
     staleTime: 1000 * 60 * 2,
   });

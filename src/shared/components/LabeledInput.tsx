@@ -1,4 +1,4 @@
-"use client";
+
 
 import { cn } from "@/shared/lib/utils";
 import { type Control, type FieldPath, type FieldValues } from "react-hook-form";
