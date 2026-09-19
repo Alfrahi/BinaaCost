@@ -51,7 +51,7 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
       if (!dbId) continue;
       authorizeDb(dbId);
 
-      const esc = (s) => String(s).replace(/"/g, '\\"');
+      const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       let existing = null;
       try {
         existing = txApp.findFirstRecordByFilter(
@@ -62,10 +62,12 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
         existing = null;
       }
 
+      const ALLOWED_ITEM_FIELDS = ["csi_division", "description", "unit", "unit_price"];
+
       if (existing) {
         if (strategy === "overwrite") {
-          for (const k in item) {
-            if (["id", "database_id", "csi_code", "created_at", "updated_at"].indexOf(k) === -1) {
+          for (const k of ALLOWED_ITEM_FIELDS) {
+            if (Object.prototype.hasOwnProperty.call(item, k) && item[k] !== undefined) {
               existing.set(k, item[k]);
             }
           }
@@ -76,10 +78,14 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
         }
       } else {
         const rec = new Record(coll);
-        for (const k in item) {
-          rec.set(k, item[k]);
-        }
+        rec.set("database_id", dbId);
+        rec.set("csi_code", code);
         rec.set("user_id", auth.id);
+        for (const k of ALLOWED_ITEM_FIELDS) {
+          if (Object.prototype.hasOwnProperty.call(item, k) && item[k] !== undefined) {
+            rec.set(k, item[k]);
+          }
+        }
         txApp.save(rec);
         inserted += 1;
       }

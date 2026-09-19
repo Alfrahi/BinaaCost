@@ -35,11 +35,12 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
     "project_groups",
   ];
   const snapshot = { project: project.publicExport() };
+  const esc = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   for (const coll of collections) {
     try {
       const rows = $app.findRecordsByFilter(
         coll,
-        `project_id="${projectId}"`,
+        `project_id="${esc(projectId)}"`,
         "",
         0,
         0,
@@ -133,20 +134,30 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
     throw new BadRequestError("Finalized versions cannot be restored");
   }
 
-  // M6: server-side snapshot authority — prefer the stored version.data.
-  // body.snapshot is accepted only as an explicit override for the
-  // conflict-resolver flow, and must belong to the same project.
-  let snapshot = version.get("data");
+  let snapshot = null;
   if (body.snapshot) {
     if (body.snapshot.project_id && body.snapshot.project_id !== projectId) {
       throw new BadRequestError("snapshot.project_id does not match version");
     }
     snapshot = body.snapshot;
+  } else {
+    const rawStr = version.getString("data");
+    if (rawStr) {
+      try {
+        snapshot = JSON.parse(rawStr);
+      } catch (_) {
+        snapshot = null;
+      }
+    }
+    if (!snapshot) {
+      snapshot = version.get("data");
+    }
   }
   if (!snapshot) {
     throw new BadRequestError("version has no snapshot data");
   }
 
+  const esc = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   const collections = [
     "materials",
     "labor_items",
@@ -162,7 +173,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       try {
         const rows = txApp.findRecordsByFilter(
           coll,
-          `project_id="${projectId}"`,
+          `project_id="${esc(projectId)}"`,
           "",
           0,
           0,
@@ -173,6 +184,46 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       }
     }
     return snap;
+  };
+
+  const ALLOWED_SNAPSHOT_FIELDS = {
+    project_groups: ["name", "sort_order"],
+    materials: [
+      "name",
+      "description",
+      "quantity",
+      "unit",
+      "unit_price",
+      "supplier_options",
+    ],
+    labor_items: [
+      "worker_type",
+      "description",
+      "number_of_workers",
+      "daily_rate",
+      "total_days",
+      "total_cost",
+    ],
+    equipment_items: [
+      "name",
+      "type",
+      "rental_or_purchase",
+      "quantity",
+      "cost_per_period",
+      "period_unit",
+      "usage_duration",
+      "maintenance_cost",
+      "fuel_cost",
+      "total_cost",
+    ],
+    additional_costs: ["category", "description", "amount"],
+    risks: [
+      "description",
+      "probability",
+      "impact_amount",
+      "mitigation_plan",
+      "contingency_amount",
+    ],
   };
 
   $app.runInTransaction((txApp) => {
@@ -189,10 +240,11 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       txApp.save(rollback);
     }
 
+    // Delete existing records: delete child collections before groups
     for (const coll of collections) {
       const existing = txApp.findRecordsByFilter(
         coll,
-        `project_id="${projectId}"`,
+        `project_id="${esc(projectId)}"`,
         "",
         0,
         0,
@@ -202,19 +254,53 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       }
     }
 
-    for (const coll of collections) {
+    // DATA-001 & SEC-002: Restore project_groups FIRST and map old group ID -> new group ID
+    const groupIdMap = {};
+    const groups = snapshot.project_groups || [];
+    const groupMeta = txApp.findCollectionByNameOrId("project_groups");
+    for (const g of groups) {
+      const rec = new Record(groupMeta);
+      rec.set("project_id", projectId);
+      rec.set("user_id", auth.id);
+      for (const k of ALLOWED_SNAPSHOT_FIELDS.project_groups) {
+        if (Object.prototype.hasOwnProperty.call(g, k) && g[k] !== undefined) {
+          rec.set(k, g[k]);
+        }
+      }
+      txApp.save(rec);
+      if (g.id) {
+        groupIdMap[g.id] = rec.id;
+      }
+    }
+
+    // Restore child collections with mapped group_id and strict field allowlists
+    const childCollections = [
+      "materials",
+      "labor_items",
+      "equipment_items",
+      "additional_costs",
+      "risks",
+    ];
+    for (const coll of childCollections) {
       const items = snapshot[coll] || [];
       const meta = txApp.findCollectionByNameOrId(coll);
+      const allowed = ALLOWED_SNAPSHOT_FIELDS[coll] || [];
       for (const item of items) {
         const rec = new Record(meta);
-        for (const k in item) {
-          if (["id", "created", "updated", "expand", "collectionId", "collectionName"].indexOf(k) === -1) {
+        rec.set("project_id", projectId);
+        rec.set("user_id", auth.id);
+        for (const k of allowed) {
+          if (Object.prototype.hasOwnProperty.call(item, k) && item[k] !== undefined) {
             rec.set(k, item[k]);
           }
         }
-        rec.set("project_id", projectId);
-        if (!rec.get("user_id")) {
-          rec.set("user_id", auth.id);
+        // Map group_id for collections that support groups
+        if (coll !== "risks") {
+          if (item.group_id && groupIdMap[item.group_id]) {
+            rec.set("group_id", groupIdMap[item.group_id]);
+          } else {
+            rec.set("group_id", "");
+          }
         }
         txApp.save(rec);
       }
