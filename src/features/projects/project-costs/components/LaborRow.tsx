@@ -166,4 +166,18 @@ export const LaborRow = memo(function LaborRow({
       </TableCell>
     </TableRow>
   );
+}, (prev, next) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.worker_type === next.item.worker_type &&
+    prev.item.number_of_workers === next.item.number_of_workers &&
+    prev.item.daily_rate === next.item.daily_rate &&
+    prev.item.total_days === next.item.total_days &&
+    prev.item.total_cost === next.item.total_cost &&
+    prev.selected === next.selected &&
+    prev.isOwner === next.isOwner &&
+    prev.currency === next.currency &&
+    prev.locationFactor === next.locationFactor &&
+    prev.locationLabel === next.locationLabel
+  );
 });

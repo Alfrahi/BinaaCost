@@ -40,12 +40,9 @@ import {
   AdditionalCostItem,
 } from "@/features/projects/project-costs/types/items";
 import { Risk } from "@/features/projects/project-core/types/project";
-import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
-import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
-import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
-import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
-import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
 import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
+import { useProjectTotals } from "@/features/projects/project-core/hooks/useProjectTotals";
+import { useProjectSettingsOptions } from "@/features/projects/project-core/hooks/useProjectSettingsOptions";
 
 const LazyOverviewTab = React.lazy(() => import("./OverviewTab"));
 const LazyCostsTab = React.lazy(() => import("../../project-costs/components/CostsTab"));
@@ -115,25 +112,8 @@ function ProjectTabsComponent({
   } = useProjectData(projectId);
 
   // Use entity hooks directly for data fetching
-  const { data: materials = [], isLoading: isLoadingMaterials } = useProjectMaterials(projectId);
-  const { data: labor = [], isLoading: isLoadingLabor } = useProjectLabor(projectId);
-  const { data: equipment = [], isLoading: isLoadingEquipment } = useProjectEquipment(projectId);
-  const { data: additional = [], isLoading: isLoadingAdditional } = useProjectAdditionalCosts(projectId);
+  const { totals, isLoading: isLoadingTotals, materials, labor, equipment, additional } = useProjectTotals(projectId);
   const { isLoading: isLoadingRisks } = useProjectRisks(projectId);
-
-  const totals = useMemo(() => {
-    const materialsTotal = calculateCategoryTotal.materials(materials);
-    const laborTotal = calculateCategoryTotal.labor(labor);
-    const equipmentTotal = calculateCategoryTotal.equipment(equipment);
-    const additionalTotal = calculateCategoryTotal.additional(additional);
-
-    return {
-      materialsTotal,
-      laborTotal,
-      equipmentTotal,
-      additionalTotal,
-    };
-  }, [materials, labor, equipment, additional]);
 
   const {
     itemComments,
@@ -149,22 +129,24 @@ function ProjectTabsComponent({
     isAnyCommentMutationLoading,
   } = useProjectComments(projectId);
 
-  const { options: materialUnits, isLoading: isLoadingMaterialUnits } =
-    useSettingsOptions("material_unit");
-  const { scenarios } = useScenarioManager();
-  const { options: rentalOptions, isLoading: isLoadingRentalOptions } =
-    useSettingsOptions("equipment_rental_purchase");
-  const { options: periodUnits, isLoading: isLoadingPeriodUnits } =
-    useSettingsOptions("equipment_period_unit");
   const {
-    options: additionalCategories,
-    isLoading: isLoadingAdditionalCategories,
-  } = useSettingsOptions("additional_cost_category");
-  const { options: riskProbabilities, isLoading: isLoadingRiskProbabilities } =
-    useSettingsOptions("risk_probability");
-  const { options: durationUnits } = useSettingsOptions("duration_unit");
+    materialUnits,
+    isLoadingMaterialUnits,
+    rentalOptions,
+    isLoadingRentalOptions,
+    periodUnits,
+    isLoadingPeriodUnits,
+    additionalCategories,
+    isLoadingAdditionalCategories,
+    riskProbabilities,
+    isLoadingRiskProbabilities,
+    durationUnits,
+    isLoading: isLoadingSettings,
+  } = useProjectSettingsOptions();
 
-  const isLoadingEntities = isLoadingMaterials || isLoadingLabor || isLoadingEquipment || isLoadingAdditional || isLoadingRisks;
+  const { scenarios } = useScenarioManager();
+
+  const isLoadingEntities = isLoadingTotals || isLoadingRisks || isLoadingSettings;
 
   const tabGroups = useMemo(
     () => [
