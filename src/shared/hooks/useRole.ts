@@ -1,13 +1,2 @@
-import { useAuth } from "@/features/auth";
-
-export function useRole() {
-  const { role, loading } = useAuth();
-
-  return {
-    role,
-    isSuperAdmin: role === "super_admin",
-    isAdmin: role === "admin" || role === "super_admin",
-    isUser: role === "user",
-    loading,
-  };
-}
+// Re-exported for backward compatibility. Canonical location: @/features/auth
+export { useRole } from "@/features/auth";

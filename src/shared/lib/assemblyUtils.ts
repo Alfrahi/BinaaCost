@@ -1,9 +1,2 @@
-import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
-
-/** Filter assembly items to only include the given item types. */
-export function filterAssemblyItemsByType(
-  items: AssemblyItem[],
-  types: Array<string>,
-): AssemblyItem[] {
-  return items.filter((item) => types.includes(item.item_type));
-}
+// Re-exported for backward compatibility. Canonical location: @/features/cost-library
+export * from "@/features/cost-library/utils/assemblyUtils";

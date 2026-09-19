@@ -13,13 +13,13 @@ import PageLoader from "@/shared/components/PageLoader";
 
 // Lazily load all page components for code-splitting
 const Login = React.lazy(() => import("@/features/auth/components/Login"));
-const Dashboard = React.lazy(() => import("@/pages/(dashboard)/Dashboard"));
-const CreateProject = React.lazy(() => import("@/pages/(project)/CreateProject"));
-const ProjectDetail = React.lazy(() => import("@/pages/(project)/ProjectDetail"));
-const EditProject = React.lazy(() => import("@/pages/(project)/EditProject"));
-const Settings = React.lazy(() => import("@/pages/(settings)/Settings"));
-const CostLibrary = React.lazy(() => import("@/pages/(cost-library)/CostLibrary"));
-const Analytics = React.lazy(() => import("@/pages/(analytics)/Analytics"));
+const Dashboard = React.lazy(() => import("@/pages/dashboard/Dashboard"));
+const CreateProject = React.lazy(() => import("@/pages/projects/CreateProject"));
+const ProjectDetail = React.lazy(() => import("@/pages/projects/ProjectDetail"));
+const EditProject = React.lazy(() => import("@/pages/projects/EditProject"));
+const Settings = React.lazy(() => import("@/pages/settings/Settings"));
+const CostLibrary = React.lazy(() => import("@/pages/cost-library/CostLibrary"));
+const Analytics = React.lazy(() => import("@/pages/analytics/Analytics"));
 const AdminPanel = React.lazy(() => import("@/pages/admin/AdminPanel"));
 const UserManagement = React.lazy(() => import("@/pages/admin/UserManagement"));
 const ProjectManagement = React.lazy(() => import("@/pages/admin/ProjectManagement"));
