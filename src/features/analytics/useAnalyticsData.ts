@@ -4,6 +4,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
 import { safeAdd } from "@/shared/lib/math";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
+import { calculateItemCost } from "@/shared/logic/shared";
 import { ProjectCostData, AnalyticsData } from "./types";
 import { handleError } from "@/shared/lib/toast";
 
@@ -34,17 +35,42 @@ export function useAnalyticsData() {
           fields: "id,name,currency",
         });
 
-      const tables = [
-        ["materials", "materials_cost", (i: any) => (i.quantity || 0) * (i.unit_price || 0)],
-        ["labor_items", "labor_cost", (i: any) => (i.number_of_workers || 0) * (i.daily_rate || 0) * (i.total_days || 0)],
-        ["equipment_items", "equipment_cost", (i: any) => (i.quantity || 0) * (i.cost_per_period || 0) * (i.usage_duration || 0) + (i.maintenance_cost || 0) + (i.fuel_cost || 0)],
-        ["additional_costs", "additional_cost", (i: any) => i.amount || 0],
-      ] as const;
-
       // Fetch each cost table once for the whole user (not once per project)
       // to avoid an N+1 query storm, then group by project in memory.
+      // All cost calculations use the same Decimal.js-backed helpers as the
+      // project detail view so totals match across screens.
+      const tables = [
+        {
+          coll: "materials",
+          key: "materials_cost" as const,
+          fn: (i: any) => calculateItemCost.material(i.quantity || 0, i.unit_price || 0),
+        },
+        {
+          coll: "labor_items",
+          key: "labor_cost" as const,
+          fn: (i: any) => calculateItemCost.labor(i.number_of_workers || 0, i.daily_rate || 0, i.total_days || 0),
+        },
+        {
+          coll: "equipment_items",
+          key: "equipment_cost" as const,
+          fn: (i: any) =>
+            calculateItemCost.equipment({
+              quantity: i.quantity || 0,
+              costPerPeriod: i.cost_per_period || 0,
+              usageDuration: i.usage_duration || 0,
+              maintenanceCost: i.maintenance_cost,
+              fuelCost: i.fuel_cost,
+            }).totalCost,
+        },
+        {
+          coll: "additional_costs",
+          key: "additional_cost" as const,
+          fn: (i: any) => calculateItemCost.additional(i.amount || 0),
+        },
+      ];
+
       const byProject: Record<string, Record<string, number>> = {};
-      for (const [coll, key, fn] of tables) {
+      for (const { coll, key, fn } of tables) {
         const items = await pb
           .collection(coll)
           .getFullList({ filter: `user_id="${user.id}"` });
@@ -52,17 +78,18 @@ export function useAnalyticsData() {
           const pid = item.project_id;
           if (!pid) continue;
           byProject[pid] ??= {};
-          byProject[pid][key] = (byProject[pid][key] ?? 0) + fn(item);
+          byProject[pid][key] = safeAdd(byProject[pid][key] ?? 0, fn(item));
         }
       }
 
       const out: ProjectCostData[] = (projects as any[]).map((p) => {
         const sums = byProject[p.id] ?? {};
-        const total =
-          (sums.materials_cost ?? 0) +
-          (sums.labor_cost ?? 0) +
-          (sums.equipment_cost ?? 0) +
-          (sums.additional_cost ?? 0);
+        const total = safeAdd(
+          sums.materials_cost ?? 0,
+          sums.labor_cost ?? 0,
+          sums.equipment_cost ?? 0,
+          sums.additional_cost ?? 0,
+        );
         return {
           id: p.id,
           name: p.name,

@@ -1,7 +1,7 @@
-"use client";
+
 
 import { useTranslation } from "react-i18next";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { z } from "zod";
 import { LibraryResourceManager } from "./LibraryResourceManager";
 import { DataTableColumn } from "@/shared/components/ui/data-table";

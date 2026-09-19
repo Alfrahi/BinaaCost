@@ -1,4 +1,4 @@
-"use client";
+
 import { useTranslation } from "react-i18next";
 import ProjectForm from "@/features/projects/project-core/components/ProjectForm";
 import Breadcrumbs from "@/app/layout/Breadcrumbs";

@@ -10,7 +10,7 @@ import { calculateProjectFinancials } from "@/shared/logic/financials";
 import { calculateItemCost } from "@/shared/logic/shared";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 import { ProjectCostReport } from "@/features/reports/components/ProjectCostReport";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import {
   MaterialItem,
   LaborItem,

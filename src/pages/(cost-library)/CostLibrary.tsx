@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";

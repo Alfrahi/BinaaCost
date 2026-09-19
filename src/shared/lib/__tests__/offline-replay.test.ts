@@ -4,19 +4,6 @@ vi.mock("@/shared/lib/pb-executor", () => ({
   executePbMutation: vi.fn(),
 }));
 
-vi.mock("sonner", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-    warning: vi.fn(),
-    info: vi.fn(),
-  },
-}));
-
-vi.mock("@/i18n", () => ({
-  default: { t: (key: string) => key },
-}));
-
 // in-memory localforage
 const store = new Map<string, unknown>();
 vi.mock("localforage", () => ({
@@ -32,14 +19,22 @@ vi.mock("localforage", () => ({
 }));
 
 import { executePbMutation } from "@/shared/lib/pb-executor";
-import { toast } from "sonner";
-import { offlineManager } from "@/shared/lib/offline";
+import { offlineManager, OfflineSyncEvent } from "@/shared/lib/offline";
 
 const flush = async () => {
   // let addMutation/processQueue promise chains settle
   for (let i = 0; i < 10; i++) await Promise.resolve();
   await new Promise((r) => setTimeout(r, 0));
 };
+
+/** Capture sync events emitted by OfflineManager during a callback. */
+async function captureEvents(fn: () => Promise<void>): Promise<OfflineSyncEvent[]> {
+  const captured: OfflineSyncEvent[] = [];
+  const unsub = offlineManager.onSyncEvent((e) => captured.push(e));
+  await fn();
+  unsub();
+  return captured;
+}
 
 describe("offline queue replay (PocketBase executor)", () => {
   beforeEach(() => {
@@ -73,17 +68,19 @@ describe("offline queue replay (PocketBase executor)", () => {
   it("keeps failed mutations in the queue with an incremented retry count", async () => {
     (executePbMutation as any).mockRejectedValue(new Error("Network down"));
 
-    await offlineManager.addMutation({
-      table: "materials",
-      type: "INSERT",
-      payload: { name: "Steel" },
-      queryKey: ["materials", "p1"],
-      userId: "u1",
+    const events = await captureEvents(async () => {
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "INSERT",
+        payload: { name: "Steel" },
+        queryKey: ["materials", "p1"],
+        userId: "u1",
+      });
+      await flush();
     });
-    await flush();
 
     expect(offlineManager.getQueueSize()).toBe(1);
-    expect(toast.warning).toHaveBeenCalled();
+    expect(events.some((e) => e.type === "mutation_retrying")).toBe(true);
   });
 
   it("moves corrupted payloads to the dead letter queue without calling the executor", async () => {
@@ -100,13 +97,16 @@ describe("offline queue replay (PocketBase executor)", () => {
     };
     store.set("offline_mutation_queue", [corrupted]);
 
+    const events: OfflineSyncEvent[] = [];
+    const unsub = offlineManager.onSyncEvent((e) => events.push(e));
     await offlineManager.init();
     await offlineManager.processQueue();
     await flush();
+    unsub();
 
     expect(executePbMutation).not.toHaveBeenCalled();
     expect(offlineManager.getQueueSize()).toBe(0);
-    expect(toast.error).toHaveBeenCalled();
+    expect(events.some((e) => e.type === "mutation_failed")).toBe(true);
   });
 
   it("replays a comment mutation with content intact (no redaction)", async () => {
@@ -264,6 +264,8 @@ describe("offline queue replay (PocketBase executor)", () => {
     );
     (executePbMutation as any).mockRejectedValue(conflictErr);
 
+    const events: OfflineSyncEvent[] = [];
+    const unsub = offlineManager.onSyncEvent((e) => events.push(e));
     await offlineManager.addMutation({
       table: "materials",
       type: "INSERT",
@@ -272,10 +274,10 @@ describe("offline queue replay (PocketBase executor)", () => {
       userId: "u1",
     });
     await flush();
+    unsub();
 
-    // queue drained, no dead-letter, no retry toast
+    // queue drained, no dead-letter, no retry events
     expect(offlineManager.getQueueSize()).toBe(0);
-    expect(toast.warning).not.toHaveBeenCalled();
-    expect(toast.error).not.toHaveBeenCalled();
+    expect(events.some((e) => e.type === "mutation_retrying" || e.type === "mutation_failed")).toBe(false);
   });
 });

@@ -18,7 +18,7 @@ import { mapRecord } from "@/shared/lib/pb-mapper";
 import { handleError } from "@/shared/lib/toast";
 import { useAuth } from "@/features/auth";
 import { cn } from "@/shared/lib/utils";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useLibrarySyncManager } from "@/features/cost-library/hooks/useLibrarySyncManager";
 
 interface AssemblyDetailProps {
