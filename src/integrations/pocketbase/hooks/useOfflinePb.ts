@@ -9,6 +9,8 @@ import {
   PbMutationConfig,
 } from "@/integrations/pocketbase/utils";
 
+import { handleError } from "@/shared/lib/toast";
+
 export function useOfflinePb() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -23,7 +25,8 @@ export function useOfflinePb() {
     useQuery<T, Error | ClientResponseError>({
       queryKey,
       queryFn,
-      enabled: enabled && offlineManager.getIsOnline(),
+      networkMode: "offlineFirst",
+      enabled,
       staleTime,
       gcTime,
     });
@@ -80,7 +83,11 @@ export function useOfflinePb() {
         if (context?.previousData) {
           queryClient.setQueryData(queryKey, context.previousData);
         }
-        onError?.(err, variables, context);
+        if (onError) {
+          onError(err, variables, context);
+        } else {
+          handleError(err);
+        }
       },
       onSuccess: (data, variables, context) => {
         onSuccess?.(data, variables, context);

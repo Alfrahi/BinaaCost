@@ -53,9 +53,9 @@ describe("client.ts stale-session healing (pb.afterSend)", () => {
     expect(hoisted.authStore.clear).not.toHaveBeenCalled();
   });
 
-  it("does NOT clear session on a 401 for a non-auth, non-own-user request", () => {
+  it("clears session on a 401 for a non-auth, non-own-user request (SEC-003)", () => {
     runAfterSend(401, "/api/collections/projects/records");
-    expect(hoisted.authStore.clear).not.toHaveBeenCalled();
+    expect(hoisted.authStore.clear).toHaveBeenCalled();
   });
 
   it("clears session on 404 for the authenticated user's own record", () => {

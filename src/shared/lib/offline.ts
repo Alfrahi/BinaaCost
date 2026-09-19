@@ -170,18 +170,23 @@ class OfflineManager {
         this.deadLetterQueue = [];
       }
 
-      // H1: migrate a legacy unscoped queue into the current user's namespace.
+      // SEC-004: Do not reassign legacy unscoped mutations to whichever user logs in.
+      // Isolate legacy unscoped mutations into an archival backup key to prevent
+      // cross-account execution vulnerabilities on shared browsers.
       if (userId) {
         const legacy = await localforage.getItem<OfflineMutation[]>(
           MUTATION_QUEUE_KEY,
         );
         if (legacy && legacy.length > 0) {
-          // Update userId for all legacy mutations to current user
-          const migratedLegacy = legacy.map(mutation => ({
-            ...mutation,
-            userId: userId
-          }));
-          this.queue = this.queue.concat(migratedLegacy);
+          console.warn(
+            `[SEC-004] Detected ${legacy.length} legacy unscoped offline mutations. Isolating to 'offline_unscoped_backup' to prevent cross-account execution.`,
+          );
+          const backup =
+            (await localforage.getItem<OfflineMutation[]>("offline_unscoped_backup")) || [];
+          await localforage.setItem("offline_unscoped_backup", [
+            ...backup,
+            ...legacy,
+          ]);
           await localforage.removeItem(MUTATION_QUEUE_KEY);
         }
       }

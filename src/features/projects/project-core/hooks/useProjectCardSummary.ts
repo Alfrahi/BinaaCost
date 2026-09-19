@@ -32,19 +32,32 @@ export function useProjectCardSummary(
         await Promise.all([
           pb
             .collection("materials")
-            .getFullList({ filter: `project_id="${projectId}"` }),
+            .getFullList({
+              filter: `project_id="${projectId}"`,
+              fields: "quantity,unit_price",
+            }),
           pb
             .collection("labor_items")
-            .getFullList({ filter: `project_id="${projectId}"` }),
+            .getFullList({
+              filter: `project_id="${projectId}"`,
+              fields: "number_of_workers,daily_rate,total_days",
+            }),
           pb
             .collection("equipment_items")
-            .getFullList({ filter: `project_id="${projectId}"` }),
+            .getFullList({
+              filter: `project_id="${projectId}"`,
+              fields:
+                "quantity,cost_per_period,usage_duration,maintenance_cost,fuel_cost",
+            }),
           pb
             .collection("additional_costs")
-            .getFullList({ filter: `project_id="${projectId}"` }),
-          pb.collection("project_versions").getFullList({
+            .getFullList({
+              filter: `project_id="${projectId}"`,
+              fields: "amount",
+            }),
+          pb.collection("project_versions").getList(1, 1, {
             filter: `project_id="${projectId}" && is_final=true`,
-            limit: 1,
+            fields: "id",
           }),
         ]);
 
@@ -68,7 +81,7 @@ export function useProjectCardSummary(
 
       return {
         grandTotal: financials.grandTotal,
-        isFinalized: versions.length > 0,
+        isFinalized: versions.totalItems > 0,
       };
     },
     enabled: !!projectId,

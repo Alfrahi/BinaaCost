@@ -3,6 +3,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { callRoute } from "@/integrations/pocketbase/routes";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
+import { handleError } from "@/shared/lib/toast";
 
 export interface CostDatabaseItem {
   id: string;
@@ -90,6 +91,7 @@ export function useCostDatabaseItems(
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
+    onError: (err) => handleError(err),
   });
 
   const updateItem = useOfflineMutation<
@@ -101,6 +103,7 @@ export function useCostDatabaseItems(
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
+    onError: (err) => handleError(err),
   });
 
   const deleteItem = useOfflineMutation<
@@ -112,6 +115,7 @@ export function useCostDatabaseItems(
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
+    onError: (err) => handleError(err),
   });
 
   const optimisticBulkUpdater = (
@@ -141,6 +145,7 @@ export function useCostDatabaseItems(
     operation: "BULK_DELETE",
     optimisticUpdater: optimisticBulkUpdater,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
+    onError: (err) => handleError(err),
   });
 
   const importItems = useMutation({
@@ -158,6 +163,7 @@ export function useCostDatabaseItems(
       });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
+    onError: (err) => handleError(err),
   });
 
   return {

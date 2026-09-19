@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";
@@ -28,11 +29,27 @@ export function useProjectGroupsManager(
   const queryClient = useQueryClient();
   const queryKey = ["project_groups", projectId];
 
-  const [groups, setGroups] = useState<ProjectGroup[]>(initialGroups);
+  const { data: groups = initialGroups } = useQuery<ProjectGroup[]>({
+    queryKey,
+    queryFn: async () => {
+      const records = await pb
+        .collection("project_groups")
+        .getFullList({ filter: `project_id="${projectId}"`, sort: "sort_order" });
+      return mapRecords<ProjectGroup>(records);
+    },
+    initialData: initialGroups?.length ? initialGroups : undefined,
+    staleTime: 1000 * 60,
+  });
 
-  useEffect(() => {
-    setGroups(initialGroups);
-  }, [initialGroups]);
+  const setGroups = useCallback(
+    (updater: ProjectGroup[] | ((prev: ProjectGroup[]) => ProjectGroup[])) => {
+      queryClient.setQueryData<ProjectGroup[]>(queryKey, (old) => {
+        const prev = old ?? groups;
+        return typeof updater === "function" ? updater(prev) : updater;
+      });
+    },
+    [groups, queryClient, queryKey],
+  );
 
   const optimisticSingleUpdater = useCallback(
     (old: ProjectGroup[] | undefined, variables: any, operation: string) => {
@@ -161,11 +178,15 @@ export function useProjectGroupsManager(
 
   const reorderGroupsMutation = useMutation({
     mutationFn: async (newGroups: ProjectGroup[]) => {
-      for (const [index, g] of newGroups.entries()) {
-        await pb
-          .collection("project_groups")
-          .update(g.id, { sort_order: index });
-      }
+      const updates = newGroups
+        .map((g, index) => ({ id: g.id, sort_order: index, changed: g.sort_order !== index }))
+        .filter((u) => u.changed);
+
+      await Promise.all(
+        updates.map((u) =>
+          pb.collection("project_groups").update(u.id, { sort_order: u.sort_order }),
+        ),
+      );
     },
     onMutate: async (newGroups) => {
       await queryClient.cancelQueries({ queryKey });
@@ -190,16 +211,16 @@ export function useProjectGroupsManager(
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
-        setGroups((currentGroups) => {
-          const oldIndex = currentGroups.findIndex((g) => g.id === active.id);
-          const newIndex = currentGroups.findIndex((g) => g.id === over.id);
-          const newOrderedGroups = arrayMove(currentGroups, oldIndex, newIndex);
-          reorderGroupsMutation.mutate(newOrderedGroups);
-          return newOrderedGroups;
-        });
+        const currentGroups =
+          queryClient.getQueryData<ProjectGroup[]>(queryKey) || groups;
+        const oldIndex = currentGroups.findIndex((g) => g.id === active.id);
+        const newIndex = currentGroups.findIndex((g) => g.id === over.id);
+        if (oldIndex === -1 || newIndex === -1) return;
+        const newOrderedGroups = arrayMove(currentGroups, oldIndex, newIndex);
+        reorderGroupsMutation.mutate(newOrderedGroups);
       }
     },
-    [reorderGroupsMutation],
+    [groups, queryClient, queryKey, reorderGroupsMutation],
   );
 
   return {
