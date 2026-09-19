@@ -73,6 +73,12 @@ export function LaborTable({
             format((row.total_cost || 0) * locationFactor, currency),
           sortValue: (row) => (row.total_cost || 0) * locationFactor,
         },
+        {
+          key: "actions",
+          label: t("common:actions"),
+          align: "end",
+          minWidth: "120px",
+        },
       ],
       getSearchText: (row) => `${row.worker_type} ${row.description || ""}`,
       ariaLabel: t("project_labor:tableLabel"),

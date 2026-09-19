@@ -96,6 +96,12 @@ export function MaterialsTable({
             calculateItemCost.material(row.quantity, row.unit_price) *
             locationFactor,
         },
+        {
+          key: "actions",
+          label: t("common:actions"),
+          align: "end",
+          minWidth: "120px",
+        },
       ],
       getSearchText: (row) => `${row.name} ${row.description || ""}`,
       ariaLabel: t("project_materials:tableLabel"),

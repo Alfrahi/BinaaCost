@@ -304,7 +304,6 @@ export function EntityTable<T>({
           renderRow={renderRow}
           grandTotal={format(grandTotal, currency)}
           grandTotalLabel={config.grandTotalLabel}
-          grandTotalColSpan={config.columns.length - 1}
           emptyMessage={config.emptyMessage}
           pagination={{
             currentPage,

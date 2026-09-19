@@ -75,6 +75,12 @@ export function AdditionalCostsTable({
           format: (value: number) => format(value * locationFactor, currency),
           sortValue: (row) => row.amount * locationFactor,
         },
+        {
+          key: "actions",
+          label: t("common:actions"),
+          align: "end",
+          minWidth: "120px",
+        },
       ],
       getSearchText: (row) => `${row.description || ""} ${row.category || ""}`,
       ariaLabel: t("project_additional:tableLabel"),
