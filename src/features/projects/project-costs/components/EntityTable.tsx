@@ -170,7 +170,7 @@ export function EntityTable<T>({
   }, [totalPages, currentPage]);
 
   const renderRow = useCallback(
-    (item: T) =>
+    (item: T, state: { isSelected: boolean; onToggle: () => void }) =>
       config.renderRow(item, {
         canEdit,
         currency,
@@ -179,8 +179,8 @@ export function EntityTable<T>({
         onDuplicate: () => crud.handleDuplicate(item),
         onComment: () => onOpenComments(item, config.itemType),
         onUpdateField: crud.handleUpdateField,
-        selected: selection.isSelected((item as any).id),
-        onToggle: () => selection.toggle((item as any).id),
+        selected: state.isSelected,
+        onToggle: state.onToggle,
         locationFactor,
         locationLabel,
       }),
@@ -192,7 +192,6 @@ export function EntityTable<T>({
       setDeleteTarget,
       crud,
       onOpenComments,
-      selection,
       locationFactor,
       locationLabel,
     ],
