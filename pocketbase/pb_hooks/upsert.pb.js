@@ -16,8 +16,9 @@ routerAdd("POST", "/api/upsert/library_materials", (e) => {
   body.user_id = auth.id;
   delete body.id;
 
-  const name = String(body.name ?? "").replace(/"/g, '\\"');
-  const unit = String(body.unit ?? "").replace(/"/g, '\\"');
+  const esc = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const name = esc(body.name);
+  const unit = esc(body.unit);
 
   let record = null;
   try {
@@ -29,16 +30,24 @@ routerAdd("POST", "/api/upsert/library_materials", (e) => {
     record = null;
   }
 
+  const ALLOWED_MATERIAL_FIELDS = ["name", "description", "unit", "unit_price"];
+
   if (record) {
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    for (const k of ALLOWED_MATERIAL_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
+    record.set("user_id", auth.id);
     $app.save(record);
   } else {
     const coll = $app.findCollectionByNameOrId("library_materials");
     record = new Record(coll);
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    record.set("user_id", auth.id);
+    for (const k of ALLOWED_MATERIAL_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
     $app.save(record);
   }
@@ -56,7 +65,8 @@ routerAdd("POST", "/api/upsert/library_labor", (e) => {
   body.user_id = auth.id;
   delete body.id;
 
-  const workerType = String(body.worker_type ?? "").replace(/"/g, '\\"');
+  const esc = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const workerType = esc(body.worker_type);
 
   let record = null;
   try {
@@ -68,16 +78,24 @@ routerAdd("POST", "/api/upsert/library_labor", (e) => {
     record = null;
   }
 
+  const ALLOWED_LABOR_FIELDS = ["worker_type", "daily_rate"];
+
   if (record) {
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    for (const k of ALLOWED_LABOR_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
+    record.set("user_id", auth.id);
     $app.save(record);
   } else {
     const coll = $app.findCollectionByNameOrId("library_labor");
     record = new Record(coll);
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    record.set("user_id", auth.id);
+    for (const k of ALLOWED_LABOR_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
     $app.save(record);
   }
@@ -95,11 +113,11 @@ routerAdd("POST", "/api/upsert/library_equipment", (e) => {
   body.user_id = auth.id;
   delete body.id;
 
-  const q = (v) => String(v ?? "").replace(/"/g, '\\"');
-  const name = q(body.name);
-  const type = q(body.type);
-  const rental = q(body.rental_or_purchase);
-  const unit = q(body.period_unit);
+  const esc = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const name = esc(body.name);
+  const type = esc(body.type);
+  const rental = esc(body.rental_or_purchase);
+  const unit = esc(body.period_unit);
 
   let record = null;
   try {
@@ -111,16 +129,30 @@ routerAdd("POST", "/api/upsert/library_equipment", (e) => {
     record = null;
   }
 
+  const ALLOWED_EQUIPMENT_FIELDS = [
+    "name",
+    "type",
+    "rental_or_purchase",
+    "cost_per_period",
+    "period_unit",
+  ];
+
   if (record) {
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    for (const k of ALLOWED_EQUIPMENT_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
+    record.set("user_id", auth.id);
     $app.save(record);
   } else {
     const coll = $app.findCollectionByNameOrId("library_equipment");
     record = new Record(coll);
-    for (const [k, v] of Object.entries(body)) {
-      record.set(k, v);
+    record.set("user_id", auth.id);
+    for (const k of ALLOWED_EQUIPMENT_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, k) && body[k] !== undefined) {
+        record.set(k, body[k]);
+      }
     }
     $app.save(record);
   }
