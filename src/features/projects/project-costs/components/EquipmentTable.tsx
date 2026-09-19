@@ -146,6 +146,12 @@ export function EquipmentTable({
               fuelCost: row.fuel_cost,
             }).totalCost * locationFactor,
         },
+        {
+          key: "actions",
+          label: t("common:actions"),
+          align: "end",
+          minWidth: "120px",
+        },
       ],
       getSearchText: (row) => `${row.name} ${row.type || ""}`,
       ariaLabel: t("project_equipment:tableLabel"),
