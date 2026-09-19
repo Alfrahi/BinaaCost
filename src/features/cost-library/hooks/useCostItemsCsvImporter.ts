@@ -8,7 +8,7 @@ import { useCostDatabaseItems } from "@/features/cost-library/hooks/useCostDatab
 import {
   COST_ITEM_SCHEMA_FIELDS,
   parseAndValidateCostItemsCsv,
-} from "@/shared/lib/csv";
+} from "@/features/cost-library/utils/csv";
 import { handleError } from "@/shared/lib/toast";
 
 const SCHEMA_FIELDS = COST_ITEM_SCHEMA_FIELDS;

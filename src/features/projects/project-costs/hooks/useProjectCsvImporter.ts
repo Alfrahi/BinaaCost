@@ -6,7 +6,7 @@ import {
   PROJECT_CSV_CONFIGS,
   parseAndValidateProjectCsv,
   ProjectItemType,
-} from "@/shared/lib/projectCsv";
+} from "@/features/projects/project-costs/utils/projectCsv";
 import { handleError } from "@/shared/lib/toast";
 
 type CsvRow = Record<string, string>;

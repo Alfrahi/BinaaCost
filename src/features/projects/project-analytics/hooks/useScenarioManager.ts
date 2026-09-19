@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";

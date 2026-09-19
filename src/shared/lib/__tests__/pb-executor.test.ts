@@ -18,7 +18,7 @@ vi.mock("@/integrations/pocketbase/routes", () => ({
   }),
 }));
 
-import { executePbMutation } from "@/shared/lib/pb-executor";
+import { executePbMutation } from "@/integrations/pocketbase/executor";
 import { callRoute } from "@/integrations/pocketbase/routes";
 
 describe("executePbMutation", () => {

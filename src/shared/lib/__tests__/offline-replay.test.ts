@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-vi.mock("@/shared/lib/pb-executor", () => ({
+vi.mock("@/integrations/pocketbase/executor", () => ({
   executePbMutation: vi.fn(),
 }));
 
@@ -18,7 +18,7 @@ vi.mock("localforage", () => ({
   },
 }));
 
-import { executePbMutation } from "@/shared/lib/pb-executor";
+import { executePbMutation } from "@/integrations/pocketbase/executor";
 import { offlineManager, OfflineSyncEvent } from "@/shared/lib/offline";
 
 const flush = async () => {

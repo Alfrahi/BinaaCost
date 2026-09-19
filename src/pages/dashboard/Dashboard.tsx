@@ -12,7 +12,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Button } from "@/shared/components/ui/button";
 import { Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord, mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecord } from "@/integrations/pocketbase/mappers";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { useMyProjects } from "@/features/projects/project-core/hooks/useMyProjects";
 import { useSharedProjects } from "@/features/projects/project-core/hooks/useSharedProjects";
@@ -52,26 +52,6 @@ export default function Dashboard() {
         mapRecord(await pb.collection("projects").getOne(projectId)),
       staleTime: 1000 * 60 * 2,
     });
-    for (const table of [
-      "materials",
-      "labor_items",
-      "equipment_items",
-      "additional_costs",
-      "risks",
-      "project_groups",
-      "comments",
-    ]) {
-      queryClient.prefetchQuery({
-        queryKey: [table, projectId],
-        queryFn: async () =>
-          mapRecords(
-            await pb
-              .collection(table)
-              .getFullList({ filter: `project_id="${projectId}"` }),
-          ),
-        staleTime: 1000 * 60 * 2,
-      });
-    }
   };
 
   useEffect(() => {

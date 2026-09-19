@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { toast } from "sonner";
-import { WORLD_CURRENCIES } from "@/shared/lib/world-currencies";
+import { WORLD_CURRENCIES } from "@/features/admin/utils/world-currencies";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/features/auth";
 import { handleError } from "@/shared/lib/toast";

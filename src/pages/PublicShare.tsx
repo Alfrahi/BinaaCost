@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
@@ -6,21 +6,14 @@ import LoadingState from "@/shared/components/ui/LoadingState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
-import { calculateProjectFinancials } from "@/shared/logic/financials";
-import { calculateItemCost } from "@/shared/logic/shared";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
-import { ProjectCostReport } from "@/features/reports/components/ProjectCostReport";
+import { ProjectCostReport } from "@/features/projects/project-reports/components/ProjectCostReport";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
-import {
-  MaterialItem,
-  LaborItem,
-  EquipmentItem,
-  AdditionalCostItem,
-} from "@/features/projects/project-costs/types/items";
-import { PublicShareResponse } from "@/features/projects/project-core/types/project";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
+import { usePublicShare } from "@/features/projects/project-sharing/hooks/usePublicShare";
+import { calculatePublicShareFinancials } from "@/features/projects/project-sharing/utils/publicShareFinancials";
 
 export default function PublicShare() {
   const { accessToken } = useParams<{ accessToken: string }>();
@@ -30,9 +23,6 @@ export default function PublicShare() {
     "project_detail",
     "project_reports",
   ]);
-  const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
 
   const { format: _formatCurrency } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
@@ -54,75 +44,16 @@ export default function PublicShare() {
     [materialUnits, periodUnits, additionalCategories, riskProbabilities],
   );
 
-  type QueryResult =
-    | PublicShareResponse
-    | { password_protected: true }
-    | { error: string };
-
-  const [shareData, setShareData] = useState<QueryResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const doFetch = useCallback(
-    async (pw: string): Promise<QueryResult> => {
-      if (!accessToken) throw new Error("Access token is missing.");
-      const base = import.meta.env.VITE_POCKETBASE_URL;
-      const res = await fetch(`${base}/api/share/${accessToken}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pw }),
-      });
-      if (res.ok) return (await res.json()) as PublicShareResponse;
-      if (res.status === 403) {
-        const body = await res.json().catch(() => null);
-        const msg = body?.message as string | undefined;
-        if (msg?.startsWith("Incorrect password"))
-          return { password_protected: true };
-        throw new Error(msg || t("public_share:linkNotFoundOrExpired"));
-      }
-      throw new Error(t("public_share:linkNotFoundOrExpired"));
-    },
-    [accessToken, t],
-  );
-
-  // Probe once: empty password tells us whether this is a gated link.
-  useEffect(() => {
-    let alive = true;
-    doFetch("")
-      .then((data) => {
-        if (!alive) return;
-        if ("password_protected" in data) {
-          setShareData(data);
-        } else {
-          setShareData(data);
-          setIsAuthenticated(true);
-        }
-      })
-      .catch((e) => alive && setError(e as Error))
-      .finally(() => alive && setIsLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [doFetch]);
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    try {
-      const data = await doFetch(password);
-      if ("password_protected" in data) {
-        setAuthError(t("public_share:incorrectPassword"));
-        setPassword("");
-        return;
-      }
-      setShareData(data);
-      setIsAuthenticated(true);
-    } catch (err) {
-      setAuthError(
-        err instanceof Error ? err.message : t("public_share:invalidLink"),
-      );
-    }
-  };
+  const {
+    password,
+    setPassword,
+    isAuthenticated,
+    authError,
+    shareData,
+    isLoading,
+    error,
+    handlePasswordSubmit,
+  } = usePublicShare(accessToken);
 
   if (isLoading) {
     return <LoadingState className="min-h-screen" />;
@@ -208,41 +139,12 @@ export default function PublicShare() {
     expires_at,
   } = shareData;
 
-  const materialsTotal = materials.reduce(
-    (sum: number, item: MaterialItem) =>
-      sum + calculateItemCost.material(item.quantity, item.unit_price),
-    0,
-  );
-  const laborTotal = labor.reduce(
-    (sum: number, item: LaborItem) =>
-      sum +
-      calculateItemCost.labor(
-        item.number_of_workers,
-        item.daily_rate,
-        item.total_days,
-      ),
-    0,
-  );
-  const equipmentTotal = equipment.reduce(
-    (sum: number, item: EquipmentItem) =>
-      sum +
-      calculateItemCost.equipment({
-        quantity: item.quantity,
-        costPerPeriod: item.cost_per_period,
-        usageDuration: item.usage_duration,
-        maintenanceCost: item.maintenance_cost,
-        fuelCost: item.fuel_cost,
-      }).totalCost,
-    0,
-  );
-  const additionalTotal = additional.reduce(
-    (sum: number, item: AdditionalCostItem) => sum + item.amount,
-    0,
-  );
-
-  const financials = calculateProjectFinancials(
-    { materialsTotal, laborTotal, equipmentTotal, additionalTotal },
+  const financials = calculatePublicShareFinancials(
     project.financial_settings,
+    materials,
+    labor,
+    equipment,
+    additional,
   );
 
   const companyInfo = {

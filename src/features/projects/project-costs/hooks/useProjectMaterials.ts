@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
-import { useEntityCrud, EntityCrud } from "@/shared/hooks/useEntityCrud";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
-import { useSyncToLibrary } from "@/shared/hooks/useSyncToLibrary";
+import { useEntityCrud, EntityCrud } from "@/features/projects/project-costs/hooks/useEntityCrud";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
+import { useSyncToLibrary } from "@/features/projects/project-costs/hooks/useSyncToLibrary";
 import { calculateItemCost } from "@/shared/logic/shared";
 import { MaterialItem } from "@/features/projects/project-costs/types/items";
 import { MaterialFormValues } from "@/features/projects/project-costs/types/schemas";

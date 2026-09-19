@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AssemblyIntegrationRow } from "@/features/projects/project-costs/components/AssemblyIntegrationRow";
-import { filterAssemblyItemsByType } from "@/shared/lib/assemblyUtils";
+import { filterAssemblyItemsByType } from "@/features/cost-library/utils/assemblyUtils";
 import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
 
 vi.mock("react-i18next", () => ({
@@ -21,7 +21,7 @@ vi.mock("@/features/cost-library/hooks/useAssemblies", () => ({
   }),
 }));
 
-vi.mock("@/features/projects/project-costs/hooks/useAssemblyItems", () => ({
+vi.mock("@/features/cost-library/hooks/useAssemblyItems", () => ({
   useAssemblyItems: () => ({
     itemsQuery: {
       data: [

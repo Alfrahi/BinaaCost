@@ -16,9 +16,9 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { useAssemblies } from "@/features/cost-library/hooks/useAssemblies";
-import { useAssemblyItems } from "@/features/projects/project-costs/hooks/useAssemblyItems";
+import { useAssemblyItems } from "@/features/cost-library/hooks/useAssemblyItems";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
-import { filterAssemblyItemsByType } from "@/shared/lib/assemblyUtils";
+import { filterAssemblyItemsByType } from "@/features/cost-library/utils/assemblyUtils";
 import {
   Select,
   SelectContent,

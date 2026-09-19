@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/aler
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 
-import { useAnalyticsData } from "@/features/analytics/useAnalyticsData";
+import { useAnalyticsData } from "@/features/analytics/hooks/useAnalyticsData";
 import ProjectComparisonChart from "@/features/analytics/components/ProjectComparisonChart";
 
 export default function Analytics() {

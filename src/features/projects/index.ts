@@ -17,7 +17,6 @@ export * from "./project-costs/hooks/useProjectLabor";
 export * from "./project-costs/hooks/useProjectEquipment";
 export * from "./project-costs/hooks/useProjectAdditionalCosts";
 export * from "./project-costs/hooks/useProjectRisks";
-export * from "./project-costs/hooks/useAssemblyItems";
 export * from "./project-costs/hooks/useAssemblyImport";
 export * from "./project-costs/hooks/useProjectCsvImporter";
 export type * from "./project-costs/types/items";

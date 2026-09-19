@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { callRoute } from "@/integrations/pocketbase/routes";
-import { mapRecords } from "@/shared/lib/pb-mapper";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export interface CostDatabaseItem {
   id: string;

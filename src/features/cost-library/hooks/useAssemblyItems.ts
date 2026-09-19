@@ -1,9 +1,9 @@
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
 import { handleError } from "@/shared/lib/toast";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export function useAssemblyItems(assemblyId?: string) {
   const { user } = useAuth();

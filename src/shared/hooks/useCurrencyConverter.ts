@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { Decimal } from "@/shared/lib/math";
 import { useCallback } from "react";
 

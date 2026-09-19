@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import SettingsSection from "@/features/admin/components/SettingsSection";
-import { useRole } from "@/shared/hooks/useRole";
+import { useRole } from "@/features/auth";
 import PageHeader from "@/shared/components/PageHeader";
 
 interface SettingsCategory {
