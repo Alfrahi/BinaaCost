@@ -78,7 +78,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
 
   const handleDuplicate = useCallback(
     (item: MaterialItem) => {
-      const { id: _id, total_cost: _tc, created_at: _ca, updated_at: _ua, ...rest } = item;
+      const { id: _id, created_at: _ca, updated_at: _ua, ...rest } = item;
       addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id });
     },
     [addItem, projectId, user?.id],
