@@ -1,4 +1,6 @@
 import { useCallback } from "react";
+import { pb } from "@/integrations/pocketbase/client";
+import { mapRecords } from "@/shared/lib/pb-mapper";
 import { useAuth } from "@/features/auth";
 import { useEntityCrud, EntityCrud } from "@/shared/hooks/useEntityCrud";
 import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
@@ -20,13 +22,9 @@ export function useProjectAdditionalCosts(
 
   const { data: additionalCosts = [], isLoading, error } = useQuery<AdditionalCostItem[]>({
     queryKey: ["additional_costs", projectId],
-    queryFn: async () => {
-      const pb = (await import("@/integrations/pocketbase/client")).pb;
-      const records = await pb.collection("additional_costs").getFullList({
-        filter: `project_id="${projectId}"`,
-      });
-      return records.map((r: any) => ({ ...r, id: r.id, created_at: r.created, updated_at: r.updated }));
-    },
+    queryFn: async () => mapRecords<AdditionalCostItem>(
+      await pb.collection("additional_costs").getFullList({ filter: `project_id="${projectId}"` }),
+    ),
     enabled: !!projectId,
     staleTime: 1000 * 60 * 2,
   });

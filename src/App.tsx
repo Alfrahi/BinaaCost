@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "@/features/auth";
 import ProtectedRoute from "./app/router/ProtectedRoute";
 import AdminRoute from "./app/router/AdminRoute";
@@ -11,6 +11,7 @@ import ErrorDisplay from "@/shared/components/ErrorDisplay";
 import React, { Suspense } from "react";
 import PageLoader from "@/shared/components/PageLoader";
 
+// Lazily load all page components for code-splitting
 const Login = React.lazy(() => import("@/features/auth/components/Login"));
 const Dashboard = React.lazy(() => import("@/pages/(dashboard)/Dashboard"));
 const CreateProject = React.lazy(() => import("@/pages/(project)/CreateProject"));
@@ -21,17 +22,38 @@ const CostLibrary = React.lazy(() => import("@/pages/(cost-library)/CostLibrary"
 const Analytics = React.lazy(() => import("@/pages/(analytics)/Analytics"));
 const AdminPanel = React.lazy(() => import("@/pages/admin/AdminPanel"));
 const UserManagement = React.lazy(() => import("@/pages/admin/UserManagement"));
-const ProjectManagement = React.lazy(
-  () => import("@/pages/admin/ProjectManagement"),
-);
-const DropdownSettings = React.lazy(
-  () => import("@/pages/admin/DropdownSettings"),
-);
+const ProjectManagement = React.lazy(() => import("@/pages/admin/ProjectManagement"));
+const DropdownSettings = React.lazy(() => import("@/pages/admin/DropdownSettings"));
 const AppSettings = React.lazy(() => import("@/pages/admin/AppSettings"));
 const AuditLogs = React.lazy(() => import("@/pages/admin/AuditLogs"));
 const UserDetails = React.lazy(() => import("@/pages/admin/UserDetails"));
 const PublicShare = React.lazy(() => import("@/pages/PublicShare"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
+
+/**
+ * Layout wrapper that renders LayoutShell with Outlet for nested routes.
+ * Using React Router v6 layout routes eliminates repeated ProtectedRoute +
+ * LayoutShell boilerplate on every individual route definition.
+ */
+function ProtectedLayout() {
+  return (
+    <ProtectedRoute>
+      <LayoutShell>
+        <Outlet />
+      </LayoutShell>
+    </ProtectedRoute>
+  );
+}
+
+function AdminLayout() {
+  return (
+    <AdminRoute>
+      <LayoutShell>
+        <Outlet />
+      </LayoutShell>
+    </AdminRoute>
+  );
+}
 
 function AppContent() {
   return (
@@ -42,179 +64,43 @@ function AppContent() {
             <ErrorBoundary FallbackComponent={ErrorDisplay}>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/public-share/:accessToken"
-                  element={<PublicShare />}
-                />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <Dashboard />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/projects/new"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <CreateProject />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/projects/:id"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <ProjectDetail />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/projects/:id/edit"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <EditProject />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <Settings />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/cost-library"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <CostLibrary />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/resources"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <Navigate to="/cost-library" replace />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/cost-databases"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <Navigate to="/cost-library" replace />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <LayoutShell>
-                        <Analytics />
-                      </LayoutShell>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <AdminPanel />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <UserManagement />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users/:userId"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <UserDetails />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/projects"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <ProjectManagement />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/settings"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <DropdownSettings />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/app-settings"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <AppSettings />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/audit-logs"
-                  element={
-                    <AdminRoute>
-                      <LayoutShell>
-                        <AuditLogs />
-                      </LayoutShell>
-                    </AdminRoute>
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </ErrorBoundary>
-        </Router>
-        <Toaster />
-      </LanguageProvider>
-    </ThemeProvider>
+                  {/* Public routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/public-share/:accessToken" element={<PublicShare />} />
+
+                  {/* Protected user routes — LayoutShell rendered once via Outlet */}
+                  <Route element={<ProtectedLayout />}>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/projects/new" element={<CreateProject />} />
+                    <Route path="/projects/:id" element={<ProjectDetail />} />
+                    <Route path="/projects/:id/edit" element={<EditProject />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/cost-library" element={<CostLibrary />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    {/* Legacy route redirects */}
+                    <Route path="/resources" element={<Navigate to="/cost-library" replace />} />
+                    <Route path="/cost-databases" element={<Navigate to="/cost-library" replace />} />
+                  </Route>
+
+                  {/* Admin-only routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route path="/admin" element={<AdminPanel />} />
+                    <Route path="/admin/users" element={<UserManagement />} />
+                    <Route path="/admin/users/:userId" element={<UserDetails />} />
+                    <Route path="/admin/projects" element={<ProjectManagement />} />
+                    <Route path="/admin/settings" element={<DropdownSettings />} />
+                    <Route path="/admin/app-settings" element={<AppSettings />} />
+                    <Route path="/admin/audit-logs" element={<AuditLogs />} />
+                  </Route>
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
+          </Router>
+          <Toaster />
+        </LanguageProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

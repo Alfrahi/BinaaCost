@@ -15,7 +15,7 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-vi.mock("@/features/admin/hooks/useSettingsOptions", () => ({
+vi.mock("@/shared/hooks/useSettingsOptions", () => ({
   useSettingsOptions: () => ({ options: [], isLoading: false }),
 }));
 

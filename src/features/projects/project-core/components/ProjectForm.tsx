@@ -21,7 +21,7 @@ import {
 import ConfirmDialog from "@/shared/components/ConfirmDialog";
 import { useTranslation } from "react-i18next";
 import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useEffect, useState } from "react";
 import { projectSchema } from "@/features/projects/project-core/types/form";
 import { sanitizeText } from "@/shared/lib/sanitizeText";

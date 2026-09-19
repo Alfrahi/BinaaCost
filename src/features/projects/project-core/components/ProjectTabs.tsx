@@ -1,4 +1,4 @@
-"use client";
+
 
 import React, { Suspense, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -40,7 +40,7 @@ import {
   AdditionalCostItem,
 } from "@/features/projects/project-costs/types/items";
 import { Risk } from "@/features/projects/project-core/types/project";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
 import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
 import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { useCostDatabases } from "@/features/cost-library/hooks/useCostDatabases";
-import { useSettingsOptions } from "@/features/admin/hooks/useSettingsOptions";
+import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/shared/components/ui/card";

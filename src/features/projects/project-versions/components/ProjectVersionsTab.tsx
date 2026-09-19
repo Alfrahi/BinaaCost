@@ -17,6 +17,11 @@ import {
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
+import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
+import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
+import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
+import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
+import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 import VersionConflictResolver, {
   ResolutionMap,
 } from "./VersionConflictResolver";
@@ -76,13 +81,14 @@ export default function ProjectVersionsTab({
   const {
     project,
     groups,
-    materials,
-    labor,
-    equipment,
-    additional,
-    risks,
     isLoading: isLoadingCurrent,
   } = useProjectData(projectId);
+
+  const { data: materials } = useProjectMaterials(projectId);
+  const { data: labor } = useProjectLabor(projectId);
+  const { data: equipment } = useProjectEquipment(projectId);
+  const { data: additional } = useProjectAdditionalCosts(projectId);
+  const { data: risks } = useProjectRisks(projectId);
 
   const [newVersionName, setNewVersionName] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useTheme } from "@/app/providers/ThemeContext";
 import { Toaster as Sonner, type ToasterProps } from "sonner";

@@ -1,8 +1,21 @@
 import localforage from "localforage";
 import { executePbMutation } from "@/shared/lib/pb-executor";
 import { QueryClient, QueryKey } from "@tanstack/react-query";
-import { toast } from "sonner";
-import i18n from "@/i18n";
+
+// ---------------------------------------------------------------------------
+// Event system — UI layers (components, hooks) subscribe to these events
+// instead of OfflineManager importing toast/i18n directly.
+// ---------------------------------------------------------------------------
+
+export type OfflineSyncEvent =
+  | { type: "sync_success"; count: number }
+  | { type: "sync_partial_failure"; failedCount: number }
+  | { type: "mutation_failed"; mutationId: string }
+  | { type: "mutation_retrying"; mutationId: string }
+  | { type: "cannot_sync_offline" }
+  | { type: "no_pending_changes" };
+
+export type OfflineSyncEventHandler = (event: OfflineSyncEvent) => void;
 
 interface OfflineMutation {
   id: string;
@@ -57,6 +70,7 @@ class OfflineManager {
   private deadLetterQueue: OfflineMutation[] = [];
   private isSyncing = false;
   private listeners = new Set<() => void>();
+  private syncEventHandlers = new Set<OfflineSyncEventHandler>();
   private queryClient: QueryClient | null = null;
   private _isOnline = true;
   private activeUserId: string | null = null;
@@ -69,6 +83,20 @@ class OfflineManager {
       OfflineManager.instance = new OfflineManager();
     }
     return OfflineManager.instance;
+  }
+
+  // ---------------------------------------------------------------------------
+  // UI event bus — register handlers to receive sync notifications without
+  // coupling this class to toast/i18n
+  // ---------------------------------------------------------------------------
+
+  public onSyncEvent(handler: OfflineSyncEventHandler): () => void {
+    this.syncEventHandlers.add(handler);
+    return () => this.syncEventHandlers.delete(handler);
+  }
+
+  private emitSyncEvent(event: OfflineSyncEvent): void {
+    this.syncEventHandlers.forEach((h) => h(event));
   }
 
   public setQueryClient(client: QueryClient) {
@@ -290,7 +318,7 @@ class OfflineManager {
         mutation.error = `Payload corruption: ${decodeError.message}`;
         this.deadLetterQueue.push(mutation);
         this.queue = this.queue.filter((q) => q.id !== mutation.id);
-        toast.error(i18n.t("common:offlineMutationFailed"));
+        this.emitSyncEvent({ type: "mutation_failed", mutationId: mutation.id });
         continue;
       }
 
@@ -349,11 +377,11 @@ class OfflineManager {
         if (mutation.retries >= MAX_RETRIES) {
           this.deadLetterQueue.push(mutation);
           this.queue = this.queue.filter((q) => q.id !== mutation.id);
-          toast.error(i18n.t("common:offlineMutationFailed"));
+          this.emitSyncEvent({ type: "mutation_failed", mutationId: mutation.id });
           console.warn("Mutation moved to dead letter queue:", mutation.id);
         } else {
           failedAttempts.push(mutation);
-          toast.warning(i18n.t("common:offlineMutationRetrying"));
+          this.emitSyncEvent({ type: "mutation_retrying", mutationId: mutation.id });
         }
       }
     }
@@ -369,16 +397,10 @@ class OfflineManager {
     await this.saveQueues();
 
     if (successfulMutations > 0) {
-      toast.success(
-        i18n.t("common:offlineSyncSuccess", { count: successfulMutations }),
-      );
+      this.emitSyncEvent({ type: "sync_success", count: successfulMutations });
     }
     if (failedAttempts.length > 0) {
-      toast.error(
-        i18n.t("common:offlineSyncPartialFailure", {
-          count: failedAttempts.length,
-        }),
-      );
+      this.emitSyncEvent({ type: "sync_partial_failure", failedCount: failedAttempts.length });
     }
 
     this.isSyncing = false;
@@ -391,11 +413,11 @@ class OfflineManager {
 
   public syncNow = () => {
     if (!this._isOnline) {
-      toast.info(i18n.t("common:offlineCannotSync"));
+      this.emitSyncEvent({ type: "cannot_sync_offline" });
       return;
     }
     if (this.queue.length === 0) {
-      toast.info(i18n.t("common:noPendingChanges"));
+      this.emitSyncEvent({ type: "no_pending_changes" });
       return;
     }
     this.processQueue();
