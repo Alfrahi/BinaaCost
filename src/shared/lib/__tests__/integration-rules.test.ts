@@ -281,6 +281,45 @@ describe("pocketbase integration", () => {
       await api("DELETE", `/api/collections/materials/records/${restored.id}`, undefined, tok);
       await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
     });
+
+    itLive("DATA-001: restore maps old group_id to newly generated group_id", async () => {
+      // 1. Create a group
+      const grp = await api("POST", "/api/collections/project_groups/records", {
+        project_id: pid, user_id: uid, name: "Foundation Group", sort_order: 1,
+      }, tok);
+      const oldGroupId = grp.json.id;
+
+      // 2. Create a material linked to that group
+      const mat = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, group_id: oldGroupId, name: "Cement", quantity: 50, unit: "bag", unit_price: 15,
+      }, tok);
+
+      // 3. Take snapshot
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "v-groups" }, tok);
+      const vid = v.json.id;
+
+      // 4. Apply the version (which deletes old groups and recreates them)
+      const applyRes = await api("POST", `/api/versions/${vid}/apply`, {}, tok);
+      expect(applyRes.status).toBe(200);
+
+      // 5. Query restored groups and materials
+      const groupsRes = await api("GET", `/api/collections/project_groups/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      const materialsRes = await api("GET", `/api/collections/materials/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+
+      const restoredGroup = groupsRes.json.items.find((g: any) => g.name === "Foundation Group");
+      const restoredMat = materialsRes.json.items.find((m: any) => m.name === "Cement");
+
+      expect(restoredGroup).toBeDefined();
+      expect(restoredMat).toBeDefined();
+      // Crucial assertion: group_id must NOT be orphaned, it must match the NEW group id!
+      expect(restoredMat.group_id).toBe(restoredGroup.id);
+      expect(restoredMat.group_id).not.toBe(oldGroupId);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/materials/records/${restoredMat.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/project_groups/records/${restoredGroup.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
   });
 
   describe("M6: version apply + concurrency", () => {
@@ -364,6 +403,71 @@ describe("pocketbase integration", () => {
       // cleanup
       await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
     });
+
+    itLive("DATA-002: convert-currency recalculates labor and equipment total_cost", async () => {
+      // Create a dedicated test project
+      const p = await api("POST", "/api/collections/projects/records", {
+        name: "Currency Test Project",
+        currency: "USD",
+        user_id: uid,
+      }, tok);
+      const testPid = p.json.id;
+
+      // 1. Create a labor item: 2 workers, 100 daily_rate, 5 days -> total_cost = 1000
+      const labor = await api("POST", "/api/collections/labor_items/records", {
+        project_id: testPid,
+        user_id: uid,
+        worker_type: "Carpenter",
+        number_of_workers: 2,
+        daily_rate: 100,
+        total_days: 5,
+        total_cost: 1000,
+      }, tok);
+      const laborId = labor.json.id;
+
+      // 2. Create an equipment item: 2 qty, 100 cost_per_period, 3 duration, 50 maint, 50 fuel -> total_cost = 700
+      const eq = await api("POST", "/api/collections/equipment_items/records", {
+        project_id: testPid,
+        user_id: uid,
+        name: "Excavator",
+        quantity: 2,
+        cost_per_period: 100,
+        usage_duration: 3,
+        maintenance_cost: 50,
+        fuel_cost: 50,
+        total_cost: 700,
+      }, tok);
+      const eqId = eq.json.id;
+
+      // 3. Convert USD -> EUR (rate factor = 0.92 / 1.0 = 0.92)
+      const conv = await api("POST", `/api/projects/${testPid}/convert-currency`, {
+        old_currency: "USD",
+        new_currency: "EUR",
+      }, tok);
+      expect(conv.status).toBe(200);
+      expect(conv.json.factor).toBe(0.92);
+
+      // 4. Verify labor: daily_rate = 92, total_cost = 2 * 92 * 5 = 920
+      const laborAfter = await api("GET", `/api/collections/labor_items/records/${laborId}`, undefined, tok);
+      expect(laborAfter.json.daily_rate).toBe(92);
+      expect(laborAfter.json.total_cost).toBe(920);
+
+      // 5. Verify equipment: cost_per_period = 92, maintenance_cost = 46, fuel_cost = 46, total_cost = (2*92*3) + 46 + 46 = 644
+      const eqAfter = await api("GET", `/api/collections/equipment_items/records/${eqId}`, undefined, tok);
+      expect(eqAfter.json.cost_per_period).toBe(92);
+      expect(eqAfter.json.maintenance_cost).toBe(46);
+      expect(eqAfter.json.fuel_cost).toBe(46);
+      expect(eqAfter.json.total_cost).toBe(644);
+
+      // 6. Verify project currency updated
+      const projAfter = await api("GET", `/api/collections/projects/records/${testPid}`, undefined, tok);
+      expect(projAfter.json.currency).toBe("EUR");
+
+      // Cleanup
+      await api("DELETE", `/api/collections/labor_items/records/${laborId}`, undefined, tok);
+      await api("DELETE", `/api/collections/equipment_items/records/${eqId}`, undefined, tok);
+      await api("DELETE", `/api/collections/projects/records/${testPid}`, undefined, tok);
+    });
   });
 
   describe("H4: child collection ownership binding", () => {
@@ -423,6 +527,13 @@ describe("pocketbase integration", () => {
       }, tok);
       expect(sane.status).toBe(200);
       await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
+    });
+
+    itLive("editor cannot reassign project user_id on update (SEC-001)", async () => {
+      const upd = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        user_id: editorId,
+      }, editorTok);
+      expect([400, 403, 404]).toContain(upd.status);
     });
   });
 
