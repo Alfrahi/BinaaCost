@@ -21,7 +21,7 @@ import {
 } from "@/features/cost-library/assemblies/types/assemblies";
 import { Label } from "@/shared/components/ui/label";
 import { useAssemblies } from "@/features/cost-library/hooks/useAssemblies";
-import { useAssemblyItems } from "@/features/projects/project-costs/hooks/useAssemblyItems";
+import { useAssemblyItems } from "@/features/cost-library/hooks/useAssemblyItems";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useAssemblyImport } from "@/features/projects/project-costs/hooks/useAssemblyImport";

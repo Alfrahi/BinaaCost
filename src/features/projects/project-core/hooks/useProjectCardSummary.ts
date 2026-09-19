@@ -1,5 +1,5 @@
 import { pb } from "@/integrations/pocketbase/client";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { calculateCategoryTotal } from "@/shared/logic/shared";
 import {
   calculateProjectFinancials,

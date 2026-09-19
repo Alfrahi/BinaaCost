@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord } from "@/shared/lib/pb-mapper";
+import { mapRecord } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { useForm } from "react-hook-form";
 import { projectSchema, ProjectFormValues } from "@/features/projects/project-core/types/form";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -37,12 +37,12 @@ import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProj
 import { ProjectGroup } from "@/features/projects/project-core/types/project";
 
 const LazyClientProposalReport = React.lazy(() =>
-  import("@/features/reports/components/ClientProposalReport").then((module) => ({
+  import("./ClientProposalReport").then((module) => ({
     default: module.ClientProposalReport,
   })),
 );
 const LazyProjectCostReport = React.lazy(() =>
-  import("@/features/reports/components/ProjectCostReport").then((module) => ({
+  import("./ProjectCostReport").then((module) => ({
     default: module.ProjectCostReport,
   })),
 );

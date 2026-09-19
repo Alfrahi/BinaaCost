@@ -3,9 +3,9 @@ import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/features/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { useOfflinePb } from "@/shared/hooks/useOfflinePb";
-import { CrudOperation } from "@/shared/lib/pb-utils";
-import { mapRecord } from "@/shared/lib/pb-mapper";
+import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
+import { CrudOperation } from "@/integrations/pocketbase/utils";
+import { mapRecord } from "@/integrations/pocketbase/mappers";
 
 export interface Profile {
   id: string;

@@ -17,7 +17,7 @@ import { useEffect, useCallback } from "react";
 import { equipmentSchema } from "@/features/projects/project-costs/types/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/shared/lib/pb-mapper";
+import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { toast } from "sonner";
 

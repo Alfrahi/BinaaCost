@@ -20,7 +20,7 @@ import { Heading } from "@/shared/components/ui/heading";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { Separator } from "@/shared/components/ui/separator";
 import { useAuth } from "@/features/auth";
-import { useRole } from "@/shared/hooks/useRole";
+import { useRole } from "@/features/auth";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 
