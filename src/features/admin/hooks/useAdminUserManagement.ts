@@ -62,7 +62,7 @@ export function useAdminUserManagement() {
     staleTime: 1000 * 60,
   });
 
-  const filteredAndPaginatedUsers = useMemo(() => {
+  const filteredUsers = useMemo(() => {
     let filteredData = allUsersData || [];
     if (search.trim()) {
       const s = search.trim().toLowerCase();
@@ -73,11 +73,14 @@ export function useAdminUserManagement() {
           user.last_name?.toLowerCase().includes(s),
       );
     }
+    return filteredData;
+  }, [allUsersData, search]);
 
+  const paginatedUsers = useMemo(() => {
     const from = currentPage * PAGE_SIZE;
     const to = from + PAGE_SIZE;
-    return filteredData.slice(from, to);
-  }, [allUsersData, search, currentPage]);
+    return filteredUsers.slice(from, to);
+  }, [filteredUsers, currentPage]);
 
   useEffect(() => {
     if (error) {
@@ -133,12 +136,12 @@ export function useAdminUserManagement() {
   };
 
   const totalPages = useMemo(
-    () => Math.ceil(filteredAndPaginatedUsers.length / PAGE_SIZE) || 1,
-    [filteredAndPaginatedUsers],
+    () => Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE)),
+    [filteredUsers.length],
   );
 
   return {
-    users: filteredAndPaginatedUsers,
+    users: paginatedUsers,
     isLoading,
     error,
     search,

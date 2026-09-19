@@ -38,10 +38,10 @@ export function useAdminProjectManagement() {
   const queryKey = ["admin_projects", currentPage, search, activeTab];
 
   const {
-    data: projects = [],
+    data: projectData = { items: [], totalItems: 0 },
     isLoading,
     error,
-  } = useQuery<Project[]>({
+  } = useQuery<{ items: Project[]; totalItems: number }>({
     queryKey,
     queryFn: async () => {
       const parts: string[] = [];
@@ -63,14 +63,20 @@ export function useAdminProjectManagement() {
         fields: "*, expand.user_id.email",
       });
       const rows = mapRecords(result.items) as any[];
-      return rows.map((r) => ({
+      const items = rows.map((r) => ({
         ...r,
         owner_email: r.expand?.user_id?.email ?? "",
       })) as Project[];
+      return {
+        items,
+        totalItems: result.totalItems,
+      };
     },
-    placeholderData: (previousData) => previousData || [],
+    placeholderData: (previousData) => previousData || { items: [], totalItems: 0 },
     staleTime: 1000 * 60,
   });
+
+  const projects = projectData.items;
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -95,8 +101,8 @@ export function useAdminProjectManagement() {
   };
 
   const totalPages = useMemo(
-    () => Math.ceil((projects?.length ?? 0) / PAGE_SIZE) ?? 1,
-    [projects],
+    () => Math.max(1, Math.ceil((projectData.totalItems || 0) / PAGE_SIZE)),
+    [projectData.totalItems],
   );
 
   return {

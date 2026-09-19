@@ -173,7 +173,7 @@ describe("offline queue replay (PocketBase executor)", () => {
     expect(executePbMutation).toHaveBeenCalledTimes(1); // only A's single replay
   });
 
-  it("legacy unscoped queue migrates into the first user's namespace", async () => {
+  it("legacy unscoped queue is quarantined to offline_unscoped_backup instead of adopted (SEC-004)", async () => {
     (executePbMutation as any).mockResolvedValue({ id: "ok" });
     const legacy = {
       id: "legacy2",
@@ -187,12 +187,15 @@ describe("offline queue replay (PocketBase executor)", () => {
     };
     store.set("offline_mutation_queue", [legacy]);
 
-    await offlineManager.init("userA");
+    await offlineManager.init("userB");
     await flush();
 
-    // legacy entry was adopted into user A's queue (replayed on next sync)
-    expect(offlineManager.getQueueSize()).toBe(1);
+    // legacy entry is NOT adopted into user B's queue
+    expect(offlineManager.getQueueSize()).toBe(0);
     expect(store.has("offline_mutation_queue")).toBe(false);
+    const backup = store.get("offline_unscoped_backup") as any[];
+    expect(backup).toHaveLength(1);
+    expect(backup[0].id).toBe("legacy2");
   });
 
   it("round-trips Arabic text byte-identically (no base64)", async () => {
