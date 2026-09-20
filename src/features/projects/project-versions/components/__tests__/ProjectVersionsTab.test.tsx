@@ -124,4 +124,15 @@ describe("ProjectVersionsTab timeline", () => {
     fireEvent.click(finalizeButtons[0]);
     expect(screen.getByText("finalizeConfirmTitle")).toBeTruthy();
   });
+
+  it("disables delete button for finalized versions and enables it for draft versions", () => {
+    render(<ProjectVersionsTab {...baseProps} />);
+    const deleteButtons = screen.getAllByLabelText(/deleteAction/);
+    expect(deleteButtons).toHaveLength(2);
+    // v1 is finalized
+    expect((deleteButtons[0] as HTMLButtonElement).disabled).toBe(true);
+    expect((deleteButtons[0] as HTMLButtonElement).title).toBe("finalizedCannotDelete");
+    // v2 is not finalized
+    expect((deleteButtons[1] as HTMLButtonElement).disabled).toBe(false);
+  });
 });

@@ -125,7 +125,13 @@ export function useProjectVersions(projectId: string) {
     fetchVersionSnapshot,
     createVersion: createVersionMutation.mutateAsync,
     isCreatingVersion: createVersionMutation.isPending,
-    deleteVersion: deleteVersionMutation.mutateAsync,
+    deleteVersion: async (vars: { id: string }) => {
+      const target = versions.find((v) => v.id === vars.id);
+      if (target?.is_final) {
+        throw new Error(t("finalizedCannotDelete"));
+      }
+      return deleteVersionMutation.mutateAsync(vars);
+    },
     isDeletingVersion: deleteVersionMutation.isPending,
     finalizeVersion: finalizeVersionMutation.mutateAsync,
     isFinalizingVersion: finalizeVersionMutation.isPending,
