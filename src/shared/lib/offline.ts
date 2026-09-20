@@ -1,5 +1,6 @@
 import localforage from "localforage";
 import { executePbMutation } from "@/integrations/pocketbase/executor";
+import { pb } from "@/integrations/pocketbase/client";
 import { QueryClient, QueryKey } from "@tanstack/react-query";
 
 // ---------------------------------------------------------------------------
@@ -13,7 +14,8 @@ export type OfflineSyncEvent =
   | { type: "mutation_failed"; mutationId: string }
   | { type: "mutation_retrying"; mutationId: string }
   | { type: "cannot_sync_offline" }
-  | { type: "no_pending_changes" };
+  | { type: "no_pending_changes" }
+  | { type: "id_remapped"; oldId: string; newId: string; table: string };
 
 export type OfflineSyncEventHandler = (event: OfflineSyncEvent) => void;
 
@@ -42,6 +44,56 @@ const DEAD_LETTER_QUEUE_KEY = "offline_dead_letter_queue";
 const MAX_RETRIES = 3;
 
 const scopedKey = (base: string, userId: string) => `${base}_${userId}`;
+
+/**
+ * Recursively remaps foreign keys, record IDs, and array references in an
+ * offline mutation payload using the optimistic-to-server ID mapping table.
+ */
+export function remapPayload(payload: unknown, idMap: Map<string, string>): unknown {
+  if (idMap.size === 0 || payload === null || payload === undefined) {
+    return payload;
+  }
+
+  if (typeof payload === "string") {
+    return idMap.get(payload) ?? payload;
+  }
+
+  if (Array.isArray(payload)) {
+    return payload.map((item) => remapPayload(item, idMap));
+  }
+
+  if (typeof payload === "object") {
+    const remapped: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(payload as Record<string, unknown>)) {
+      if (typeof value === "string") {
+        remapped[key] = idMap.get(value) ?? value;
+      } else if (Array.isArray(value)) {
+        remapped[key] = value.map((item) =>
+          typeof item === "string" ? idMap.get(item) ?? item : remapPayload(item, idMap),
+        );
+      } else if (typeof value === "object" && value !== null) {
+        remapped[key] = remapPayload(value, idMap);
+      } else {
+        remapped[key] = value;
+      }
+    }
+    return remapped;
+  }
+
+  return payload;
+}
+
+/**
+ * Remaps any optimistic IDs present within a TanStack Query key array.
+ */
+export function remapQueryKey(queryKey: QueryKey, idMap: Map<string, string>): QueryKey {
+  if (idMap.size === 0 || !Array.isArray(queryKey)) {
+    return queryKey;
+  }
+  return queryKey.map((part) =>
+    typeof part === "string" ? idMap.get(part) ?? part : part,
+  );
+}
 
 // M1: payloads are stored as plain objects now; legacy entries were base64.
 // Decode either form.
@@ -341,6 +393,28 @@ class OfflineManager {
     this.processQueue();
   }
 
+  private cascadeIdRemap(idMap: Map<string, string>, currentQueue: OfflineMutation[]) {
+    if (idMap.size === 0) return;
+    for (const m of this.queue) {
+      try {
+        const decoded = decodePayload(m.payload);
+        m.payload = remapPayload(decoded, idMap);
+      } catch {
+        // ignore decode errors for corrupt payloads
+      }
+      m.queryKey = remapQueryKey(m.queryKey, idMap);
+    }
+    for (const m of currentQueue) {
+      try {
+        const decoded = decodePayload(m.payload);
+        m.payload = remapPayload(decoded, idMap);
+      } catch {
+        // ignore
+      }
+      m.queryKey = remapQueryKey(m.queryKey, idMap);
+    }
+  }
+
   public async processQueue() {
     if (!this._isOnline || this.isSyncing || this.queue.length === 0) {
       return;
@@ -364,6 +438,7 @@ class OfflineManager {
     let successfulMutations = 0;
     const failedAttempts: OfflineMutation[] = [];
     const currentQueue = [...this.queue];
+    const idMap = new Map<string, string>();
 
     for (const mutation of currentQueue) {
       let actualPayload: any;
@@ -384,8 +459,18 @@ class OfflineManager {
         continue;
       }
 
+      // Remap optimistic foreign keys / record IDs in the current mutation payload
+      actualPayload = remapPayload(actualPayload, idMap);
+      const originalQueryKey = mutation.queryKey;
+      mutation.queryKey = remapQueryKey(mutation.queryKey, idMap);
+
+      const preExecutionId =
+        actualPayload && typeof actualPayload === "object" && "id" in actualPayload
+          ? String(actualPayload.id)
+          : undefined;
+
       try {
-        await executePbMutation({
+        const result = await executePbMutation<Record<string, unknown>>({
           table: mutation.table,
           operation: mutation.type,
           payload: actualPayload,
@@ -394,10 +479,63 @@ class OfflineManager {
         successfulMutations++;
         console.log("Successfully synced mutation:", mutation.id);
 
+        const serverId =
+          result && typeof result === "object" && "id" in result
+            ? String((result as any).id)
+            : undefined;
+
+        if (mutation.type === "INSERT" && serverId) {
+          let hasNewMapping = false;
+          if (preExecutionId && serverId !== preExecutionId) {
+            idMap.set(preExecutionId, serverId);
+            hasNewMapping = true;
+            this.emitSyncEvent({
+              type: "id_remapped",
+              oldId: preExecutionId,
+              newId: serverId,
+              table: mutation.table,
+            });
+          }
+          if (mutation.id && mutation.id !== serverId) {
+            idMap.set(mutation.id, serverId);
+            hasNewMapping = true;
+          }
+          if (
+            actualPayload?.client_mutation_id &&
+            String(actualPayload.client_mutation_id) !== serverId
+          ) {
+            idMap.set(String(actualPayload.client_mutation_id), serverId);
+            hasNewMapping = true;
+          }
+
+          if (hasNewMapping) {
+            this.cascadeIdRemap(idMap, currentQueue);
+            await this.saveQueues();
+          }
+
+          if (this.queryClient && preExecutionId) {
+            const oldProject = this.queryClient.getQueryData(["project", preExecutionId]);
+            if (oldProject) {
+              this.queryClient.setQueryData(["project", serverId], {
+                ...(typeof oldProject === "object" ? oldProject : {}),
+                id: serverId,
+              });
+            }
+          }
+        }
+
         if (this.queryClient) {
           await this.queryClient.invalidateQueries({
             queryKey: mutation.queryKey,
           });
+          if (
+            originalQueryKey &&
+            JSON.stringify(originalQueryKey) !== JSON.stringify(mutation.queryKey)
+          ) {
+            await this.queryClient.invalidateQueries({
+              queryKey: originalQueryKey,
+            });
+          }
           if (
             mutation.table === "projects" ||
             mutation.table === "materials" ||
@@ -421,12 +559,34 @@ class OfflineManager {
             "Mutation already committed (client_mutation_id conflict):",
             mutation.id,
           );
+          if (preExecutionId && actualPayload?.client_mutation_id) {
+            try {
+              const existing = await pb
+                .collection(mutation.table)
+                .getFirstListItem(`client_mutation_id="${actualPayload.client_mutation_id}"`);
+              if (existing?.id) {
+                idMap.set(preExecutionId, existing.id);
+                this.cascadeIdRemap(idMap, currentQueue);
+                await this.saveQueues();
+              }
+            } catch {
+              // Ignore lookup error if record cannot be fetched
+            }
+          }
           successfulMutations++;
           this.queue = this.queue.filter((q) => q.id !== mutation.id);
           if (this.queryClient) {
             await this.queryClient.invalidateQueries({
               queryKey: mutation.queryKey,
             });
+            if (
+              originalQueryKey &&
+              JSON.stringify(originalQueryKey) !== JSON.stringify(mutation.queryKey)
+            ) {
+              await this.queryClient.invalidateQueries({
+                queryKey: originalQueryKey,
+              });
+            }
           }
           continue;
         }

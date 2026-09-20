@@ -62,7 +62,7 @@ export function useCreateProject() {
           ...oldData,
           {
             ...variables,
-            id: crypto.randomUUID(),
+            id: variables.id || crypto.randomUUID(),
             created_at: new Date().toISOString(),
           },
         ],
@@ -83,8 +83,8 @@ export function useCreateProject() {
     onSuccess: (data: any) => {
       toast.success(t("project_form:success_created"));
       const id = data?.id as string | undefined;
-      // Offline fallback: queued inserts return the payload, not a record id,
-      // so land on the dashboard when no server id is available.
+      // When offline, queued insert returns the payload containing optimistic id,
+      // allowing navigation directly to the project offline.
       navigate(id ? `/projects/${id}` : "/");
     },
     onError: (error: any) => {
@@ -100,7 +100,9 @@ export function useCreateProject() {
         return;
       }
 
+      const optimisticProjectId = crypto.randomUUID();
       const projectData = {
+        id: optimisticProjectId,
         name: sanitizeText(validatedData.name),
         description: sanitizeText(validatedData.description),
         type: sanitizeText(validatedData.type),
