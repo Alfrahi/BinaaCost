@@ -30,9 +30,12 @@ export async function executePbMutation<T = unknown>(args: {
       return collection.create(body) as Promise<T>;
     }
 
-    case "UPDATE":
+    case "UPDATE": {
       if (!recordId) throw new Error("Update requires ID");
-      return collection.update(recordId, payloadObj ?? {}) as Promise<T>;
+      const body = { ...(payloadObj ?? {}) };
+      delete body.user_id;
+      return collection.update(recordId, body) as Promise<T>;
+    }
 
     case "DELETE":
       if (!recordId) throw new Error("Delete requires ID");
@@ -49,9 +52,11 @@ export async function executePbMutation<T = unknown>(args: {
 
     case "BULK_UPDATE": {
       const { ids, data } = payload as { ids: string[]; data: Record<string, unknown> };
+      const body = { ...(data ?? {}) };
+      delete body.user_id;
       const updated: unknown[] = [];
       for (const id of ids) {
-        updated.push(await collection.update(id, data));
+        updated.push(await collection.update(id, body));
       }
       return updated as T;
     }

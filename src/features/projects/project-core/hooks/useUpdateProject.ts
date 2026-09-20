@@ -75,9 +75,11 @@ export function useUpdateProject() {
     string | null
   >(null);
 
+  const { reset: resetForm } = form;
+
   useEffect(() => {
     if (initialData) {
-      form.reset({
+      resetForm({
         name: initialData.name || "",
         description: initialData.description || "",
         type: initialData.type || "",
@@ -91,7 +93,7 @@ export function useUpdateProject() {
       });
       setOriginalProjectCurrency(initialData.currency);
     }
-  }, [initialData, form]);
+  }, [initialData, resetForm]);
 
   const optimisticUpdater = (
     old: ProjectData | undefined,
@@ -196,8 +198,6 @@ export function useUpdateProject() {
         updateProjectMutation.mutate({
           id,
           ...validatedData,
-          user_id: user?.id,
-          updated: initialData?.updated_at,
         });
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -216,7 +216,6 @@ export function useUpdateProject() {
       id,
       updateProjectMutation,
       openConversionDialog,
-      initialData,
     ],
   );
 
