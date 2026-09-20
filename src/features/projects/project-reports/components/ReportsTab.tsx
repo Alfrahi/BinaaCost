@@ -201,8 +201,8 @@ export default function ReportsTab({
   ]);
 
   const companyInfo = {
-    name: reportSettings.company_name || (user?.company_name as string) || "",
-    website: reportSettings.company_website || (user?.company_website as string) || "",
+    name: reportSettings.company_name || "",
+    website: reportSettings.company_website || "",
     logoUrl: reportSettings.company_logo_url || (user ? pb.files.getURL(user, user.avatar) || "" : ""),
     email: reportSettings.company_email || user?.email || "",
   };

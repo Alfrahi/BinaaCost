@@ -16,39 +16,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Mail, Loader2 } from "lucide-react";
+import { UserProfile } from "../hooks/useAdminUserManagement";
 
-interface AddUserModalProps {
+interface EditUserModalProps {
+  user: UserProfile | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddUser: (data: {
-    email: string;
-    password: string;
+  onSave: (data: {
+    user_id: string;
     first_name: string;
     last_name: string;
+    email: string;
     role: string;
+    password?: string;
   }) => Promise<void>;
+  onSendPasswordReset?: (email: string) => Promise<void>;
   loading: boolean;
 }
 
-export default function AddUserModal({
+export default function EditUserModal({
+  user,
   open,
   onOpenChange,
-  onAddUser,
+  onSave,
+  onSendPasswordReset,
   loading,
-}: AddUserModalProps) {
+}: EditUserModalProps) {
   const { t } = useTranslation(["admin", "roles", "common"]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
   const [password, setPassword] = useState("");
+  const [isSendingReset, setIsSendingReset] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.first_name || "");
+      setLastName(user.last_name || "");
+      setEmail(user.email || "");
+      setRole(user.role || "user");
+      setPassword("");
+    }
+  }, [user, open]);
+
+  if (!user) return null;
 
   const generatePassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    const chars =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let pwd = "";
     for (let i = 0; i < 12; i++) {
       pwd += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -56,12 +76,16 @@ export default function AddUserModal({
     setPassword(pwd);
   };
 
-  const resetForm = () => {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setRole("user");
-    setPassword("");
+  const handleSendResetEmail = async () => {
+    if (!email || !onSendPasswordReset) return;
+    try {
+      setIsSendingReset(true);
+      await onSendPasswordReset(email);
+    } catch {
+      // Error handled in parent mutation
+    } finally {
+      setIsSendingReset(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,20 +94,20 @@ export default function AddUserModal({
       toast.error(t("admin:users.emailRequired"));
       return;
     }
-    if (!password || password.length < 8) {
+    if (password && password.length < 8) {
       toast.error(t("admin:users.passwordMinLength"));
       return;
     }
 
     try {
-      await onAddUser({
+      await onSave({
+        user_id: user.id,
         email: email.trim(),
-        password,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         role,
+        password: password ? password : undefined,
       });
-      resetForm();
       onOpenChange(false);
     } catch {
       // Error handled in parent mutation
@@ -91,31 +115,25 @@ export default function AddUserModal({
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) resetForm();
-        onOpenChange(next);
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
-            {t("admin:users.addUser")}
+            {t("admin:users.editUserDetails")}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            {t("admin:users.description", "Create a new user account with credentials and assign an initial role.")}
+            {t("admin:users.editUserDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2 text-sm">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="first_name" className="text-sm">
+              <Label htmlFor="edit_first_name" className="text-sm">
                 {t("admin:users.firstName")}
               </Label>
               <Input
-                id="first_name"
+                id="edit_first_name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder={t("admin:users.firstNamePlaceholder")}
@@ -124,11 +142,11 @@ export default function AddUserModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="last_name" className="text-sm">
+              <Label htmlFor="edit_last_name" className="text-sm">
                 {t("admin:users.lastName")}
               </Label>
               <Input
-                id="last_name"
+                id="edit_last_name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder={t("admin:users.lastNamePlaceholder")}
@@ -138,11 +156,11 @@ export default function AddUserModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="user_email" className="text-sm">
+            <Label htmlFor="edit_email" className="text-sm">
               {t("admin:users.email")} <span className="text-destructive">*</span>
             </Label>
             <Input
-              id="user_email"
+              id="edit_email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -153,11 +171,11 @@ export default function AddUserModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="user_role" className="text-sm">
+            <Label htmlFor="edit_role" className="text-sm">
               {t("admin:users.role")}
             </Label>
             <Select value={role} onValueChange={setRole}>
-              <SelectTrigger id="user_role" className="text-sm">
+              <SelectTrigger id="edit_role" className="text-sm">
                 <SelectValue placeholder={t("admin:editRoleModal.select_placeholder")}>
                   {t(`roles:${role}_display`, role.replace("_", " "))}
                 </SelectValue>
@@ -173,10 +191,11 @@ export default function AddUserModal({
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          {/* Password Reset Section */}
+          <div className="space-y-2 pt-2 border-t">
             <div className="flex justify-between items-center">
-              <Label htmlFor="user_password" className="text-sm">
-                {t("admin:users.password")} <span className="text-destructive">*</span>
+              <Label htmlFor="edit_password" className="text-sm font-medium">
+                {t("admin:users.newPasswordOptional")}
               </Label>
               <button
                 type="button"
@@ -188,17 +207,38 @@ export default function AddUserModal({
               </button>
             </div>
             <Input
-              id="user_password"
+              id="edit_password"
               type="text"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={t("admin:users.passwordPlaceholder")}
-              required
+              placeholder={t("admin:users.newPasswordPlaceholder")}
               className="text-sm font-mono"
             />
             <p className="text-xs text-muted-foreground">
-              {t("admin:users.passwordHelper")}
+              {t("admin:users.passwordResetHelper")}
             </p>
+
+            {onSendPasswordReset && (
+              <div className="pt-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleSendResetEmail}
+                  disabled={isSendingReset || loading || !email}
+                  className="w-full text-xs gap-1.5"
+                >
+                  {isSendingReset ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Mail className="w-3.5 h-3.5" />
+                  )}
+                  {isSendingReset
+                    ? t("admin:users.sendingResetEmail")
+                    : t("admin:users.sendPasswordResetEmail")}
+                </Button>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="pt-2">
@@ -212,7 +252,7 @@ export default function AddUserModal({
               {t("common:cancel")}
             </Button>
             <Button type="submit" disabled={loading} className="text-sm">
-              {loading ? t("common:saving") : t("admin:users.createUser")}
+              {loading ? t("common:saving") : t("common:save")}
             </Button>
           </DialogFooter>
         </form>

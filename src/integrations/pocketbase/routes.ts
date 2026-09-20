@@ -27,6 +27,8 @@ function routePath(name: string, params: Record<string, string>) {
       return `/api/versions/${params.id}/apply`;
     case "admin/users/role":
       return `/api/admin/users/${params.id}/role`;
+    case "admin/users/update":
+      return `/api/admin/users/${params.id}/update`;
     case "admin/users/delete":
       return `/api/admin/users/${params.id}/delete`;
     case "share":
