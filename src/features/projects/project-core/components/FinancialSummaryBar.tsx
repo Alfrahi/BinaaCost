@@ -111,39 +111,50 @@ export default function FinancialSummaryBar({
   );
 
   const grandTotal = (
-    <span className="flex items-baseline gap-2">
-      <span className="text-sm font-medium">{grandTotalLabel}</span>
-      <span className="text-lg font-bold tabular-nums text-foreground">
-        {format(financials.grandTotal, currency)}
+    <button
+      type="button"
+      onClick={onViewPricing}
+      className="flex items-baseline gap-2 shrink-0 rounded-sm p-1 -m-1 hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-start cursor-pointer"
+      aria-label={t("project_detail:profit_pricing.viewPricing")}
+      title={t("project_detail:profit_pricing.viewPricing")}
+    >
+      <span className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        {grandTotalLabel}
       </span>
-    </span>
+      <span className="text-lg font-bold tabular-nums text-foreground flex items-center gap-1.5">
+        {format(financials.grandTotal, currency)}
+        <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" aria-hidden="true" />
+      </span>
+    </button>
   );
 
   return (
-    <div className="sticky top-0 z-10 bg-background border-b border-border">
+    <div className="sticky top-0 z-20 -mt-4 sm:-mt-6 pt-4 sm:pt-6 -mx-4 sm:-mx-6 px-4 sm:px-6 bg-background/95 backdrop-blur-sm border-b border-border shadow-xs">
       <div className="flex items-center justify-between gap-4 py-2">
         {isMobile ? (
-          <div className="flex flex-1 items-center gap-2 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-11 w-11 shrink-0"
-              onClick={() => setExpanded((prev) => !prev)}
-              aria-expanded={expanded}
-              aria-label={t(
-                expanded
-                  ? "project_detail:profit_pricing.hideBreakdown"
-                  : "project_detail:profit_pricing.showBreakdown",
-              )}
-            >
-              <ChevronDown
-                className={cn(
-                  "w-4 h-4 transition-transform",
-                  expanded && "rotate-180",
+          <div className="flex flex-1 items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11 shrink-0"
+                onClick={() => setExpanded((prev) => !prev)}
+                aria-expanded={expanded}
+                aria-label={t(
+                  expanded
+                    ? "project_detail:profit_pricing.hideBreakdown"
+                    : "project_detail:profit_pricing.showBreakdown",
                 )}
-              />
-            </Button>
-            {grandTotal}
+              >
+                <ChevronDown
+                  className={cn(
+                    "w-4 h-4 transition-transform",
+                    expanded && "rotate-180",
+                  )}
+                />
+              </Button>
+              {grandTotal}
+            </div>
           </div>
         ) : (
           <>
@@ -151,15 +162,6 @@ export default function FinancialSummaryBar({
             {grandTotal}
           </>
         )}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onViewPricing}
-          className="text-sm shrink-0"
-        >
-          <TrendingUp className="w-4 h-4 me-1" />
-          {t("project_detail:profit_pricing.viewPricing")}
-        </Button>
       </div>
       {isMobile && expanded && (
         <div className="pb-2">
