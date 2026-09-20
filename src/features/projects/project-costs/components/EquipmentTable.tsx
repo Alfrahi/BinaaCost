@@ -264,6 +264,8 @@ export function EquipmentTable({
                 maintenance_cost?: number | null;
                 fuel_cost?: number | null;
               } | null;
+              const isPurchase =
+                (details?.rental_or_purchase || "").toLowerCase() === "purchase";
               await crud.handleAddOrUpdate(
                 {
                   name: item.description,
@@ -272,8 +274,8 @@ export function EquipmentTable({
                     details?.rental_or_purchase || "Rental",
                   quantity: item.quantity,
                   cost_per_period: item.unit_price,
-                  period_unit: item.unit || "Day",
-                  usage_duration: details?.usage_duration ?? 1,
+                  period_unit: isPurchase ? (item.unit || "Day") : (item.unit || "Day"),
+                  usage_duration: isPurchase ? 1 : (details?.usage_duration ?? 1),
                   maintenance_cost: details?.maintenance_cost ?? 0,
                   fuel_cost: details?.fuel_cost ?? 0,
                   group_id: "ungrouped",

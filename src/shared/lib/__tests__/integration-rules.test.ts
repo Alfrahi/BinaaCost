@@ -425,11 +425,12 @@ describe("pocketbase integration", () => {
       }, tok);
       const laborId = labor.json.id;
 
-      // 2. Create an equipment item: 2 qty, 100 cost_per_period, 3 duration, 50 maint, 50 fuel -> total_cost = 700
+      // 2. Create an equipment item (rental): 2 qty, 100 cost_per_period, 3 duration, 50 maint, 50 fuel -> total_cost = 700
       const eq = await api("POST", "/api/collections/equipment_items/records", {
         project_id: testPid,
         user_id: uid,
         name: "Excavator",
+        rental_or_purchase: "Rental",
         quantity: 2,
         cost_per_period: 100,
         usage_duration: 3,
@@ -438,6 +439,21 @@ describe("pocketbase integration", () => {
         total_cost: 700,
       }, tok);
       const eqId = eq.json.id;
+
+      // 2b. Create a purchased equipment item: 1 qty, 1000 cost_per_period, 10 duration, 100 maint, 0 fuel -> total_cost = 1100 (duration NOT multiplied)
+      const eqPurch = await api("POST", "/api/collections/equipment_items/records", {
+        project_id: testPid,
+        user_id: uid,
+        name: "Purchased Crane",
+        rental_or_purchase: "Purchase",
+        quantity: 1,
+        cost_per_period: 1000,
+        usage_duration: 10,
+        maintenance_cost: 100,
+        fuel_cost: 0,
+        total_cost: 1100,
+      }, tok);
+      const eqPurchId = eqPurch.json.id;
 
       // 3. Convert USD -> EUR (rate factor = 0.92 / 1.0 = 0.92)
       const conv = await api("POST", `/api/projects/${testPid}/convert-currency`, {
@@ -452,12 +468,18 @@ describe("pocketbase integration", () => {
       expect(laborAfter.json.daily_rate).toBe(92);
       expect(laborAfter.json.total_cost).toBe(920);
 
-      // 5. Verify equipment: cost_per_period = 92, maintenance_cost = 46, fuel_cost = 46, total_cost = (2*92*3) + 46 + 46 = 644
+      // 5. Verify rental equipment: cost_per_period = 92, maintenance_cost = 46, fuel_cost = 46, total_cost = (2*92*3) + 46 + 46 = 644
       const eqAfter = await api("GET", `/api/collections/equipment_items/records/${eqId}`, undefined, tok);
       expect(eqAfter.json.cost_per_period).toBe(92);
       expect(eqAfter.json.maintenance_cost).toBe(46);
       expect(eqAfter.json.fuel_cost).toBe(46);
       expect(eqAfter.json.total_cost).toBe(644);
+
+      // 5b. Verify purchased equipment: cost_per_period = 920, maintenance_cost = 92, total_cost = 920 * 1 + 92 = 1012 (duration 10 NOT multiplied)
+      const eqPurchAfter = await api("GET", `/api/collections/equipment_items/records/${eqPurchId}`, undefined, tok);
+      expect(eqPurchAfter.json.cost_per_period).toBe(920);
+      expect(eqPurchAfter.json.maintenance_cost).toBe(92);
+      expect(eqPurchAfter.json.total_cost).toBe(1012);
 
       // 6. Verify project currency updated
       const projAfter = await api("GET", `/api/collections/projects/records/${testPid}`, undefined, tok);
@@ -466,6 +488,7 @@ describe("pocketbase integration", () => {
       // Cleanup
       await api("DELETE", `/api/collections/labor_items/records/${laborId}`, undefined, tok);
       await api("DELETE", `/api/collections/equipment_items/records/${eqId}`, undefined, tok);
+      await api("DELETE", `/api/collections/equipment_items/records/${eqPurchId}`, undefined, tok);
       await api("DELETE", `/api/collections/projects/records/${testPid}`, undefined, tok);
     });
   });

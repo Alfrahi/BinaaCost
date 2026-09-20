@@ -40,6 +40,7 @@ export function calculatePublicShareFinancials(
         usageDuration: item.usage_duration,
         maintenanceCost: item.maintenance_cost,
         fuelCost: item.fuel_cost,
+        rentalOrPurchase: item.rental_or_purchase,
       }).totalCost,
     0,
   );
