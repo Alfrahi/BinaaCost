@@ -6,6 +6,9 @@ import type {
   AdditionalCostItem,
 } from "@/features/projects/project-costs/types/items";
 
+import type { VersionCostSummary } from "@/shared/logic/versionCosts";
+import type { FinancialSummary } from "@/shared/logic/financials";
+
 export interface ProjectSnapshotData {
   project?: Partial<Project> | null;
   materials?: MaterialItem[];
@@ -14,6 +17,8 @@ export interface ProjectSnapshotData {
   additional_costs?: AdditionalCostItem[];
   risks?: Risk[];
   project_groups?: ProjectGroup[];
+  summary?: VersionCostSummary;
+  financials?: FinancialSummary;
   [key: string]: unknown;
 }
 

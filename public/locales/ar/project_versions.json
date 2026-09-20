@@ -42,6 +42,7 @@
   "deleteConfirmBody": "حذف \"{{name}}\" يزيل لقطة التكلفة الخاصة به نهائيًا ولا يمكن التراجع عنه.",
   "finalizedBadge": "نهائي",
   "finalizedCannotRestore": "لا يمكن استعادة الإصدارات المعتمدة",
+  "finalizedCannotDelete": "لا يمكن حذف الإصدارات المعتمدة",
   "versionStamp": "الإصدار: {{name}} ({{date}})",
   "compare": "مقارنة",
   "compareTitle": "مقارنة الإصدارات",
