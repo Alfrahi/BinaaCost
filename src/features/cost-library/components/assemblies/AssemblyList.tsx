@@ -85,6 +85,7 @@ export function AssemblyList({
   const { t } = useTranslation(["resources", "common"]);
   const {
     assemblies,
+    count,
     isLoading,
     search,
     setSearch,
@@ -163,21 +164,53 @@ export function AssemblyList({
 
   return (
     <div className="space-y-4 text-sm">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-64">
-            <Input
-              placeholder={t("common:searchPlaceholder")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="text-sm"
-            />
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <Heading level={1}>{t("resources:assemblies.title")}</Heading>
+        {!isFormOpen && (
+          <Button
+            onClick={() => openForm()}
+            size="icon"
+            aria-label={t("common:add")}
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" />
+          </Button>
+        )}
+      </div>
+
+      {isFormOpen && (
+        <AssemblyFormDialog
+          onOpenChange={setIsFormOpen}
+          initialData={editingAssembly}
+          onSubmit={handleCreateOrUpdate}
+          isSubmitting={createAssembly.isPending || updateAssembly.isPending}
+        />
+      )}
+
+      <div className="flex justify-between items-center mb-4">
+        <Input
+          placeholder={t("common:searchPlaceholder")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="text-sm w-full"
+        />
+      </div>
+
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-muted-foreground">
+          {t("common:item", { count })}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t("common:rowsPerPage")}:
+          </span>
           <Select
             value={pageSize.toString()}
-            onValueChange={(val) => setPageSize(Number(val))}
+            onValueChange={(val) => {
+              setPageSize(Number(val));
+              setCurrentPage(0);
+            }}
           >
-            <SelectTrigger className="w-[80px] text-sm">
+            <SelectTrigger className="w-[70px] h-8 text-sm">
               <SelectValue>
                 {pageSize.toString()}
               </SelectValue>
@@ -195,26 +228,7 @@ export function AssemblyList({
             </SelectContent>
           </Select>
         </div>
-        {!isFormOpen && (
-          <Button
-            onClick={() => openForm()}
-            size="icon"
-            aria-label={t("common:add")}
-            className="text-sm"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </Button>
-        )}
       </div>
-
-      {isFormOpen && (
-        <AssemblyFormDialog
-          onOpenChange={setIsFormOpen}
-          initialData={editingAssembly}
-          onSubmit={handleCreateOrUpdate}
-          isSubmitting={createAssembly.isPending || updateAssembly.isPending}
-        />
-      )}
 
       <DataTable
         columns={columns}

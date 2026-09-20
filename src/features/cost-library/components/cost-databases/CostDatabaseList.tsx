@@ -27,10 +27,18 @@ import {
   TableCell,
   TableRow,
 } from "@/shared/components/ui/table";
-import { Edit2, Trash2, Plus, Search, X } from "lucide-react";
+import { Edit2, Trash2, Plus, X } from "lucide-react";
 import { useBulkSelection } from "@/shared/hooks/useBulkSelection";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { PaginationControls } from "@/shared/components/PaginationControls";
 import DataTable, {
   DataTableColumn,
 } from "@/shared/components/ui/data-table";
@@ -61,7 +69,7 @@ export default function CostDatabaseList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
+  const [pageSize, setPageSize] = useState(20);
 
   const defaultCurrency = useMemo(
     () => currencies[0]?.value || "USD",
@@ -87,16 +95,18 @@ export default function CostDatabaseList({
         db.description.toLowerCase().includes(search.toLowerCase())),
   );
 
+  const count = filteredDatabases.length;
+
   const paginatedDatabases = filteredDatabases.slice(
-    currentPage * ITEMS_PER_PAGE,
-    (currentPage + 1) * ITEMS_PER_PAGE,
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize,
   );
 
-  const totalPages = Math.ceil(filteredDatabases.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(count / pageSize);
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [search]);
+  }, [search, pageSize]);
 
   useEffect(() => {
     if (editingId && editingId !== "new") {
@@ -187,34 +197,75 @@ export default function CostDatabaseList({
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 text-sm">
+      <div className="flex items-center justify-between mb-4">
         <Heading level={1}>
-          {t("pages:cost_databases.title")}
+          {t("resources:databases")}
         </Heading>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {selection.hasSelection && (
-            <Button variant="destructive" onClick={handleBulkDelete}>
-              <Trash2 className="ms-2 h-4 w-4" />
+            <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+              <Trash2 className="w-4 h-4" />
               {t("common:delete")}
+            </Button>
+          )}
+          {!editingId && (
+            <Button
+              onClick={() => setEditingId("new")}
+              size="icon"
+              aria-label={t("common:add")}
+            >
+              <Plus className="w-4 h-4" aria-hidden="true" />
             </Button>
           )}
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t("common:search")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="ps-8"
-          />
+      <div className="flex justify-between items-center mb-4">
+        <Input
+          placeholder={t("common:searchPlaceholder")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="text-sm w-full"
+        />
+      </div>
+
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-muted-foreground">
+          {t("common:item", { count })}
         </div>
-        <Button onClick={() => setEditingId("new")}>
-          <Plus className="w-4 h-4" aria-hidden="true" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t("common:rowsPerPage")}:
+          </span>
+          <Select
+            value={pageSize.toString()}
+            onValueChange={(val) => {
+              setPageSize(Number(val));
+              setCurrentPage(0);
+            }}
+          >
+            <SelectTrigger className="w-[70px] h-8 text-sm">
+              <SelectValue>
+                {pageSize.toString()}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10" className="text-sm">
+                10
+              </SelectItem>
+              <SelectItem value="20" className="text-sm">
+                20
+              </SelectItem>
+              <SelectItem value="50" className="text-sm">
+                50
+              </SelectItem>
+              <SelectItem value="100" className="text-sm">
+                100
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <DataTable
@@ -271,13 +322,14 @@ export default function CostDatabaseList({
             </TableCell>
           </TableRow>
         )}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-        }}
         emptyMessage={t("common:noItems")}
-        ariaLabel={t("pages:cost_databases.title")}
+        ariaLabel={t("resources:databases")}
+      />
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
       />
 
       {editingId && (
