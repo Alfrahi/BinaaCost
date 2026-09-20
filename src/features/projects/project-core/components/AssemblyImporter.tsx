@@ -160,7 +160,9 @@ export default function AssemblyImporter({
                 placeholder={t(
                   "project_detail:assembly_importer.selectAssemblyPlaceholder",
                 )}
-              />
+              >
+                {availableAssemblies.find((a) => a.id === selectedAssemblyId)?.name}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {isLoadingAssemblies ? (

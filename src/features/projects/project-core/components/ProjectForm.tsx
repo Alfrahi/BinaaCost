@@ -78,16 +78,16 @@ export default function ProjectForm({
 
   useEffect(() => {
     if (!form.getValues("type") && projectTypes.length > 0) {
-      form.setValue("type", projectTypes[0].value);
+      form.setValue("type", projectTypes[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (!form.getValues("size_unit") && sizeUnits.length > 0) {
-      form.setValue("size_unit", sizeUnits[0].value);
+      form.setValue("size_unit", sizeUnits[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (!form.getValues("duration_unit") && durationUnits.length > 0) {
-      form.setValue("duration_unit", durationUnits[0].value);
+      form.setValue("duration_unit", durationUnits[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (!form.getValues("currency") && currencies.length > 0) {
-      form.setValue("currency", currencies[0].value);
+      form.setValue("currency", currencies[0].value, { shouldValidate: true, shouldDirty: false });
     }
   }, [projectTypes, sizeUnits, durationUnits, currencies, form]);
 
@@ -198,6 +198,7 @@ export default function ProjectForm({
                           onValueChange={field.onChange}
                           options={projectTypes}
                           isLoading={isLoadingProjectTypes}
+                          autoSelectFirst={true}
                           placeholder={t("project_form:typePlaceholder")}
                           aria-label={t("project_form:type")}
                           className="text-sm"
@@ -247,6 +248,7 @@ export default function ProjectForm({
                             onValueChange={field.onChange}
                             options={sizeUnits}
                             isLoading={isLoadingSizeUnits}
+                            autoSelectFirst={true}
                             placeholder={t("project_form:sizeUnitPlaceholder")}
                             aria-label={t("project_form:sizeUnit")}
                             className="text-sm"
@@ -347,6 +349,7 @@ export default function ProjectForm({
                           onValueChange={field.onChange}
                           options={durationUnits}
                           isLoading={isLoadingDurationUnits}
+                          autoSelectFirst={true}
                           placeholder={t("project_form:durationUnitPlaceholder")}
                           aria-label={t("project_form:durationUnit")}
                           className="text-sm"
@@ -372,6 +375,7 @@ export default function ProjectForm({
                         onValueChange={field.onChange}
                         options={currencies}
                         isLoading={isLoadingCurrencies}
+                        autoSelectFirst={true}
                         placeholder={t("project_form:currencyPlaceholder")}
                         aria-label={t("project_form:currency")}
                         className="text-sm"

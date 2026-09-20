@@ -122,7 +122,9 @@ export function AssemblyIntegrationRow({
                   placeholder={t(
                     "project_detail:assembly_importer.selectAssemblyPlaceholder",
                   )}
-                />
+                >
+                  {allAssemblies.find((a) => a.id === selectedId)?.name}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {isLoadingAssemblies ? (

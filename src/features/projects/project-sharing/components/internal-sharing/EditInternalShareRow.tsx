@@ -59,7 +59,9 @@ export function EditInternalShareRow({
             disabled={isUpdating}
           >
             <SelectTrigger className="w-[120px] text-sm">
-              <SelectValue />
+              <SelectValue>
+                {currentRole === "viewer" ? t("roles:viewer_display") : t("roles:editor_display")}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="viewer" className="text-sm">

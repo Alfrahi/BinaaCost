@@ -75,7 +75,7 @@ export function CostItemGroupSelect<TFieldValues extends FieldValues = FieldValu
           </FormLabel>
           <FormControl>
             <TranslatedSelect
-              value={field.value}
+              value={field.value || "ungrouped"}
               onValueChange={field.onChange}
               options={[
                 {
@@ -84,6 +84,7 @@ export function CostItemGroupSelect<TFieldValues extends FieldValues = FieldValu
                 },
                 ...groups.map((g) => ({ value: g.id, label: g.name })),
               ]}
+              autoSelectFirst={true}
               placeholder={t("project_detail:groups.selectGroup")}
               aria-label={t("project_detail:groups.assignGroup")}
               className="text-sm"

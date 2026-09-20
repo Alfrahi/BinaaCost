@@ -242,7 +242,12 @@ export default function CostItemsTable({
             <SelectTrigger className="w-[150px] h-8 text-sm">
               <SelectValue
                 placeholder={t("pages:cost_databases.noAdjustment")}
-              />
+              >
+                {(() => {
+                  const loc = locations.find((l) => l.id === selectedLocationId);
+                  return loc ? `${loc.city} (${loc.multiplier}x)` : t("pages:cost_databases.noAdjustment");
+                })()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none" className="text-sm">
@@ -266,7 +271,9 @@ export default function CostItemsTable({
             }}
           >
             <SelectTrigger className="w-[70px] h-8 text-sm">
-              <SelectValue />
+              <SelectValue>
+                {pageSize.toString()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="10" className="text-sm">

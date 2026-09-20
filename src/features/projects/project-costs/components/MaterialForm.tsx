@@ -79,10 +79,10 @@ export function MaterialForm({
 
   useEffect(() => {
     if (!form.getValues("unit") && materialUnits.length > 0) {
-      form.setValue("unit", materialUnits[0].value);
+      form.setValue("unit", materialUnits[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (enableGroups && !form.getValues("group_id") && groups.length > 0) {
-      form.setValue("group_id", "ungrouped");
+      form.setValue("group_id", "ungrouped", { shouldValidate: true, shouldDirty: false });
     }
   }, [materialUnits, groups, form, enableGroups]);
 
@@ -145,7 +145,7 @@ export function MaterialForm({
 
   const handleUnitChange = useCallback(
     (value: string) => {
-      form.setValue("unit", value);
+      form.setValue("unit", value, { shouldValidate: true, shouldDirty: true });
       const currentName = form.getValues("name");
       if (currentName && value) {
         findAndApplyMatch(currentName, value);
@@ -245,9 +245,13 @@ export function MaterialForm({
                 <FormControl>
                   <TranslatedSelect
                     value={field.value}
-                    onValueChange={handleUnitChange}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                      handleUnitChange(val);
+                    }}
                     options={materialUnits}
                     isLoading={isLoadingMaterialUnits}
+                    autoSelectFirst={true}
                     placeholder={t("columns.unitPlaceholder")}
                     aria-label={t("columns.unit")}
                     className="text-sm"

@@ -89,13 +89,13 @@ export function EquipmentForm({
 
   useEffect(() => {
     if (!form.getValues("rental_or_purchase") && rentalOptions.length > 0) {
-      form.setValue("rental_or_purchase", rentalOptions[0].value);
+      form.setValue("rental_or_purchase", rentalOptions[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (!form.getValues("period_unit") && periodUnits.length > 0) {
-      form.setValue("period_unit", periodUnits[0].value);
+      form.setValue("period_unit", periodUnits[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (enableGroups && !form.getValues("group_id") && groups.length > 0) {
-      form.setValue("group_id", "ungrouped");
+      form.setValue("group_id", "ungrouped", { shouldValidate: true, shouldDirty: false });
     }
   }, [rentalOptions, periodUnits, groups, form, enableGroups]);
 
@@ -165,7 +165,7 @@ export function EquipmentForm({
 
   const handlePeriodUnitChange = useCallback(
     (value: string) => {
-      form.setValue("period_unit", value);
+      form.setValue("period_unit", value, { shouldValidate: true, shouldDirty: true });
       const currentName = form.getValues("name");
       if (currentName && value) {
         findAndApplyMatch(currentName, value);
@@ -246,6 +246,7 @@ export function EquipmentForm({
                     onValueChange={field.onChange}
                     options={rentalOptions}
                     isLoading={isLoadingRentalOptions}
+                    autoSelectFirst={true}
                     placeholder={t("columns.rentalPurchasePlaceholder")}
                     aria-label={t("columns.rentalPurchase")}
                     className="text-sm"
@@ -319,9 +320,13 @@ export function EquipmentForm({
                   <FormControl>
                     <TranslatedSelect
                       value={field.value}
-                      onValueChange={handlePeriodUnitChange}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        handlePeriodUnitChange(val);
+                      }}
                       options={periodUnits}
                       isLoading={isLoadingPeriodUnits}
+                      autoSelectFirst={true}
                       placeholder={t("columns.periodUnitPlaceholder")}
                       aria-label={t("columns.periodUnit")}
                       className="text-sm"

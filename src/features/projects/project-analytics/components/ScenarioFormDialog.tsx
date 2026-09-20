@@ -230,7 +230,11 @@ export function ScenarioFormDialog({
                           scenarioForm.setValue(`impact_rules.${index}.filter_category_is`, "");
                           scenarioForm.setValue(`impact_rules.${index}.filter_worker_type_contains`, "");
                         }}>
-                          <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="text-sm">
+                            <SelectValue>
+                              {itemTypeOptions.find((opt) => opt.value === value)?.label}
+                            </SelectValue>
+                          </SelectTrigger>
                           <SelectContent>{itemTypeOptions.map(opt => <SelectItem key={opt.value} value={opt.value} className="text-sm">{opt.label}</SelectItem>)}</SelectContent>
                         </Select>
                       )}
@@ -238,7 +242,11 @@ export function ScenarioFormDialog({
                     <DynamicRuleField control={scenarioForm.control} name={`impact_rules.${index}.field`} label={t("field")}>
                       {({ value, onChange }) => (
                         <Select value={value} onValueChange={(val) => { onChange(val); scenarioForm.setValue(`impact_rules.${index}.adjustment_type`, getAdjustmentTypeOptions(rule.item_type, val)[0]?.value as any || "percentage_increase"); }}>
-                          <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="text-sm">
+                            <SelectValue>
+                              {getFieldOptions(rule.item_type).find((opt) => opt.value === value)?.label}
+                            </SelectValue>
+                          </SelectTrigger>
                           <SelectContent>{getFieldOptions(rule.item_type).map(opt => <SelectItem key={opt.value} value={opt.value} className="text-sm">{opt.label}</SelectItem>)}</SelectContent>
                         </Select>
                       )}
@@ -246,7 +254,11 @@ export function ScenarioFormDialog({
                     <DynamicRuleField control={scenarioForm.control} name={`impact_rules.${index}.adjustment_type`} label={t("adjustmentType")}>
                       {({ value, onChange }) => (
                         <Select value={value} onValueChange={(val: ScenarioRuleFormValues["adjustment_type"]) => onChange(val)}>
-                          <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="text-sm">
+                            <SelectValue>
+                              {getAdjustmentTypeOptions(rule.item_type, rule.field).find((opt) => opt.value === value)?.label}
+                            </SelectValue>
+                          </SelectTrigger>
                           <SelectContent>{getAdjustmentTypeOptions(rule.item_type, rule.field).map(opt => <SelectItem key={opt.value} value={opt.value} className="text-sm">{opt.label}</SelectItem>)}</SelectContent>
                         </Select>
                       )}
