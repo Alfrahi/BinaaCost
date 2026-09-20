@@ -114,10 +114,11 @@ export default function AssemblyImporter({
           );
         }
         default: {
-          const scaledQty = Number((item.quantity * scaleFactor).toFixed(4));
+          const rawItem = item as any;
+          const scaledQty = Number(((rawItem.quantity || 0) * scaleFactor).toFixed(4));
           return (
             <bdi>
-              {`${scaledQty} ${item.unit || t("common:unit")} @ ${formattedPrice}`}
+              {`${scaledQty} ${rawItem.unit || t("common:unit")} @ ${formattedPrice}`}
             </bdi>
           );
         }

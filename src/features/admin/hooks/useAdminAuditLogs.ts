@@ -59,8 +59,8 @@ export function useAdminAuditLogs(
     staleTime: 1000 * 30,
   });
 
-  const logs = logsData;
-  const totalLogs = logs.length > 0 ? logs[0].total_rows : 0;
+  const logs = logsData ?? [];
+  const totalLogs = logs.length > 0 ? (logs[0]?.total_rows ?? 0) : 0;
   const totalPages = Math.ceil(totalLogs / pageSize);
 
   return {

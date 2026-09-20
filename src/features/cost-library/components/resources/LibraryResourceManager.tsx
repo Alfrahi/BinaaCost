@@ -385,9 +385,9 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
                     col.minWidth ? MIN_WIDTH_CLASSES[col.minWidth] : "",
                   )}
                 >
-                  {col.format
+                  {(col.format
                     ? col.format(item[col.key], item)
-                    : item[col.key] ?? ""}
+                    : (item[col.key] as any) ?? "") as React.ReactNode}
                 </TableCell>
               ))}
             <TableCell className="px-3 py-2 flex gap-2 justify-end min-w-[100px]">

@@ -13,7 +13,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Heading } from "@/shared/components/ui/heading";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { Separator } from "@/shared/components/ui/separator";
 import { useAuth } from "@/features/auth";
@@ -50,14 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     },
     { name: t("navigation:analytics"), href: "/analytics", icon: BarChart },
     { name: t("navigation:settings"), href: "/settings", icon: Settings },
-  ];
-
-  const adminNavigation = [
-    {
-      name: t("navigation:adminPanel"),
-      href: "/admin",
-      icon: ShieldCheck,
-    },
   ];
 
   const isActive = (path: string) =>

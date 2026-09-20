@@ -200,8 +200,8 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
                   </div>
                 }
               >
-                <LazyChartContainer height="220px">
-                  <div dir="ltr" className="h-full w-full">
+                <LazyChartContainer>
+                  <div dir="ltr" className="h-[220px] w-full">
                     <ReactECharts
                       option={pieChartOptions}
                       style={{ height: "100%", width: "100%" }}

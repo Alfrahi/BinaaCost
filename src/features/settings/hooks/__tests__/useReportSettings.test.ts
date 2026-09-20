@@ -21,7 +21,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
   }),
-  useQuery: ({ queryFn }: any) => {
+  useQuery: ({ queryFn: _queryFn }: any) => {
     return {
       data: undefined,
       isLoading: false,

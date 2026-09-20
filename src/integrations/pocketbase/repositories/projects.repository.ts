@@ -1,4 +1,4 @@
-import { BaseRepository, PaginatedResult } from "./base.repository";
+import { BaseRepository } from "./base.repository";
 import { Project, ProjectGroup } from "@/features/projects/project-core/types/project";
 import { RecordListOptions } from "pocketbase";
 

@@ -15,7 +15,6 @@ import { useProjectData } from "@/features/projects/project-core/hooks/useProjec
 import CommentsDrawer from "@/features/projects/project-core/components/CommentsDrawer";
 import { useProjectComments } from "@/features/projects/project-core/hooks/useProjectComments";
 import { useScenarioManager } from "@/features/projects/project-analytics/hooks/useScenarioManager";
-import { calculateCategoryTotal } from "@/shared/logic/shared";
 import {
   LayoutDashboard,
   Receipt,
