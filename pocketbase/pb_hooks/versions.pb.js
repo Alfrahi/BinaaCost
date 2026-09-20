@@ -568,6 +568,31 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
         txApp.save(rec);
       }
     }
+
+    // Restore project-level currency and financial settings if captured in snapshot
+    if (snapshot.project) {
+      try {
+        const pRec = txApp.findRecordById("projects", projectId);
+        let projectChanged = false;
+        if (snapshot.project.currency && pRec.get("currency") !== snapshot.project.currency) {
+          pRec.set("currency", snapshot.project.currency);
+          projectChanged = true;
+        }
+        if (snapshot.project.financial_settings !== undefined && snapshot.project.financial_settings !== null) {
+          pRec.set("financial_settings", snapshot.project.financial_settings);
+          projectChanged = true;
+        }
+        if (snapshot.project.financial_settings_confirmed !== undefined) {
+          pRec.set("financial_settings_confirmed", snapshot.project.financial_settings_confirmed);
+          projectChanged = true;
+        }
+        if (projectChanged) {
+          txApp.save(pRec);
+        }
+      } catch (err) {
+        $app.logger().error("failed to restore project settings during version apply", "err", String(err));
+      }
+    }
   });
 
   return e.json(200, { success: true });
