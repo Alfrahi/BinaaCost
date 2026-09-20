@@ -47,6 +47,23 @@ const LazyProjectCostReport = React.lazy(() =>
   })),
 );
 
+const reportTabItems = [
+  {
+    value: "project-cost",
+    labelKey: "project_reports:detailedCostReport",
+    icon: DollarSign,
+    badgeKey: "project_reports:internalLabel",
+    badgeVariant: "muted",
+  },
+  {
+    value: "client-proposal",
+    labelKey: "project_reports:clientProposal",
+    icon: Users,
+    badgeKey: "project_reports:clientFacingLabel",
+    badgeVariant: "default",
+  },
+] as const;
+
 export default function ReportsTab({
   project,
   materialsTotal,
@@ -177,27 +194,6 @@ export default function ReportsTab({
   };
 
   const sanitizedTerms = useMemo(() => sanitizeText(terms) || "", [terms]);
-
-  const reportTabItems = useMemo(
-    () =>
-      [
-        {
-          value: "project-cost",
-          labelKey: "project_reports:detailedCostReport",
-          icon: DollarSign,
-          badgeKey: "project_reports:internalLabel",
-          badgeVariant: "muted",
-        },
-        {
-          value: "client-proposal",
-          labelKey: "project_reports:clientProposal",
-          icon: Users,
-          badgeKey: "project_reports:clientFacingLabel",
-          badgeVariant: "default",
-        },
-      ] as const,
-    [],
-  );
 
   const handleGeneratePdf = async (
     reportType: "clientProposal" | "projectCost",
