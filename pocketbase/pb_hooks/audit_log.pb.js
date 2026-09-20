@@ -11,7 +11,7 @@
 // fields are never logged.
 
 const TRACKED = {
-  projects: ["name", "description", "type", "size", "location", "client_requirements", "duration_days", "size_unit", "duration_unit", "currency", "financial_settings", "deleted_at"],
+  projects: ["name", "description", "type", "size", "location", "client_requirements", "duration_days", "size_unit", "duration_unit", "currency", "financial_settings", "deleted_at", "user_id"],
   project_groups: ["project_id", "name", "sort_order"],
   materials: ["project_id", "group_id", "name", "description", "quantity", "unit", "unit_price", "supplier_options"],
   labor_items: ["project_id", "group_id", "worker_type", "description", "number_of_workers", "daily_rate", "total_days", "total_cost"],
