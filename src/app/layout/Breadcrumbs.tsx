@@ -76,6 +76,16 @@ export default function Breadcrumbs() {
             } else {
               translatedSeg = seg;
             }
+          } else if (segments[0] === "admin" && idx === 1) {
+            const adminSegmentMap: Record<string, string> = {
+              users: "admin:users.title",
+              projects: "admin:projects.title",
+              settings: "admin:dropdowns.title",
+              "app-settings": "admin:appSettings.title",
+              "audit-logs": "admin:auditLogs.title",
+            };
+            const key = adminSegmentMap[seg];
+            translatedSeg = key ? t(key) : seg;
           } else {
             const translationKey = pathSegmentTranslations[seg];
             if (translationKey) {

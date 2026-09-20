@@ -13,5 +13,6 @@
   "createFirstProject": "أنشئ مشروعك الأول",
   "shared": "مشترك",
   "finalized": "معتمد",
+  "duplicateProject": "تكرار المشروع {{projectName}}",
   "noDate": "لا يوجد تاريخ"
 }

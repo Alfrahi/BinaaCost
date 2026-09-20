@@ -5,6 +5,7 @@ export * from "./project-core/hooks/useProjectData";
 export * from "./project-core/hooks/useCreateProject";
 export * from "./project-core/hooks/useUpdateProject";
 export * from "./project-core/hooks/useSoftDeleteProject";
+export * from "./project-core/hooks/useCloneProject";
 export * from "./project-core/hooks/useProjectCardSummary";
 export * from "./project-core/hooks/useProjectComments";
 export { useProjectGroupsManager } from "./project-core/hooks/useProjectGroupsManager";

@@ -4,7 +4,7 @@ import EmptyState from "@/shared/components/ui/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
-import { Calendar, Activity, AlertTriangle } from "lucide-react";
+import { Calendar, Activity, AlertTriangle, ArrowLeft } from "lucide-react";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { RoleBadge } from "@/features/admin/components/RoleBadge";
 import { Button } from "@/shared/components/ui/button";
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { cn } from "@/shared/lib/utils";
 import { useAdminUserProjects } from "@/features/admin/hooks/useAdminUserProjects";
 import { useAdminUserAuditLogs } from "@/features/admin/hooks/useAdminUserAuditLogs";
 import { useAdminUserDetails } from "@/features/admin/hooks/useAdminUserDetails";
@@ -26,7 +27,7 @@ const formatJsonForDisplay = (data: any) => {
 };
 
 export default function UserDetails() {
-  const { t } = useTranslation(["admin", "common"]);
+  const { t, i18n } = useTranslation(["admin", "common"]);
   const { formatDate } = useDateFormatter();
   const { userId } = useParams();
 
@@ -72,11 +73,18 @@ export default function UserDetails() {
   return (
     <div className="space-y-6 text-sm">
       <PageHeader
-        title={t("admin:users.userDetails")}
-        actions={
-          <Button variant="outline" asChild className="text-sm">
-            <Link to="/admin/users">{t("common:back")}</Link>
-          </Button>
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin/users" aria-label={t("admin:users.title")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:users.userDetails")}</span>
+          </div>
         }
       />
 

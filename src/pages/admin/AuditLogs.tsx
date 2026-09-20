@@ -12,10 +12,11 @@ import { useTranslation } from "react-i18next";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { X, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { cn } from "@/shared/lib/utils";
+import { Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -38,7 +39,7 @@ const formatJsonForDisplay = (data: any) => {
 };
 
 export default function AuditLogs() {
-  const { t } = useTranslation(["admin", "common"]);
+  const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
   const { formatDate } = useDateFormatter();
   const [search, setSearch] = useState("");
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
@@ -67,7 +68,21 @@ export default function AuditLogs() {
 
   return (
     <div className="space-y-6 text-sm">
-      <PageHeader title={t("admin:auditLogs.title")} />
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin" aria-label={t("navigation:adminPanel")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:auditLogs.title")}</span>
+          </div>
+        }
+      />
 
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1 max-w-md">

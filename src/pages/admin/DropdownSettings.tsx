@@ -1,7 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import SettingsSection from "@/features/admin/components/SettingsSection";
 import { useRole } from "@/features/auth";
 import PageHeader from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/lib/utils";
 
 interface SettingsCategory {
   key: string;
@@ -58,13 +62,25 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
 ];
 
 export default function DropdownSettings() {
-  const { t } = useTranslation(["admin", "common"]);
+  const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
   const { isSuperAdmin, isAdmin } = useRole();
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t("admin:dropdowns.title")}
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin" aria-label={t("navigation:adminPanel")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:dropdowns.title")}</span>
+          </div>
+        }
         description={t("admin:dropdowns.description")}
       />
       <div className="space-y-8">
