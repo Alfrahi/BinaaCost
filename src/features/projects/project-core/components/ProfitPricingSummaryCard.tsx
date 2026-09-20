@@ -52,10 +52,23 @@ export default function ProfitPricingSummaryCard({
   const financials = useMemo(
     () =>
       calculateProjectFinancials(
-        { materialsTotal, laborTotal, equipmentTotal, additionalTotal },
+        {
+          materialsTotal,
+          laborTotal,
+          equipmentTotal,
+          additionalTotal,
+          riskContingency,
+        },
         settings,
       ),
-    [materialsTotal, laborTotal, equipmentTotal, additionalTotal, settings],
+    [
+      materialsTotal,
+      laborTotal,
+      equipmentTotal,
+      additionalTotal,
+      riskContingency,
+      settings,
+    ],
   );
 
   return (
@@ -80,6 +93,9 @@ export default function ProfitPricingSummaryCard({
             locationAdjustmentAmount: financials.locationAdjustmentAmount,
             overheadAmount: financials.overheadAmount,
             contingencyAmount: financials.contingencyAmount,
+            contingencyBasis: financials.contingencyBasis,
+            flatContingencyAmount: financials.flatContingencyAmount,
+            riskContingencyAmount: financials.riskContingencyAmount,
             primeCost: financials.primeCost,
             markupAmount: financials.markupAmount,
             bidPrice: financials.bidPrice,

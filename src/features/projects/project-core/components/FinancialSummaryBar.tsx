@@ -17,6 +17,7 @@ interface FinancialSummaryBarProps {
     laborTotal: number;
     equipmentTotal: number;
     additionalTotal: number;
+    riskContingency?: number;
   };
   currency?: string;
   settings?: FinancialSettings;
@@ -69,7 +70,12 @@ export default function FinancialSummaryBar({
     },
     {
       key: "contingency",
-      label: t("project_detail:profit_pricing.generalContingency"),
+      label:
+        financials.contingencyBasis === "risk_register"
+          ? t("project_detail:profit_pricing.riskRegisterContingency")
+          : financials.contingencyBasis === "combined"
+            ? t("project_detail:profit_pricing.combinedContingency")
+            : t("project_detail:profit_pricing.generalContingency"),
       value: financials.contingencyAmount,
     },
     {

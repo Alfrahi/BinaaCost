@@ -97,7 +97,7 @@ interface MemoizedRowProps<T> {
 }
 
 const MemoizedRow = React.memo(
-  function MemoizedRow<T>({ row, rowKey, isSelected, onToggle, renderRow }: MemoizedRowProps<T>) {
+  function MemoizedRow<T>({ row, rowKey: _rowKey, isSelected, onToggle, renderRow }: MemoizedRowProps<T>) {
     return <>{renderRow(row, { isSelected, onToggle })}</>;
   },
   (prev, next) => {
@@ -166,8 +166,20 @@ function DataTable<T>({
   }, [data, searchable, search, getSearchText, sort, sortable, columns]);
 
   const displayData = React.useMemo(() => {
+    const shouldPaginate =
+      pagination?.pageSize !== undefined && pagination.pageSize > 0;
+    const pageStart = shouldPaginate
+      ? pagination.currentPage * pagination.pageSize!
+      : 0;
+    const pageEnd = shouldPaginate
+      ? pageStart + pagination.pageSize!
+      : filteredData.length;
+
     if (!hasGroups || !groupRows.groups || groupRows.groups.length === 0) {
-      return filteredData.map((row) => ({ type: "item" as const, row }));
+      const pagedRows = shouldPaginate
+        ? filteredData.slice(pageStart, pageEnd)
+        : filteredData;
+      return pagedRows.map((row) => ({ type: "item" as const, row }));
     }
 
     const grouped: Record<string, T[]> = {};
@@ -183,31 +195,58 @@ function DataTable<T>({
       }
     });
 
-    const result: Array<{ type: "header" | "item"; group?: { id: string; name: string }; row?: T }> = [];
-
+    const orderedRowsWithGroup: Array<{ groupId: string; row: T }> = [];
     groupRows.groups.forEach((group) => {
       const groupItems = grouped[group.id] || [];
-      if (groupItems.length > 0) {
-        result.push({ type: "header", group });
-        groupItems.forEach((row) => result.push({ type: "item", row }));
+      groupItems.forEach((row) =>
+        orderedRowsWithGroup.push({ groupId: group.id, row }),
+      );
+    });
+    ungrouped.forEach((row) =>
+      orderedRowsWithGroup.push({ groupId: "ungrouped", row }),
+    );
+
+    const pagedRowsWithGroup = shouldPaginate
+      ? orderedRowsWithGroup.slice(pageStart, pageEnd)
+      : orderedRowsWithGroup;
+
+    const result: Array<{
+      type: "header" | "item";
+      group?: { id: string; name: string };
+      row?: T;
+    }> = [];
+
+    let currentGroupId: string | null = null;
+    const groupMap = new Map(groupRows.groups.map((g) => [g.id, g]));
+
+    pagedRowsWithGroup.forEach(({ groupId, row }) => {
+      if (groupId !== currentGroupId) {
+        currentGroupId = groupId;
+        if (groupId === "ungrouped") {
+          result.push({
+            type: "header",
+            group: {
+              id: "ungrouped",
+              name:
+                groupRows.ungroupedLabel ||
+                t(
+                  groupRows.ungroupedLabelKey ||
+                    "project_detail:groups.ungrouped",
+                ),
+            },
+          });
+        } else {
+          const grp = groupMap.get(groupId);
+          if (grp) {
+            result.push({ type: "header", group: grp });
+          }
+        }
       }
+      result.push({ type: "item", row });
     });
 
-    if (ungrouped.length > 0) {
-      if (groupRows.groups.length > 0) {
-        result.push({
-          type: "header",
-          group: {
-            id: "ungrouped",
-            name: groupRows.ungroupedLabel || t(groupRows.ungroupedLabelKey || "project_detail:groups.ungrouped"),
-          },
-        });
-      }
-      ungrouped.forEach((row) => result.push({ type: "item", row }));
-    }
-
     return result;
-  }, [filteredData, hasGroups, groupRows, t]);
+  }, [filteredData, hasGroups, groupRows, pagination, t]);
 
   const totalColSpan = columns.length + (hasSelection ? 1 : 0);
 

@@ -15,11 +15,14 @@ import { Decimal } from "@/shared/lib/math";
  * 2. DB schema can evolve (e.g. add new fields) without breaking calculation API.
  * 3. Default values live in one place (DEFAULT_FINANCIAL_SETTINGS) not duplicated.
  */
+export type ContingencyBasis = "flat" | "risk_register" | "combined";
+
 export interface FinancialSettings {
   overhead_percent: number;
   markup_percent: number;
   tax_percent: number;
   contingency_percent: number;
+  contingency_basis?: ContingencyBasis;
   /** Optional location cost multiplier (e.g. 1.15 = +15%) applied to direct costs before any percent loadings. */
   location_factor?: number;
   /** Human-readable label for the location factor (e.g. "Riyadh"). */
@@ -31,6 +34,7 @@ export const DEFAULT_FINANCIAL_SETTINGS: FinancialSettings = {
   markup_percent: 20,
   tax_percent: 0,
   contingency_percent: 5,
+  contingency_basis: "flat",
   location_factor: 1,
 };
 
@@ -53,6 +57,9 @@ export interface FinancialSummary {
   directCosts: number;
   overheadAmount: number;
   contingencyAmount: number;
+  contingencyBasis: ContingencyBasis;
+  flatContingencyAmount: number;
+  riskContingencyAmount: number;
   primeCost: number;
   markupAmount: number;
   bidPrice: number;
@@ -60,11 +67,12 @@ export interface FinancialSummary {
   grandTotal: number;
 }
 
-interface CostInputs {
+export interface CostInputs {
   materialsTotal: number;
   laborTotal: number;
   equipmentTotal: number;
   additionalTotal: number;
+  riskContingency?: number;
 }
 
 export function calculateProjectFinancials(
@@ -112,10 +120,24 @@ export function calculateProjectFinancials(
     .dividedBy(100)
     .toDecimalPlaces(2);
 
-  const contingencyAmount = directCosts
+  const basis: ContingencyBasis = settings.contingency_basis ?? "flat";
+
+  const flatContingencyAmount = directCosts
     .times(settings.contingency_percent || 0)
     .dividedBy(100)
     .toDecimalPlaces(2);
+
+  const riskContingencyAmount = new Decimal(costs.riskContingency || 0).toDecimalPlaces(2);
+
+  let contingencyAmount: Decimal;
+  if (basis === "risk_register") {
+    contingencyAmount = riskContingencyAmount;
+  } else if (basis === "combined") {
+    contingencyAmount = flatContingencyAmount.plus(riskContingencyAmount).toDecimalPlaces(2);
+  } else {
+    // "flat"
+    contingencyAmount = flatContingencyAmount;
+  }
 
   const primeCost = directCosts
     .plus(overheadAmount)
@@ -146,6 +168,9 @@ export function calculateProjectFinancials(
     directCosts: directCosts.toNumber(),
     overheadAmount: overheadAmount.toNumber(),
     contingencyAmount: contingencyAmount.toNumber(),
+    contingencyBasis: basis,
+    flatContingencyAmount: flatContingencyAmount.toNumber(),
+    riskContingencyAmount: riskContingencyAmount.toNumber(),
     primeCost: primeCost.toNumber(),
     markupAmount: markupAmount.toNumber(),
     bidPrice: bidPrice.toNumber(),

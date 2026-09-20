@@ -45,7 +45,13 @@ export function QuickAddRow({
   ariaLabel,
   className,
 }: QuickAddRowProps) {
-  const { t } = useTranslation(["common"]);
+  const { t } = useTranslation([
+    "common",
+    "project_materials",
+    "project_labor",
+    "project_equipment",
+    "project_additional",
+  ]);
 
   const getInitialValue = useCallback((f: QuickAddField) => {
     return f.defaultValue ?? (f.type === "select" && f.options?.length ? f.options[0].value : "");
@@ -87,7 +93,9 @@ export function QuickAddRow({
   const handleSubmit = useCallback(async () => {
     const parsed = schema.safeParse(buildValues(values));
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? t("common:error"));
+      const rawMessage = parsed.error.issues[0]?.message;
+      const translated = rawMessage ? t(rawMessage) : t("common:error");
+      setError(translated);
       return;
     }
     try {

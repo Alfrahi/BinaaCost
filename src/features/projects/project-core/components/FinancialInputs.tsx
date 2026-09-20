@@ -13,6 +13,13 @@ import {
   FinancialAssumptionsStrip,
   DefaultAssumptionsWarning,
 } from "../../project-reports/components/FinancialAssumptions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { FinancialSettings, DEFAULT_FINANCIAL_SETTINGS } from "@/shared/logic/financials";
 
 const settingsSchema = z.object({
@@ -20,6 +27,7 @@ const settingsSchema = z.object({
   markup_percent: z.coerce.number().min(0, "project_detail:profit_pricing.markupError"),
   tax_percent: z.coerce.number().min(0, "project_detail:profit_pricing.taxError"),
   contingency_percent: z.coerce.number().min(0, "project_detail:profit_pricing.generalContingencyError"),
+  contingency_basis: z.enum(["flat", "risk_register", "combined"]).optional(),
   location_factor: z.coerce.number().min(0.01, "project_detail:profit_pricing.locationFactorError").optional(),
 });
 
@@ -109,6 +117,43 @@ export function FinancialInputs({
           </div>
 
           <div>
+            <Label htmlFor="contingency-basis" className="text-sm text-muted-foreground">
+              {t("project_detail:profit_pricing.contingencyBasis")}
+            </Label>
+            <div className="mt-1">
+              <Select
+                value={settings.contingency_basis || "flat"}
+                onValueChange={(val: "flat" | "risk_register" | "combined") => {
+                  setSettings((prev) => ({ ...prev, contingency_basis: val }));
+                  setIsDirty(true);
+                }}
+              >
+                <SelectTrigger id="contingency-basis" className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="flat">
+                    {t("project_detail:profit_pricing.contingencyBasisFlat")}
+                  </SelectItem>
+                  <SelectItem value="risk_register">
+                    {t("project_detail:profit_pricing.contingencyBasisRiskRegister")}
+                  </SelectItem>
+                  <SelectItem value="combined">
+                    {t("project_detail:profit_pricing.contingencyBasisCombined")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {settings.contingency_basis === "risk_register"
+                ? t("project_detail:profit_pricing.contingencyBasisRiskRegisterDesc")
+                : settings.contingency_basis === "combined"
+                  ? t("project_detail:profit_pricing.contingencyBasisCombinedDesc")
+                  : t("project_detail:profit_pricing.contingencyBasisFlatDesc")}
+            </p>
+          </div>
+
+          <div>
             <Label htmlFor="contingency" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.generalContingency")}
             </Label>
@@ -120,10 +165,15 @@ export function FinancialInputs({
                 value={settings.contingency_percent}
                 onChange={(e) => handleChange("contingency_percent", e.target.value)}
                 className="pe-8 text-sm"
+                disabled={settings.contingency_basis === "risk_register"}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">%</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t("project_detail:profit_pricing.generalContingencyDesc")}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {settings.contingency_basis === "risk_register"
+                ? t("project_detail:profit_pricing.generalContingencyIgnored")
+                : t("project_detail:profit_pricing.generalContingencyDesc")}
+            </p>
           </div>
 
           <div>
