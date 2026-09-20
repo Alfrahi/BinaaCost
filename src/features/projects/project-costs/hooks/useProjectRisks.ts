@@ -170,8 +170,6 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
       }
       await updateRisk.mutateAsync({
         id,
-        project_id: projectId,
-        user_id: user.id,
         description: sanitizeText(values.description),
         probability: sanitizeText(values.probability),
         impact_amount: values.impact_amount,
@@ -179,7 +177,7 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
         contingency_amount: values.contingency_amount,
       });
     },
-    [updateRisk, projectId, user?.id, t],
+    [updateRisk, user?.id, t],
   );
 
   const handleDeleteRisk = useCallback(

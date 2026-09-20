@@ -51,6 +51,13 @@ describe("executePbMutation", () => {
     expect(collectionMock.update).toHaveBeenCalledWith("abc", payload);
   });
 
+  it("UPDATE strips immutable user_id from update payload", async () => {
+    collectionMock.update.mockResolvedValue({ id: "abc", name: "New" });
+    const payload = { id: "abc", name: "New", user_id: "u123" };
+    await executePbMutation({ table: "materials", operation: "UPDATE", payload });
+    expect(collectionMock.update).toHaveBeenCalledWith("abc", { id: "abc", name: "New" });
+  });
+
   it("DELETE requires an id and resolves null", async () => {
     await expect(
       executePbMutation({ table: "materials", operation: "DELETE", payload: {} }),
@@ -84,6 +91,22 @@ describe("executePbMutation", () => {
       table: "materials",
       operation: "BULK_UPDATE",
       payload: { ids: ["a", "b"], data: { archived: true } },
+    });
+    expect(collectionMock.update).toHaveBeenCalledTimes(2);
+    expect(collectionMock.update).toHaveBeenNthCalledWith(1, "a", {
+      archived: true,
+    });
+    expect(collectionMock.update).toHaveBeenNthCalledWith(2, "b", {
+      archived: true,
+    });
+  });
+
+  it("BULK_UPDATE strips immutable user_id from update data", async () => {
+    collectionMock.update.mockResolvedValue({});
+    await executePbMutation({
+      table: "materials",
+      operation: "BULK_UPDATE",
+      payload: { ids: ["a", "b"], data: { archived: true, user_id: "u123" } },
     });
     expect(collectionMock.update).toHaveBeenCalledTimes(2);
     expect(collectionMock.update).toHaveBeenNthCalledWith(1, "a", {
