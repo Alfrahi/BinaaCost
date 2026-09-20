@@ -101,4 +101,51 @@ describe("QuickAddRow", () => {
     expect(nameInput.value).toBe("");
     expect(qtyInput.value).toBe("");
   });
+
+  it("respects conditional visibility and formatLabel", () => {
+    const conditionalFields: QuickAddField[] = [
+      {
+        key: "type",
+        label: "Type",
+        type: "select",
+        options: [
+          { value: "Rental", label: "Rental" },
+          { value: "Purchase", label: "Purchase" },
+        ],
+      },
+      {
+        key: "price",
+        label: "Price",
+        formatLabel: (vals) => (vals.type === "Purchase" ? "Purchase Price" : "Rental Rate"),
+      },
+      {
+        key: "duration",
+        label: "Duration",
+        conditional: (vals) => vals.type !== "Purchase",
+      },
+    ];
+
+    render(
+      <QuickAddRow
+        fields={conditionalFields}
+        schema={z.object({ type: z.string(), price: z.string().optional() })}
+        buildValues={(vals) => vals}
+        onSubmit={vi.fn()}
+        submitLabel="Add"
+        ariaLabel="Add item"
+      />,
+    );
+
+    // Initially type is "Rental" -> Duration is visible, Price label is "Rental Rate"
+    expect(screen.getByLabelText("Rental Rate")).toBeTruthy();
+    expect(screen.getByLabelText("Duration")).toBeTruthy();
+
+    // Change type to "Purchase"
+    const select = screen.getByLabelText("Type") as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: "Purchase" } });
+
+    // Duration is now hidden, Price label is "Purchase Price"
+    expect(screen.queryByLabelText("Duration")).toBeNull();
+    expect(screen.getByLabelText("Purchase Price")).toBeTruthy();
+  });
 });

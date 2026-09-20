@@ -74,7 +74,7 @@ export function AssemblyEquipmentForm({
   });
 
   const rentalOrPurchase = form.watch("rental_or_purchase");
-  const isPurchase = rentalOrPurchase === "Purchase";
+  const isPurchase = rentalOrPurchase?.toLowerCase() === "purchase";
 
   useEffect(() => {
     if (!form.getValues("rental_or_purchase") && rentalOptions.length > 0) {
