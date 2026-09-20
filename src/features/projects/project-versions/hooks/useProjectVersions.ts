@@ -5,16 +5,13 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { handleError } from "@/shared/lib/toast";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
-export interface ProjectVersion {
-  id: string;
-  name: string;
-  created_at: string;
-  is_final: boolean;
-  created_by_user_id?: string;
-  author_name?: string;
-  data?: any;
-}
+import type {
+  ProjectVersion,
+  ProjectSnapshotData,
+} from "../types/version";
+export type { ProjectVersion, ProjectSnapshotData };
 
 export function useProjectVersions(projectId: string) {
   const { t } = useTranslation(["project_versions", "common"]);
@@ -49,15 +46,15 @@ export function useProjectVersions(projectId: string) {
       }));
     },
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: STALE_TIME.LISTS,
   });
 
   const fetchVersionSnapshot = async (
     versionId: string,
-  ): Promise<any | null> => {
+  ): Promise<ProjectSnapshotData | null> => {
     if (!versionId) return null;
     const record = await pb.collection("project_versions").getOne(versionId);
-    return record.data;
+    return (record.data as ProjectSnapshotData) || null;
   };
 
   const optimisticDeleteUpdater = (

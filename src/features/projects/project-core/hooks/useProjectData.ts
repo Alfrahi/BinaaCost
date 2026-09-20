@@ -4,10 +4,8 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useAuth } from "@/features/auth";
 import type { ProjectGroup } from "@/features/projects/project-core/types/project";
-import {
-  projectsRepository,
-  projectGroupsRepository,
-} from "@/integrations/pocketbase/repositories";
+import { projectsRepository, projectGroupsRepository } from "@/integrations/pocketbase/repositories/projects.repository";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 /**
  * Core project hook — fetches the project record, access control,
@@ -27,7 +25,7 @@ export function useProjectData(projectId?: string) {
 
   const queryOptions = {
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   };
 
   const {
@@ -63,7 +61,7 @@ export function useProjectData(projectId?: string) {
       }
     },
     enabled: !!projectId && !!user?.id && !isOwner,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const canEdit = useMemo(() => {

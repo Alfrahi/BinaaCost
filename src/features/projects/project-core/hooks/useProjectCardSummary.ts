@@ -6,6 +6,7 @@ import {
   DEFAULT_FINANCIAL_SETTINGS,
   FinancialSettings,
 } from "@/shared/logic/financials";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 export interface ProjectCardSummary {
   grandTotal: number;
@@ -85,7 +86,7 @@ export function useProjectCardSummary(
       };
     },
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   return { summary: data, isLoadingSummary: isLoading };

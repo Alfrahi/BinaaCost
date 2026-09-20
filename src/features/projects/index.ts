@@ -25,5 +25,6 @@ export type * from "./project-costs/types/schemas";
 export * from "./project-sharing/hooks/useProjectSharing";
 export * from "./project-versions/hooks/useProjectVersions";
 export * from "./project-versions/hooks/useApplyProjectVersion";
+export type * from "./project-versions/types/version";
 export * from "./project-analytics/hooks/useProjectSimulator";
 export * from "./project-analytics/hooks/useScenarioManager";

@@ -2,17 +2,8 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 
-interface AuditLog {
-  id: string;
-  action: string;
-  table_name: string;
-  record_id: string | null;
-  old_data: Record<string, any> | null;
-  new_data: Record<string, any> | null;
-  created_at: string;
-  user_email: string | null;
-  total_rows: number;
-}
+import type { AuditLog } from "../types/audit";
+export type { AuditLog };
 
 export function useAdminUserAuditLogs(userId?: string) {
   const { useQuery: useOfflineQuery } = useOfflinePb();

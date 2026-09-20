@@ -17,8 +17,7 @@ routerAdd("POST", "/api/users/resolve", (e) => {
 
   let record = null;
   try {
-    const escaped = email.replace(/"/g, '\\"');
-    record = $app.findFirstRecordByFilter("users", `email="${escaped}"`);
+    record = $app.findAuthRecordByEmail("users", email);
   } catch (_) {
     throw new NotFoundError("No user with that email");
   }
