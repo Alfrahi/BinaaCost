@@ -14,10 +14,21 @@ import { Loader2, Plus } from "lucide-react";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { toast } from "sonner";
 
+import { z } from "zod";
+
 interface AddInternalShareFormProps {
   isAdding: boolean;
   onAdd: (email: string, role: "viewer" | "editor") => Promise<void>;
 }
+
+const internalShareSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, { message: "project_detail:share.emailRequired" })
+    .email({ message: "project_detail:share.invalidEmail" }),
+  role: z.enum(["viewer", "editor"]),
+});
 
 export function AddInternalShareForm({
   isAdding,
@@ -29,11 +40,14 @@ export function AddInternalShareForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.error(t("project_detail:share.emailRequired"));
+    const result = internalShareSchema.safeParse({ email, role });
+    if (!result.success) {
+      const firstError = result.error.errors[0];
+      const messageKey = firstError?.message || "common:invalidInput";
+      toast.error(t(messageKey as any));
       return;
     }
-    await onAdd(email, role);
+    await onAdd(result.data.email, result.data.role);
     setEmail("");
     setRole("viewer");
   };

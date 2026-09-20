@@ -28,7 +28,7 @@ interface OfflineMutation {
     | "BULK_DELETE"
     | "BULK_UPDATE"
     | "UPSERT";
-  payload: any;
+  payload: unknown;
   queryKey: QueryKey;
   userId: string;
   retries: number;
@@ -45,7 +45,7 @@ const scopedKey = (base: string, userId: string) => `${base}_${userId}`;
 
 // M1: payloads are stored as plain objects now; legacy entries were base64.
 // Decode either form.
-function decodePayload(payload: any): any {
+function decodePayload(payload: unknown): unknown {
   if (payload && typeof payload === "object") {
     return payload;
   }
@@ -56,8 +56,10 @@ function decodePayload(payload: any): any {
 }
 
 // M2: detect a PocketBase unique-constraint error on client_mutation_id.
-function isClientMutationIdConflict(err: any): boolean {
-  const msg = String(err?.message ?? err?.data?.message ?? "");
+function isClientMutationIdConflict(err: unknown): boolean {
+  const errObj = typeof err === "object" && err !== null ? (err as Record<string, unknown>) : {};
+  const dataObj = typeof errObj.data === "object" && errObj.data !== null ? (errObj.data as Record<string, unknown>) : {};
+  const msg = String(errObj.message ?? dataObj.message ?? "");
   return (
     /client_mutation_id/i.test(msg) &&
     /unique|constraint|already exists/i.test(msg)
@@ -259,7 +261,7 @@ class OfflineManager {
     mutation: Omit<
       OfflineMutation,
       "id" | "retries" | "createdAt" | "payload"
-    > & { payload: any },
+    > & { payload: unknown },
   ) {
     // M1: store the plain object (structured clone) — no base64, so Unicode
     // (e.g. Arabic) round-trips byte-identically.
@@ -267,8 +269,10 @@ class OfflineManager {
     // lost response can't create a duplicate row.
     const mutationId = crypto.randomUUID();
     const payload =
-      mutation.type === "INSERT"
-        ? { ...mutation.payload, client_mutation_id: mutationId }
+      mutation.type === "INSERT" &&
+      typeof mutation.payload === "object" &&
+      mutation.payload !== null
+        ? { ...(mutation.payload as Record<string, unknown>), client_mutation_id: mutationId }
         : mutation.payload;
 
     const newMutation: OfflineMutation = {

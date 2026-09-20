@@ -33,12 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(next);
       if (next?.id) {
         offlineManager.init(next.id);
+      } else {
+        offlineManager.reset();
+        queryClient.clear();
       }
     }, true);
 
     setLoading(false);
     return unsubscribe;
-  }, []);
+  }, [queryClient]);
 
   const role = useMemo(
     () => (user?.role as string | undefined) ?? null,

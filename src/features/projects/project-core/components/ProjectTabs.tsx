@@ -9,6 +9,8 @@ import PageLoader from "@/shared/components/PageLoader";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import ErrorDisplay from "@/shared/components/ErrorDisplay";
 import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
 import CommentsDrawer from "@/features/projects/project-core/components/CommentsDrawer";
 import { useProjectComments } from "@/features/projects/project-core/hooks/useProjectComments";
@@ -66,6 +68,18 @@ const tabVariants = {
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -10 },
 };
+
+function TabErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  return (
+    <div className="p-6 bg-card rounded-lg border border-border my-4">
+      <ErrorDisplay
+        error={error}
+        onRetry={resetErrorBoundary}
+        fullPage={false}
+      />
+    </div>
+  );
+}
 
 function ProjectTabsComponent({
   projectId,
@@ -306,110 +320,126 @@ function ProjectTabsComponent({
           >
             <Suspense fallback={<PageLoader className="h-40" />}>
               <TabsContent value="overview" className="mt-4">
-                <LazyOverviewTab
-                  project={project}
-                  sizeUnits={sizeUnits}
-                  projectTypes={projectTypes}
-                  durationUnits={durationUnits}
-                  totals={totals}
-                  materials={materials}
-                  labor={labor}
-                  equipment={equipment}
-                  additional={additional}
-                  onAddCosts={() => setActiveTab("costs")}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyOverviewTab
+                    project={project}
+                    sizeUnits={sizeUnits}
+                    projectTypes={projectTypes}
+                    durationUnits={durationUnits}
+                    totals={totals}
+                    materials={materials}
+                    labor={labor}
+                    equipment={equipment}
+                    additional={additional}
+                    onAddCosts={() => setActiveTab("costs")}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="costs" className="mt-4">
-                <LazyCostsTab
-                  projectId={projectId}
-                  groups={groups}
-                  canEdit={canEdit}
-                  currency={project.currency}
-                  onOpenComments={handleOpenComments}
-                  materialUnits={materialUnits}
-                  isLoadingMaterialUnits={isLoadingMaterialUnits}
-                  rentalOptions={rentalOptions}
-                  isLoadingRentalOptions={isLoadingRentalOptions}
-                  periodUnits={periodUnits}
-                  isLoadingPeriodUnits={isLoadingPeriodUnits}
-                  additionalCategories={additionalCategories}
-                  isLoadingAdditionalCategories={isLoadingAdditionalCategories}
-                  locationFactor={project.financial_settings?.location_factor}
-                  locationLabel={project.financial_settings?.location_label}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyCostsTab
+                    projectId={projectId}
+                    groups={groups}
+                    canEdit={canEdit}
+                    currency={project.currency}
+                    onOpenComments={handleOpenComments}
+                    materialUnits={materialUnits}
+                    isLoadingMaterialUnits={isLoadingMaterialUnits}
+                    rentalOptions={rentalOptions}
+                    isLoadingRentalOptions={isLoadingRentalOptions}
+                    periodUnits={periodUnits}
+                    isLoadingPeriodUnits={isLoadingPeriodUnits}
+                    additionalCategories={additionalCategories}
+                    isLoadingAdditionalCategories={isLoadingAdditionalCategories}
+                    locationFactor={project.financial_settings?.location_factor}
+                    locationLabel={project.financial_settings?.location_label}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="risks" className="mt-4">
-                <LazyRiskManagementTable
-                  projectId={projectId}
-                  currency={project.currency}
-                  canEdit={canEdit}
-                  riskProbabilities={riskProbabilities}
-                  isLoadingRiskProbabilities={isLoadingRiskProbabilities}
-                  onNavigateToPricing={() => setActiveTab("profit-pricing")}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyRiskManagementTable
+                    projectId={projectId}
+                    currency={project.currency}
+                    canEdit={canEdit}
+                    riskProbabilities={riskProbabilities}
+                    isLoadingRiskProbabilities={isLoadingRiskProbabilities}
+                    onNavigateToPricing={() => setActiveTab("profit-pricing")}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="scenario-analysis" className="mt-4">
-                <LazyScenarioAnalysisTab
-                  projectId={projectId}
-                  currency={project.currency}
-                  canEdit={canEdit}
-                  additionalCategories={additionalCategories}
-                  riskProbabilities={riskProbabilities}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyScenarioAnalysisTab
+                    projectId={projectId}
+                    currency={project.currency}
+                    canEdit={canEdit}
+                    additionalCategories={additionalCategories}
+                    riskProbabilities={riskProbabilities}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="profit-pricing" className="mt-4">
-                <LazyProfitPricingSummaryCard
-                  projectId={projectId}
-                  materialsTotal={totals.materialsTotal}
-                  laborTotal={totals.laborTotal}
-                  equipmentTotal={totals.equipmentTotal}
-                  additionalTotal={totals.additionalTotal}
-                  currency={project.currency}
-                  initialSettings={project.financial_settings}
-                  settingsConfirmed={project.financial_settings_confirmed}
-                  scenarioCount={scenarios.length}
-                  onNavigateToRisks={() => setActiveTab("risks")}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyProfitPricingSummaryCard
+                    projectId={projectId}
+                    materialsTotal={totals.materialsTotal}
+                    laborTotal={totals.laborTotal}
+                    equipmentTotal={totals.equipmentTotal}
+                    additionalTotal={totals.additionalTotal}
+                    currency={project.currency}
+                    initialSettings={project.financial_settings}
+                    settingsConfirmed={project.financial_settings_confirmed}
+                    scenarioCount={scenarios.length}
+                    onNavigateToRisks={() => setActiveTab("risks")}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="analytics" className="mt-4">
-                <LazyAnalyticsTab
-                  materialsTotal={totals.materialsTotal}
-                  laborTotal={totals.laborTotal}
-                  equipmentTotal={totals.equipmentTotal}
-                  additionalTotal={totals.additionalTotal}
-                  currency={project.currency}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyAnalyticsTab
+                    materialsTotal={totals.materialsTotal}
+                    laborTotal={totals.laborTotal}
+                    equipmentTotal={totals.equipmentTotal}
+                    additionalTotal={totals.additionalTotal}
+                    currency={project.currency}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="reports" className="mt-4">
-                <LazyReportsTab
-                  project={project}
-                  materialsTotal={totals.materialsTotal}
-                  laborTotal={totals.laborTotal}
-                  equipmentTotal={totals.equipmentTotal}
-                  additionalTotal={totals.additionalTotal}
-                  groups={groups}
-                  materialUnits={materialUnits}
-                  periodUnits={periodUnits}
-                  additionalCategories={additionalCategories}
-                  riskProbabilities={riskProbabilities}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyReportsTab
+                    project={project}
+                    materialsTotal={totals.materialsTotal}
+                    laborTotal={totals.laborTotal}
+                    equipmentTotal={totals.equipmentTotal}
+                    additionalTotal={totals.additionalTotal}
+                    groups={groups}
+                    materialUnits={materialUnits}
+                    periodUnits={periodUnits}
+                    additionalCategories={additionalCategories}
+                    riskProbabilities={riskProbabilities}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="versions" className="mt-4">
-                <LazyProjectVersionsTab
-                  projectId={projectId}
-                  canEdit={canEdit}
-                  materialUnits={materialUnits}
-                  periodUnits={periodUnits}
-                  additionalCategories={additionalCategories}
-                  riskProbabilities={riskProbabilities}
-                />
+                <ErrorBoundary FallbackComponent={TabErrorFallback}>
+                  <LazyProjectVersionsTab
+                    projectId={projectId}
+                    canEdit={canEdit}
+                    materialUnits={materialUnits}
+                    periodUnits={periodUnits}
+                    additionalCategories={additionalCategories}
+                    riskProbabilities={riskProbabilities}
+                  />
+                </ErrorBoundary>
               </TabsContent>
             </Suspense>
           </motion.div>

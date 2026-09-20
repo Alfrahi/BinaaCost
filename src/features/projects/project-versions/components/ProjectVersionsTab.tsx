@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { toast } from "sonner";
+import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
 import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
@@ -110,11 +111,26 @@ export default function ProjectVersionsTab({
   const [compareAId, setCompareAId] = useState<string>("");
   const [compareBId, setCompareBId] = useState<string>("");
 
+  const versionNameSchema = useMemo(
+    () =>
+      z
+        .string()
+        .trim()
+        .min(1, { message: "project_versions:versionNameRequired" })
+        .max(100, { message: "project_versions:versionNameTooLong" }),
+    [],
+  );
+
   const handleCreateVersion = useCallback(async () => {
-    if (!newVersionName.trim()) return;
-    await createVersion({ name: newVersionName });
+    const parseResult = versionNameSchema.safeParse(newVersionName);
+    if (!parseResult.success) {
+      const errorMsg = parseResult.error.errors[0]?.message || "common:invalidInput";
+      toast.error(t(errorMsg as any));
+      return;
+    }
+    await createVersion({ name: parseResult.data });
     setNewVersionName("");
-  }, [newVersionName, createVersion]);
+  }, [newVersionName, createVersion, versionNameSchema, t]);
 
   const handleDeleteVersion = useCallback(async () => {
     if (!versionToDelete) return;

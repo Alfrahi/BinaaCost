@@ -9,12 +9,12 @@ import { X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import ReactECharts from "echarts-for-react";
-import { FinancialSummary } from "@/shared/logic/financials";
 import { SCENARIO_COLORS } from "@/shared/logic/chartPalette";
 import ChartContainer from "@/shared/components/ChartContainer";
+import { SimulationResult } from "@/features/projects/project-analytics/types/scenario";
 
 interface SimulationResultsProps {
-  simulationResult: any;
+  simulationResult: SimulationResult | null;
   currency: string;
   onClose: () => void;
 }
@@ -27,8 +27,8 @@ export function SimulationResults({
   const { t, i18n } = useTranslation(["scenario_analysis", "project_tabs", "project_detail"]);
   const { format } = useCurrencyFormatter();
 
-  const originalFinancials = simulationResult?.original?.financials as FinancialSummary | undefined;
-  const simulatedFinancials = simulationResult?.simulated?.financials as FinancialSummary | undefined;
+  const originalFinancials = simulationResult?.original?.financials;
+  const simulatedFinancials = simulationResult?.simulated?.financials;
 
   const hasData = !!simulationResult && !!originalFinancials && !!simulatedFinancials;
 
