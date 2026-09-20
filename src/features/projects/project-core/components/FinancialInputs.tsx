@@ -35,12 +35,14 @@ interface FinancialInputsProps {
   projectId: string;
   initialSettings?: FinancialSettings;
   settingsConfirmed?: boolean;
+  canEdit?: boolean;
 }
 
 export function FinancialInputs({
   projectId,
   initialSettings,
   settingsConfirmed,
+  canEdit = true,
 }: FinancialInputsProps) {
   const { t } = useTranslation(["project_detail", "common"]);
 
@@ -59,17 +61,19 @@ export function FinancialInputs({
   const updateFinancialSettings = useUpdateProjectFinancialSettings();
 
   const handleChange = useCallback((key: keyof FinancialSettings, value: string) => {
+    if (!canEdit) return;
     const numValue = value === "" ? 0 : parseFloat(value);
     setSettings((prev) => ({ ...prev, [key]: numValue }));
     setIsDirty(true);
-  }, []);
+  }, [canEdit]);
 
   const handleSave = useCallback(() => {
+    if (!canEdit) return;
     const result = settingsSchema.safeParse(settings);
     if (!result.success) return;
     updateFinancialSettings.mutate({ projectId, newSettings: settings });
     setIsDirty(false);
-  }, [settings, projectId, updateFinancialSettings]);
+  }, [canEdit, settings, projectId, updateFinancialSettings]);
 
   return (
     <div className="space-y-4">
@@ -81,7 +85,7 @@ export function FinancialInputs({
         <CardHeader className="bg-muted py-4 border-b">
           <CardTitle className="flex justify-between items-center m-0">
             {t("project_detail:profit_pricing.loadingsMarkups")}
-            {isDirty && (
+            {isDirty && canEdit && (
               <Button
                 size="sm"
                 onClick={handleSave}
@@ -98,6 +102,11 @@ export function FinancialInputs({
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6 space-y-5">
+          {!canEdit && (
+            <div className="bg-muted/70 border border-border rounded-md px-3 py-2 text-xs text-muted-foreground">
+              {t("project_detail:profit_pricing.readOnlyNotice")}
+            </div>
+          )}
           <div>
             <Label htmlFor="overhead" className="text-sm text-muted-foreground">
               {t("project_detail:profit_pricing.overhead")}
@@ -110,6 +119,7 @@ export function FinancialInputs({
                 value={settings.overhead_percent}
                 onChange={(e) => handleChange("overhead_percent", e.target.value)}
                 className="pe-8 text-sm"
+                disabled={!canEdit}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">%</span>
             </div>
@@ -127,8 +137,9 @@ export function FinancialInputs({
                   setSettings((prev) => ({ ...prev, contingency_basis: val }));
                   setIsDirty(true);
                 }}
+                disabled={!canEdit}
               >
-                <SelectTrigger id="contingency-basis" className="text-sm">
+                <SelectTrigger id="contingency-basis" className="text-sm" disabled={!canEdit}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,7 +176,7 @@ export function FinancialInputs({
                 value={settings.contingency_percent}
                 onChange={(e) => handleChange("contingency_percent", e.target.value)}
                 className="pe-8 text-sm"
-                disabled={settings.contingency_basis === "risk_register"}
+                disabled={!canEdit || settings.contingency_basis === "risk_register"}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">%</span>
             </div>
@@ -188,6 +199,7 @@ export function FinancialInputs({
                 value={settings.markup_percent}
                 onChange={(e) => handleChange("markup_percent", e.target.value)}
                 className="pe-8 text-sm"
+                disabled={!canEdit}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">%</span>
             </div>
@@ -206,6 +218,7 @@ export function FinancialInputs({
                 value={settings.tax_percent}
                 onChange={(e) => handleChange("tax_percent", e.target.value)}
                 className="pe-8 text-sm"
+                disabled={!canEdit}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">%</span>
             </div>
@@ -224,6 +237,7 @@ export function FinancialInputs({
                 value={settings.location_factor ?? 1}
                 onChange={(e) => handleChange("location_factor", e.target.value)}
                 className="pe-8 text-sm"
+                disabled={!canEdit}
               />
               <span className="absolute end-3 top-2.5 text-muted-foreground text-sm">×</span>
             </div>
@@ -231,7 +245,7 @@ export function FinancialInputs({
             <p className="text-xs text-muted-foreground mt-1">{t("project_detail:profit_pricing.locationFactorTooltip")}</p>
           </div>
 
-          {isDirty && (
+          {isDirty && canEdit && (
             <Button
               className="w-full mt-4 text-sm"
               onClick={handleSave}
