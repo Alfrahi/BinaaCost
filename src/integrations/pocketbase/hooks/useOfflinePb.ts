@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { offlineManager } from "@/shared/lib/offline";
+import { offlineManager, isNetworkOrTransientError } from "@/shared/lib/offline";
 import { executePbMutation } from "@/integrations/pocketbase/executor";
 import { ClientResponseError } from "pocketbase";
 import { useAuth } from "@/features/auth";
@@ -24,7 +24,16 @@ export function useOfflinePb() {
   }: PbQueryConfig<T>) =>
     useQuery<T, Error | ClientResponseError>({
       queryKey,
-      queryFn,
+      queryFn: async () => {
+        try {
+          return await queryFn();
+        } catch (error) {
+          if (isNetworkOrTransientError(error)) {
+            offlineManager.setIsOnline(false);
+          }
+          throw error;
+        }
+      },
       networkMode: "offlineFirst",
       enabled,
       staleTime,
@@ -47,7 +56,34 @@ export function useOfflinePb() {
       networkMode: "offlineFirst",
       mutationFn: async (payload: TVariables) => {
         if (offlineManager.getIsOnline()) {
-          return executePbMutation<TData>({ table, operation, payload });
+          try {
+            return await executePbMutation<TData>({ table, operation, payload });
+          } catch (error) {
+            // OFFL-04: Catch transient network errors and fallback to offline queue
+            if (isNetworkOrTransientError(error)) {
+              if (disableOfflineQueue) {
+                throw error;
+              }
+
+              if (!user?.id) {
+                throw error;
+              }
+
+              offlineManager.setIsOnline(false);
+
+              await offlineManager.addMutation({
+                type: operation,
+                table,
+                payload: payload,
+                queryKey: queryKey,
+                userId: user.id,
+              });
+
+              return payload as unknown as TData;
+            }
+
+            throw error;
+          }
         } else {
           if (disableOfflineQueue) {
             throw new Error(i18n.t("common:offlineOperationNotAllowed"));
