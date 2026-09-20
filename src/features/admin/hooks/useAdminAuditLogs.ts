@@ -9,10 +9,19 @@ export function useAdminAuditLogs(
   search: string,
   currentPage: number,
   pageSize: number,
+  actionFilter: string = "ALL",
+  tableFilter: string = "ALL",
 ) {
   const { useQuery: useOfflineQuery } = useOfflinePb();
 
-  const queryKey = ["audit_logs", search, currentPage, pageSize];
+  const queryKey = [
+    "audit_logs",
+    search,
+    currentPage,
+    pageSize,
+    actionFilter,
+    tableFilter,
+  ];
 
   const {
     data: logsData = [],
@@ -21,10 +30,21 @@ export function useAdminAuditLogs(
   } = useOfflineQuery<AuditLog[]>({
     queryKey,
     queryFn: async () => {
+      const parts: string[] = [];
       const term = search.trim().replace(/"/g, '\\"');
-      const filter = term
-        ? `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`
-        : "";
+      if (term) {
+        parts.push(
+          `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`,
+        );
+      }
+      if (actionFilter && actionFilter !== "ALL") {
+        parts.push(`action = "${actionFilter}"`);
+      }
+      if (tableFilter && tableFilter !== "ALL") {
+        parts.push(`table_name = "${tableFilter}"`);
+      }
+      const filter = parts.join(" && ");
+
       const result = await pb.collection("audit_logs").getList(
         currentPage,
         pageSize,

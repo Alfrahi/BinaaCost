@@ -1,5 +1,13 @@
 {
   "title": "لوحة الإدارة",
+  "stats": {
+    "overview": "نظرة عامة على النظام",
+    "totalUsers": "إجمالي المستخدمين",
+    "activeProjects": "تقديرات نشطة",
+    "deletedProjects": "قيد الاسترداد",
+    "auditEvents": "أحداث التدقيق",
+    "systemOnline": "النظام متصل"
+  },
   "users": {
     "title": "المستخدمين",
     "description": "عرض وتعديل وإدارة حسابات المستخدمين وصلاحياتهم",
@@ -24,8 +32,22 @@
     "userDetails": "تفاصيل المستخدم",
     "noProjectsFound": "لم يتم العثور على مشاريع لهذا المستخدم.",
     "noActivityFound": "لم يتم العثور على سجلات نشاط لهذا المستخدم.",
-    "accountCreated": "تم إنشاء الحساب",
-    "lastSignIn": "آخر تسجيل دخول"
+    "accountCreated": "تاريخ إنشاء الحساب",
+    "lastSignIn": "آخر تسجيل دخول",
+    "addUser": "إضافة مستخدم",
+    "createUser": "إنشاء مستخدم",
+    "firstName": "الاسم الأول",
+    "firstNamePlaceholder": "محمد",
+    "lastName": "اسم العائلة",
+    "lastNamePlaceholder": "علي",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "8 أحرف على الأقل",
+    "passwordHelper": "يجب ألا تقل كلمة المرور عن 8 أحرف.",
+    "generatePassword": "توليد كلمة مرور آمنة",
+    "emailRequired": "عنوان البريد الإلكتروني مطلوب وصالح",
+    "passwordMinLength": "يجب ألا تقل كلمة المرور عن 8 أحرف",
+    "successCreated": "تم إنشاء حساب المستخدم بنجاح!",
+    "errorCreate": "فشل إنشاء المستخدم: {{message}}"
   },
   "projects": {
     "title": "المشاريع",
@@ -46,7 +68,17 @@
     "permanentDelete": "حذف دائم",
     "confirm_permanent_delete_title": "تأكيد الحذف الدائم للمشروع",
     "confirm_permanent_delete_body": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع بيانات المشروع، بما في ذلك المواد والعمالة والمعدات والتكاليف الإضافية، بشكل دائم. هل أنت متأكد تمامًا؟",
-    "success_permanent_deleted": "تم حذف المشروع نهائيًا بنجاح!"
+    "success_permanent_deleted": "تم حذف المشروع نهائيًا بنجاح!",
+    "restore": "استعادة",
+    "restoreProject": "استعادة المشروع",
+    "successRestored": "تمت استعادة المشروع بنجاح!",
+    "errorRestore": "فشلت استعادة المشروع: {{message}}",
+    "transferOwnership": "نقل الملكية",
+    "transferDescription": "نقل ملكية '{{projectName}}' من {{currentOwner}} إلى حساب مستخدم آخر.",
+    "selectNewOwner": "اختر مالكاً جديداً",
+    "newOwner": "مالك المشروع الجديد",
+    "successOwnershipTransferred": "تم نقل ملكية المشروع بنجاح!",
+    "errorOwnershipTransfer": "فشل نقل ملكية المشروع: {{message}}"
   },
   "dropdowns": {
     "title": "إعدادات بيانات المشروع",
@@ -112,7 +144,20 @@
     "allowUserSignups": "السماح بتسجيل المستخدمين الجدد",
     "allowUserSignupsDescription": "تمكين أو تعطيل تسجيل المستخدمين الجدد للتطبيق.",
     "signupEnabled": "تسجيل المستخدمين الجدد ممكن حاليًا.",
-    "signupDisabled": "تسجيل المستخدمين الجدد معطل حاليًا."
+    "signupDisabled": "تسجيل المستخدمين الجدد معطل حاليًا.",
+    "financialDefaultsTitle": "الإعدادات المالية الافتراضية للشركة",
+    "financialDefaultsDescription": "حدد النسب الافتراضية للشركة للهوامش، المصاريف العامة، الطوارئ والضرائب، بالإضافة إلى العملة الافتراضية للمشاريع.",
+    "defaultCurrency": "العملة الافتراضية",
+    "selectCurrency": "اختر العملة",
+    "defaultCurrencyHelp": "العملة القياسية المحددة مسبقاً لتقديرات التكلفة الجديدة.",
+    "defaultOverhead": "المصاريف العامة الافتراضية",
+    "defaultOverheadHelp": "التكاليف غير المباشرة مثل تشغيل المكاتب والإدارة والتأمين.",
+    "defaultMarkup": "هامش الربح الافتراضي",
+    "defaultMarkupHelp": "هامش ربح الشركة المطبق على تكاليف المشروع.",
+    "defaultContingency": "نسبة الطوارئ الافتراضية",
+    "defaultContingencyHelp": "احتياطي مخصص للمخاطر والتغييرات غير المتوقعة.",
+    "defaultTax": "الضريبة الافتراضية",
+    "defaultTaxHelp": "نسبة ضريبة المبيعات أو القيمة المضافة القياسية."
   },
   "auditLogs": {
     "title": "سجلات التدقيق",
@@ -126,13 +171,24 @@
     "noLogs": "لم يتم العثور على سجلات تدقيق.",
     "previous": "السابق",
     "next": "التالي",
-    "searchPlaceholder": "البحث حسب الإجراء أو اسم الجدول",
+    "searchPlaceholder": "البحث حسب الإجراء أو المورد أو بريد المستخدم",
     "noLogsFound": "لم يتم العثور على سجلات تدقيق.",
     "noDetailsAvailable": "لا توجد تفاصيل متاحة لهذا الإدخال في السجل.",
     "oldData": "البيانات القديمة:",
     "newData": "البيانات الجديدة:",
     "rowsPerPage": "صفوف في الصفحة",
-    "page": "صفحة"
+    "page": "صفحة",
+    "actionFilter": "تصفية حسب الإجراء",
+    "tableFilter": "تصفية حسب المورد",
+    "allActions": "جميع الإجراءات",
+    "allTables": "جميع الموارد",
+    "exportCsv": "تصدير CSV",
+    "exporting": "جاري التصدير...",
+    "exportSuccess": "تم تصدير سجلات التدقيق بنجاح",
+    "exportFailed": "فشل تصدير سجلات التدقيق: {{message}}",
+    "actionInsert": "إنشاء (INSERT)",
+    "actionUpdate": "تعديل (UPDATE)",
+    "actionDelete": "حذف (DELETE)"
   },
   "editRoleModal": {
     "title": "تعديل الدور لـ {{email}}",

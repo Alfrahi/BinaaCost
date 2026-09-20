@@ -95,6 +95,42 @@ export function useAdminProjectManagement() {
     },
   });
 
+  const restoreProjectMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      await pb.collection("projects").update(projectId, { deleted_at: null });
+    },
+    onSuccess: () => {
+      void toast.success(t("admin:projects.successRestored"));
+      queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
+    },
+    onError: (error: Error) => {
+      void toast.error(
+        t("admin:projects.errorRestore", { message: error.message }),
+      );
+    },
+  });
+
+  const transferOwnershipMutation = useMutation({
+    mutationFn: async ({
+      projectId,
+      newUserId,
+    }: {
+      projectId: string;
+      newUserId: string;
+    }) => {
+      await pb.collection("projects").update(projectId, { user_id: newUserId });
+    },
+    onSuccess: () => {
+      void toast.success(t("admin:projects.successOwnershipTransferred"));
+      queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
+    },
+    onError: (error: Error) => {
+      void toast.error(
+        t("admin:projects.errorOwnershipTransfer", { message: error.message }),
+      );
+    },
+  });
+
   const handleDelete = (project: Project) => {
     setDeleteTarget(project);
     setIsDeleteDialogOpen(true);
@@ -120,6 +156,8 @@ export function useAdminProjectManagement() {
     setIsDeleteDialogOpen,
     handleDelete,
     deleteProjectMutation,
+    restoreProjectMutation,
+    transferOwnershipMutation,
     totalPages,
     PAGE_SIZE,
   };

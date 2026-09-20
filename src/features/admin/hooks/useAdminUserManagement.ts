@@ -130,6 +130,38 @@ export function useAdminUserManagement() {
     },
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: async ({
+      email,
+      password,
+      first_name,
+      last_name,
+      role,
+    }: {
+      email: string;
+      password: string;
+      first_name?: string;
+      last_name?: string;
+      role: string;
+    }) => {
+      await pb.collection("users").create({
+        email,
+        password,
+        passwordConfirm: password,
+        first_name: first_name || "",
+        last_name: last_name || "",
+        role: role || "user",
+      });
+    },
+    onSuccess: () => {
+      void toast.success(t("admin:users.successCreated"));
+      void queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+    },
+    onError: (error: Error) => {
+      handleError(error);
+    },
+  });
+
   const handleDelete = (userId: string) => {
     setDeleteTarget(userId);
     setIsDeleteDialogOpen(true);
@@ -154,6 +186,7 @@ export function useAdminUserManagement() {
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     showFallbackWarning,
+    createUserMutation,
     updateUserRoleMutation,
     deleteUserMutation,
     handleDelete,
