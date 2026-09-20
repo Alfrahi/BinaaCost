@@ -48,10 +48,7 @@ export interface Scenario {
 
 import { FinancialSummary } from "@/shared/logic/financials";
 
-export type SimulationFinancials = Omit<
-  FinancialSummary,
-  "directCostsBase" | "locationAdjustmentAmount"
->;
+export type SimulationFinancials = FinancialSummary;
 
 export interface SimulationResult {
   original: {

@@ -108,6 +108,7 @@ export function ScenarioFormDialog({
         { value: "markup_percent", label: t("project_detail:profit_pricing.markup") },
         { value: "tax_percent", label: t("project_detail:profit_pricing.taxes") },
         { value: "contingency_percent", label: t("project_detail:profit_pricing.generalContingency") },
+        { value: "location_factor", label: t("project_detail:financial_inputs.locationFactor") },
       ];
       default: return [];
     }
