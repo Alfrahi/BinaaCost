@@ -91,4 +91,19 @@ describe("calculatePublicShareFinancials", () => {
     expect(summary.equipmentTotal).toBe(10150);
     expect(summary.directCosts).toBe(10150);
   });
+
+  it("safely handles undefined financialSettings without throwing", () => {
+    const materials: MaterialItem[] = [
+      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 50, unit: "bag", created_at: "", updated_at: "" },
+    ];
+    const summary = calculatePublicShareFinancials(
+      undefined,
+      materials,
+      [],
+      [],
+      [],
+    );
+    expect(summary.directCosts).toBe(500);
+    expect(summary.grandTotal).toBe(500);
+  });
 });
