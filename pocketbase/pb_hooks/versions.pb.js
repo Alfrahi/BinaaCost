@@ -134,24 +134,23 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
     throw new BadRequestError("Finalized versions cannot be restored");
   }
 
+  if (body.snapshot && body.snapshot.project_id && body.snapshot.project_id !== projectId) {
+    throw new BadRequestError("snapshot.project_id does not match version");
+  }
+
+  // CRIT-03: Always load snapshot strictly from the database-stored version record.
+  // Arbitrary snapshot injection via body.snapshot is completely disallowed.
   let snapshot = null;
-  if (body.snapshot) {
-    if (body.snapshot.project_id && body.snapshot.project_id !== projectId) {
-      throw new BadRequestError("snapshot.project_id does not match version");
+  const rawStr = version.getString("data");
+  if (rawStr) {
+    try {
+      snapshot = JSON.parse(rawStr);
+    } catch (_) {
+      snapshot = null;
     }
-    snapshot = body.snapshot;
-  } else {
-    const rawStr = version.getString("data");
-    if (rawStr) {
-      try {
-        snapshot = JSON.parse(rawStr);
-      } catch (_) {
-        snapshot = null;
-      }
-    }
-    if (!snapshot) {
-      snapshot = version.get("data");
-    }
+  }
+  if (!snapshot) {
+    snapshot = version.get("data");
   }
   if (!snapshot) {
     throw new BadRequestError("version has no snapshot data");

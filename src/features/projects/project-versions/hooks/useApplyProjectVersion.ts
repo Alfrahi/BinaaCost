@@ -12,13 +12,12 @@ export function useApplyProjectVersion() {
     mutationFn: async (payload: {
       projectId: string;
       versionId: string;
-      snapshot: any;
+      snapshot?: any;
       createRollback: boolean;
     }) => {
-      const { versionId, snapshot, createRollback } = payload;
+      const { versionId, createRollback } = payload;
       // M6: rollback snapshot is created atomically server-side.
       await callRouteWithParams("versions/apply", { id: versionId }, {
-        snapshot,
         create_rollback: createRollback,
       });
     },
