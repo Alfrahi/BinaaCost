@@ -7,12 +7,13 @@ import EmptyState from "@/shared/components/ui/EmptyState";
 import { ArrowLeft, Share2, Edit, Trash2, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import ShareProjectDialog from "@/features/projects/project-sharing/components/ShareProjectDialog";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import { useSoftDeleteProject } from "@/features/projects/project-core/hooks/useSoftDeleteProject";
 import { useCloneProject } from "@/features/projects/project-core/hooks/useCloneProject";
+import { offlineManager } from "@/shared/lib/offline";
 
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation(["project_detail", "common"]);
@@ -24,6 +25,18 @@ export default function ProjectDetail() {
 
   const softDeleteMutation = useSoftDeleteProject();
   const cloneMutation = useCloneProject();
+
+  useEffect(() => {
+    return offlineManager.onSyncEvent((event) => {
+      if (
+        event.type === "id_remapped" &&
+        event.table === "projects" &&
+        event.oldId === id
+      ) {
+        navigate(`/projects/${event.newId}`, { replace: true });
+      }
+    });
+  }, [id, navigate]);
 
   const handleDelete = async () => {
     if (!id) return;
