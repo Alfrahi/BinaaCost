@@ -59,4 +59,36 @@ describe("calculatePublicShareFinancials", () => {
     expect(summary.directCosts).toBe(2300);
     expect(summary.grandTotal).toBeGreaterThan(2300);
   });
+
+  it("does not multiply usage_duration for purchased equipment", () => {
+    const equipment: EquipmentItem[] = [
+      {
+        id: "e2",
+        project_id: "p1",
+        user_id: "u1",
+        name: "Crane",
+        rental_or_purchase: "Purchase",
+        quantity: 2,
+        cost_per_period: 5000,
+        usage_duration: 10, // Must NOT be multiplied (2 * 5000 + 100 + 50 = 10150)
+        maintenance_cost: 100,
+        fuel_cost: 50,
+        period_unit: "day",
+        created_at: "",
+        updated_at: "",
+      },
+    ];
+
+    const summary = calculatePublicShareFinancials(
+      { overhead_percent: 0, contingency_percent: 0, markup_percent: 0, tax_percent: 0 },
+      [],
+      [],
+      equipment,
+      [],
+    );
+
+    // Purchased equipment total: 2 * 5000 + 100 + 50 = 10150
+    expect(summary.equipmentTotal).toBe(10150);
+    expect(summary.directCosts).toBe(10150);
+  });
 });

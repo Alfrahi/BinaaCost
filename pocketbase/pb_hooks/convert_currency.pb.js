@@ -84,7 +84,8 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
         } else if (coll === "equipment_items") {
           const qty = Number(row.get("quantity")) || 0;
           const costPerPeriod = Number(row.get("cost_per_period")) || 0;
-          const duration = Number(row.get("usage_duration")) || 0;
+          const isPurchase = (row.get("rental_or_purchase") || "").toLowerCase() === "purchase";
+          const duration = isPurchase ? 1 : (Number(row.get("usage_duration")) || 0);
           const maintenance = Number(row.get("maintenance_cost")) || 0;
           const fuel = Number(row.get("fuel_cost")) || 0;
           const base = Math.round(qty * costPerPeriod * duration * 100) / 100;

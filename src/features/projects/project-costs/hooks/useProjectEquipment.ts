@@ -45,6 +45,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
         usageDuration: item.usage_duration || 0,
         maintenanceCost: item.maintenance_cost,
         fuelCost: item.fuel_cost,
+        rentalOrPurchase: item.rental_or_purchase,
       }).totalCost,
   });
 

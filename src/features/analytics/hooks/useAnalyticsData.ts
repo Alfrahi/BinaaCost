@@ -60,6 +60,7 @@ export function useAnalyticsData() {
               usageDuration: i.usage_duration || 0,
               maintenanceCost: i.maintenance_cost,
               fuelCost: i.fuel_cost,
+              rentalOrPurchase: i.rental_or_purchase,
             }).totalCost,
         },
         {

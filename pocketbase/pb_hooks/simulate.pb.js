@@ -19,7 +19,9 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
     if (coll === "labor_items")
       return safeMult(item.number_of_workers, item.daily_rate, item.total_days);
     if (coll === "equipment_items") {
-      const base = safeMult(item.quantity, item.cost_per_period, item.usage_duration);
+      const isPurchase = (item.rental_or_purchase || "").toLowerCase() === "purchase";
+      const duration = isPurchase ? 1 : (Number(item.usage_duration) || 0);
+      const base = safeMult(item.quantity, item.cost_per_period, duration);
       return safeAdd(base, item.maintenance_cost || 0, item.fuel_cost || 0);
     }
     if (coll === "additional_costs") return item.amount || 0;

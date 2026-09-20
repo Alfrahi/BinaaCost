@@ -151,18 +151,22 @@ export const PROJECT_CSV_CONFIGS: Record<ProjectItemType, ProjectCsvConfig> = {
         type: "number",
       },
     ],
-    buildValues: (row) => ({
-      name: sanitizeText(row.name),
-      type: row.type ? sanitizeText(row.type) : undefined,
-      rental_or_purchase: sanitizeText(row.rental_or_purchase),
-      quantity: Number(row.quantity),
-      cost_per_period: Number(row.cost_per_period),
-      period_unit: sanitizeText(row.period_unit),
-      usage_duration: Number(row.usage_duration),
-      maintenance_cost: row.maintenance_cost ? Number(row.maintenance_cost) : 0,
-      fuel_cost: row.fuel_cost ? Number(row.fuel_cost) : 0,
-      group_id: "ungrouped",
-    }),
+    buildValues: (row) => {
+      const isPurchase =
+        (sanitizeText(row.rental_or_purchase) || "").toLowerCase() === "purchase";
+      return {
+        name: sanitizeText(row.name),
+        type: row.type ? sanitizeText(row.type) : undefined,
+        rental_or_purchase: sanitizeText(row.rental_or_purchase),
+        quantity: Number(row.quantity),
+        cost_per_period: Number(row.cost_per_period),
+        period_unit: sanitizeText(row.period_unit) || (isPurchase ? "Day" : ""),
+        usage_duration: isPurchase ? 1 : Number(row.usage_duration),
+        maintenance_cost: row.maintenance_cost ? Number(row.maintenance_cost) : 0,
+        fuel_cost: row.fuel_cost ? Number(row.fuel_cost) : 0,
+        group_id: "ungrouped",
+      };
+    },
   },
   additional: {
     type: "additional",
