@@ -284,6 +284,25 @@ export function EquipmentTable({
           },
         },
       },
+      costDatabaseImport: {
+        onImport: async (item, quantity, groupId) => {
+          await crud.handleAddOrUpdate(
+            {
+              name: item.description,
+              type: item.csi_code || undefined,
+              rental_or_purchase: "Rental",
+              quantity: 1,
+              cost_per_period: item.unit_price,
+              period_unit: item.unit || "Day",
+              usage_duration: quantity,
+              maintenance_cost: 0,
+              fuel_cost: 0,
+              group_id: groupId || "ungrouped",
+            },
+            currency,
+          );
+        },
+      },
       csvImport: {
         itemType: "equipment",
         onImport: (values) =>

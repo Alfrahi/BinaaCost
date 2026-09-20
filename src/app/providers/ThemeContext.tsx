@@ -2,10 +2,11 @@
 
 import { createContext, useContext } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
-interface ThemeContextValue {
+export interface ThemeContextValue {
   theme: Theme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   mounted: boolean;
 }

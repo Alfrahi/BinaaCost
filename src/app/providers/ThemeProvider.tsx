@@ -19,17 +19,23 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     document.documentElement.classList.toggle("dark", initial === "dark");
   }, []);
 
-  const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light";
+  const handleSetTheme = (next: Theme) => {
     setTheme(next);
     localStorage.setItem("theme", next);
     document.documentElement.classList.toggle("dark", next === "dark");
   };
 
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    handleSetTheme(next);
+  };
+
   // Always provide the context to avoid "useTheme must be used within ThemeProvider"
   // during SSR/hydration. The `mounted` flag only controls when we hydrate from localStorage.
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+    <ThemeContext.Provider
+      value={{ theme, setTheme: handleSetTheme, toggleTheme, mounted }}
+    >
       {children}
     </ThemeContext.Provider>
   );

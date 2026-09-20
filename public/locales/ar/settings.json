@@ -54,6 +54,15 @@
     "taxId": "الرقم التعريفي الضريبي",
     "taxIdPlaceholder": "مثال: 12-3456789"
   },
+  "appearance": {
+    "title": "المظهر",
+    "theme": "السمة",
+    "themeDesc": "اختر مظهر العرض المفضل للتطبيق.",
+    "lightMode": "فاتح",
+    "lightModeDesc": "سمة ساطعة عالية التباين وواضحة",
+    "darkMode": "داكن",
+    "darkModeDesc": "مريح للعينين في البيئات منخفضة الإضاءة"
+  },
   "notifications": {
     "title": "الإشعارات",
     "emailNotifications": "إشعارات البريد الإلكتروني",

@@ -161,6 +161,21 @@ export function MaterialsTable({
           },
         },
       },
+      costDatabaseImport: {
+        onImport: async (item, quantity, groupId) => {
+          await crud.handleAddOrUpdate(
+            {
+              name: item.description,
+              description: item.csi_code ? `[${item.csi_code}] ${item.description}` : "",
+              quantity,
+              unit: item.unit || materialUnits[0]?.value || "unit",
+              unit_price: item.unit_price,
+              group_id: groupId || "ungrouped",
+            },
+            currency,
+          );
+        },
+      },
       csvImport: {
         itemType: "materials",
         onImport: (values) =>
