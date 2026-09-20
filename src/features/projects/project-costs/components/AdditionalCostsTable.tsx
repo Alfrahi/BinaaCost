@@ -3,6 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
+import { Decimal } from "@/shared/lib/math";
 import { AdditionalCostRow } from "./AdditionalCostRow";
 import { AdditionalCostForm } from "./AdditionalCostForm";
 import {
@@ -132,6 +133,19 @@ export function AdditionalCostsTable({
               });
             }
           },
+        },
+      },
+      costDatabaseImport: {
+        onImport: async (item, quantity, groupId) => {
+          await crud.handleAddOrUpdate({
+            category: item.csi_division || "Miscellaneous",
+            description: item.description,
+            amount: new Decimal(item.unit_price)
+              .times(quantity)
+              .toDecimalPlaces(2)
+              .toNumber(),
+            group_id: groupId || "ungrouped",
+          });
         },
       },
       csvImport: {

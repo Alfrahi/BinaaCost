@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { pb } from "@/integrations/pocketbase/client";
 import { useTranslation } from "react-i18next";
-import { Menu, UserCircle } from "lucide-react";
+import { Menu, UserCircle, Sun, Moon } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import {
@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/features/auth";
 import { useProfile } from "@/features/settings/hooks/useProfile";
 import { useIsMobile } from "@/shared/hooks/useMobile";
+import { useTheme } from "@/app/providers/ThemeContext";
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +27,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
 
   const userDisplayName =
     profile?.first_name && profile?.last_name
@@ -63,7 +65,25 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
         </Link>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="text-foreground h-9 w-9"
+          aria-label={
+            theme === "dark"
+              ? t("common:switchToLightMode")
+              : t("common:switchToDarkMode")
+          }
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </Button>
+
         <Button
           variant="ghost"
           size="sm"

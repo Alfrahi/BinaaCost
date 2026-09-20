@@ -98,6 +98,21 @@
     "takeoffQuantityPlaceholder": "مثال: 10",
     "scaleFactor": "معامل الضرب"
   },
+  "cost_database_picker": {
+    "pickFromDatabase": "من قاعدة التكاليف",
+    "title": "استيراد من قاعدة بيانات التكاليف",
+    "description": "تصفح بنود تصنيف ماسترفورمات (CSI) من قواعد بيانات التكاليف وأضفها مباشرة إلى هذا التقدير.",
+    "selectDatabase": "قاعدة بيانات التكاليف",
+    "selectDbPlaceholder": "اختر قاعدة بيانات",
+    "noDatabasesFound": "لا توجد قواعد بيانات متاحة. أنشئ واحدة في مكتبة التكاليف.",
+    "searchPlaceholder": "البحث برمز CSI أو القسم أو الوصف...",
+    "noItemsFound": "لم يتم العثور على بنود مطابقة للبحث.",
+    "itemConfig": "إعدادات الإضافة",
+    "estimatedTotal": "الإجمالي التقديري",
+    "keepOpen": "إبقاء النافذة مفتوحة لإضافة بنود متعددة",
+    "importItem": "استيراد إلى جدول التكاليف",
+    "successImported": "تم استيراد \"{{name}}\" إلى جدول التكاليف."
+  },
   "analytics": {
     "title": "تحليلات المشروع",
     "chartTooltip": "يعرض هذا الرسم البياني توزيع التكاليف داخل مشروعك.",

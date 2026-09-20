@@ -283,4 +283,64 @@ describe("offline queue replay (PocketBase executor)", () => {
     expect(offlineManager.getQueueSize()).toBe(0);
     expect(events.some((e) => e.type === "mutation_retrying" || e.type === "mutation_failed")).toBe(false);
   });
+
+  describe("dead-letter queue inspection and recovery", () => {
+    beforeEach(async () => {
+      // Force an item into the dead-letter queue by failing 3 retries
+      (executePbMutation as any).mockRejectedValue(new Error("Server 500 error"));
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "INSERT",
+        payload: { name: "Failed Item" },
+        queryKey: ["materials", "p1"],
+        userId: "u1",
+      });
+      // Run through 3 retries
+      await flush(); // Attempt 1 -> retries=1
+      await (offlineManager as any).processQueue();
+      await flush(); // Attempt 2 -> retries=2
+      await (offlineManager as any).processQueue();
+      await flush(); // Attempt 3 -> retries=3 -> dead letter!
+    });
+
+    it("moves exhausted mutation to deadLetterQueue and allows inspection", () => {
+      expect(offlineManager.getQueueSize()).toBe(0);
+      expect(offlineManager.getDeadLetterSize()).toBe(1);
+
+      const deadItems = offlineManager.getDeadLetterQueue();
+      expect(deadItems.length).toBe(1);
+      expect(deadItems[0].table).toBe("materials");
+      expect(deadItems[0].error).toBe("Server 500 error");
+    });
+
+    it("retries a dead-letter item by moving it back to the active queue with reset retries", async () => {
+      const deadItems = offlineManager.getDeadLetterQueue();
+      const mutationId = deadItems[0].id;
+
+      // Mock executor to succeed on next attempt
+      (executePbMutation as any).mockResolvedValue({ id: "recovered" });
+
+      await offlineManager.retryDeadLetter(mutationId);
+      await flush();
+
+      // Item should be processed and cleared
+      expect(offlineManager.getDeadLetterSize()).toBe(0);
+      expect(offlineManager.getQueueSize()).toBe(0);
+    });
+
+    it("dismisses a single dead-letter item from the queue", async () => {
+      const deadItems = offlineManager.getDeadLetterQueue();
+      const mutationId = deadItems[0].id;
+
+      await offlineManager.dismissDeadLetter(mutationId);
+
+      expect(offlineManager.getDeadLetterSize()).toBe(0);
+      expect(offlineManager.getDeadLetterQueue()).toEqual([]);
+    });
+
+    it("clears all dead-letter items", async () => {
+      await offlineManager.clearDeadLetters();
+      expect(offlineManager.getDeadLetterSize()).toBe(0);
+    });
+  });
 });

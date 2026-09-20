@@ -54,6 +54,15 @@
     "taxId": "Tax ID",
     "taxIdPlaceholder": "e.g., 12-3456789"
   },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "themeDesc": "Select your preferred visual appearance for the application.",
+    "lightMode": "Light",
+    "lightModeDesc": "Clean, high-contrast bright theme",
+    "darkMode": "Dark",
+    "darkModeDesc": "Easy on the eyes in low-light environments"
+  },
   "notifications": {
     "title": "Notifications",
     "description": "Manage your notification preferences.",

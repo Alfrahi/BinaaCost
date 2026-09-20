@@ -98,6 +98,21 @@
     "takeoffQuantityPlaceholder": "e.g. 10",
     "scaleFactor": "Multiplier"
   },
+  "cost_database_picker": {
+    "pickFromDatabase": "From Cost Database",
+    "title": "Import from Cost Database",
+    "description": "Browse MasterFormat CSI items from your cost databases and insert them directly into this estimate.",
+    "selectDatabase": "Cost Database",
+    "selectDbPlaceholder": "Select a database",
+    "noDatabasesFound": "No databases available. Create one in Cost Library.",
+    "searchPlaceholder": "Search by CSI code, division, or description...",
+    "noItemsFound": "No items match your search.",
+    "itemConfig": "Insertion Settings",
+    "estimatedTotal": "Estimated Total",
+    "keepOpen": "Keep dialog open for multiple items",
+    "importItem": "Import to Cost Sheet",
+    "successImported": "Imported \"{{name}}\" into cost sheet."
+  },
   "analytics": {
     "title": "Project Analytics",
     "chartTooltip": "This chart visualizes the distribution of costs within your project.",
