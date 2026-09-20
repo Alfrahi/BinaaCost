@@ -52,7 +52,12 @@ export function useProjectLabor(projectId: string): UseProjectLaborReturn {
   }));
 
   const handleAddOrUpdate = useCallback(
-    async (data: LaborFormValues, currentCurrency?: string, editingId?: string) => {
+    async (
+      data: LaborFormValues,
+      currentCurrency?: string,
+      editingId?: string,
+      saveToLibrary: boolean = false,
+    ) => {
       const payload = {
         worker_type: sanitizeText(data.worker_type),
         number_of_workers: data.number_of_workers,
@@ -66,7 +71,7 @@ export function useProjectLabor(projectId: string): UseProjectLaborReturn {
       } else {
         await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
       }
-      if (currentCurrency) {
+      if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ worker_type: payload.worker_type, daily_rate: payload.daily_rate }, currentCurrency);
         queryClient.invalidateQueries({ queryKey: ["library_labor"] });
       }

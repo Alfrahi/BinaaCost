@@ -54,7 +54,12 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
   }));
 
   const handleAddOrUpdate = useCallback(
-    async (data: MaterialFormValues, currentCurrency?: string, editingId?: string) => {
+    async (
+      data: MaterialFormValues,
+      currentCurrency?: string,
+      editingId?: string,
+      saveToLibrary: boolean = false,
+    ) => {
       const payload = {
         name: sanitizeText(data.name),
         description: sanitizeText(data.description),
@@ -68,7 +73,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
       } else {
         await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
       }
-      if (currentCurrency) {
+      if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ name: payload.name, description: payload.description ?? "", unit: payload.unit, unit_price: payload.unit_price }, currentCurrency);
         queryClient.invalidateQueries({ queryKey: ["library_materials"] });
       }

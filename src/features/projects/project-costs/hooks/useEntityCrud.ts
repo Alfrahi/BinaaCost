@@ -15,6 +15,7 @@ export interface EntityCrud<T> {
     data: any,
     currency?: string,
     editingId?: string,
+    saveToLibrary?: boolean,
   ) => Promise<void>;
   handleDuplicate: (item: T) => void;
   handleDelete: (id: string) => Promise<void>;

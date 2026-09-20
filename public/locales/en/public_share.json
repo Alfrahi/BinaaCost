@@ -7,5 +7,13 @@
   "errorLoadingProjectData": "Failed to load project data. Please try again later.",
   "readOnlyView": "Read-Only View",
   "incorrectPassword": "Incorrect password.",
-  "linkNotFoundOrExpired": "Link not found or expired."
+  "linkNotFoundOrExpired": "Link not found or expired.",
+  "proposalView": "Client Proposal",
+  "detailedView": "Detailed Breakdown",
+  "print": "Print",
+  "passwordRequired": "Password Required",
+  "invalidLink": "Invalid Link",
+  "sharedProject": "Shared Project",
+  "linkExpires": "Link expires",
+  "sharedByOwner": "Project Owner"
 }
