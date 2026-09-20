@@ -118,6 +118,53 @@ function isClientMutationIdConflict(err: unknown): boolean {
   );
 }
 
+/**
+ * Detects whether an error is a transient network failure, disconnection, or
+ * abort, indicating that the client should drop back to offline queueing rather
+ * than abandoning the user's mutation.
+ */
+export function isNetworkOrTransientError(error: unknown): boolean {
+  if (!error) return false;
+
+  if (typeof error === "object" && error !== null) {
+    const err = error as Record<string, unknown>;
+
+    // PocketBase ClientResponseError with status 0 or server gateway failure
+    if (err.status === 0) return true;
+    if (typeof err.status === "number" && [502, 503, 504].includes(err.status)) {
+      return true;
+    }
+
+    if (err.isAbort === true) return true;
+
+    if (err.name === "AbortError" || err.name === "TimeoutError") return true;
+
+    const code = String(err.code || "");
+    if (["ECONNREFUSED", "ENOTFOUND", "ETIMEDOUT", "ECONNRESET"].includes(code)) {
+      return true;
+    }
+
+    const message = String(err.message || "");
+    if (
+      message === "Failed to fetch" ||
+      message === "fetch failed" ||
+      message.includes("NetworkError") ||
+      message.includes("network error") ||
+      message.toLowerCase().includes("failed to fetch") ||
+      message.toLowerCase().includes("network request failed") ||
+      message.toLowerCase().includes("timeout")
+    ) {
+      return true;
+    }
+
+    if (err.originalError && isNetworkOrTransientError(err.originalError)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 class OfflineManager {
   private static instance: OfflineManager;
   private queue: OfflineMutation[] = [];
@@ -589,6 +636,21 @@ class OfflineManager {
             }
           }
           continue;
+        }
+
+        // OFFL-04: If this was a network disconnection / transient error during replay,
+        // mark offline and abort this drain cycle WITHOUT burning retries toward dead-letter.
+        if (isNetworkOrTransientError(err)) {
+          console.warn("Network interrupted during queue replay:", mutation.id, err);
+          this._isOnline = false;
+          this.notifyListeners();
+          failedAttempts.push(mutation);
+          const remainingIndex = currentQueue.indexOf(mutation) + 1;
+          for (let r = remainingIndex; r < currentQueue.length; r++) {
+            failedAttempts.push(currentQueue[r]);
+          }
+          this.emitSyncEvent({ type: "cannot_sync_offline" });
+          break;
         }
 
         console.error("Failed to sync offline mutation:", mutation.id, err);
