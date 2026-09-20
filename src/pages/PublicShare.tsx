@@ -1,13 +1,16 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Globe, Printer, ShieldCheck } from "lucide-react";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
+import { Badge } from "@/shared/components/ui/badge";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 import { ProjectCostReport } from "@/features/projects/project-reports/components/ProjectCostReport";
+import { ClientProposalReport } from "@/features/projects/project-reports/components/ClientProposalReport";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
@@ -17,15 +20,21 @@ import { calculatePublicShareFinancials } from "@/features/projects/project-shar
 
 export default function PublicShare() {
   const { accessToken } = useParams<{ accessToken: string }>();
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     "public_share",
     "common",
     "project_detail",
     "project_reports",
   ]);
 
+  const [viewMode, setViewMode] = useState<"proposal" | "detailed">("proposal");
   const { format: _formatCurrency } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language.startsWith("en") ? "ar" : "en";
+    i18n.changeLanguage(newLang);
+  };
 
   const { options: materialUnits } = useSettingsOptions("material_unit");
   const { options: periodUnits } = useSettingsOptions("equipment_period_unit");
@@ -78,38 +87,55 @@ export default function PublicShare() {
     !isAuthenticated
   ) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-xl">
-              {t("public_share:passwordRequired")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
-              <Label htmlFor="password">
-                {t("public_share:enterPassword")}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              {authError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertDescription className="text-sm">
-                    {authError}
-                  </AlertDescription>
-                </Alert>
-              )}
-              <Button type="submit" className="w-full">
-                {t("common:submit")}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col min-h-screen bg-background">
+        <header className="flex justify-end p-4 border-b border-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="text-sm font-medium"
+            aria-label={t("common:switchLanguage")}
+          >
+            <Globe className="h-4 w-4 me-1.5" />
+            {i18n.language.startsWith("en")
+              ? t("common:languageNameAr")
+              : t("common:languageNameEn")}
+          </Button>
+        </header>
+        <div className="flex flex-1 items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-xl">
+                {t("public_share:passwordRequired")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <Label htmlFor="password">
+                  {t("public_share:enterPassword")}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder={t("public_share:passwordPlaceholder")}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                {authError && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertDescription className="text-sm">
+                      {authError}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <Button type="submit" className="w-full">
+                  {t("public_share:access")}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -155,46 +181,101 @@ export default function PublicShare() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-2xl">{project.name}</CardTitle>
-          <p className="text-muted-foreground">{project.description}</p>
-        </CardHeader>
-        <CardContent className="text-sm">
-          <p>
-            <strong>{t("project_detail:overview.type")}:</strong> {project.type}
-          </p>
-          <p>
-            <strong>{t("project_detail:overview.location")}:</strong>{" "}
-            {project.location || t("common:notSpecified")}
-          </p>
-          <p>
-            <strong>{t("project_detail:overview.currency")}:</strong>{" "}
-            {project.currency}
-          </p>
-          {expires_at && (
-            <p className="text-muted-foreground mt-2">
-              {t("public_share:linkExpires")}:{" "}
-              {formatDate(expires_at, "dateTime")}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-muted/20 pb-12">
+      {/* Top action bar - hidden on print */}
+      <header className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3 shadow-xs print:hidden">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-foreground text-sm sm:text-base truncate max-w-[200px] sm:max-w-xs">
+              {project.name}
+            </span>
+            <Badge variant="secondary" className="gap-1 text-xs font-normal">
+              <ShieldCheck className="h-3 w-3 text-primary" />
+              {t("public_share:readOnlyView")}
+            </Badge>
+          </div>
 
-      <ProjectCostReport
-        project={project}
-        financials={financials}
-        materials={materials}
-        labor={labor}
-        equipment={equipment}
-        additional={additional}
-        risks={risks}
-        groups={groups}
-        companyInfo={companyInfo}
-        preparedBy={t("public_share:sharedByOwner")}
-        allSettingsOptions={allSettingsOptions}
-      />
+          <div className="flex items-center gap-2">
+            <Tabs
+              value={viewMode}
+              onValueChange={(val) => setViewMode(val as "proposal" | "detailed")}
+              className="w-auto"
+            >
+              <TabsList className="h-8">
+                <TabsTrigger value="proposal" className="text-xs px-2.5 py-1">
+                  {t("public_share:proposalView")}
+                </TabsTrigger>
+                <TabsTrigger value="detailed" className="text-xs px-2.5 py-1">
+                  {t("public_share:detailedView")}
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="text-xs font-medium h-8 px-2.5"
+              aria-label={t("common:switchLanguage")}
+            >
+              <Globe className="h-3.5 w-3.5 me-1.5" />
+              {i18n.language.startsWith("en")
+                ? t("common:languageNameAr")
+                : t("common:languageNameEn")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.print()}
+              className="text-xs h-8 px-2.5"
+            >
+              <Printer className="h-3.5 w-3.5 me-1.5" />
+              {t("public_share:print")}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Expiry Banner */}
+      {expires_at && (
+        <div className="mx-auto max-w-5xl px-4 pt-3 print:hidden">
+          <div className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground">
+            {t("public_share:linkExpires")}: {formatDate(expires_at, "dateTime")}
+          </div>
+        </div>
+      )}
+
+      {/* Main Report View */}
+      <main className="mx-auto max-w-5xl p-4 sm:p-6">
+        <div className="rounded-lg border border-border bg-card shadow-xs print:border-none print:shadow-none">
+          {viewMode === "proposal" ? (
+            <ClientProposalReport
+              project={project}
+              financials={financials}
+              companyInfo={companyInfo}
+              terms=""
+              preparedBy={t("public_share:sharedByOwner")}
+              clientName=""
+            />
+          ) : (
+            <ProjectCostReport
+              project={project}
+              financials={financials}
+              materials={materials}
+              labor={labor}
+              equipment={equipment}
+              additional={additional}
+              risks={risks}
+              groups={groups}
+              companyInfo={companyInfo}
+              preparedBy={t("public_share:sharedByOwner")}
+              allSettingsOptions={allSettingsOptions}
+            />
+          )}
+        </div>
+      </main>
     </div>
   );
 }

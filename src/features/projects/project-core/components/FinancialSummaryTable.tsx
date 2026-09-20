@@ -54,6 +54,7 @@ interface FinancialSummaryTableProps {
   currency: string;
   settings: FinancialSettings;
   financials: {
+    directCostsBase?: number;
     directCosts: number;
     locationAdjustmentAmount: number;
     overheadAmount: number;
@@ -86,6 +87,7 @@ export function FinancialSummaryTable({
   format,
 }: FinancialSummaryTableProps) {
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
+  const hasLocationAdjustment = (settings.location_factor ?? 1) !== 1;
 
   return (
     <Card className="shadow-md border-accent">
@@ -100,17 +102,28 @@ export function FinancialSummaryTable({
             <SummaryRow label={t("project_tabs:equipment")} value={format(equipmentTotal, currency)} className="text-muted-foreground" />
             <SummaryRow label={t("project_tabs:additional")} value={format(additionalTotal, currency)} className="text-muted-foreground" />
             <div className="border-t border-border my-2"></div>
-            <SummaryRow label={t("project_detail:profit_pricing.totalDirectCosts")} value={format(financials.directCosts, currency)} className="text-base font-bold text-foreground" />
+            <SummaryRow
+              label={hasLocationAdjustment
+                ? t("project_detail:profit_pricing.baseDirectCosts")
+                : t("project_detail:profit_pricing.totalDirectCosts")}
+              value={format(hasLocationAdjustment ? (financials.directCostsBase ?? financials.directCosts) : financials.directCosts, currency)}
+              className="text-base font-bold text-foreground"
+            />
           </div>
 
-          {(settings.location_factor ?? 1) !== 1 && (
-            <div className="px-2 pt-1">
+          {hasLocationAdjustment && (
+            <div className="px-2 pt-1 pb-2">
               <SummaryRow
                 label={locationLabel
                   ? `${t("project_detail:profit_pricing.locationFactor")} (${locationLabel} ×${settings.location_factor})`
                   : `${t("project_detail:profit_pricing.locationFactor")} (×${settings.location_factor})`}
                 value={format(financials.locationAdjustmentAmount, currency, { showSign: true })}
                 className={cn("text-sm font-medium", financials.locationAdjustmentAmount >= 0 ? "text-success" : "text-destructive")}
+              />
+              <SummaryRow
+                label={t("project_detail:profit_pricing.totalDirectCostsAdjusted")}
+                value={format(financials.directCosts, currency)}
+                className="text-sm font-semibold text-foreground border-t border-border pt-1 mt-1"
               />
             </div>
           )}

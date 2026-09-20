@@ -7,5 +7,13 @@
   "errorLoadingProjectData": "فشل تحميل بيانات المشروع. يرجى المحاولة مرة أخرى لاحقًا.",
   "readOnlyView": "عرض للقراءة فقط",
   "incorrectPassword": "كلمة المرور غير صحيحة.",
-  "linkNotFoundOrExpired": "الرابط غير موجود أو منتهي الصلاحية."
+  "linkNotFoundOrExpired": "الرابط غير موجود أو منتهي الصلاحية.",
+  "proposalView": "عرض العميل المقترح",
+  "detailedView": "التفصيل الكامل للتكاليف",
+  "print": "طباعة",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "invalidLink": "رابط غير صالح",
+  "sharedProject": "مشروع تمت مشاركته",
+  "linkExpires": "ينتهي الرابط في",
+  "sharedByOwner": "مالك المشروع"
 }
