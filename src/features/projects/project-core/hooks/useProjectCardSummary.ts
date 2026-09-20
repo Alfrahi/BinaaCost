@@ -48,7 +48,7 @@ export function useProjectCardSummary(
             .getFullList({
               filter: `project_id="${projectId}"`,
               fields:
-                "quantity,cost_per_period,usage_duration,maintenance_cost,fuel_cost",
+                "rental_or_purchase,quantity,cost_per_period,usage_duration,maintenance_cost,fuel_cost",
             }),
           pb
             .collection("additional_costs")

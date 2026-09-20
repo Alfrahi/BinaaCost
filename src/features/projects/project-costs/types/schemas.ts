@@ -49,10 +49,10 @@ export const equipmentSchema = z.object({
     (val) => (val === "" ? undefined : Number(val)),
     z.number().min(0.01, "project_equipment:costNonNegative"),
   ),
-  period_unit: z.string().min(1, "project_equipment:periodUnitRequired"),
+  period_unit: z.string().optional().default("Day"),
   usage_duration: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().int().min(1, "project_equipment:usageDurationMin"),
+    (val) => (val === "" || val === undefined ? undefined : Number(val)),
+    z.number().int().min(1, "project_equipment:usageDurationMin").optional().default(1),
   ),
   maintenance_cost: z.preprocess(
     (val) => (val === "" ? undefined : Number(val)),
@@ -63,6 +63,24 @@ export const equipmentSchema = z.object({
     z.number().min(0).optional().default(0),
   ),
   group_id: z.string().optional(),
+}).superRefine((data, ctx) => {
+  const isPurchase = data.rental_or_purchase?.toLowerCase() === "purchase";
+  if (!isPurchase) {
+    if (!data.period_unit || data.period_unit.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["period_unit"],
+        message: "project_equipment:periodUnitRequired",
+      });
+    }
+    if (data.usage_duration === undefined || data.usage_duration < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["usage_duration"],
+        message: "project_equipment:usageDurationMin",
+      });
+    }
+  }
 });
 
 export type EquipmentFormValues = z.infer<typeof equipmentSchema>;

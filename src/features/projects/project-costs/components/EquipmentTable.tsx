@@ -134,6 +134,7 @@ export function EquipmentTable({
                 usageDuration: row.usage_duration,
                 maintenanceCost: row.maintenance_cost,
                 fuelCost: row.fuel_cost,
+                rentalOrPurchase: row.rental_or_purchase,
               }).totalCost * locationFactor,
               currency,
             ),
@@ -144,6 +145,7 @@ export function EquipmentTable({
               usageDuration: row.usage_duration,
               maintenanceCost: row.maintenance_cost,
               fuelCost: row.fuel_cost,
+              rentalOrPurchase: row.rental_or_purchase,
             }).totalCost * locationFactor,
         },
         {
@@ -165,6 +167,7 @@ export function EquipmentTable({
           usageDuration: item.usage_duration,
           maintenanceCost: item.maintenance_cost,
           fuelCost: item.fuel_cost,
+          rentalOrPurchase: item.rental_or_purchase,
         }).totalCost * locationFactor,
       getDeleteName: (item) => item.name,
       quickAdd: {
@@ -195,6 +198,10 @@ export function EquipmentTable({
           {
             key: "cost_per_period",
             label: `${t("columns.costPerPeriod")} (${currency})`,
+            formatLabel: (values) =>
+              values.rental_or_purchase?.toLowerCase() === "purchase"
+                ? `${t("columns.purchaseCost")} (${currency})`
+                : `${t("columns.costPerPeriod")} (${currency})`,
             type: "number",
             placeholder: t("columns.costPerPeriodPlaceholder"),
           },
@@ -204,12 +211,16 @@ export function EquipmentTable({
             type: "select",
             options: periodUnits,
             placeholder: t("columns.periodUnitPlaceholder"),
+            conditional: (values) =>
+              values.rental_or_purchase?.toLowerCase() !== "purchase",
           },
           {
             key: "usage_duration",
             label: t("columns.usageDuration"),
             type: "number",
             placeholder: t("columns.usageDurationPlaceholder"),
+            conditional: (values) =>
+              values.rental_or_purchase?.toLowerCase() !== "purchase",
           },
           {
             key: "maintenance_cost",
@@ -225,18 +236,21 @@ export function EquipmentTable({
           },
         ],
         schema: equipmentSchema,
-        buildValues: (raw) => ({
-          name: raw.name,
-          type: raw.type,
-          rental_or_purchase: raw.rental_or_purchase,
-          quantity: Number(raw.quantity),
-          cost_per_period: Number(raw.cost_per_period),
-          period_unit: raw.period_unit,
-          usage_duration: Number(raw.usage_duration),
-          maintenance_cost: Number(raw.maintenance_cost || 0),
-          fuel_cost: Number(raw.fuel_cost || 0),
-          group_id: "ungrouped",
-        }),
+        buildValues: (raw) => {
+          const isPurchase = raw.rental_or_purchase?.toLowerCase() === "purchase";
+          return {
+            name: raw.name,
+            type: raw.type,
+            rental_or_purchase: raw.rental_or_purchase,
+            quantity: Number(raw.quantity),
+            cost_per_period: Number(raw.cost_per_period),
+            period_unit: isPurchase ? (raw.period_unit || "Day") : raw.period_unit,
+            usage_duration: isPurchase ? 1 : Number(raw.usage_duration),
+            maintenance_cost: Number(raw.maintenance_cost || 0),
+            fuel_cost: Number(raw.fuel_cost || 0),
+            group_id: "ungrouped",
+          };
+        },
       },
       assemblyImport: {
         itemTypes: ["equipment"],
@@ -324,13 +338,19 @@ export function EquipmentTable({
           selected={rowProps.selected}
           onToggle={rowProps.onToggle}
           rentalOptions={rentalOptions}
+          periodUnits={periodUnits}
           locationFactor={rowProps.locationFactor}
           locationLabel={rowProps.locationLabel}
         />
       ),
       getMobileName: (item) => item.name,
       getMobileSubtitle: (item) =>
-        `${item.quantity} × ${format(item.cost_per_period, currency)}`,
+        item.rental_or_purchase?.toLowerCase() === "purchase"
+          ? `${item.quantity} × ${format(item.cost_per_period, currency)}`
+          : `${item.quantity} × ${format(item.cost_per_period, currency)}/${t(
+              periodUnits.find((u) => u.value === item.period_unit)?.value || item.period_unit || "day",
+              { defaultValue: item.period_unit || "day" },
+            )} × ${item.usage_duration}`,
       getMobileTotal: (item) => format(item.total_cost || 0, currency),
     }),
     [

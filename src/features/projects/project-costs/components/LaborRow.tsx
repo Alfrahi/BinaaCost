@@ -58,15 +58,15 @@ export const LaborRow = memo(function LaborRow({
 
   return (
     <TableRow>
-      {isOwner && (
-        <TableCell className="w-[40px] px-3 py-2">
+      <TableCell className="w-[40px] px-3 py-2">
+        {isOwner && (
           <Checkbox
             checked={selected}
             onCheckedChange={onToggle}
             aria-label={`${t("common:select")} ${item.worker_type}`}
           />
-        </TableCell>
-      )}
+        )}
+      </TableCell>
       <TableCell className="text-start font-medium text-sm">
         {item.worker_type}
       </TableCell>

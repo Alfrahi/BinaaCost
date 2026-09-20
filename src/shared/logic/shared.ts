@@ -19,11 +19,14 @@ export const calculateItemCost = {
     usageDuration: number;
     maintenanceCost?: number | null;
     fuelCost?: number | null;
+    rentalOrPurchase?: string | null;
   }): { baseCost: number; totalCost: number } => {
+    const isPurchase = input.rentalOrPurchase?.toLowerCase() === "purchase";
+    const duration = isPurchase ? 1 : input.usageDuration;
     const baseCost = safeMult(
       input.quantity,
       input.costPerPeriod,
-      input.usageDuration,
+      duration,
     );
     const maintenance = input.maintenanceCost || 0;
     const fuel = input.fuelCost || 0;
@@ -82,6 +85,7 @@ export const calculateCategoryTotal = {
       usage_duration: number;
       maintenance_cost?: number | null;
       fuel_cost?: number | null;
+      rental_or_purchase?: string | null;
     }[],
   ): number => {
     return equipmentItems.reduce(
@@ -94,6 +98,7 @@ export const calculateCategoryTotal = {
             usageDuration: item.usage_duration,
             maintenanceCost: item.maintenance_cost,
             fuelCost: item.fuel_cost,
+            rentalOrPurchase: item.rental_or_purchase,
           }).totalCost,
         ),
       0,
