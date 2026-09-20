@@ -379,6 +379,40 @@ describe("pocketbase integration", () => {
 
       await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
     });
+
+    itLive("CRIT-03: apply ignores arbitrary injected snapshot payload and applies stored snapshot", async () => {
+      // 1. Create a genuine material and take a version snapshot
+      const origMat = await api("POST", "/api/collections/materials/records",
+        { project_id: pid, user_id: uid, name: "AuthenticMat", quantity: 5, unit: "bag", unit_price: 20 }, tok);
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "authentic-v1" }, tok);
+      const vid = v.json.id;
+
+      // 2. Mutate live material
+      await api("PATCH", `/api/collections/materials/records/${origMat.json.id}`, { unit_price: 999 }, tok);
+
+      // 3. Attempt to apply with an arbitrary injected snapshot (fake item)
+      const injectedSnapshot = {
+        materials: [{ name: "InjectedForgedMat", quantity: 100, unit: "kg", unit_price: 1 }],
+      };
+      const r = await api("POST", `/api/versions/${vid}/apply`,
+        { snapshot: injectedSnapshot }, tok);
+      expect(r.status).toBe(200);
+
+      // 4. Verify that restored material is the AUTHENTIC material, NOT the injected forged material!
+      const matsAfter = await api("GET", `/api/collections/materials/records?filter=project_id%3D%22${pid}%22`, undefined, tok);
+      const authenticRestored = matsAfter.json.items.find((m: any) => m.name === "AuthenticMat");
+      const forgedFound = matsAfter.json.items.find((m: any) => m.name === "InjectedForgedMat");
+
+      expect(authenticRestored).toBeDefined();
+      expect(authenticRestored.unit_price).toBe(20);
+      expect(forgedFound).toBeUndefined();
+
+      // Cleanup
+      if (authenticRestored) {
+        await api("DELETE", `/api/collections/materials/records/${authenticRestored.id}`, undefined, tok);
+      }
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
   });
 
   describe("M7: convert_currency rate guard", () => {
