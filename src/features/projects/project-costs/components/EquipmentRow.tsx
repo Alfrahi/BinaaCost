@@ -29,6 +29,7 @@ interface EquipmentRowProps {
   selected: boolean;
   onToggle: () => void;
   rentalOptions: { value: string; label: string }[];
+  periodUnits: { value: string; label: string }[];
   /** Project-level location cost multiplier (default 1) */
   locationFactor?: number;
   /** Label for the location factor shown in formula tooltip */
@@ -47,13 +48,14 @@ export const EquipmentRow = memo(function EquipmentRow({
   selected,
   onToggle,
   rentalOptions,
+  periodUnits,
   locationFactor = 1,
   locationLabel,
 }: EquipmentRowProps) {
   const { t } = useTranslation(["project_equipment", "common"]);
   const { format } = useCurrencyFormatter();
 
-  const isPurchase = item.rental_or_purchase.toLowerCase() === "purchase";
+  const isPurchase = item.rental_or_purchase?.toLowerCase() === "purchase";
 
   const { baseCost } = calculateItemCost.equipment({
     quantity: item.quantity,
@@ -61,6 +63,7 @@ export const EquipmentRow = memo(function EquipmentRow({
     usageDuration: item.usage_duration,
     maintenanceCost: item.maintenance_cost,
     fuelCost: item.fuel_cost,
+    rentalOrPurchase: item.rental_or_purchase,
   });
 
   const maintenance = item.maintenance_cost || 0;
@@ -74,15 +77,21 @@ export const EquipmentRow = memo(function EquipmentRow({
     : `/${t(item.period_unit, { defaultValue: item.period_unit })}`;
   const formula = locationFactor !== 1
     ? (isPurchase
-        ? `${item.quantity} × ${format(item.cost_per_period, currency)} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} = ${format(totalCost, currency)}`
+        ? `${item.quantity} × ${format(item.cost_per_period, currency)} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`
         : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`)
     : (isPurchase
-        ? `${item.quantity} × ${format(item.cost_per_period, currency)} = ${format(totalCost, currency)}`
+        ? `${item.quantity} × ${format(item.cost_per_period, currency)} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`
         : `${item.quantity} × ${format(item.cost_per_period, currency)}${periodLabel} × ${item.usage_duration} + ${format(maintenance, currency)} + ${format(fuel, currency)} = ${format(totalCost, currency)}`);
 
   const rentalOrPurchaseLabel =
     rentalOptions.find((option) => option.value === item.rental_or_purchase)
       ?.label || item.rental_or_purchase;
+
+  const periodUnitLabel = isPurchase
+    ? t("common:notApplicable")
+    : (periodUnits.find((u) => u.value === item.period_unit)?.label ||
+      item.period_unit ||
+      t("common:notApplicable"));
 
   return (
     <TableRow>
@@ -117,12 +126,15 @@ export const EquipmentRow = memo(function EquipmentRow({
         <bdi dir="ltr">
           <InlineEditableCell
             value={item.cost_per_period}
-            display={`${format(item.cost_per_period, currency)}${!isPurchase ? periodLabel : ""}`}
+            display={format(item.cost_per_period, currency)}
             onCommit={(v) => onUpdateField(item.id, { cost_per_period: v })}
             disabled={!isOwner}
-            ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.costPerPeriod")} ${item.name}`}
+            ariaLabel={`${t("common:edit")} ${t(isPurchase ? "project_equipment:columns.purchaseCost" : "project_equipment:columns.costPerPeriod")} ${item.name}`}
           />
         </bdi>
+      </TableCell>
+      <TableCell className="text-start text-sm">
+        {periodUnitLabel}
       </TableCell>
       <TableCell className="text-end tabular-nums text-sm">
         {isPurchase ? (
@@ -138,6 +150,28 @@ export const EquipmentRow = memo(function EquipmentRow({
             />
           </bdi>
         )}
+      </TableCell>
+      <TableCell className="text-end tabular-nums text-sm">
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.maintenance_cost || 0}
+            display={format(item.maintenance_cost || 0, currency)}
+            onCommit={(v) => onUpdateField(item.id, { maintenance_cost: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.maintenance")} ${item.name}`}
+          />
+        </bdi>
+      </TableCell>
+      <TableCell className="text-end tabular-nums text-sm">
+        <bdi dir="ltr">
+          <InlineEditableCell
+            value={item.fuel_cost || 0}
+            display={format(item.fuel_cost || 0, currency)}
+            onCommit={(v) => onUpdateField(item.id, { fuel_cost: v })}
+            disabled={!isOwner}
+            ariaLabel={`${t("common:edit")} ${t("project_equipment:columns.fuel")} ${item.name}`}
+          />
+        </bdi>
       </TableCell>
       <TableCell className="text-end tabular-nums font-medium text-sm">
         <TooltipProvider>
@@ -236,6 +270,7 @@ export const EquipmentRow = memo(function EquipmentRow({
     prev.currency === next.currency &&
     prev.locationFactor === next.locationFactor &&
     prev.locationLabel === next.locationLabel &&
-    prev.rentalOptions === next.rentalOptions
+    prev.rentalOptions === next.rentalOptions &&
+    prev.periodUnits === next.periodUnits
   );
 });

@@ -15,6 +15,8 @@ export interface QuickAddField {
   defaultValue?: string;
   options?: { value: string; label: string }[];
   className?: string;
+  conditional?: (values: Record<string, string>) => boolean;
+  formatLabel?: (values: Record<string, string>) => string;
 }
 
 interface QuickAddRowProps {
@@ -112,14 +114,18 @@ export function QuickAddRow({
   return (
     <div className={cn("border rounded-lg p-3 bg-muted/50", className)}>
       <div className="flex flex-wrap items-end gap-2">
-        {fields.map((field, idx) => (
-          <div key={field.key} className="flex-1 min-w-[120px] space-y-1">
-            <label
-              htmlFor={field.key}
-              className="text-xs font-medium text-muted-foreground"
-            >
-              {field.label}
-            </label>
+        {fields
+          .filter((field) => !field.conditional || field.conditional(values))
+          .map((field, idx) => {
+            const label = field.formatLabel ? field.formatLabel(values) : field.label;
+            return (
+              <div key={field.key} className="flex-1 min-w-[120px] space-y-1">
+                <label
+                  htmlFor={field.key}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  {label}
+                </label>
             {field.type === "select" ? (
               <select
                 id={field.key}
@@ -146,14 +152,15 @@ export function QuickAddRow({
                 onChange={(e) => setField(field.key, e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={field.placeholder}
-                aria-label={field.label}
+                aria-label={label}
                 className="h-11 text-sm"
                 min={field.type === "number" ? "0" : undefined}
                 step={field.type === "number" ? "0.01" : undefined}
               />
             )}
           </div>
-        ))}
+            );
+          })}
         <Button
           type="button"
           onClick={handleSubmit}

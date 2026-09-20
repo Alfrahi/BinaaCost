@@ -85,7 +85,7 @@ export function EquipmentForm({
   });
 
   const rentalOrPurchase = form.watch("rental_or_purchase");
-  const isPurchase = rentalOrPurchase === "Purchase";
+  const isPurchase = rentalOrPurchase?.toLowerCase() === "purchase";
 
   useEffect(() => {
     if (!form.getValues("rental_or_purchase") && rentalOptions.length > 0) {
@@ -174,9 +174,21 @@ export function EquipmentForm({
     [form, findAndApplyMatch],
   );
 
+  const handleFormSubmit = useCallback(
+    (values: EquipmentFormValues) => {
+      const isPurch = values.rental_or_purchase?.toLowerCase() === "purchase";
+      onSubmit({
+        ...values,
+        period_unit: isPurch ? (values.period_unit || "Day") : values.period_unit,
+        usage_duration: isPurch ? 1 : (values.usage_duration || 1),
+      });
+    },
+    [onSubmit],
+  );
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-sm">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 text-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}

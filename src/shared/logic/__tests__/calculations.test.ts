@@ -44,24 +44,41 @@ describe("Cost Calculations", () => {
       expect(result.totalCost).toBe(1150);
     });
 
-    it("calculates total", () => {
+    it("calculates item cost (Purchase - duration is not multiplied)", () => {
+      const input = {
+        quantity: 2,
+        costPerPeriod: 50000,
+        usageDuration: 12, // Even if duration is passed, purchase uses single purchase price
+        maintenanceCost: 500,
+        fuelCost: 200,
+        rentalOrPurchase: "Purchase",
+      };
+      const result = calculateItemCost.equipment(input);
+      expect(result.baseCost).toBe(100000); // 2 * 50000
+      expect(result.totalCost).toBe(100700); // 100000 + 500 + 200
+    });
+
+    it("calculates total with mixed rental and purchase", () => {
       const items = [
         {
-          quantity: 1,
-          cost_per_period: 500,
-          usage_duration: 1,
+          quantity: 2,
+          cost_per_period: 100,
+          usage_duration: 5,
           maintenance_cost: 0,
           fuel_cost: 0,
+          rental_or_purchase: "Rental",
         },
         {
           quantity: 1,
-          cost_per_period: 600,
-          usage_duration: 1,
+          cost_per_period: 2000,
+          usage_duration: 10,
           maintenance_cost: 0,
           fuel_cost: 0,
+          rental_or_purchase: "Purchase",
         },
       ];
-      expect(calculateCategoryTotal.equipment(items)).toBe(1100);
+      // Rental: 2 * 100 * 5 = 1000; Purchase: 1 * 2000 = 2000 => Total = 3000
+      expect(calculateCategoryTotal.equipment(items)).toBe(3000);
     });
   });
 

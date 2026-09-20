@@ -54,7 +54,7 @@ export default function LibraryEquipmentManager() {
       min: 0,
       placeholder: "resources:equipment.costPlaceholder",
       formatLabel: (values: LibraryEquipmentFormValues) =>
-        values.rental_or_purchase === "Purchase"
+        values.rental_or_purchase?.toLowerCase() === "purchase"
           ? t("resources:equipment.purchaseCost")
           : t("resources:equipment.costPerPeriod"),
     },
@@ -65,7 +65,8 @@ export default function LibraryEquipmentManager() {
       options: periodUnits,
       isLoading: isLoadingPeriodUnits,
       placeholder: "resources:equipment.periodUnitPlaceholder",
-      conditional: (values: LibraryEquipmentFormValues) => values.rental_or_purchase !== "Purchase",
+      conditional: (values: LibraryEquipmentFormValues) =>
+        values.rental_or_purchase?.toLowerCase() !== "purchase",
     },
   ];
 
