@@ -58,6 +58,11 @@ export function calculatePublicShareFinancials(
       additionalTotal,
       riskContingency,
     },
-    financialSettings,
+    financialSettings || {
+      overhead_percent: 0,
+      markup_percent: 0,
+      tax_percent: 0,
+      contingency_percent: 0,
+    },
   );
 }

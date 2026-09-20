@@ -692,6 +692,68 @@ describe("pocketbase integration", () => {
       await api("DELETE", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, tok);
     });
 
+    itLive("public share endpoint strips proprietary data (PUB-01)", async () => {
+      // Create material with supplier_options
+      const mat = await api("POST", "/api/collections/materials/records", {
+        project_id: pid,
+        user_id: uid,
+        name: "Proprietary Cement",
+        quantity: 10,
+        unit: "bag",
+        unit_price: 25,
+        supplier_options: [{ supplier: "Secret Supplier", price: 20 }],
+      }, tok);
+      expect(mat.status).toBe(200);
+
+      const link = await api("POST", `/api/projects/${pid}/share-links`,
+        { expires_at: future(), password: "secretsharepass1" }, tok);
+      expect(link.status).toBe(200);
+      const token = link.json.access_token;
+
+      const res = await api("POST", `/api/share/${token}`, { password: "secretsharepass1" });
+      expect(res.status).toBe(200);
+
+      // Verify project proprietary data is stripped
+      expect(res.json.project.financial_settings).toBeUndefined();
+      expect(res.json.project.user_id).toBeUndefined();
+
+      // Verify materials supplier_options and user_id are stripped
+      expect(res.json.materials.length).toBeGreaterThan(0);
+      const foundMat = res.json.materials.find((m: any) => m.id === mat.json.id);
+      expect(foundMat).toBeDefined();
+      expect(foundMat.supplier_options).toBeUndefined();
+      expect(foundMat.user_id).toBeUndefined();
+
+      // Verify child items have user_id stripped
+      res.json.materials.forEach((m: any) => {
+        expect(m.supplier_options).toBeUndefined();
+        expect(m.user_id).toBeUndefined();
+      });
+      res.json.labor.forEach((l: any) => {
+        expect(l.user_id).toBeUndefined();
+      });
+      res.json.equipment.forEach((eq: any) => {
+        expect(eq.user_id).toBeUndefined();
+      });
+      res.json.additional.forEach((a: any) => {
+        expect(a.user_id).toBeUndefined();
+      });
+      res.json.groups.forEach((g: any) => {
+        expect(g.user_id).toBeUndefined();
+      });
+
+      // Verify raw risks are omitted
+      expect(res.json.risks).toEqual([]);
+
+      // Verify computed financials are provided without exposing margin formula parameters
+      expect(res.json.financials).toBeDefined();
+      expect(res.json.financials.grandTotal).toBeGreaterThan(0);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/materials/records/${mat.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/shared_project_links/records/${link.json.id}`, undefined, tok);
+    });
+
     itLive("deleting an editor share removes editor-created links, owner links survive", async () => {
       // share project with an editor
       const RUN = String(Date.now());

@@ -166,14 +166,16 @@ export default function PublicShare() {
     expires_at,
   } = shareData;
 
-  const financials = calculatePublicShareFinancials(
-    project.financial_settings,
-    materials,
-    labor,
-    equipment,
-    additional,
-    risks,
-  );
+  const financials =
+    shareData.financials ||
+    calculatePublicShareFinancials(
+      project.financial_settings,
+      materials,
+      labor,
+      equipment,
+      additional,
+      risks,
+    );
 
   const { reportSettings } = useReportSettings();
 

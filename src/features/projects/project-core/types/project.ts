@@ -57,15 +57,22 @@ import type {
   EquipmentItem,
   AdditionalCostItem,
 } from "../../project-costs/types/items";
+import type { FinancialSummary } from "@/shared/logic/financials";
+
+export interface PublicProject extends Omit<Project, "financial_settings" | "user_id"> {
+  user_id?: string;
+  financial_settings?: ProjectFinancialSettings;
+}
 
 export interface PublicShareResponse {
-  project: Project;
+  project: PublicProject;
   materials: MaterialItem[];
   labor: LaborItem[];
   equipment: EquipmentItem[];
   additional: AdditionalCostItem[];
   risks: Risk[];
   groups: ProjectGroup[];
+  financials?: FinancialSummary;
   expires_at: string | null;
   password_protected?: boolean;
   error?: string;
