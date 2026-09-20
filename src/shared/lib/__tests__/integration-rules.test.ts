@@ -353,6 +353,72 @@ describe("pocketbase integration", () => {
       }
     });
 
+    itLive("HIST-01: version creation freezes summary and financials onto snapshot data", async () => {
+      await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        financial_settings: {
+          overhead_percent: 10,
+          markup_percent: 20,
+          tax_percent: 5,
+          contingency_percent: 5,
+          location_factor: 1,
+        },
+      }, tok);
+
+      const m = await api("POST", "/api/collections/materials/records",
+        { project_id: pid, user_id: uid, name: "FrozenMat", quantity: 10, unit: "pc", unit_price: 20 }, tok);
+      const l = await api("POST", "/api/collections/labor_items/records",
+        { project_id: pid, user_id: uid, worker_type: "Carpenter", number_of_workers: 2, daily_rate: 100, total_days: 3 }, tok);
+
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "v-frozen" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      const vRec = await api("GET", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      expect(vRec.status).toBe(200);
+      const data = vRec.json.data;
+
+      expect(data).toHaveProperty("summary");
+      expect(data.summary.materials).toBe(200);
+      expect(data.summary.labor).toBe(600);
+      expect(data.summary.equipment).toBe(0);
+      expect(data.summary.additional).toBe(0);
+      expect(data.summary.directTotal).toBe(800);
+
+      expect(data).toHaveProperty("financials");
+      expect(data.financials.directCosts).toBe(800);
+      expect(data.financials.overheadAmount).toBe(80);
+      expect(data.financials.contingencyAmount).toBe(40);
+      expect(data.financials.primeCost).toBe(920);
+      expect(data.financials.markupAmount).toBe(184);
+      expect(data.financials.bidPrice).toBe(1104);
+      expect(data.financials.taxAmount).toBe(55.2);
+      expect(data.financials.grandTotal).toBe(1159.2);
+
+      await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/labor_items/records/${l.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
+
+    itLive("HIST-03: finalized versions cannot be deleted by owner or super_admin", async () => {
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "v-to-finalize" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      const fin = await api("POST", `/api/versions/${vid}/finalize`, {}, tok);
+      expect(fin.status).toBe(200);
+      expect(fin.json.is_final).toBe(true);
+
+      const delOwner = await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      expect([400, 403, 404]).toContain(delOwner.status);
+
+      const delAdmin = await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, adminTok);
+      expect([400, 403, 404]).toContain(delAdmin.status);
+
+      const check = await api("GET", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      expect(check.status).toBe(200);
+      expect(check.json.is_final).toBe(true);
+    });
+
     itLive("stale project update (mismatched updated) is rejected with 409", async () => {
       const p = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
       const currentUpdated = p.json.updated;

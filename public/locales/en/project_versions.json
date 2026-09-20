@@ -42,6 +42,7 @@
   "deleteConfirmBody": "Deleting \"{{name}}\" permanently removes its cost snapshot and cannot be undone.",
   "finalizedBadge": "Final",
   "finalizedCannotRestore": "Finalized versions cannot be restored",
+  "finalizedCannotDelete": "Finalized versions cannot be deleted",
   "versionStamp": "Version: {{name}} ({{date}})",
   "compare": "Compare",
   "compareTitle": "Compare Versions",

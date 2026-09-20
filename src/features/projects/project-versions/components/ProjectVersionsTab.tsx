@@ -133,7 +133,7 @@ export default function ProjectVersionsTab({
   }, [newVersionName, createVersion, versionNameSchema, t]);
 
   const handleDeleteVersion = useCallback(async () => {
-    if (!versionToDelete) return;
+    if (!versionToDelete || versionToDelete.is_final) return;
     await deleteVersion({ id: versionToDelete.id });
     setVersionToDelete(null);
   }, [deleteVersion, versionToDelete]);
@@ -582,7 +582,12 @@ export default function ProjectVersionsTab({
                           onClick={() => setVersionToDelete(version)}
                           className="h-9 w-9 text-destructive hover:text-destructive"
                           aria-label={`${t("deleteAction")} ${version.name}`}
-                          disabled={isDeletingVersion}
+                          disabled={version.is_final || isDeletingVersion}
+                          title={
+                            version.is_final
+                              ? t("finalizedCannotDelete")
+                              : t("deleteAction")
+                          }
                         >
                           <Trash2
                             className="w-4 h-4"

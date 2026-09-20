@@ -37,6 +37,28 @@ describe("computeVersionCostSummary", () => {
     expect(summary.directTotal).toBe(2680);
   });
 
+  it("returns frozen snapshot.summary directly when present", () => {
+    const snapshot: ProjectSnapshotData = {
+      summary: {
+        materials: 123.45,
+        labor: 200,
+        equipment: 300,
+        additional: 50,
+        directTotal: 673.45,
+      },
+      // raw items with different values
+      materials: [{ quantity: 1, unit_price: 999 } as any],
+    };
+    const summary = computeVersionCostSummary(snapshot);
+    expect(summary).toEqual({
+      materials: 123.45,
+      labor: 200,
+      equipment: 300,
+      additional: 50,
+      directTotal: 673.45,
+    });
+  });
+
   it("handles empty/missing snapshot categories as zero", () => {
     const summary = computeVersionCostSummary({});
     expect(summary).toEqual({
@@ -186,5 +208,32 @@ describe("computeVersionComparison", () => {
     const result = computeVersionComparison(snapshotA, snapshotB);
     expect(result.a.settings.overhead_percent).toBe(10);
     expect(result.b.settings.markup_percent).toBe(20);
+  });
+
+  it("uses frozen snapshot.financials directly when present", () => {
+    const snapAWithFrozen: ProjectSnapshotData = {
+      ...snapshotA,
+      financials: {
+        materialsTotal: 50,
+        laborTotal: 0,
+        equipmentTotal: 0,
+        additionalTotal: 0,
+        directCostsBase: 50,
+        locationAdjustmentAmount: 0,
+        directCosts: 50,
+        overheadAmount: 5,
+        contingencyAmount: 2.5,
+        contingencyBasis: "flat",
+        flatContingencyAmount: 2.5,
+        riskContingencyAmount: 0,
+        primeCost: 57.5,
+        markupAmount: 11.5,
+        bidPrice: 69,
+        taxAmount: 0,
+        grandTotal: 999.99, // Custom frozen grandTotal
+      },
+    };
+    const result = computeVersionComparison(snapAWithFrozen, snapshotB);
+    expect(result.a.financials.grandTotal).toBe(999.99);
   });
 });

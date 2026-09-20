@@ -296,6 +296,12 @@ export default function ReportsTab({
 
   const activeFinancials = useMemo(() => {
     if (isHistorical && snapshotData) {
+      if (
+        snapshotData.financials &&
+        typeof snapshotData.financials.grandTotal === "number"
+      ) {
+        return snapshotData.financials;
+      }
       const summary = computeVersionCostSummary(snapshotData);
       const riskContingency = calculateCategoryTotal.risks(activeRisks);
       return calculateProjectFinancials(

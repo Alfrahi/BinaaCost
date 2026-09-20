@@ -27,6 +27,16 @@ export interface VersionCostSummary {
 export function computeVersionCostSummary(
   snapshot: ProjectSnapshotData | null | undefined,
 ): VersionCostSummary {
+  if (
+    snapshot?.summary &&
+    typeof snapshot.summary.materials === "number" &&
+    typeof snapshot.summary.labor === "number" &&
+    typeof snapshot.summary.equipment === "number" &&
+    typeof snapshot.summary.additional === "number" &&
+    typeof snapshot.summary.directTotal === "number"
+  ) {
+    return snapshot.summary;
+  }
   const materials = calculateCategoryTotal.materials(snapshot?.materials || []);
   const labor = calculateCategoryTotal.labor(snapshot?.labor_items || []);
   const equipment = calculateCategoryTotal.equipment(
@@ -130,26 +140,32 @@ export function computeVersionComparison(
   const bSettings = getVersionFinancialSettings(bSnapshot);
   const aRisks = calculateCategoryTotal.risks(aSnapshot?.risks || []);
   const bRisks = calculateCategoryTotal.risks(bSnapshot?.risks || []);
-  const aFinancials = calculateProjectFinancials(
-    {
-      materialsTotal: aSummary.materials,
-      laborTotal: aSummary.labor,
-      equipmentTotal: aSummary.equipment,
-      additionalTotal: aSummary.additional,
-      riskContingency: aRisks,
-    },
-    aSettings,
-  );
-  const bFinancials = calculateProjectFinancials(
-    {
-      materialsTotal: bSummary.materials,
-      laborTotal: bSummary.labor,
-      equipmentTotal: bSummary.equipment,
-      additionalTotal: bSummary.additional,
-      riskContingency: bRisks,
-    },
-    bSettings,
-  );
+  const aFinancials =
+    aSnapshot?.financials && typeof aSnapshot.financials.grandTotal === "number"
+      ? aSnapshot.financials
+      : calculateProjectFinancials(
+          {
+            materialsTotal: aSummary.materials,
+            laborTotal: aSummary.labor,
+            equipmentTotal: aSummary.equipment,
+            additionalTotal: aSummary.additional,
+            riskContingency: aRisks,
+          },
+          aSettings,
+        );
+  const bFinancials =
+    bSnapshot?.financials && typeof bSnapshot.financials.grandTotal === "number"
+      ? bSnapshot.financials
+      : calculateProjectFinancials(
+          {
+            materialsTotal: bSummary.materials,
+            laborTotal: bSummary.labor,
+            equipmentTotal: bSummary.equipment,
+            additionalTotal: bSummary.additional,
+            riskContingency: bRisks,
+          },
+          bSettings,
+        );
 
   return {
     a: { summary: aSummary, settings: aSettings, financials: aFinancials },
