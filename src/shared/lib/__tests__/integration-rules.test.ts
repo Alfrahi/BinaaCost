@@ -535,6 +535,21 @@ describe("pocketbase integration", () => {
       }, editorTok);
       expect([400, 403, 404]).toContain(upd.status);
     });
+
+    itLive("super_admin can transfer project ownership (reassign user_id)", async () => {
+      const upd = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        user_id: editorId,
+      }, adminTok);
+      expect(upd.status).toBe(200);
+      expect(upd.json.user_id).toBe(editorId);
+
+      // Revert back to original owner
+      const revert = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        user_id: uid,
+      }, adminTok);
+      expect(revert.status).toBe(200);
+      expect(revert.json.user_id).toBe(uid);
+    });
   });
 
   describe("H3: users directory restricted", () => {

@@ -36,3 +36,25 @@ onRecordAfterDeleteSuccess((e) => {
 
   e.next();
 }, "project_shares");
+
+// Clean up redundant project_shares when project ownership is transferred.
+// An owner does not need an entry in project_shares for their own project.
+onRecordAfterUpdateSuccess((e) => {
+  try {
+    const newUserId = e.record.get("user_id");
+    const projectId = e.record.id;
+    if (newUserId && projectId) {
+      const shares = $app.findRecordsByFilter(
+        "project_shares",
+        `project_id="${projectId}" && shared_with_user_id="${newUserId}"`,
+      );
+      for (const share of shares) {
+        $app.delete(share);
+      }
+    }
+  } catch (err) {
+    $app.logger().error("project owner share cleanup failed", "err", String(err));
+  }
+  e.next();
+}, "projects");
+
