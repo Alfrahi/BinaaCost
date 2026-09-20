@@ -7,28 +7,32 @@ import { CrudOperation } from "@/integrations/pocketbase/utils";
 //   create/update/delete per record, BULK_* as sequential per-id calls
 //   (PocketBase has no `.in([])` bulk ops), RPC via the JSVM route registry.
 // onConflict/UPSERT semantics are implemented by those JSVM routes.
-export async function executePbMutation<T = any>(args: {
+export async function executePbMutation<T = unknown>(args: {
   table: string;
   operation: CrudOperation;
-  payload: any;
+  payload: unknown;
 }): Promise<T> {
   const { table, operation, payload } = args;
   const collection = pb.collection(table);
-  const recordId = payload?.id;
+  const payloadObj =
+    typeof payload === "object" && payload !== null
+      ? (payload as Record<string, unknown>)
+      : null;
+  const recordId = payloadObj?.id ? String(payloadObj.id) : undefined;
 
   switch (operation) {
     case "INSERT": {
       // Offline-queued payloads may carry optimistic uuids (crypto.randomUUID
       // in optimistic updaters). PocketBase ids are 15-char alphanumeric;
       // strip invalid client ids and let the server assign one.
-      const body = { ...payload };
-      if (!/^[a-zA-Z0-9]{15}$/.test(body.id ?? "")) delete body.id;
-      return collection.create(body);
+      const body = { ...(payloadObj ?? {}) };
+      if (!/^[a-zA-Z0-9]{15}$/.test(String(body.id ?? ""))) delete body.id;
+      return collection.create(body) as Promise<T>;
     }
 
     case "UPDATE":
       if (!recordId) throw new Error("Update requires ID");
-      return collection.update(recordId, payload);
+      return collection.update(recordId, payloadObj ?? {}) as Promise<T>;
 
     case "DELETE":
       if (!recordId) throw new Error("Delete requires ID");
@@ -44,7 +48,7 @@ export async function executePbMutation<T = any>(args: {
     }
 
     case "BULK_UPDATE": {
-      const { ids, data } = payload as { ids: string[]; data: any };
+      const { ids, data } = payload as { ids: string[]; data: Record<string, unknown> };
       const updated: unknown[] = [];
       for (const id of ids) {
         updated.push(await collection.update(id, data));

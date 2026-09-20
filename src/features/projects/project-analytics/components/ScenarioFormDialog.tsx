@@ -165,9 +165,15 @@ export function ScenarioFormDialog({
   }, [scenarioForm, formatRulesForForm, onOpenChange]);
 
   const closeForm = useCallback(() => {
+    if (scenarioForm.formState.isDirty) {
+      const confirmDiscard = window.confirm(
+        t("common:confirmDiscardUnsaved", "You have unsaved changes. Discard them?"),
+      );
+      if (!confirmDiscard) return;
+    }
     onOpenChange(false);
     scenarioForm.reset();
-  }, [onOpenChange, scenarioForm]);
+  }, [onOpenChange, scenarioForm, t]);
 
   // Open on mount if editingScenario is provided
   useEffect(() => {

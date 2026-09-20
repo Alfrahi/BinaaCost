@@ -553,14 +553,19 @@ describe("pocketbase integration", () => {
       expect(ids).toContain(adminUid);
     });
 
-    itLive("/api/users/minimal returns only display fields", async () => {
-      const r = await api("POST", "/api/users/minimal", { ids: [uid, adminUid] }, tok);
-      expect(r.status).toBe(200);
-      expect(Array.isArray(r.json)).toBe(true);
-      expect(r.json).toHaveLength(2);
-      for (const u of r.json) {
-        expect(Object.keys(u).sort()).toEqual(["email", "first_name", "id", "last_name"]);
-      }
+    itLive("/api/users/minimal scopes to collaborators and returns only display fields (SEC-005)", async () => {
+      // 1. Non-admin caller querying self and an unrelated user only gets self (unrelated user is omitted)
+      const rUser = await api("POST", "/api/users/minimal", { ids: [uid, adminUid] }, tok);
+      expect(rUser.status).toBe(200);
+      expect(Array.isArray(rUser.json)).toBe(true);
+      expect(rUser.json).toHaveLength(1);
+      expect(rUser.json[0].id).toBe(uid);
+      expect(Object.keys(rUser.json[0]).sort()).toEqual(["email", "first_name", "id", "last_name"]);
+
+      // 2. Admin caller can query arbitrary users
+      const rAdmin = await api("POST", "/api/users/minimal", { ids: [uid, adminUid] }, adminTok);
+      expect(rAdmin.status).toBe(200);
+      expect(rAdmin.json).toHaveLength(2);
     });
 
     itLive("/api/users/minimal caps at 100 ids", async () => {

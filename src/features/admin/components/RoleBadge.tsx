@@ -8,7 +8,6 @@ export function RoleBadge({ role }: { role?: string }) {
 
   let variant: BadgeProps["variant"] = "muted";
   if (role === "super_admin") variant = "default";
-  if (role === "admin") variant = "secondary";
 
   const translatedRole = t(role, role.replace("_", " "));
 

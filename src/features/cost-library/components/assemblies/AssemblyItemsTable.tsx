@@ -116,29 +116,26 @@ export const AssemblyItemsTable = React.memo(function AssemblyItemsTable({
       data={items}
       getRowKey={(item) => item.id}
       renderRow={(item) => {
-        const itemDetails = item.details;
         return (
           <TableRow key={item.id}>
             <TableCell className="text-start text-sm">{getTypeLabel(item.item_type)}</TableCell>
             <TableCell className="text-start text-sm">
               <div className="font-medium">{item.description}</div>
               {item.item_type === "additional" &&
-                itemDetails &&
-                "category" in itemDetails && (
+                item.details && (
                   <div className="text-xs text-muted-foreground">
                     {additionalCategories.find(
-                      (c) => c.value === itemDetails.category,
-                    )?.label || itemDetails.category}
+                      (c) => c.value === item.details?.category,
+                    )?.label || item.details.category}
                   </div>
                 )}
             </TableCell>
             <TableCell className="text-start text-sm">
               {item.item_type === "labor" &&
-              itemDetails &&
-              "total_days" in itemDetails ? (
+              item.details ? (
                 <span>
                   {item.quantity} {t("project_detail:reports.workersUnit")}
-                  {` × ${itemDetails.total_days} ${t("project_equipment:Day")}`}
+                  {` × ${item.details.total_days} ${t("project_equipment:Day")}`}
                 </span>
               ) : (
                 <>

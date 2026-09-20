@@ -46,36 +46,19 @@ export interface Scenario {
   updated_at: string;
 }
 
+import { FinancialSummary } from "@/shared/logic/financials";
+
+export type SimulationFinancials = Omit<
+  FinancialSummary,
+  "directCostsBase" | "locationAdjustmentAmount"
+>;
+
 export interface SimulationResult {
   original: {
-    financials: {
-      materialsTotal: number;
-      laborTotal: number;
-      equipmentTotal: number;
-      additionalTotal: number;
-      overheadAmount: number;
-      contingencyAmount: number;
-      primeCost: number;
-      markupAmount: number;
-      bidPrice: number;
-      taxAmount: number;
-      grandTotal: number;
-    };
+    financials: SimulationFinancials;
   };
   simulated: {
-    financials: {
-      materialsTotal: number;
-      laborTotal: number;
-      equipmentTotal: number;
-      additionalTotal: number;
-      overheadAmount: number;
-      contingencyAmount: number;
-      primeCost: number;
-      markupAmount: number;
-      bidPrice: number;
-      taxAmount: number;
-      grandTotal: number;
-    };
+    financials: SimulationFinancials;
   };
 }
 

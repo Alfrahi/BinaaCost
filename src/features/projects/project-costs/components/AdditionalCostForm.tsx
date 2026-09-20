@@ -17,6 +17,10 @@ import {
   AdditionalCostFormValues,
   additionalCostSchema,
 } from "@/features/projects/project-costs/types/schemas";
+import {
+  CostItemGroupSelect,
+  CostItemFormActions,
+} from "./CostItemFormWrapper";
 
 interface AdditionalCostFormProps {
   editingItem?: any;
@@ -153,46 +157,18 @@ export function AdditionalCostForm({
             )}
           />
 
-          {enableGroups && (
-            <FormField
-              control={form.control}
-              name="group_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm">
-                    {t("project_detail:groups.assignGroup")}
-                  </FormLabel>
-                  <FormControl>
-                    <TranslatedSelect
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={groupOptions}
-                      placeholder={t("project_detail:groups.selectGroup")}
-                      aria-label={t("project_detail:groups.assignGroup")}
-                      className="text-sm"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-sm" />
-                </FormItem>
-              )}
-            />
-          )}
+          <CostItemGroupSelect
+            control={form.control}
+            name="group_id"
+            groups={groups}
+            enabled={enableGroups}
+          />
         </div>
 
-        <div className="flex justify-end gap-2 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSubmitting}
-            className="text-sm"
-          >
-            {t("common:cancel")}
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="text-sm">
-            {isSubmitting ? t("common:saving") : t("common:save")}
-          </Button>
-        </div>
+        <CostItemFormActions
+          onCancel={onCancel}
+          isSubmitting={isSubmitting}
+        />
       </form>
     </Form>
   );

@@ -1,19 +1,13 @@
 import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecord, mapRecords } from "@/integrations/pocketbase/mappers";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useAuth } from "@/features/auth";
 import type { ProjectGroup } from "@/features/projects/project-core/types/project";
-
-const listByProject = (table: string, projectId: string, sort?: string) => () =>
-  pb
-    .collection(table)
-    .getFullList({
-      filter: `project_id="${projectId}"`,
-      ...(sort ? { sort } : {}),
-    })
-    .then((records) => mapRecords(records));
+import {
+  projectsRepository,
+  projectGroupsRepository,
+} from "@/integrations/pocketbase/repositories";
 
 /**
  * Core project hook — fetches the project record, access control,
@@ -43,8 +37,7 @@ export function useProjectData(projectId?: string) {
   } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
-      const record = await pb.collection("projects").getOne(projectId!);
-      return mapRecord(record);
+      return projectsRepository.getProjectById(projectId!);
     },
     ...queryOptions,
   });
@@ -92,7 +85,7 @@ export function useProjectData(projectId?: string) {
 
   const groupsQuery = useQuery({
     queryKey: ["project_groups", projectId],
-    queryFn: listByProject("project_groups", projectId!, "sort_order,created"),
+    queryFn: () => projectGroupsRepository.getGroupsByProject(projectId!),
     ...queryOptions,
   });
 
