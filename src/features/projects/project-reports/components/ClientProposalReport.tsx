@@ -7,7 +7,7 @@ import { Heading } from "@/shared/components/ui/heading";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { FinancialSummary } from "@/shared/logic/financials";
 import { sanitizeHtml } from "@/shared/lib/sanitizeText";
-import { ReportFinancialSummary } from "./ReportFinancialSummary";
+import { ClientProposalFinancialSummary } from "./ClientProposalFinancialSummary";
 
 interface ClientProposalReportProps {
   project: any;
@@ -135,7 +135,7 @@ export const ClientProposalReport = React.forwardRef<
         <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:proposedCost")}
         </h3>
-        <ReportFinancialSummary
+        <ClientProposalFinancialSummary
           financials={financials}
           project={project}
           formatCurrency={formatCurrency}

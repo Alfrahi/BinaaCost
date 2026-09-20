@@ -2,7 +2,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Globe } from "lucide-react";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
@@ -25,7 +25,7 @@ import { loginSchema, signupSchema, type LoginValues, type SignupValues } from "
 export default function Login() {
   const { loading, user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation("auth");
+  const { t, i18n } = useTranslation(["auth", "common"]);
 
   const [signupEnabled, setSignupEnabled] = useState(false);
   const [checkingSettings, setCheckingSettings] = useState(true);
@@ -145,6 +145,11 @@ export default function Login() {
     [signupForm, t],
   );
 
+  const toggleLanguage = () => {
+    const isEn = i18n.language?.toLowerCase().startsWith("en");
+    i18n.changeLanguage(isEn ? "ar" : "en");
+  };
+
   if (loading || checkingSettings) {
     return <LoadingState className="min-h-screen" />;
   }
@@ -152,6 +157,22 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="max-w-md w-full bg-card rounded-lg shadow p-8">
+        <div className="flex justify-end mb-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="text-xs font-medium"
+            aria-label={t("common:switchLanguage")}
+          >
+            <Globe className="h-3.5 w-3.5 me-1.5" />
+            {i18n.language?.toLowerCase().startsWith("en")
+              ? t("common:languageNameAr")
+              : t("common:languageNameEn")}
+          </Button>
+        </div>
+
         <Heading level={1} className="mb-4 text-center">
           {mode === "signup"
             ? t("signUp")
@@ -273,12 +294,12 @@ export default function Login() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel>{t("passwordLabel")}</FormLabel>
+                    <FormLabel>{t("confirmPasswordLabel")}</FormLabel>
                     <FormControl>
                       <Input
                         id="signup-confirm"
                         type="password"
-                        placeholder={t("passwordPlaceholder")}
+                        placeholder={t("confirmPasswordPlaceholder")}
                         {...field}
                       />
                     </FormControl>

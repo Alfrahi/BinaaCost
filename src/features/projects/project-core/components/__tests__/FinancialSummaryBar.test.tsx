@@ -92,4 +92,28 @@ describe("FinancialSummaryBar", () => {
     fireEvent.click(screen.getByRole("button", { name: /viewPricing/ }));
     expect(onViewPricing).toHaveBeenCalledTimes(1);
   });
+
+  it("uses baseDirectCosts when location adjustment is active to prevent double-counting", () => {
+    const settingsWithLocation = {
+      ...settings,
+      location_factor: 1.15,
+      location_label: "Riyadh",
+    };
+
+    render(
+      <FinancialSummaryBar
+        costs={costs}
+        currency="USD"
+        settings={settingsWithLocation}
+        onViewPricing={() => {}}
+      />,
+    );
+
+    // base direct cost is 2000.00
+    expect(screen.getByText("profit_pricing.baseDirectCosts")).toBeTruthy();
+    expect(screen.getByText("USD 2000.00")).toBeTruthy();
+    expect(screen.getByText("Riyadh ×1.15")).toBeTruthy();
+    // adjustment is 255.00 (1000*0.15 + 500*0.15 + 200*0.15 = 150+75+30 = 255)
+    expect(screen.getByText("USD 255.00")).toBeTruthy();
+  });
 });

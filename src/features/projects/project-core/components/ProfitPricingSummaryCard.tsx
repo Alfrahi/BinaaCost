@@ -75,6 +75,7 @@ export default function ProfitPricingSummaryCard({
           currency={currency}
           settings={settings}
           financials={{
+            directCostsBase: financials.directCostsBase,
             directCosts: financials.directCosts,
             locationAdjustmentAmount: financials.locationAdjustmentAmount,
             overheadAmount: financials.overheadAmount,

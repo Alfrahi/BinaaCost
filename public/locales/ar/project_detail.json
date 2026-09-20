@@ -128,6 +128,8 @@
     "taxes": "الضرائب",
     "taxesWithPercent": "الضرائب ({{percent}}%)",
     "totalDirectCosts": "إجمالي التكاليف المباشرة",
+    "baseDirectCosts": "التكاليف المباشرة الأساسية",
+    "totalDirectCostsAdjusted": "إجمالي التكاليف المباشرة (المعدلة)",
     "primeCost": "التكلفة الأولية",
     "primeCostDesc": "التكاليف المباشرة + النفقات العامة + الاحتياطي العام",
     "subtotalBeforeTax": "المجموع الفرعي (قبل الضريبة)",

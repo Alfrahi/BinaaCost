@@ -61,7 +61,12 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
   }));
 
   const handleAddOrUpdate = useCallback(
-    async (data: EquipmentFormValues, currentCurrency?: string, editingId?: string) => {
+    async (
+      data: EquipmentFormValues,
+      currentCurrency?: string,
+      editingId?: string,
+      saveToLibrary: boolean = false,
+    ) => {
       const payload = {
         name: sanitizeText(data.name),
         type: sanitizeText(data.type),
@@ -79,7 +84,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
       } else {
         await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
       }
-      if (currentCurrency) {
+      if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ name: payload.name, type: payload.type, rental_or_purchase: payload.rental_or_purchase, cost_per_period: payload.cost_per_period, period_unit: payload.period_unit }, currentCurrency);
         queryClient.invalidateQueries({ queryKey: ["library_equipment"] });
       }

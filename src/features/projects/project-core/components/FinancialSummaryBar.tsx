@@ -48,8 +48,12 @@ export default function FinancialSummaryBar({
   const steps: { label: string; value: number; key: string }[] = [
     {
       key: "direct",
-      label: t("project_detail:profit_pricing.totalDirectCosts"),
-      value: financials.directCosts,
+      label: hasLocationAdjustment
+        ? t("project_detail:profit_pricing.baseDirectCosts")
+        : t("project_detail:profit_pricing.totalDirectCosts"),
+      value: hasLocationAdjustment
+        ? financials.directCostsBase
+        : financials.directCosts,
     },
     ...(hasLocationAdjustment
       ? [{

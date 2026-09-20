@@ -129,6 +129,8 @@
     "taxes": "Taxes",
     "taxesWithPercent": "Taxes ({{percent}}%)",
     "totalDirectCosts": "Total Direct Costs",
+    "baseDirectCosts": "Base Direct Costs",
+    "totalDirectCostsAdjusted": "Total Direct Costs (Adjusted)",
     "primeCost": "Prime Cost",
     "primeCostDesc": "Direct Costs + Overhead + General Contingency",
     "subtotalBeforeTax": "Subtotal (Before Tax)",
