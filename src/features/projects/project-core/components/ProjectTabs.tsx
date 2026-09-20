@@ -117,6 +117,7 @@ function ProjectTabsComponent({
     sizeUnits,
     projectTypes,
     groups,
+    canEditFinancials,
     isLoading,
     error,
   } = useProjectData(projectId);
@@ -384,6 +385,7 @@ function ProjectTabsComponent({
                     initialSettings={project.financial_settings}
                     settingsConfirmed={project.financial_settings_confirmed}
                     scenarioCount={scenarios.length}
+                    canEditFinancials={canEditFinancials}
                     onNavigateToRisks={() => setActiveTab("risks")}
                   />
                 </ErrorBoundary>

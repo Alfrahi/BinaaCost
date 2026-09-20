@@ -72,6 +72,13 @@ export function useProjectData(projectId?: string) {
     return false;
   }, [authLoading, userRole, isOwner, projectShare?.role]);
 
+  const canEditFinancials = useMemo(() => {
+    if (authLoading) return false;
+    if (userRole === "super_admin") return true;
+    if (isOwner) return true;
+    return false;
+  }, [authLoading, userRole, isOwner]);
+
   const accessLevel = useMemo(() => {
     if (authLoading) return "loading";
     if (userRole === "super_admin") return "super_admin";
@@ -106,6 +113,7 @@ export function useProjectData(projectId?: string) {
     isOwner,
     accessLevel,
     canEdit,
+    canEditFinancials,
     sizeUnits,
     projectTypes,
     groups,
