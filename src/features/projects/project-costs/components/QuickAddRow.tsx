@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Plus, X } from "lucide-react";
@@ -44,11 +44,30 @@ export function QuickAddRow({
   className,
 }: QuickAddRowProps) {
   const { t } = useTranslation(["common"]);
+
+  const getInitialValue = useCallback((f: QuickAddField) => {
+    return f.defaultValue ?? (f.type === "select" && f.options?.length ? f.options[0].value : "");
+  }, []);
+
   const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(fields.map((f) => [f.key, f.defaultValue ?? ""])),
+    Object.fromEntries(fields.map((f) => [f.key, getInitialValue(f)])),
   );
   const [error, setError] = useState<string | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+
+  // When options load asynchronously, ensure select fields have an initial value
+  useEffect(() => {
+    fields.forEach((f) => {
+      if (f.type === "select" && f.options && f.options.length > 0) {
+        setValues((prev) => {
+          if (!prev[f.key]) {
+            return { ...prev, [f.key]: f.defaultValue || f.options![0].value };
+          }
+          return prev;
+        });
+      }
+    });
+  }, [fields]);
 
   const setField = useCallback((key: string, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -57,11 +76,11 @@ export function QuickAddRow({
 
   const reset = useCallback(() => {
     setValues(
-      Object.fromEntries(fields.map((f) => [f.key, f.defaultValue ?? ""])),
+      Object.fromEntries(fields.map((f) => [f.key, getInitialValue(f)])),
     );
     setError(null);
     firstInputRef.current?.focus();
-  }, [fields]);
+  }, [fields, getInitialValue]);
 
   const handleSubmit = useCallback(async () => {
     const parsed = schema.safeParse(buildValues(values));

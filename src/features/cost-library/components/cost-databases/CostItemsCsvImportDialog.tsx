@@ -107,7 +107,9 @@ export default function CostItemsCsvImportDialog({
                     >
                       <SelectValue
                         placeholder={t("pages:data_import.selectCsvColumn")}
-                      />
+                      >
+                        {fieldMapping[schemaField.key] || undefined}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {csvHeaders.map((header) => (

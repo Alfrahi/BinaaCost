@@ -134,7 +134,12 @@ export default function CostsTab({
         {isMobile ? (
           <Select value={activeCostTab} onValueChange={setActiveCostTab}>
             <SelectTrigger className="w-full text-sm mb-4">
-              <SelectValue placeholder={t("project_tabs:selectCostCategory")} />
+              <SelectValue placeholder={t("project_tabs:selectCostCategory")}>
+                {(() => {
+                  const activeItem = costTabItems.find((item) => item.value === activeCostTab);
+                  return activeItem ? t(activeItem.labelKey) : undefined;
+                })()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {costTabItems.map((item) => (

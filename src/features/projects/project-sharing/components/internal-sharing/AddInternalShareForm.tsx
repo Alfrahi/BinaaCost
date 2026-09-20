@@ -81,7 +81,9 @@ export function AddInternalShareForm({
           disabled={isAdding}
         >
           <SelectTrigger id="new-share-role" className="text-sm">
-            <SelectValue />
+            <SelectValue>
+              {role === "viewer" ? t("roles:viewer_display") : t("roles:editor_display")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="viewer" className="text-sm">

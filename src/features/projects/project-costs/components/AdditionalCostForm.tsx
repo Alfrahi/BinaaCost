@@ -64,10 +64,10 @@ export function AdditionalCostForm({
 
   useEffect(() => {
     if (!form.getValues("category") && additionalCategories.length > 0) {
-      form.setValue("category", additionalCategories[0].value);
+      form.setValue("category", additionalCategories[0].value, { shouldValidate: true, shouldDirty: false });
     }
     if (enableGroups && !form.getValues("group_id") && groups.length > 0) {
-      form.setValue("group_id", "ungrouped");
+      form.setValue("group_id", "ungrouped", { shouldValidate: true, shouldDirty: false });
     }
   }, [additionalCategories, groups, form, enableGroups]);
 
@@ -104,6 +104,7 @@ export function AdditionalCostForm({
                     onValueChange={field.onChange}
                     options={additionalCategories}
                     isLoading={isLoadingAdditionalCategories}
+                    autoSelectFirst={true}
                     placeholder={t("columns.categoryPlaceholder")}
                     aria-label={t("columns.category")}
                     className="text-sm"

@@ -54,7 +54,12 @@ export default function Resources() {
         {isMobile ? (
           <Select value={activeTab} onValueChange={handleTabChange}>
             <SelectTrigger className="w-full text-sm mb-4">
-              <SelectValue placeholder={t("resources:selectCategory")} />
+              <SelectValue placeholder={t("resources:selectCategory")}>
+                {(() => {
+                  const activeItem = tabItems.find((item) => item.value === activeTab);
+                  return activeItem ? t(activeItem.labelKey) : undefined;
+                })()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {tabItems.map((item) => (

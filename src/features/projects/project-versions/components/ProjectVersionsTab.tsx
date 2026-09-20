@@ -344,7 +344,9 @@ export default function ProjectVersionsTab({
               disabled={isLoadingVersions}
             >
               <SelectTrigger className="w-full text-sm">
-                <SelectValue placeholder={t("select")} />
+                <SelectValue placeholder={t("select")}>
+                  {versionA ? versionA.name : undefined}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {versions.map((v) => (
@@ -363,7 +365,9 @@ export default function ProjectVersionsTab({
               disabled={isLoadingVersions}
             >
               <SelectTrigger className="w-full text-sm">
-                <SelectValue placeholder={t("select")} />
+                <SelectValue placeholder={t("select")}>
+                  {versionB ? versionB.name : undefined}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {versions.map((v) => (

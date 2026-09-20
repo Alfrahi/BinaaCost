@@ -54,7 +54,12 @@ export function ScenarioSelector({
           disabled={isLoadingScenarios || isSimulating}
         >
           <SelectTrigger className="w-full text-sm">
-            <SelectValue placeholder={t("selectScenario")} />
+            <SelectValue placeholder={t("selectScenario")}>
+              {(() => {
+                const s = scenarios.find((sc) => sc.id === selectedScenarioId);
+                return s ? `${s.name}${s.is_public ? ` (${t("public")})` : ""}` : undefined;
+              })()}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {isLoadingScenarios ? (

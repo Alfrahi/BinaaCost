@@ -52,7 +52,12 @@ export default function Settings() {
         {isMobile ? (
           <Select value={activeTab} onValueChange={setActiveTab}>
             <SelectTrigger className="w-full text-sm mb-4">
-              <SelectValue placeholder={t("settings:selectCategory")} />
+              <SelectValue placeholder={t("settings:selectCategory")}>
+                {(() => {
+                  const activeItem = tabItems.find((item) => item.value === activeTab);
+                  return activeItem ? t(activeItem.labelKey) : undefined;
+                })()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {tabItems.map((item) => (

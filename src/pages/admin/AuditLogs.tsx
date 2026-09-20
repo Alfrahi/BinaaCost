@@ -202,7 +202,9 @@ export default function AuditLogs() {
             }}
           >
             <SelectTrigger className="w-[80px] text-sm">
-              <SelectValue placeholder={pageSize} />
+              <SelectValue placeholder={pageSize}>
+                {String(pageSize)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {[10, 20, 50, 100].map((size) => (

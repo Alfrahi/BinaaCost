@@ -331,7 +331,9 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
             }}
           >
             <SelectTrigger className="w-[70px] h-8 text-sm">
-              <SelectValue />
+              <SelectValue>
+                {pageSize.toString()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="10" className="text-sm">

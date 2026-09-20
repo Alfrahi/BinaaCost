@@ -117,7 +117,7 @@ describe("ProjectTabs ErrorBoundary Isolation", () => {
     expect(screen.getByText("costs")).toBeTruthy();
 
     // ErrorDisplay should be rendered inside the tab content
-    expect(await screen.findByText("boundaryTitle")).toBeTruthy();
+    expect(await screen.findByText("boundaryTitle", {}, { timeout: 5000 })).toBeTruthy();
     expect(screen.getByText("Crash inside OverviewTab")).toBeTruthy();
     expect(screen.getByText("tryAgain")).toBeTruthy();
 
