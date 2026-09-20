@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui
 import { useAuth } from "@/features/auth";
 import { pb } from "@/integrations/pocketbase/client";
 import { calculateProjectFinancials } from "@/shared/logic/financials";
+import { calculateCategoryTotal } from "@/shared/logic/shared";
 import {
   FinancialAssumptionsStrip,
   DefaultAssumptionsWarning,
@@ -164,12 +165,14 @@ export default function ReportsTab({
   );
 
   const financials = useMemo(() => {
+    const riskContingency = calculateCategoryTotal.risks(risks);
     return calculateProjectFinancials(
       {
         materialsTotal,
         laborTotal,
         equipmentTotal,
         additionalTotal,
+        riskContingency,
       },
       project.financial_settings || {
         overhead_percent: 10,
@@ -183,6 +186,7 @@ export default function ReportsTab({
     laborTotal,
     equipmentTotal,
     additionalTotal,
+    risks,
     project.financial_settings,
   ]);
 

@@ -17,6 +17,7 @@ import { MobileItemCard } from "./MobileItemCard";
 import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
 import { useIsMobile } from "@/shared/hooks/useMobile";
+import { PaginationControls } from "@/shared/components/PaginationControls";
 import DataTable, { DataTableColumn } from "@/shared/components/ui/data-table";
 import {
   AssemblyIntegrationRow,
@@ -163,6 +164,11 @@ export function EntityTable<T>({
 
   const totalPages = Math.ceil(items.length / PAGE_SIZE);
 
+  const paginatedItems = useMemo(() => {
+    const from = currentPage * PAGE_SIZE;
+    return items.slice(from, from + PAGE_SIZE);
+  }, [items, currentPage]);
+
   useEffect(() => {
     if (currentPage > 0 && currentPage >= totalPages) {
       setCurrentPage(Math.max(0, totalPages - 1));
@@ -264,7 +270,7 @@ export function EntityTable<T>({
       )}
       {isMobile ? (
         <div className="space-y-3">
-          {items.map((item) => (
+          {paginatedItems.map((item) => (
             <MobileItemCard
               key={(item as any).id}
               name={config.getMobileName(item)}
@@ -294,6 +300,13 @@ export function EntityTable<T>({
             <div className="text-center h-24 text-sm text-muted-foreground">
               {config.emptyMessage}
             </div>
+          )}
+          {totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       ) : (

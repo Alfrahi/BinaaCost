@@ -59,6 +59,9 @@ interface FinancialSummaryTableProps {
     locationAdjustmentAmount: number;
     overheadAmount: number;
     contingencyAmount: number;
+    contingencyBasis?: "flat" | "risk_register" | "combined";
+    flatContingencyAmount?: number;
+    riskContingencyAmount?: number;
     primeCost: number;
     markupAmount: number;
     bidPrice: number;
@@ -89,14 +92,18 @@ export function FinancialSummaryTable({
   const { t } = useTranslation(["project_detail", "common", "project_tabs"]);
   const hasLocationAdjustment = (settings.location_factor ?? 1) !== 1;
 
+  const contingencyBasis = settings.contingency_basis || financials.contingencyBasis || "flat";
+
   return (
-    <Card className="shadow-md border-accent">
-      <CardHeader className="bg-accent py-4 border-b border-accent">
-        <CardTitle className="text-xl text-accent-foreground m-0">{t("project_detail:profit_pricing.title")}</CardTitle>
+    <Card className="lg:col-span-2 shadow-sm border-border">
+      <CardHeader className="bg-muted py-4 border-b">
+        <CardTitle className="m-0">
+          {t("project_detail:profit_pricing.title")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="space-y-1">
-          <div className="bg-muted p-3 rounded-lg mb-4 text-sm">
+        <div className="space-y-4">
+          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
             <SummaryRow label={t("project_tabs:materials")} value={format(materialsTotal, currency)} className="text-muted-foreground" />
             <SummaryRow label={t("project_tabs:labor")} value={format(laborTotal, currency)} className="text-muted-foreground" />
             <SummaryRow label={t("project_tabs:equipment")} value={format(equipmentTotal, currency)} className="text-muted-foreground" />
@@ -139,13 +146,43 @@ export function FinancialSummaryTable({
                   valueClassName="text-destructive"
                   tooltip={t("project_detail:profit_pricing.tooltips.overhead")}
                 />
-                <SummaryRow
-                  label={t("project_detail:profit_pricing.generalContingencyWithPercent", { percent: settings.contingency_percent })}
-                  value={format(financials.contingencyAmount, currency)}
-                  className="text-foreground"
-                  valueClassName="text-destructive"
-                  tooltip={t("project_detail:profit_pricing.tooltips.generalContingency")}
-                />
+                {contingencyBasis === "risk_register" ? (
+                  <SummaryRow
+                    label={t("project_detail:profit_pricing.riskRegisterContingency")}
+                    value={format(financials.contingencyAmount, currency)}
+                    className="text-foreground font-medium"
+                    valueClassName="text-destructive"
+                    tooltip={t("project_detail:profit_pricing.contingencyBasisRiskRegisterDesc")}
+                  />
+                ) : contingencyBasis === "combined" ? (
+                  <>
+                    <SummaryRow
+                      label={t("project_detail:profit_pricing.combinedContingency")}
+                      value={format(financials.contingencyAmount, currency)}
+                      className="text-foreground font-medium"
+                      valueClassName="text-destructive"
+                      tooltip={t("project_detail:profit_pricing.contingencyBasisCombinedDesc")}
+                    />
+                    <div className="ps-4 space-y-0.5 text-xs text-muted-foreground border-s-2 border-muted my-1">
+                      <div className="flex justify-between">
+                        <span>• {t("project_detail:profit_pricing.generalContingencyWithPercent", { percent: settings.contingency_percent })}</span>
+                        <span>{format(financials.flatContingencyAmount ?? 0, currency)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>• {t("project_detail:profit_pricing.riskContingency")}</span>
+                        <span>{format(financials.riskContingencyAmount ?? (riskContingency || 0), currency)}</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <SummaryRow
+                    label={t("project_detail:profit_pricing.generalContingencyWithPercent", { percent: settings.contingency_percent })}
+                    value={format(financials.contingencyAmount, currency)}
+                    className="text-foreground"
+                    valueClassName="text-destructive"
+                    tooltip={t("project_detail:profit_pricing.tooltips.generalContingency")}
+                  />
+                )}
               </div>
             </div>
 
@@ -157,7 +194,20 @@ export function FinancialSummaryTable({
                   className="text-muted-foreground"
                   tooltip={t("project_detail:profit_pricing.riskContingencyCombinedTooltip")}
                 />
-                <p className="text-xs text-muted-foreground -mt-1">{t("project_detail:profit_pricing.riskContingencyInfo")}</p>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  {contingencyBasis === "risk_register" || contingencyBasis === "combined"
+                    ? t("project_detail:profit_pricing.riskContingencyIncluded")
+                    : t("project_detail:profit_pricing.riskContingencyNotIncluded")}
+                </p>
+                {onNavigateToRisks && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToRisks}
+                    className="text-xs text-primary hover:underline mt-0.5 inline-block cursor-pointer"
+                  >
+                    {t("project_detail:profit_pricing.viewRiskRegister")}
+                  </button>
+                )}
               </div>
             )}
 

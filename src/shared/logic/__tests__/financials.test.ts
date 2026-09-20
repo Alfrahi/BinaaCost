@@ -132,6 +132,55 @@ describe("Financial Logic", () => {
     expect(result.directCosts).toBe(3650);
     expect(result.locationAdjustmentAmount).toBe(-350);
   });
+
+  describe("contingency basis options", () => {
+    const costInputsWithRisk = {
+      ...mockTotals,
+      riskContingency: 350,
+    };
+
+    it("defaults to flat percentage when contingency_basis is unspecified", () => {
+      const result = calculateProjectFinancials(costInputsWithRisk, mockSettings);
+
+      expect(result.contingencyBasis).toBe("flat");
+      expect(result.flatContingencyAmount).toBe(200); // 4000 * 5%
+      expect(result.riskContingencyAmount).toBe(350);
+      expect(result.contingencyAmount).toBe(200); // Only flat is used in prime cost
+      expect(result.primeCost).toBe(4600); // direct (4000) + overhead (400) + flat (200)
+    });
+
+    it("uses risk register amount when contingency_basis is risk_register", () => {
+      const result = calculateProjectFinancials(costInputsWithRisk, {
+        ...mockSettings,
+        contingency_basis: "risk_register",
+      });
+
+      expect(result.contingencyBasis).toBe("risk_register");
+      expect(result.contingencyAmount).toBe(350);
+      expect(result.primeCost).toBe(4750); // direct (4000) + overhead (400) + risk (350)
+      expect(result.markupAmount).toBe(950); // 4750 * 20%
+      expect(result.bidPrice).toBe(5700); // 4750 + 950
+      expect(result.taxAmount).toBe(570); // 5700 * 10%
+      expect(result.grandTotal).toBe(6270);
+    });
+
+    it("combines flat percentage and risk register when contingency_basis is combined", () => {
+      const result = calculateProjectFinancials(costInputsWithRisk, {
+        ...mockSettings,
+        contingency_basis: "combined",
+      });
+
+      expect(result.contingencyBasis).toBe("combined");
+      expect(result.flatContingencyAmount).toBe(200);
+      expect(result.riskContingencyAmount).toBe(350);
+      expect(result.contingencyAmount).toBe(550); // 200 + 350
+      expect(result.primeCost).toBe(4950); // direct (4000) + overhead (400) + combined (550)
+      expect(result.markupAmount).toBe(990); // 4950 * 20%
+      expect(result.bidPrice).toBe(5940); // 4950 + 990
+      expect(result.taxAmount).toBe(594); // 5940 * 10%
+      expect(result.grandTotal).toBe(6534);
+    });
+  });
 });
 
 describe("hasConfirmedFinancialSettings", () => {

@@ -171,6 +171,7 @@ export default function PublicShare() {
     labor,
     equipment,
     additional,
+    risks,
   );
 
   const companyInfo = {

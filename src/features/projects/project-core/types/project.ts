@@ -1,8 +1,11 @@
-interface ProjectFinancialSettings {
+export interface ProjectFinancialSettings {
   tax_percent: number;
   markup_percent: number;
   overhead_percent: number;
   contingency_percent: number;
+  contingency_basis?: "flat" | "risk_register" | "combined";
+  location_factor?: number;
+  location_label?: string;
 }
 
 export interface Project {

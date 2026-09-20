@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import LoadingState from "@/shared/components/ui/LoadingState";
+import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import {
   AssemblyItem,
   AssemblyLaborDetails,
+  AssemblyEquipmentDetails,
   AssemblyAdditionalCostDetails,
 } from "@/features/cost-library/assemblies/types/assemblies";
 import { Label } from "@/shared/components/ui/label";
@@ -46,6 +48,8 @@ export default function AssemblyImporter({
   const [selectedAssemblyId, setSelectedAssemblyId] = useState<string | null>(
     null,
   );
+  const [takeoffQuantity, setTakeoffQuantity] = useState<number>(1);
+  const scale = Number(takeoffQuantity) > 0 ? Number(takeoffQuantity) : 1;
 
   const {
     itemsQuery: { data: assemblyItems = [], isLoading: isLoadingAssemblyItems },
@@ -61,7 +65,7 @@ export default function AssemblyImporter({
   );
 
   const getTranslatedUnitDisplay = useCallback(
-    (item: AssemblyItem) => {
+    (item: AssemblyItem, scaleFactor: number = 1) => {
       const formattedPrice = formatCurrencyValue(item.unit_price, "USD");
       switch (item.item_type) {
         case "material": {
@@ -69,17 +73,21 @@ export default function AssemblyImporter({
             materialUnits.find((u) => u.value === item.unit)?.label ||
             item.unit ||
             t("common:unit");
+          const scaledQty = Number((item.quantity * scaleFactor).toFixed(4));
           return (
             <bdi>
-              {`${item.quantity} ${materialUnitLabel} @ ${formattedPrice}`}
+              {`${scaledQty} ${materialUnitLabel} @ ${formattedPrice}`}
             </bdi>
           );
         }
         case "labor": {
-          const laborDetails = item.details as AssemblyLaborDetails;
+          const laborDetails = item.details as AssemblyLaborDetails | null;
+          const scaledDays = Number(
+            ((laborDetails?.total_days ?? 1) * scaleFactor).toFixed(2),
+          );
           return (
             <bdi>
-              {`${item.quantity} ${t("project_detail:reports.workersUnit")} × ${laborDetails.total_days} ${t("project_equipment:Day")} @ ${formattedPrice}`}
+              {`${item.quantity} ${t("project_detail:reports.workersUnit")} × ${scaledDays} ${t("project_equipment:Day")} @ ${formattedPrice}`}
             </bdi>
           );
         }
@@ -88,23 +96,28 @@ export default function AssemblyImporter({
             periodUnits.find((u) => u.value === item.unit)?.label ||
             item.unit ||
             t("project_equipment:Day");
+          const equipDetails = item.details as AssemblyEquipmentDetails | null;
+          const scaledDuration = Number(
+            ((equipDetails?.usage_duration ?? 1) * scaleFactor).toFixed(2),
+          );
           return (
             <bdi>
-              {`${item.quantity} ${equipmentUnitLabel} @ ${formattedPrice}`}
+              {`${item.quantity} ${equipmentUnitLabel} × ${scaledDuration} @ ${formattedPrice}`}
             </bdi>
           );
         }
         case "additional": {
           return (
             <bdi>
-              {`1 ${t("common:each")} @ ${formattedPrice}`}
+              {`${scaleFactor} ${t("common:each")} @ ${formattedPrice}`}
             </bdi>
           );
         }
         default: {
+          const scaledQty = Number((item.quantity * scaleFactor).toFixed(4));
           return (
             <bdi>
-              {`${item.quantity} ${item.unit || t("common:unit")} @ ${formattedPrice}`}
+              {`${scaledQty} ${item.unit || t("common:unit")} @ ${formattedPrice}`}
             </bdi>
           );
         }
@@ -117,12 +130,15 @@ export default function AssemblyImporter({
     if (!selectedAssemblyId || assemblyItems.length === 0) return;
 
     try {
-      await importAssemblyItems(assemblyItems);
+      await importAssemblyItems({
+        assemblyItems,
+        scaleFactor: scale,
+      });
       onCancel();
     } catch (error: any) {
       console.error("Error during assembly import:", error);
     }
-  }, [selectedAssemblyId, assemblyItems, importAssemblyItems, onCancel]);
+  }, [selectedAssemblyId, assemblyItems, importAssemblyItems, scale, onCancel]);
 
   const isLoadingAny =
     isLoadingProject ||
@@ -187,6 +203,34 @@ export default function AssemblyImporter({
             </SelectContent>
           </Select>
         </div>
+
+        {selectedAssemblyId && (
+          <div>
+            <Label htmlFor="takeoff-quantity" className="text-sm font-medium">
+              {t("project_detail:assembly_importer.takeoffQuantity")}
+            </Label>
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                id="takeoff-quantity"
+                type="number"
+                min="0.0001"
+                step="any"
+                value={takeoffQuantity}
+                onChange={(e) =>
+                  setTakeoffQuantity(parseFloat(e.target.value) || 0)
+                }
+                placeholder={t(
+                  "project_detail:assembly_importer.takeoffQuantityPlaceholder",
+                )}
+                className="w-40 text-sm"
+              />
+              <span className="text-xs text-muted-foreground">
+                × {scale} {t("project_detail:assembly_importer.scaleFactor")}
+              </span>
+            </div>
+          </div>
+        )}
+
         {selectedAssemblyId && (
           <div className="border rounded-md bg-card">
             <div className="bg-muted px-4 py-2 border-b">
@@ -210,7 +254,7 @@ export default function AssemblyImporter({
                       {item.item_type === "additional"
                         ? `${additionalCategories.find((c) => c.value === (item.details as AssemblyAdditionalCostDetails)?.category)?.label || (item.details as AssemblyAdditionalCostDetails)?.category || t("common:notSpecified")}: ${item.description}`
                         : item.description}{" "}
-                      {getTranslatedUnitDisplay(item)}
+                      {getTranslatedUnitDisplay(item, scale)}
                     </li>
                   ))}
                 </ul>
