@@ -38,10 +38,16 @@ export function AssemblyLaborForm({
   const { t } = useTranslation(["project_labor", "common"]);
   const { convert, getMissingRates } = useCurrencyConverter();
 
+interface LibraryLaborItem {
+  id: string;
+  worker_type: string;
+  daily_rate?: number;
+}
+
   const { data: libraryItemsData } = useQuery({
     queryKey: ["library_labor"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_labor").getFullList()),
+      mapRecords<LibraryLaborItem>(await pb.collection("library_labor").getFullList()),
   });
   const libraryItems = useMemo(
     () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),

@@ -48,7 +48,7 @@ vi.mock("@/features/cost-library/hooks/useCostDatabases", () => ({
 }));
 
 vi.mock("@/features/cost-library/hooks/useCostDatabaseItems", () => ({
-  useCostDatabaseItems: (dbId?: string, page = 0, pageSize = 10, search = "") => {
+  useCostDatabaseItems: (_dbId?: string, _page = 0, _pageSize = 10, search = "") => {
     const filtered = search
       ? mockItems.filter(
           (i) =>

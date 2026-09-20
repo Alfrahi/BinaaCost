@@ -104,7 +104,10 @@ function AssemblyItemManager({
           "id" | "user_id" | "created_at" | "updated_at" | "assembly_id"
         >;
         if (editingItem) {
-          await updateItem.mutateAsync({ id: editingItem.id, ...itemValues });
+          await updateItem.mutateAsync({
+            id: editingItem.id,
+            ...itemValues,
+          } as Partial<AssemblyItem> & { id: string });
         } else {
           await createItem.mutateAsync({
             ...itemValues,

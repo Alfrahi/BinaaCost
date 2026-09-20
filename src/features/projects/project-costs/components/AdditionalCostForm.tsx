@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
   Form,
@@ -77,11 +76,6 @@ export function AdditionalCostForm({
     },
     [onSubmit],
   );
-
-  const groupOptions = [
-    { value: "ungrouped", label: t("project_detail:groups.ungrouped") },
-    ...groups.map((g) => ({ value: g.id, label: g.name })),
-  ];
 
   return (
     <Form {...form}>

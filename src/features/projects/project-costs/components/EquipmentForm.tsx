@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
   Form,
@@ -24,6 +23,15 @@ import {
   CostItemGroupSelect,
   CostItemFormActions,
 } from "./CostItemFormWrapper";
+
+interface LibraryEquipmentItem {
+  id: string;
+  name: string;
+  type?: string;
+  rental_or_purchase?: string;
+  cost_per_period?: number;
+  period_unit: string;
+}
 
 type EquipmentFormValues = z.infer<typeof equipmentSchema>;
 
@@ -64,7 +72,7 @@ export function EquipmentForm({
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_equipment"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_equipment").getFullList()),
+      mapRecords<LibraryEquipmentItem>(await pb.collection("library_equipment").getFullList()),
   });
 
   const form = useForm<EquipmentFormValues>({

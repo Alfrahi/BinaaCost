@@ -290,7 +290,7 @@ describe("pocketbase integration", () => {
       const oldGroupId = grp.json.id;
 
       // 2. Create a material linked to that group
-      const mat = await api("POST", "/api/collections/materials/records", {
+      await api("POST", "/api/collections/materials/records", {
         project_id: pid, user_id: uid, group_id: oldGroupId, name: "Cement", quantity: 50, unit: "bag", unit_price: 15,
       }, tok);
 

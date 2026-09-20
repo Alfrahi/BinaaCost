@@ -56,7 +56,7 @@ export default function EditRoleModal({
               <SelectValue
                 placeholder={t("admin:editRoleModal.select_placeholder")}
               >
-                {role ? t(`roles:${role}_display`, role.replace("_", " ")) : undefined}
+                {role ? String(t(`roles:${role}_display`, role.replace("_", " "))) : undefined}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
