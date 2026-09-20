@@ -12,7 +12,6 @@ import { useBulkSelection } from "@/shared/hooks/useBulkSelection";
 import { BulkMoveDialog } from "@/features/projects/project-costs/components/BulkMoveDialog";
 import { BulkActionBar } from "@/shared/components/BulkActionBar";
 import { safeAdd } from "@/shared/lib/math";
-import { QuickAddRow, QuickAddField } from "./QuickAddRow";
 import { MobileItemCard } from "./MobileItemCard";
 import { ItemActions } from "./ItemActions";
 import ProjectCsvImportDialog from "./ProjectCsvImportDialog";
@@ -48,8 +47,8 @@ export interface EntityTableConfig<T> {
   calculateTotal: (item: T) => number;
   /** Human-readable name for the single-delete confirmation. */
   getDeleteName: (item: T) => string;
-  quickAdd: {
-    fields: QuickAddField[];
+  quickAdd?: {
+    fields: any[];
     schema: any;
     buildValues: (raw: Record<string, string>) => any;
   };
@@ -214,10 +213,21 @@ export function EntityTable<T>({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 gap-2">
+      <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
         <Heading level={3}>{config.title}</Heading>
         {canEdit && !isFormOpen && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <AssemblyIntegrationRow
+              itemTypes={config.assemblyImport.itemTypes}
+              onImport={config.assemblyImport.onImport}
+            />
+            {config.costDatabaseImport && (
+              <CostDatabasePickerModal
+                projectCurrency={currency}
+                groups={groups}
+                onImport={config.costDatabaseImport.onImport}
+              />
+            )}
             <Button
               variant="outline"
               onClick={() => setShowCsvImport(true)}
@@ -232,45 +242,16 @@ export function EntityTable<T>({
             </Button>
             <Button
               onClick={() => openForm(null)}
-              className="h-11 text-sm"
+              size="icon"
+              className="h-11 w-11 shrink-0"
               aria-label={config.addLabel}
+              title={config.addLabel}
             >
-              <Plus
-                className={cn("w-4 h-4", getIconMarginClass())}
-                aria-hidden="true"
-              />
-              {config.addLabel}
+              <Plus className="w-5 h-5" aria-hidden="true" />
             </Button>
           </div>
         )}
       </div>
-      {canEdit && !isFormOpen && (
-        <QuickAddRow
-          className="mb-4"
-          fields={config.quickAdd.fields}
-          schema={config.quickAdd.schema}
-          buildValues={config.quickAdd.buildValues}
-          onSubmit={(values) => crud.handleAddOrUpdate(values, currency)}
-          isSubmitting={crud.isAdding}
-          submitLabel={config.addLabel}
-          ariaLabel={config.addLabel}
-        />
-      )}
-      {canEdit && !isFormOpen && (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <AssemblyIntegrationRow
-            itemTypes={config.assemblyImport.itemTypes}
-            onImport={config.assemblyImport.onImport}
-          />
-          {config.costDatabaseImport && (
-            <CostDatabasePickerModal
-              projectCurrency={currency}
-              groups={groups}
-              onImport={config.costDatabaseImport.onImport}
-            />
-          )}
-        </div>
-      )}
       {isFormOpen && (
         <div className="p-4 border rounded-sm bg-card mb-4">
           <Heading level={3} className="mb-4">
