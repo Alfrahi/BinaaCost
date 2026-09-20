@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
 import { Input } from "@/shared/components/ui/input";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -22,6 +24,7 @@ import { X } from "lucide-react";
 const costDatabaseSchema = z.object({
   name: z.string().min(1, "pages:cost_databases.nameRequired"),
   description: z.string().nullable().optional(),
+  is_public: z.boolean().default(false),
   currency: z.string().min(1, "pages:cost_databases.currencyRequired"),
 });
 
@@ -40,7 +43,7 @@ export function CostDatabaseForm({
   onCancel,
   isSubmitting,
 }: CostDatabaseFormProps) {
-  const { t } = useTranslation(["pages", "common"]);
+  const { t } = useTranslation(["pages", "common", "resources"]);
   const { options: currencies, isLoading: isLoadingCurrencies } =
     useSettingsOptions("currency");
 
@@ -49,6 +52,7 @@ export function CostDatabaseForm({
     defaultValues: {
       name: "",
       description: "",
+      is_public: false,
       currency: currencies[0]?.value || "USD",
     },
   });
@@ -58,12 +62,14 @@ export function CostDatabaseForm({
       form.reset({
         name: initialData.name,
         description: initialData.description || "",
+        is_public: initialData.is_public ?? false,
         currency: initialData.currency || currencies[0]?.value || "USD",
       });
     } else {
       form.reset({
         name: "",
         description: "",
+        is_public: false,
         currency: currencies[0]?.value || "USD",
       });
     }
@@ -79,7 +85,8 @@ export function CostDatabaseForm({
     <div className="border rounded-lg p-4 bg-muted space-y-3">
       <div className="flex justify-between items-center">
         <Heading level={3}>
-          {initialData ? t("common:edit") : t("pages:cost_databases.add")}
+          {initialData ? t("common:edit") : t("common:add")}{" "}
+          {t("resources:databases")}
         </Heading>
         <Button
           type="button"
@@ -117,10 +124,11 @@ export function CostDatabaseForm({
                   {t("common:description")}
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
                     {...field}
                     value={field.value || ""}
                     onChange={field.onChange}
+                    rows={3}
                     className="text-sm"
                   />
                 </FormControl>
@@ -148,6 +156,23 @@ export function CostDatabaseForm({
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="is_public"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center gap-2">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormLabel className="text-sm font-medium">
+                  {t("pages:cost_databases.public")}
+                </FormLabel>
               </FormItem>
             )}
           />
