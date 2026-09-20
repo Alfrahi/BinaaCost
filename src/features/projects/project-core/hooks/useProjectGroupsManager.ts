@@ -10,15 +10,8 @@ import { DragEndEvent } from "@dnd-kit/core";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { handleError } from "@/shared/lib/toast";
 
-export interface ProjectGroup {
-  id: string;
-  name: string;
-  sort_order: number;
-  project_id: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-}
+import type { ProjectGroup } from "@/features/projects/project-core/types/project";
+export type { ProjectGroup };
 
 export function useProjectGroupsManager(
   projectId: string,

@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { CrudOperation } from "@/integrations/pocketbase/utils";
 import { mapRecord } from "@/integrations/pocketbase/mappers";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
+import { handleError } from "@/shared/lib/toast";
 
 export interface Profile {
   id: string;
@@ -35,7 +37,7 @@ export function useProfile() {
       return mapRecord<Profile>(record);
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: STALE_TIME.LISTS,
   });
 
   const optimisticUpdater = (
@@ -64,10 +66,10 @@ export function useProfile() {
     disableOfflineQueue: true,
     onSuccess: () => {
       toast.success(t("success"));
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey });
     },
     onError: (error: any) => {
-      toast.error(t("error") + ": " + error.message);
+      handleError(error);
     },
   });
 

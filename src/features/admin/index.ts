@@ -10,3 +10,4 @@ export * from "./hooks/useAdminUserProjects";
 export * from "./hooks/useDropdownOptions";
 export * from "./hooks/useDropdownSettingsManager";
 export * from "./hooks/useSettingsOptions";
+export * from "./types/audit";
