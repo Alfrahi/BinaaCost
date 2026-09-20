@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import PageLoader from "@/shared/components/PageLoader";
 import ProjectTabs from "@/features/projects/project-core/components/ProjectTabs";
 import PageHeader from "@/shared/components/PageHeader";
@@ -17,6 +17,7 @@ import { useCloneProject } from "@/features/projects/project-core/hooks/useClone
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation(["project_detail", "common"]);
   const { id } = useParams();
+  const navigate = useNavigate();
   const { project, isLoading, isOwner, canEdit } = useProjectData(id);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -26,7 +27,13 @@ export default function ProjectDetail() {
 
   const handleDelete = async () => {
     if (!id) return;
-    softDeleteMutation.mutate(id);
+    try {
+      await softDeleteMutation.mutateAsync(id);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch {
+      // Error handled by mutation onError
+    }
   };
 
   if (isLoading) {

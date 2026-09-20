@@ -304,9 +304,13 @@ export function AssemblyList({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() =>
-          deleteTarget && deleteAssembly.mutateAsync({ id: deleteTarget.id })
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = deleteTarget.id;
+            setDeleteTarget(null);
+            await deleteAssembly.mutateAsync({ id: targetId });
+          }
+        }}
         itemName={deleteTarget?.name}
         loading={deleteAssembly.isPending}
       />

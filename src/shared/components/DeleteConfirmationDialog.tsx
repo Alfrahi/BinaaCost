@@ -4,7 +4,7 @@ import ConfirmDialog from "./ConfirmDialog";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   itemName?: string;
   loading?: boolean;
 }

@@ -371,18 +371,25 @@ export function EntityTable<T>({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() =>
-          deleteTarget && crud.handleDelete((deleteTarget as any).id)
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = (deleteTarget as any).id;
+            setDeleteTarget(null);
+            await crud.handleDelete(targetId);
+          }
+        }}
         itemName={deleteTarget ? config.getDeleteName(deleteTarget) : undefined}
         loading={crud.isDeleting}
       />
       <DeleteConfirmationDialog
         open={showBulkDelete}
         onOpenChange={setShowBulkDelete}
-        onConfirm={() =>
-          crud.handleBulkDelete(Array.from(selection.selectedIds))
-        }
+        onConfirm={async () => {
+          const ids = Array.from(selection.selectedIds);
+          setShowBulkDelete(false);
+          await crud.handleBulkDelete(ids);
+          selection.clear();
+        }}
         itemName={t("common:item", { count: selection.count })}
         loading={crud.isBulkDeleting}
       />

@@ -137,7 +137,13 @@ export function ScenarioAnalysisTab({
       <DeleteConfirmationDialog
         open={!!deleteTargetScenario}
         onOpenChange={() => setDeleteTargetScenario(null)}
-        onConfirm={() => deleteTargetScenario && deleteScenario(deleteTargetScenario.id)}
+        onConfirm={async () => {
+          if (deleteTargetScenario) {
+            const targetId = deleteTargetScenario.id;
+            setDeleteTargetScenario(null);
+            await deleteScenario(targetId);
+          }
+        }}
         itemName={deleteTargetScenario?.name}
         loading={isDeletingScenario}
       />

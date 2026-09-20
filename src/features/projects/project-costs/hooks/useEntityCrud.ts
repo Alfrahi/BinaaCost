@@ -145,10 +145,11 @@ export function useEntityCrud<T>({
     onError: (err: any) => handleError(err),
   });
 
-  const { mutate: deleteItem, isPending: isDeleting } = useOfflineMutation<
-    any,
-    T[]
-  >({
+  const {
+    mutate: deleteItem,
+    mutateAsync: deleteItemAsync,
+    isPending: isDeleting,
+  } = useOfflineMutation<any, T[]>({
     queryKey,
     table,
     operation: "DELETE",
@@ -157,15 +158,18 @@ export function useEntityCrud<T>({
     onError: (err: any) => handleError(err),
   });
 
-  const { mutate: bulkDeleteMutation, isPending: isBulkDeleting } =
-    useOfflineMutation<string[], T[]>({
-      queryKey,
-      table,
-      operation: "BULK_DELETE",
-      optimisticUpdater: optimisticBulkUpdater,
-      onSuccess,
-      onError: (err: any) => handleError(err),
-    });
+  const {
+    mutate: bulkDeleteMutation,
+    mutateAsync: bulkDeleteMutationAsync,
+    isPending: isBulkDeleting,
+  } = useOfflineMutation<string[], T[]>({
+    queryKey,
+    table,
+    operation: "BULK_DELETE",
+    optimisticUpdater: optimisticBulkUpdater,
+    onSuccess,
+    onError: (err: any) => handleError(err),
+  });
 
   const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
     useOfflineMutation<{ ids: string[]; data: any }, T[]>({
@@ -180,8 +184,8 @@ export function useEntityCrud<T>({
   return {
     addItem,
     updateItem,
-    deleteItem,
-    bulkDeleteMutation,
+    deleteItem: (deleteItemAsync || deleteItem) as any,
+    bulkDeleteMutation: (bulkDeleteMutationAsync || bulkDeleteMutation) as any,
     bulkMoveMutation,
     isAdding,
     isUpdating,

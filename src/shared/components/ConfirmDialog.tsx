@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   title: string;
   body: React.ReactNode;
   confirmLabel: string;
@@ -33,6 +33,15 @@ export default function ConfirmDialog({
   destructive = false,
 }: Props) {
   const { t } = useTranslation("common");
+
+  const handleConfirm = async () => {
+    try {
+      await onConfirm();
+      onOpenChange(false);
+    } catch {
+      // Keep dialog open if onConfirm fails
+    }
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -56,7 +65,7 @@ export default function ConfirmDialog({
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
-            onClick={onConfirm}
+            onClick={handleConfirm}
             disabled={loading}
             className="text-sm"
           >
