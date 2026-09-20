@@ -14,7 +14,10 @@ export function PaginationControls({
   onPageChange,
 }: PaginationControlsProps) {
   const { t, i18n } = useTranslation("common");
-  const isRtl = i18n.dir() === "rtl";
+  const isRtl =
+    typeof i18n?.dir === "function"
+      ? i18n.dir() === "rtl"
+      : (i18n?.language?.startsWith("ar") ?? false);
 
   if (totalPages <= 1) return null;
 

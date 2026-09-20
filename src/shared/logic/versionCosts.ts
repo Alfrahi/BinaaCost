@@ -77,6 +77,9 @@ export function getVersionFinancialSettings(
     markup_percent?: number;
     tax_percent?: number;
     contingency_percent?: number;
+    contingency_basis?: "flat" | "risk_register" | "combined";
+    location_factor?: number;
+    location_label?: string;
   } | undefined;
   return {
     overhead_percent:
@@ -86,6 +89,9 @@ export function getVersionFinancialSettings(
     tax_percent: s?.tax_percent ?? DEFAULT_FINANCIAL_SETTINGS.tax_percent,
     contingency_percent:
       s?.contingency_percent ?? DEFAULT_FINANCIAL_SETTINGS.contingency_percent,
+    ...(s?.contingency_basis !== undefined ? { contingency_basis: s.contingency_basis } : {}),
+    ...(s?.location_factor !== undefined ? { location_factor: s.location_factor } : {}),
+    ...(s?.location_label !== undefined ? { location_label: s.location_label } : {}),
   };
 }
 
@@ -122,12 +128,15 @@ export function computeVersionComparison(
   const bSummary = computeVersionCostSummary(bSnapshot);
   const aSettings = getVersionFinancialSettings(aSnapshot);
   const bSettings = getVersionFinancialSettings(bSnapshot);
+  const aRisks = calculateCategoryTotal.risks(aSnapshot?.risks || []);
+  const bRisks = calculateCategoryTotal.risks(bSnapshot?.risks || []);
   const aFinancials = calculateProjectFinancials(
     {
       materialsTotal: aSummary.materials,
       laborTotal: aSummary.labor,
       equipmentTotal: aSummary.equipment,
       additionalTotal: aSummary.additional,
+      riskContingency: aRisks,
     },
     aSettings,
   );
@@ -137,6 +146,7 @@ export function computeVersionComparison(
       laborTotal: bSummary.labor,
       equipmentTotal: bSummary.equipment,
       additionalTotal: bSummary.additional,
+      riskContingency: bRisks,
     },
     bSettings,
   );

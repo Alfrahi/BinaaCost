@@ -1,11 +1,12 @@
 import { calculateProjectFinancials, FinancialSummary } from "@/shared/logic/financials";
-import { calculateItemCost } from "@/shared/logic/shared";
+import { calculateItemCost, calculateCategoryTotal } from "@/shared/logic/shared";
 import type {
   MaterialItem,
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
 } from "@/features/projects/project-costs/types/items";
+import type { Risk } from "@/features/projects/project-core/types/project";
 
 export function calculatePublicShareFinancials(
   financialSettings: any,
@@ -13,6 +14,7 @@ export function calculatePublicShareFinancials(
   labor: LaborItem[],
   equipment: EquipmentItem[],
   additional: AdditionalCostItem[],
+  risks?: Risk[],
 ): FinancialSummary {
   const materialsTotal = materials.reduce(
     (sum: number, item: MaterialItem) =>
@@ -45,9 +47,16 @@ export function calculatePublicShareFinancials(
     (sum: number, item: AdditionalCostItem) => sum + item.amount,
     0,
   );
+  const riskContingency = risks ? calculateCategoryTotal.risks(risks) : 0;
 
   return calculateProjectFinancials(
-    { materialsTotal, laborTotal, equipmentTotal, additionalTotal },
+    {
+      materialsTotal,
+      laborTotal,
+      equipmentTotal,
+      additionalTotal,
+      riskContingency,
+    },
     financialSettings,
   );
 }

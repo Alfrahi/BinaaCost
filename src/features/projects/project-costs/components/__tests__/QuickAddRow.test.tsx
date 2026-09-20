@@ -5,7 +5,10 @@ import { QuickAddRow, QuickAddField } from "../QuickAddRow";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => key.split(":").pop(),
+    t: (key: string) => {
+      if (key === "project_materials:nameRequired") return "Material name is required";
+      return key.split(":").pop();
+    },
     i18n: { language: "en", dir: () => "ltr" },
   }),
 }));
@@ -88,6 +91,30 @@ describe("QuickAddRow", () => {
       expect(screen.getByRole("alert")).toBeTruthy(),
     );
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("translates validation error keys through t()", async () => {
+    const i18nSchema = z.object({
+      name: z.string().min(1, "project_materials:nameRequired"),
+    });
+
+    render(
+      <QuickAddRow
+        fields={[{ key: "name", label: "Name" }]}
+        schema={i18nSchema}
+        buildValues={(raw) => ({ name: raw.name })}
+        onSubmit={vi.fn()}
+        submitLabel="Add"
+        ariaLabel="Add item"
+      />,
+    );
+
+    const input = screen.getByLabelText("Name");
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert").textContent).toBe("Material name is required");
+    });
   });
 
   it("clears the row on Escape", () => {

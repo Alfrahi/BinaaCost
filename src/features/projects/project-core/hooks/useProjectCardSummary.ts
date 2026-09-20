@@ -29,7 +29,7 @@ export function useProjectCardSummary(
   const { data, isLoading } = useQuery<ProjectCardSummary>({
     queryKey,
     queryFn: async () => {
-      const [materials, labor, equipment, additional, versions] =
+      const [materials, labor, equipment, additional, versions, risks] =
         await Promise.all([
           pb
             .collection("materials")
@@ -60,6 +60,12 @@ export function useProjectCardSummary(
             filter: `project_id="${projectId}" && is_final=true`,
             fields: "id",
           }),
+          pb
+            .collection("risks")
+            .getFullList({
+              filter: `project_id="${projectId}"`,
+              fields: "impact_amount,contingency_amount",
+            }),
         ]);
 
       const totals = {
@@ -73,6 +79,7 @@ export function useProjectCardSummary(
         additionalTotal: calculateCategoryTotal.additional(
           additional as any[],
         ),
+        riskContingency: calculateCategoryTotal.risks(risks as any[]),
       };
       const financials = calculateProjectFinancials(
         totals,
