@@ -47,7 +47,18 @@
     "emailRequired": "عنوان البريد الإلكتروني مطلوب وصالح",
     "passwordMinLength": "يجب ألا تقل كلمة المرور عن 8 أحرف",
     "successCreated": "تم إنشاء حساب المستخدم بنجاح!",
-    "errorCreate": "فشل إنشاء المستخدم: {{message}}"
+    "errorCreate": "فشل إنشاء المستخدم: {{message}}",
+    "editUser": "تعديل المستخدم",
+    "editUserDetails": "تعديل بيانات المستخدم",
+    "editUserDescription": "تحديث تفاصيل الحساب، صلاحيات الدور، أو إعادة تعيين بيانات الاعتماد.",
+    "newPasswordOptional": "كلمة المرور الجديدة (اختياري)",
+    "newPasswordPlaceholder": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
+    "passwordResetHelper": "أدخل كلمة مرور جديدة (8 أحرف على الأقل) لإعادة تعيينها فوراً، أو أرسل رابط إعادة التعيين بالبريد.",
+    "sendPasswordResetEmail": "إرسال بريد إعادة تعيين كلمة المرور",
+    "sendingResetEmail": "جاري إرسال البريد...",
+    "successPasswordResetSent": "تم إرسال بريد إعادة تعيين كلمة المرور بنجاح!",
+    "successUpdated": "تم تحديث حساب المستخدم بنجاح!",
+    "never": "أبداً"
   },
   "projects": {
     "title": "المشاريع",

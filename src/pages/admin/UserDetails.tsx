@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageHeader from "@/shared/components/PageHeader";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
-import { Calendar, Activity, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Calendar, Activity, AlertTriangle, ArrowLeft, Edit } from "lucide-react";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useTranslation } from "react-i18next";
@@ -12,10 +13,12 @@ import { RoleBadge } from "@/features/admin/components/RoleBadge";
 import { Button } from "@/shared/components/ui/button";
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
-import { cn } from "@/shared/lib/utils";
+import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { useAdminUserProjects } from "@/features/admin/hooks/useAdminUserProjects";
 import { useAdminUserAuditLogs } from "@/features/admin/hooks/useAdminUserAuditLogs";
 import { useAdminUserDetails } from "@/features/admin/hooks/useAdminUserDetails";
+import { useAdminUserManagement } from "@/features/admin/hooks/useAdminUserManagement";
+import EditUserModal from "@/features/admin/components/EditUserModal";
 
 const formatJsonForDisplay = (data: any) => {
   if (!data) return null;
@@ -30,6 +33,10 @@ export default function UserDetails() {
   const { t, i18n } = useTranslation(["admin", "common"]);
   const { formatDate } = useDateFormatter();
   const { userId } = useParams();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const { updateUserMutation, sendPasswordResetMutation } =
+    useAdminUserManagement();
 
   const {
     user,
@@ -85,6 +92,15 @@ export default function UserDetails() {
             </Button>
             <span>{t("admin:users.userDetails")}</span>
           </div>
+        }
+        actions={
+          <Button
+            onClick={() => setIsEditOpen(true)}
+            className="text-sm"
+          >
+            <Edit className={cn("w-4 h-4", getIconMarginClass())} />
+            {t("admin:users.editUser")}
+          </Button>
         }
       />
 
@@ -263,6 +279,30 @@ export default function UserDetails() {
           </Tabs>
         </Card>
       </div>
+
+      <EditUserModal
+        user={
+          user
+            ? {
+                id: user.id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                role: user.role,
+                created_at: user.created_at,
+              }
+            : null
+        }
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        onSave={async (data) => {
+          await updateUserMutation.mutateAsync(data);
+        }}
+        onSendPasswordReset={async (email) => {
+          await sendPasswordResetMutation.mutateAsync(email);
+        }}
+        loading={updateUserMutation.isPending}
+      />
     </div>
   );
 }

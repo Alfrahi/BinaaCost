@@ -88,6 +88,58 @@ export function useAdminUserManagement() {
     }
   }, [error]);
 
+  const updateUserMutation = useMutation({
+    mutationFn: async ({
+      user_id,
+      first_name,
+      last_name,
+      email,
+      role,
+      password,
+    }: {
+      user_id: string;
+      first_name?: string;
+      last_name?: string;
+      email?: string;
+      role?: string;
+      password?: string;
+    }) => {
+      await callRouteWithParams(
+        "admin/users/update",
+        { id: user_id },
+        {
+          first_name,
+          last_name,
+          email,
+          role,
+          password: password || undefined,
+        },
+      );
+    },
+    onSuccess: () => {
+      void toast.success(t("admin:users.successUpdated"));
+      void queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin_user"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin_user_details"] });
+      setEditingUser(null);
+    },
+    onError: (error: Error) => {
+      handleError(error);
+    },
+  });
+
+  const sendPasswordResetMutation = useMutation({
+    mutationFn: async (email: string) => {
+      await pb.collection("users").requestPasswordReset(email);
+    },
+    onSuccess: () => {
+      void toast.success(t("admin:users.successPasswordResetSent"));
+    },
+    onError: (error: Error) => {
+      handleError(error);
+    },
+  });
+
   const updateUserRoleMutation = useMutation({
     mutationFn: async ({
       user_id_to_update,
@@ -105,6 +157,7 @@ export function useAdminUserManagement() {
     onSuccess: () => {
       void toast.success(t("admin:users.successRoleUpdate"));
       void queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin_user"] });
       setEditingUser(null);
     },
     onError: (error: Error) => {
@@ -151,6 +204,7 @@ export function useAdminUserManagement() {
         first_name: first_name || "",
         last_name: last_name || "",
         role: role || "user",
+        emailVisibility: true,
       });
     },
     onSuccess: () => {
@@ -187,7 +241,9 @@ export function useAdminUserManagement() {
     setIsDeleteDialogOpen,
     showFallbackWarning,
     createUserMutation,
+    updateUserMutation,
     updateUserRoleMutation,
+    sendPasswordResetMutation,
     deleteUserMutation,
     handleDelete,
     totalPages,
