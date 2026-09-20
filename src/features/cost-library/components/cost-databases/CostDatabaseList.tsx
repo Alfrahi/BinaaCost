@@ -2,36 +2,21 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
 import { useCostDatabases } from "@/features/cost-library/hooks/useCostDatabases";
 import { useAuth } from "@/features/auth";
-import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { toast } from "sonner";
-import { Card, CardHeader, CardTitle, CardContent } from "@/shared/components/ui/card";
 import { Heading } from "@/shared/components/ui/heading";
 import {
   TableCell,
   TableRow,
 } from "@/shared/components/ui/table";
-import { Edit2, Trash2, Plus, X } from "lucide-react";
+import { Edit2, Trash2, Plus } from "lucide-react";
 import { useBulkSelection } from "@/shared/hooks/useBulkSelection";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
-import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import {
   Select,
   SelectContent,
@@ -44,15 +29,10 @@ import DataTable, {
   DataTableColumn,
 } from "@/shared/components/ui/data-table";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
-
-const costDatabaseSchema = z.object({
-  name: z.string().min(1, "pages:cost_databases.nameRequired"),
-  description: z.string().optional().nullable(),
-  is_public: z.boolean().default(false),
-  currency: z.string().min(1, "pages:cost_databases.currencyRequired"),
-});
-
-type CostDatabaseFormValues = z.infer<typeof costDatabaseSchema>;
+import {
+  CostDatabaseForm,
+  type CostDatabaseFormValues,
+} from "./CostDatabaseForm";
 
 interface CostDatabaseListProps {
   onViewDatabase: (id: string) => void;
@@ -65,30 +45,18 @@ export default function CostDatabaseList({
   const { user } = useAuth();
   const { databasesQuery, createDatabase, updateDatabase, deleteDatabase } =
     useCostDatabases();
-  const { options: currencies, isLoading: isLoadingCurrencies } =
-    useSettingsOptions("currency");
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
 
-  const defaultCurrency = useMemo(
-    () => currencies[0]?.value || "USD",
-    [currencies],
-  );
-
-  const form = useForm<CostDatabaseFormValues>({
-    resolver: zodResolver(costDatabaseSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      is_public: false,
-      currency: defaultCurrency,
-    },
-  });
-
   const { data: databases = [] } = databasesQuery;
+
+  const editingDatabase = useMemo(() => {
+    if (!editingId || editingId === "new") return null;
+    return databases.find((d) => d.id === editingId) || null;
+  }, [editingId, databases]);
 
   const filteredDatabases = databases.filter(
     (db) =>
@@ -109,27 +77,6 @@ export default function CostDatabaseList({
   useEffect(() => {
     setCurrentPage(0);
   }, [search, pageSize]);
-
-  useEffect(() => {
-    if (editingId && editingId !== "new") {
-      const db = databases.find((d) => d.id === editingId);
-      if (db) {
-        form.reset({
-          name: db.name,
-          description: db.description || "",
-          is_public: db.is_public,
-          currency: db.currency,
-        });
-      }
-    } else if (editingId === "new") {
-      form.reset({
-        name: "",
-        description: "",
-        is_public: false,
-        currency: defaultCurrency,
-      });
-    }
-  }, [editingId, databases, form, defaultCurrency]);
 
   const handleSubmit = useCallback(
     async (values: CostDatabaseFormValues) => {
@@ -228,6 +175,15 @@ export default function CostDatabaseList({
           )}
         </div>
       </div>
+
+      {editingId && (
+        <CostDatabaseForm
+          initialData={editingDatabase}
+          onSubmit={handleSubmit}
+          onCancel={() => setEditingId(null)}
+          isSubmitting={createDatabase.isPending || updateDatabase.isPending}
+        />
+      )}
 
       <div className="flex justify-between items-center mb-4">
         <Input
@@ -339,112 +295,6 @@ export default function CostDatabaseList({
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-
-      {editingId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-modal">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>
-                {editingId === "new" ? t("common:add") : t("common:edit")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(handleSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">
-                          {t("common:name")}
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value ?? ""} />
-                        </FormControl>
-                        <FormMessage className="text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">
-                          {t("common:description")}
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea {...field} value={field.value ?? ""} />
-                        </FormControl>
-                        <FormMessage className="text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="currency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">
-                          {t("common:currency")}
-                        </FormLabel>
-                        <FormControl>
-                          <TranslatedSelect
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            options={currencies}
-                            isLoading={isLoadingCurrencies}
-                            placeholder={t("pages:cost_databases.selectCurrency")}
-                            aria-label={t("common:currency")}
-                            className="text-sm"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="is_public"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center gap-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm">
-                          {t("pages:cost_databases.public")}
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setEditingId(null)}
-                    >
-                      <X className="ms-2 h-4 w-4" />
-                      {t("common:cancel")}
-                    </Button>
-                    <Button type="submit">
-                      {editingId === "new"
-                        ? t("common:add")
-                        : t("common:update")}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       <DeleteConfirmationDialog
         open={!!deleteTarget}
