@@ -178,7 +178,9 @@ export function AssemblyList({
             onValueChange={(val) => setPageSize(Number(val))}
           >
             <SelectTrigger className="w-[80px] text-sm">
-              <SelectValue />
+              <SelectValue>
+                {pageSize.toString()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {PAGE_SIZE_OPTIONS.map((size) => (

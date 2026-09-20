@@ -118,6 +118,16 @@ export default function ReportsTab({
     return versions.find(v => v.id === selectedVersionId) ?? null;
   }, [selectedVersionId, versions]);
 
+  const selectedVersionLabel = useMemo(() => {
+    if (!selectedVersion) return undefined;
+    return `${selectedVersion.name} (${new Date(selectedVersion.created_at).toLocaleDateString(i18n.language)})`;
+  }, [selectedVersion, i18n.language]);
+
+  const activeReportTabLabel = useMemo(() => {
+    const item = reportTabItems.find((i) => i.value === activeReportTab);
+    return item ? `${t(item.labelKey)} — ${t(item.badgeKey)}` : undefined;
+  }, [activeReportTab, t]);
+
   const versionStampForExport = useMemo<{ name: string; date: string } | undefined>(() => {
     if (!selectedVersion) return undefined;
     return {
@@ -225,7 +235,9 @@ export default function ReportsTab({
                 <SelectTrigger className="w-full text-sm mb-4">
                   <SelectValue
                     placeholder={t("project_reports:selectReport")}
-                  />
+                  >
+                    {activeReportTabLabel}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {reportTabItems.map((item) => (
@@ -269,7 +281,9 @@ export default function ReportsTab({
                   onValueChange={setSelectedVersionId}
                 >
                   <SelectTrigger id="version-select-project-cost" className="w-full mt-1 text-sm">
-                    <SelectValue placeholder={t("project_reports:versionToExport")} />
+                    <SelectValue placeholder={t("project_reports:versionToExport")}>
+                      {selectedVersionLabel}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {versions.length > 0 ? versions.map(v => (
@@ -343,7 +357,9 @@ export default function ReportsTab({
                   onValueChange={setSelectedVersionId}
                 >
                   <SelectTrigger id="version-select-client-proposal" className="w-full mt-1 text-sm">
-                    <SelectValue placeholder={t("project_reports:versionToExport")} />
+                    <SelectValue placeholder={t("project_reports:versionToExport")}>
+                      {selectedVersionLabel}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {versions.length > 0 ? versions.map(v => (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -16,6 +16,7 @@ interface TranslatedSelectProps extends React.ComponentPropsWithoutRef<
   placeholder?: string;
   className?: string;
   isLoading?: boolean;
+  autoSelectFirst?: boolean;
 }
 
 export function TranslatedSelect({
@@ -23,14 +24,33 @@ export function TranslatedSelect({
   placeholder,
   className,
   isLoading = false,
+  autoSelectFirst = false,
+  value,
+  onValueChange,
   ...props
 }: TranslatedSelectProps) {
   const { t } = useTranslation();
+  const effectiveValue = value ?? (props.defaultValue as string | undefined);
+
+  useEffect(() => {
+    if (
+      autoSelectFirst &&
+      (!effectiveValue || effectiveValue === "") &&
+      options.length > 0 &&
+      onValueChange
+    ) {
+      onValueChange(options[0].value);
+    }
+  }, [autoSelectFirst, effectiveValue, options, onValueChange]);
+
+  const selectedOption = options.find((opt) => opt.value === effectiveValue);
 
   return (
-    <Select {...props}>
+    <Select value={value} onValueChange={onValueChange} {...props}>
       <SelectTrigger className={cn("w-full", className)}>
-        <SelectValue placeholder={placeholder || t("common:selectOption")} />
+        <SelectValue placeholder={placeholder || t("common:selectOption")}>
+          {selectedOption ? selectedOption.label : undefined}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {isLoading ? (

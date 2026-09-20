@@ -130,7 +130,10 @@ export default function RiskManagementTable({
 
   useEffect(() => {
     if (!form.getValues("probability") && riskProbabilities.length > 0) {
-      form.setValue("probability", riskProbabilities[0].value);
+      form.setValue("probability", riskProbabilities[0].value, {
+        shouldValidate: true,
+        shouldDirty: false,
+      });
     }
   }, [riskProbabilities, form]);
 
@@ -157,7 +160,17 @@ export default function RiskManagementTable({
         <Heading level={3}>{t("title")}</Heading>
         {canEdit && !showForm && (
           <Button
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              form.reset({
+                description: "",
+                probability: riskProbabilities[0]?.value || "",
+                impact_amount: 0,
+                mitigation_plan: "",
+                contingency_amount: 0,
+              });
+              setEditingItem(null);
+              setShowForm(true);
+            }}
             size="sm"
             aria-label={t("add")}
             className="text-sm"
@@ -204,6 +217,7 @@ export default function RiskManagementTable({
                       onValueChange={field.onChange}
                       options={riskProbabilities}
                       isLoading={isLoadingRiskProbabilities}
+                      autoSelectFirst={true}
                       placeholder={t("common:selectOption")}
                       className="text-sm"
                     />

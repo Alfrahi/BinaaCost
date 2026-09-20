@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const ROLES = ["super_admin", "user"];
@@ -34,6 +34,12 @@ export default function EditRoleModal({
   const { t } = useTranslation(["admin", "roles", "common"]);
   const [role, setRole] = useState(profile?.role || "");
 
+  useEffect(() => {
+    if (profile?.role) {
+      setRole(profile.role);
+    }
+  }, [profile?.role, open]);
+
   if (!profile) return null;
 
   return (
@@ -49,7 +55,9 @@ export default function EditRoleModal({
             <SelectTrigger className="text-sm">
               <SelectValue
                 placeholder={t("admin:editRoleModal.select_placeholder")}
-              />
+              >
+                {role ? t(`roles:${role}_display`, role.replace("_", " ")) : undefined}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {ROLES.map((r) => (

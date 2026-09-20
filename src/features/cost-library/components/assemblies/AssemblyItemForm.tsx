@@ -79,7 +79,14 @@ export function AssemblyItemForm({
   additionalCategories,
   isLoadingAdditionalCategories,
 }: AssemblyItemFormProps) {
-  const { t } = useTranslation(["common", "project_detail", "resources"]);
+  const { t } = useTranslation(["common", "project_detail", "resources", "project_tabs"]);
+
+  const itemTypeLabels: Record<string, string> = {
+    material: t("project_tabs:materials"),
+    labor: t("project_tabs:labor"),
+    equipment: t("project_tabs:equipment"),
+    additional: t("project_tabs:additional"),
+  };
 
   const itemTypeForm = useForm<ItemTypeFormValues>({
     resolver: zodResolver(itemTypeSchema),
@@ -215,7 +222,9 @@ export function AssemblyItemForm({
                 >
                   <FormControl>
                     <SelectTrigger className="text-sm">
-                      <SelectValue />
+                      <SelectValue>
+                        {field.value ? itemTypeLabels[field.value] : undefined}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

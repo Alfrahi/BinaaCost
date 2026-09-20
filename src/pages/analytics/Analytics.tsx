@@ -60,7 +60,11 @@ export default function Analytics() {
             onValueChange={setSelectedProjectId}
           >
             <SelectTrigger className="text-sm">
-              <SelectValue placeholder={t("pages:analytics.allProjects")} />
+              <SelectValue placeholder={t("pages:analytics.allProjects")}>
+                {selectedProjectId === "all"
+                  ? t("pages:analytics.allProjects")
+                  : filteredData?.projects.find((p) => p.id === selectedProjectId)?.name}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all" className="text-sm">
@@ -89,7 +93,9 @@ export default function Analytics() {
             disabled={selectedProjectId !== "all"}
           >
             <SelectTrigger className="text-sm">
-              <SelectValue />
+              <SelectValue>
+                {selectedCurrency}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {availableCurrencies.map((currency) => (
