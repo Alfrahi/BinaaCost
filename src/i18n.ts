@@ -52,6 +52,9 @@ i18n
     react: {
       useSuspense: true,
     },
+    interpolation: {
+      escapeValue: false,
+    },
     missingKeyHandler: function (
       lngs: readonly string[],
       ns: string,
