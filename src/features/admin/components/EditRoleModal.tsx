@@ -16,7 +16,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const ROLES = ["super_admin", "admin", "user"];
+const ROLES = ["super_admin", "user"];
 
 export default function EditRoleModal({
   profile,

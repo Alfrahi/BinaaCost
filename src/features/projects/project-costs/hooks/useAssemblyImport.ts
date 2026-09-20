@@ -51,7 +51,7 @@ export function useAssemblyImport(projectId: string) {
           try {
             switch (item.item_type) {
               case "material": {
-                const details = item.details as AssemblyMaterialDetails | null;
+                const details = item.details;
                 await handleAddOrUpdateMaterial(
                   {
                     name: item.description,
@@ -66,7 +66,7 @@ export function useAssemblyImport(projectId: string) {
                 break;
               }
               case "labor": {
-                const details = item.details as AssemblyLaborDetails | null;
+                const details = item.details;
                 await handleAddOrUpdateLabor(
                   {
                     worker_type: item.description,
@@ -81,7 +81,7 @@ export function useAssemblyImport(projectId: string) {
                 break;
               }
               case "equipment": {
-                const details = item.details as AssemblyEquipmentDetails | null;
+                const details = item.details;
                 await handleAddOrUpdateEquipment(
                   {
                     name: item.description,
@@ -100,8 +100,7 @@ export function useAssemblyImport(projectId: string) {
                 break;
               }
               case "additional": {
-                const details =
-                  item.details as AssemblyAdditionalCostDetails | null;
+                const details = item.details;
                 await handleAddOrUpdateAdditionalCost(
                   {
                     category: details?.category ?? "Miscellaneous",
