@@ -479,6 +479,85 @@ describe("pocketbase integration", () => {
       expect(check.json.is_final).toBe(true);
     });
 
+    itLive("SEC-P0: finalized versions cannot be modified via PATCH", async () => {
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "v-to-finalize-immut" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      const fin = await api("POST", `/api/versions/${vid}/finalize`, {}, tok);
+      expect(fin.status).toBe(200);
+
+      // Attempt to rename / modify the finalized version via PATCH
+      const patchRes = await api("PATCH", `/api/collections/project_versions/records/${vid}`, { name: "tampered" }, tok);
+      expect([400, 403, 404]).toContain(patchRes.status);
+
+      const check = await api("GET", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      expect(check.json.name).toBe("v-to-finalize-immut");
+    });
+
+    itLive("SEC-P0: shared editor can list and view project versions", async () => {
+      // 1. Create a version as owner
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "shared-v1" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      // 2. Share project with editor
+      const su_ = "Bearer " + su;
+      const editorEmail = `editor-v-${Date.now()}@local.dev`;
+      const editor = await api("POST", "/api/collections/users/records", {
+        email: editorEmail, password: "testpass123", passwordConfirm: "testpass123", role: "user",
+      }, su_);
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: editor.json.id, shared_with_email: editorEmail, role: "editor",
+      }, tok);
+
+      const le = await login(editorEmail);
+      const eTok = "Bearer " + le.token;
+
+      // 3. Editor should be able to view and list project_versions
+      const listRes = await api("GET", `/api/collections/project_versions/records?filter=project_id%3D%22${pid}%22`, undefined, eTok);
+      expect(listRes.status).toBe(200);
+      expect(listRes.json.items.some((item: any) => item.id === vid)).toBe(true);
+
+      const viewRes = await api("GET", `/api/collections/project_versions/records/${vid}`, undefined, eTok);
+      expect(viewRes.status).toBe(200);
+      expect(viewRes.json.id).toBe(vid);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${editor.json.id}`, undefined, su_);
+    });
+
+    itLive("SEC-P0: child item theft via project_id mutation is rejected", async () => {
+      // 1. Create a material in pid
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "TheftTargetMat", quantity: 10, unit: "kg", unit_price: 5,
+      }, tok);
+      expect(m.status).toBe(200);
+      const matId = m.json.id;
+
+      // 2. Create another project pid2
+      const p2 = await api("POST", "/api/collections/projects/records", {
+        name: "Attacker Project", user_id: uid, currency: "USD",
+      }, tok);
+      expect(p2.status).toBe(200);
+      const pid2 = p2.json.id;
+
+      // 3. Attempt to PATCH material to change project_id to pid2
+      const theftAttempt = await api("PATCH", `/api/collections/materials/records/${matId}`, {
+        project_id: pid2,
+      }, tok);
+      expect([400, 403, 404]).toContain(theftAttempt.status);
+
+      // 4. Verify material project_id remains unchanged
+      const verifyMat = await api("GET", `/api/collections/materials/records/${matId}`, undefined, tok);
+      expect(verifyMat.json.project_id).toBe(pid);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+      await api("DELETE", `/api/collections/projects/records/${pid2}`, undefined, tok);
+    });
+
     itLive("stale project update (mismatched updated) is rejected with 409", async () => {
       const p = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
       const currentUpdated = p.json.updated;
@@ -537,6 +616,41 @@ describe("pocketbase integration", () => {
       if (authenticRestored) {
         await api("DELETE", `/api/collections/materials/records/${authenticRestored.id}`, undefined, tok);
       }
+      await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
+    });
+
+    itLive("SEC-P0: applying a version restores project currency and financial settings", async () => {
+      // 1. Ensure project has known currency (USD) and markup (20)
+      await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        currency: "USD",
+        financial_settings: { overhead_percent: 10, markup_percent: 20, tax_percent: 5, contingency_percent: 5 },
+      }, tok);
+
+      // 2. Take version snapshot
+      const v = await api("POST", `/api/projects/${pid}/versions`, { name: "v-pre-currency-change" }, tok);
+      expect(v.status).toBe(200);
+      const vid = v.json.id;
+
+      // 3. Mutate project currency to EUR and change financial_settings
+      await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        currency: "EUR",
+        financial_settings: { overhead_percent: 15, markup_percent: 35, tax_percent: 10, contingency_percent: 5 },
+      }, tok);
+
+      const modifiedProject = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
+      expect(modifiedProject.json.currency).toBe("EUR");
+      expect(modifiedProject.json.financial_settings.markup_percent).toBe(35);
+
+      // 4. Apply the version
+      const applyRes = await api("POST", `/api/versions/${vid}/apply`, {}, tok);
+      expect(applyRes.status).toBe(200);
+
+      // 5. Verify project settings & currency are restored to what was captured in the snapshot
+      const restoredProject = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
+      expect(restoredProject.json.currency).toBe("USD");
+      expect(restoredProject.json.financial_settings.markup_percent).toBe(20);
+
+      // Cleanup
       await api("DELETE", `/api/collections/project_versions/records/${vid}`, undefined, tok);
     });
   });
@@ -1106,6 +1220,52 @@ describe("pocketbase integration", () => {
       expect(serialized).not.toMatch(/password|token|secret|hash/i);
 
       await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+    });
+
+    itLive("SEC-P0: audit log attributes action to editor actorId rather than record owner", async () => {
+      // 1. Create a material as project owner
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "AuditEditorMat", quantity: 2, unit: "pcs", unit_price: 15,
+      }, tok);
+      expect(m.status).toBe(200);
+      const matId = m.json.id;
+
+      // 2. Create editor user and share project with role="editor"
+      const su_ = "Bearer " + su;
+      const editorEmail = `audit-editor-${Date.now()}@local.dev`;
+      const editor = await api("POST", "/api/collections/users/records", {
+        email: editorEmail, password: "testpass123", passwordConfirm: "testpass123", role: "user",
+      }, su_);
+      const editorId = editor.json.id;
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: editorId, shared_with_email: editorEmail, role: "editor",
+      }, tok);
+
+      const le = await login(editorEmail);
+      const eTok = "Bearer " + le.token;
+
+      // 3. Editor updates the material
+      const updateRes = await api("PATCH", `/api/collections/materials/records/${matId}`, { quantity: 12 }, eTok);
+      expect(updateRes.status).toBe(200);
+
+      // 4. Fetch the audit log for this update
+      const logs = await api(
+        "GET",
+        `/api/collections/audit_logs/records?filter=record_id%3D%22${matId}%22&sort=-created`,
+        undefined,
+        "Bearer " + su,
+      );
+      expect(logs.status).toBe(200);
+      const items = logs.json.items || [];
+      const updateRow = items.find((a: any) => a.action === "UPDATE");
+      expect(updateRow).toBeTruthy();
+
+      // The audit log must record the EDITOR's user ID, not the OWNER's user ID!
+      expect(updateRow.user_id).toBe(editorId);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${editorId}`, undefined, su_);
     });
   });
 

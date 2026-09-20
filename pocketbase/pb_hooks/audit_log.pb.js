@@ -49,21 +49,43 @@ function buildWriteBody(collection, action, fields) {
   body += "var F=" + fLit + ",C=" + cLit + ";\n";
   body += "function snap(r){var o={};for(var i=0;i<F.length;i++){var k=F[i];";
   body += "var v=r.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}return o;}\n";
-  body += "function log(rec,od,nd){try{var c=$app.findCollectionByNameOrId('audit_logs');";
+  body += "function log(rec,od,nd,actorId){try{var c=$app.findCollectionByNameOrId('audit_logs');";
   body += "var L=new Record(c);L.set('action'," + JSON.stringify(action) + ");";
   body += "L.set('table_name',C);L.set('record_id',rec.id);";
   body += "if(od&&Object.keys(od).length)L.set('old_data',od);";
   body += "if(nd&&Object.keys(nd).length)L.set('new_data',nd);";
-  body += "var u=rec.getString('user_id');if(u)L.set('user_id',u);";
+  body += "var u=actorId||(rec.getString?rec.getString('user_id'):'');if(u)L.set('user_id',u);";
   body += "$app.save(L);}catch(err){";
   body += "$app.logger().error('audit write failed ('+C+')','err',String(err));}}\n";
   return body;
 }
 
+// before-create: stash actorId from request auth
+function buildBeforeCreate(collection) {
+  const actKey = JSON.stringify("audit_act_create_" + collection + "_");
+  let body = "";
+  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
+  body += "e.next();\n";
+  return new Function("e", body);
+}
+
 // after-create: new_data = snapshot of the created row
 function buildCreate(collection, fields) {
   let body = buildWriteBody(collection, "CREATE", fields);
-  body += "var nd=snap(e.record);log(e.record,null,nd);\n";
+  const actKey = JSON.stringify("audit_act_create_" + collection + "_");
+  body += "var ak=" + actKey + "+e.record.id;\n";
+  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
+  body += "var nd=snap(e.record);log(e.record,null,nd,actorId);\n";
+  body += "e.next();\n";
+  return new Function("e", body);
+}
+
+// before-delete: stash actorId from request auth
+function buildBeforeDelete(collection) {
+  const actKey = JSON.stringify("audit_act_del_" + collection + "_");
+  let body = "";
+  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -71,7 +93,11 @@ function buildCreate(collection, fields) {
 // after-delete: old_data = snapshot of the row just deleted
 function buildDelete(collection, fields) {
   let body = buildWriteBody(collection, "DELETE", fields);
-  body += "var od=snap(e.record);log(e.record,od,null);\n";
+  const actKey = JSON.stringify("audit_act_del_" + collection + "_");
+  body += "var ak=" + actKey + "+e.record.id;\n";
+  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
+  body += "var od=snap(e.record);log(e.record,od,null,actorId);\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -82,12 +108,14 @@ function buildDelete(collection, fields) {
 function buildBeforeUpdate(collection, fields) {
   const fLit = JSON.stringify(fields);
   const key = JSON.stringify("audit_old_" + collection + "_");
+  const actKey = JSON.stringify("audit_act_update_" + collection + "_");
   let body = "";
   body += "var F=" + fLit + ";\n";
   body += "try{var old=$app.findRecordById(" + JSON.stringify(collection) + ",e.record.id);";
   body += "var o={};for(var i=0;i<F.length;i++){var k=F[i];";
   body += "var v=old.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}";
   body += "$app.store().set(" + key + "+e.record.id,o);}catch(e2){}\n";
+  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -97,24 +125,28 @@ function buildBeforeUpdate(collection, fields) {
 function buildAfterUpdate(collection, fields) {
   let body = buildWriteBody(collection, "UPDATE", fields);
   const key = JSON.stringify("audit_old_" + collection + "_");
+  const actKey = JSON.stringify("audit_act_update_" + collection + "_");
   body += "var sk=" + key + "+e.record.id;\n";
   body += "var od=$app.store().get(sk);$app.store().remove(sk);od=od||{};\n";
+  body += "var ak=" + actKey + "+e.record.id;\n";
+  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
   body += "var nd={};for(var i=0;i<F.length;i++){var k=F[i];";
   body += "var n=e.record.get(k);var o=od[k];";
   body += "if(n===null||n===undefined){delete od[k];continue;}";
   body += "if(String(n)===String(o))continue;";
   body += "nd[k]=n;if(o===undefined)delete od[k];}\n";
-  body += "log(e.record,od,nd);\n";
+  body += "log(e.record,od,nd,actorId);\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
 
-// Register the four handlers for every tracked collection. The collection
-// name is passed as the trailing tag argument; the FIELD list and collection
-// name are inlined as literals inside each built body.
+// Register the handlers for every tracked collection.
 for (const collection of Object.keys(TRACKED)) {
   const fields = TRACKED[collection].filter((f) => FIELDS_DENYLIST.indexOf(f) === -1);
+  onRecordCreateRequest(buildBeforeCreate(collection), collection);
   onRecordUpdateRequest(buildBeforeUpdate(collection, fields), collection);
+  onRecordDeleteRequest(buildBeforeDelete(collection), collection);
   onRecordAfterCreateSuccess(buildCreate(collection, fields), collection);
   onRecordAfterUpdateSuccess(buildAfterUpdate(collection, fields), collection);
   onRecordAfterDeleteSuccess(buildDelete(collection, fields), collection);
