@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MaterialItem,
@@ -14,10 +14,18 @@ import {
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { StatCard } from "@/shared/components/ui/stat-card";
 import { Heading } from "@/shared/components/ui/heading";
-import { Button } from "@/shared/components/ui/button";
-import { Plus } from "lucide-react";
 import { countIncompleteItems } from "@/shared/logic/overview";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
+import {
+  prepareProjectChartData,
+  getPieChartOptions,
+} from "@/shared/logic/analytics";
+import ReactECharts from "echarts-for-react";
+import LoadingState from "@/shared/components/ui/LoadingState";
+
+const LazyChartContainer = React.lazy(
+  () => import("@/shared/components/ChartContainer"),
+);
 
 interface OverviewTabProps {
   project: any;
@@ -44,10 +52,14 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
     projectTypes,
     durationUnits,
     totals,
-    onAddCosts,
   } = props;
 
-  const { t } = useTranslation(["project_overview", "durations", "common"]);
+  const { t } = useTranslation([
+    "project_overview",
+    "project_tabs",
+    "durations",
+    "common",
+  ]);
   const { format } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
 
@@ -76,18 +88,31 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
     settings,
   );
 
+  const { chartData } = useMemo(
+    () =>
+      prepareProjectChartData(
+        {
+          materialsTotal: financials.materialsTotal,
+          laborTotal: financials.laborTotal,
+          equipmentTotal: financials.equipmentTotal,
+          additionalTotal: financials.additionalTotal,
+        },
+        t,
+      ),
+    [financials, t],
+  );
+
+  const pieChartOptions = useMemo(
+    () => getPieChartOptions(chartData, project.currency, format),
+    [chartData, project.currency, format],
+  );
+
   const incompleteCount = countIncompleteItems(props);
   const settingsConfirmed = hasConfirmedFinancialSettings(project);
   const needsAttention = incompleteCount > 0 || !settingsConfirmed;
 
   return (
     <div className="space-y-6 text-sm">
-      {onAddCosts && (
-        <Button onClick={onAddCosts} className="text-sm">
-          <Plus className="w-4 h-4 me-1" aria-hidden="true" />
-          {t("project_overview:addCosts")}
-        </Button>
-      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
           label={t("project_overview:grandTotal")}
@@ -108,57 +133,84 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
         />
       </div>
 
-      <div className="bg-card rounded-lg border border-border p-4">
-        <Heading level={4} className="mb-3">
+      <div className="bg-card rounded-lg border border-border p-5">
+        <Heading level={4} className="mb-4">
           {t("project_overview:costBreakdown")}
         </Heading>
-        <div className="space-y-2 text-sm">
-          {(
-            [
-              {
-                key: "materials",
-                label: t("project_overview:categories.materials"),
-                value: financials.materialsTotal,
-              },
-              {
-                key: "labor",
-                label: t("project_overview:categories.labor"),
-                value: financials.laborTotal,
-              },
-              {
-                key: "equipment",
-                label: t("project_overview:categories.equipment"),
-                value: financials.equipmentTotal,
-              },
-              {
-                key: "additional",
-                label: t("project_overview:categories.additional"),
-                value: financials.additionalTotal,
-              },
-            ] as const
-          ).map((cat) => {
-            const share = financials.directCosts
-              ? cat.value / financials.directCosts
-              : 0;
-            return (
-              <div key={cat.key} className="space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted-foreground">{cat.label}</span>
-                  <span className="tabular-nums font-medium">
-                    {format(cat.value, project.currency)}
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="space-y-3 text-sm lg:col-span-7">
+            {(
+              [
+                {
+                  key: "materials",
+                  label: t("project_overview:categories.materials"),
+                  value: financials.materialsTotal,
+                },
+                {
+                  key: "labor",
+                  label: t("project_overview:categories.labor"),
+                  value: financials.laborTotal,
+                },
+                {
+                  key: "equipment",
+                  label: t("project_overview:categories.equipment"),
+                  value: financials.equipmentTotal,
+                },
+                {
+                  key: "additional",
+                  label: t("project_overview:categories.additional"),
+                  value: financials.additionalTotal,
+                },
+              ] as const
+            ).map((cat) => {
+              const share = financials.directCosts
+                ? cat.value / financials.directCosts
+                : 0;
+              return (
+                <div key={cat.key} className="space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-muted-foreground">{cat.label}</span>
+                    <span className="tabular-nums font-medium">
+                      {format(cat.value, project.currency)}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-primary"
+                      style={{
+                        width: `${Math.round(share * 100)}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-primary"
-                    style={{
-                      width: `${Math.round(share * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <div className="lg:col-span-5 h-[220px] flex items-center justify-center border-t lg:border-t-0 lg:border-s lg:ps-6 pt-4 lg:pt-0">
+            {financials.directCosts === 0 ? (
+              <p className="text-xs text-muted-foreground text-center">
+                {t("common:noData")}
+              </p>
+            ) : (
+              <React.Suspense
+                fallback={
+                  <div className="h-[200px] flex items-center justify-center">
+                    <LoadingState className="py-0" />
+                  </div>
+                }
+              >
+                <LazyChartContainer height="220px">
+                  <div dir="ltr" className="h-full w-full">
+                    <ReactECharts
+                      option={pieChartOptions}
+                      style={{ height: "100%", width: "100%" }}
+                    />
+                  </div>
+                </LazyChartContainer>
+              </React.Suspense>
+            )}
+          </div>
         </div>
       </div>
 

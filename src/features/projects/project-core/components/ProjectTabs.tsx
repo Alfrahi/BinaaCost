@@ -15,14 +15,12 @@ import { useProjectData } from "@/features/projects/project-core/hooks/useProjec
 import CommentsDrawer from "@/features/projects/project-core/components/CommentsDrawer";
 import { useProjectComments } from "@/features/projects/project-core/hooks/useProjectComments";
 import { useScenarioManager } from "@/features/projects/project-analytics/hooks/useScenarioManager";
-import FinancialSummaryBar from "./FinancialSummaryBar";
 import { calculateCategoryTotal } from "@/shared/logic/shared";
 import {
   LayoutDashboard,
   Receipt,
   ShieldAlert,
   TrendingUp,
-  BarChart,
   FileText,
   GitBranch,
   FlaskConical,
@@ -59,7 +57,6 @@ const LazyScenarioAnalysisTab = React.lazy(() =>
 const LazyProfitPricingSummaryCard = React.lazy(
   () => import("./ProfitPricingSummaryCard"),
 );
-const LazyAnalyticsTab = React.lazy(() => import("../../project-analytics/components/AnalyticsTab"));
 const LazyReportsTab = React.lazy(() => import("../../project-reports/components/ReportsTab"));
 const LazyProjectVersionsTab = React.lazy(() => import("../../project-versions/components/ProjectVersionsTab"));
 
@@ -199,11 +196,6 @@ function ProjectTabsComponent({
       {
         labelKey: "project_tabs:groupReview",
         items: [
-          {
-            value: "analytics",
-            labelKey: "project_tabs:analytics",
-            icon: BarChart,
-          },
           { value: "reports", labelKey: "project_tabs:reports", icon: FileText },
           {
             value: "versions",
@@ -268,12 +260,6 @@ function ProjectTabsComponent({
 
   return (
     <>
-      <FinancialSummaryBar
-        costs={totals}
-        currency={project.currency}
-        settings={project.financial_settings}
-        onViewPricing={() => setActiveTab("profit-pricing")}
-      />
       <Tabs value={activeTab} onValueChange={setActiveTab} dir={i18n.dir()}>
         {isMobile ? (
           <Select value={activeTab} onValueChange={setActiveTab}>
@@ -336,7 +322,6 @@ function ProjectTabsComponent({
                     labor={labor}
                     equipment={equipment}
                     additional={additional}
-                    onAddCosts={() => setActiveTab("costs")}
                   />
                 </ErrorBoundary>
               </TabsContent>
@@ -401,18 +386,6 @@ function ProjectTabsComponent({
                     settingsConfirmed={project.financial_settings_confirmed}
                     scenarioCount={scenarios.length}
                     onNavigateToRisks={() => setActiveTab("risks")}
-                  />
-                </ErrorBoundary>
-              </TabsContent>
-
-              <TabsContent value="analytics" className="mt-4">
-                <ErrorBoundary FallbackComponent={TabErrorFallback}>
-                  <LazyAnalyticsTab
-                    materialsTotal={totals.materialsTotal}
-                    laborTotal={totals.laborTotal}
-                    equipmentTotal={totals.equipmentTotal}
-                    additionalTotal={totals.additionalTotal}
-                    currency={project.currency}
                   />
                 </ErrorBoundary>
               </TabsContent>
