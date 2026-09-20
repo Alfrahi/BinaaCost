@@ -139,7 +139,6 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
           await updateItem.mutateAsync({
             id: editingItem.id,
             ...dbValues,
-            user_id: user?.id,
           });
         } else {
           await createItem.mutateAsync({ ...dbValues, user_id: user?.id });
