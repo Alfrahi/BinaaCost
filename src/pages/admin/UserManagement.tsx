@@ -3,7 +3,7 @@ import { Input } from "@/shared/components/ui/input";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import PageHeader from "@/shared/components/PageHeader";
-import { X, Eye, Trash2, AlertTriangle } from "lucide-react";
+import { X, Eye, Trash2, AlertTriangle, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RoleBadge } from "@/features/admin/components/RoleBadge";
 import EditRoleModal from "@/features/admin/components/EditRoleModal";
@@ -17,7 +17,7 @@ import { useAdminUserManagement, UserProfile } from "@/features/admin/hooks/useA
 import { useMemo } from "react";
 
 export default function UserManagement() {
-  const { t } = useTranslation(["admin", "common", "roles"]);
+  const { t, i18n } = useTranslation(["admin", "common", "roles", "navigation"]);
 
   const {
     users,
@@ -52,7 +52,21 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={t("admin:users.title")} />
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin" aria-label={t("navigation:adminPanel")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:users.title")}</span>
+          </div>
+        }
+      />
 
       {showFallbackWarning && (
         <Alert>

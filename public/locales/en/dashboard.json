@@ -13,5 +13,6 @@
   "createFirstProject": "Create your first project",
   "shared": "Shared",
   "finalized": "Finalized",
+  "duplicateProject": "Duplicate project {{projectName}}",
   "noDate": "No date"
 }

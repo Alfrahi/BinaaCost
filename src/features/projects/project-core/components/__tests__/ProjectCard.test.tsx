@@ -1,14 +1,26 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ProjectCard } from "../ProjectCard";
 import { useProjectCardSummary } from "@/features/projects/project-core/hooks/useProjectCardSummary";
+import { useCloneProject } from "@/features/projects/project-core/hooks/useCloneProject";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key.split(":").pop(),
-    i18n: { language: "en", dir: () => "ltr" },
-  }),
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key.split(":").pop(),
+      i18n: { language: "en", dir: () => "ltr" },
+    }),
+  };
+});
+
+vi.mock("@/features/projects/project-core/hooks/useCloneProject", () => ({
+  useCloneProject: vi.fn(() => ({
+    mutate: vi.fn(),
+    isPending: false,
+  })),
 }));
 
 vi.mock("@/shared/lib/formatCurrency", () => ({
@@ -72,5 +84,26 @@ describe("ProjectCard", () => {
       </MemoryRouter>,
     );
     expect(screen.queryByText("finalized")).toBeNull();
+  });
+
+  it("calls duplicate mutation when duplicate button is clicked", () => {
+    const mutate = vi.fn();
+    vi.mocked(useCloneProject).mockReturnValueOnce({
+      mutate,
+      isPending: false,
+    } as any);
+
+    render(
+      <MemoryRouter>
+        <ProjectCard {...baseProps} />
+      </MemoryRouter>,
+    );
+
+    const duplicateBtn = screen.getByRole("button", {
+      name: /duplicateProject/i,
+    });
+    fireEvent.click(duplicateBtn);
+
+    expect(mutate).toHaveBeenCalledWith({ projectId: "p1" });
   });
 });

@@ -4,7 +4,7 @@ import ProjectTabs from "@/features/projects/project-core/components/ProjectTabs
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import EmptyState from "@/shared/components/ui/EmptyState";
-import { ArrowLeft, Share2, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Share2, Edit, Trash2, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import ShareProjectDialog from "@/features/projects/project-sharing/components/ShareProjectDialog";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import { useSoftDeleteProject } from "@/features/projects/project-core/hooks/useSoftDeleteProject";
+import { useCloneProject } from "@/features/projects/project-core/hooks/useCloneProject";
 
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation(["project_detail", "common"]);
@@ -21,6 +22,7 @@ export default function ProjectDetail() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const softDeleteMutation = useSoftDeleteProject();
+  const cloneMutation = useCloneProject();
 
   const handleDelete = async () => {
     if (!id) return;
@@ -61,6 +63,17 @@ export default function ProjectDetail() {
                 </Link>
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => cloneMutation.mutate({ projectId: id! })}
+              disabled={cloneMutation.isPending}
+              className="text-sm"
+            >
+              <Copy className={cn("w-4 h-4", getIconMarginClass())} />
+              {cloneMutation.isPending
+                ? t("common:duplicating")
+                : t("common:duplicate")}
+            </Button>
             {isOwner && (
               <>
                 <Button

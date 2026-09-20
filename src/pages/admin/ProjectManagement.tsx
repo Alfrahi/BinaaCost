@@ -5,7 +5,7 @@ import DataTable, {
 } from "@/shared/components/ui/data-table";
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { Button } from "@/shared/components/ui/button";
-import { Trash2, Eye, X, AlertTriangle } from "lucide-react";
+import { Trash2, Eye, X, AlertTriangle, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
@@ -20,7 +20,7 @@ import {
 import { useMemo } from "react";
 
 export default function ProjectManagement() {
-  const { t } = useTranslation(["admin", "common"]);
+  const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
   const {
     projects,
     isLoading,
@@ -72,7 +72,21 @@ export default function ProjectManagement() {
 
   return (
     <div className="space-y-6 text-sm">
-      <PageHeader title={t("admin:projects.title")} />
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin" aria-label={t("navigation:adminPanel")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:projects.title")}</span>
+          </div>
+        }
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="text-sm">
