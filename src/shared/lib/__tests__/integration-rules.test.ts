@@ -573,6 +573,90 @@ describe("pocketbase integration", () => {
       expect(stale.status).toBe(409);
     });
 
+    itLive("P1-OCC: stale child item update (mismatched updated) is rejected with 409", async () => {
+      // 1. Create a material
+      const m = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "OccMat", quantity: 1, unit: "pc", unit_price: 10,
+      }, tok);
+      expect(m.status).toBe(200);
+      const matId = m.json.id;
+      const initialUpdated = m.json.updated;
+
+      // 2. First update succeeds
+      const upd1 = await api("PATCH", `/api/collections/materials/records/${matId}`, {
+        quantity: 2,
+      }, tok);
+      expect(upd1.status).toBe(200);
+
+      // 3. Second update sending stale initialUpdated timestamp must fail with 409
+      const staleUpd = await api("PATCH", `/api/collections/materials/records/${matId}`, {
+        quantity: 3,
+        updated: initialUpdated,
+      }, tok);
+      expect(staleUpd.status).toBe(409);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/materials/records/${matId}`, undefined, tok);
+    });
+
+    itLive("P1-DATA: negative numbers rejected by database-level min: 0 constraints", async () => {
+      // 1. Negative material unit_price
+      const negMat = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "NegMat", quantity: 5, unit: "pcs", unit_price: -10,
+      }, tok);
+      expect(negMat.status).toBe(400);
+
+      // 2. Negative material quantity
+      const negQty = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "NegQtyMat", quantity: -2, unit: "pcs", unit_price: 10,
+      }, tok);
+      expect(negQty.status).toBe(400);
+
+      // 3. Negative labor daily_rate
+      const negLabor = await api("POST", "/api/collections/labor_items/records", {
+        project_id: pid, user_id: uid, worker_type: "Carpenter", daily_rate: -150,
+      }, tok);
+      expect(negLabor.status).toBe(400);
+
+      // 4. Negative additional_costs amount
+      const negAdd = await api("POST", "/api/collections/additional_costs/records", {
+        project_id: pid, user_id: uid, category: "Permits", amount: -500,
+      }, tok);
+      expect(negAdd.status).toBe(400);
+
+      // 5. Zero and positive values succeed
+      const validMat = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "ValidZeroPriceMat", quantity: 1, unit: "pcs", unit_price: 0,
+      }, tok);
+      expect(validMat.status).toBe(200);
+      await api("DELETE", `/api/collections/materials/records/${validMat.json.id}`, undefined, tok);
+    });
+
+    itLive("P1-DATA: duplicate (database_id, csi_code) rejected by database unique index", async () => {
+      // 1. Create a cost database
+      const db = await api("POST", "/api/collections/cost_databases/records", {
+        name: "UniqueIndexDB", user_id: uid, currency: "USD",
+      }, tok);
+      expect(db.status).toBe(200);
+      const dbId = db.json.id;
+
+      // 2. Insert item 1
+      const item1 = await api("POST", "/api/collections/cost_database_items/records", {
+        database_id: dbId, user_id: uid, csi_code: "03-30-00", description: "Concrete", unit: "cy", unit_price: 120,
+      }, tok);
+      expect(item1.status).toBe(200);
+
+      // 3. Insert duplicate item with identical (database_id, csi_code)
+      const item2 = await api("POST", "/api/collections/cost_database_items/records", {
+        database_id: dbId, user_id: uid, csi_code: "03-30-00", description: "Duplicate Concrete", unit: "cy", unit_price: 130,
+      }, tok);
+      expect(item2.status).toBe(400);
+
+      // Cleanup
+      await api("DELETE", `/api/collections/cost_database_items/records/${item1.json.id}`, undefined, tok);
+      await api("DELETE", `/api/collections/cost_databases/records/${dbId}`, undefined, tok);
+    });
+
     itLive("apply ignores forged snapshot with mismatched project_id", async () => {
       const v = await api("POST", `/api/projects/${pid}/versions`, { name: "m6-v2" }, tok);
       const vid = v.json.id;
