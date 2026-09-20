@@ -564,4 +564,45 @@ describe("offline queue replay (PocketBase executor)", () => {
       });
     });
   });
+
+  describe("OFFL-04: transient network interruption during replay", () => {
+    it("pauses replay and preserves mutations without burning retry limit on network failure", async () => {
+      (executePbMutation as any)
+        .mockResolvedValueOnce({ id: "srv_mat_1" })
+        .mockRejectedValueOnce({ status: 0, message: "Network connection lost" });
+
+      offlineManager.setIsOnline(false);
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "INSERT",
+        payload: { name: "Item 1" },
+        queryKey: ["materials"],
+        userId: "u1",
+      });
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "INSERT",
+        payload: { name: "Item 2" },
+        queryKey: ["materials"],
+        userId: "u1",
+      });
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "INSERT",
+        payload: { name: "Item 3" },
+        queryKey: ["materials"],
+        userId: "u1",
+      });
+
+      expect(offlineManager.getQueueSize()).toBe(3);
+
+      offlineManager.setIsOnline(true);
+      await flush();
+
+      expect(offlineManager.getIsOnline()).toBe(false);
+      expect(offlineManager.getQueueSize()).toBe(2);
+      expect(offlineManager.getDeadLetterSize()).toBe(0);
+      expect(executePbMutation).toHaveBeenCalledTimes(2);
+    });
+  });
 });
