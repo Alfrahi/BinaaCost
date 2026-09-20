@@ -83,15 +83,34 @@ export function useAdminProjectManagement() {
       // super_admin may delete any project via rules; cascades to children
       await pb.collection("projects").delete(projectId);
     },
+    onMutate: async (projectId: string) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousData = queryClient.getQueryData<{
+        items: Project[];
+        totalItems: number;
+      }>(queryKey);
+      if (previousData) {
+        queryClient.setQueryData(queryKey, {
+          ...previousData,
+          items: previousData.items.filter((p) => p.id !== projectId),
+          totalItems: Math.max(0, previousData.totalItems - 1),
+        });
+      }
+      return { previousData };
+    },
+    onError: (error: Error, _projectId, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(queryKey, context.previousData);
+      }
+      void toast.error(
+        t("admin:projects.errorDelete", { message: error.message }),
+      );
+    },
     onSuccess: () => {
       void toast.success(t("admin:projects.successDeleted"));
       queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
       setIsDeleteDialogOpen(false);
-    },
-    onError: (error: Error) => {
-      void toast.error(
-        t("admin:projects.errorDelete", { message: error.message }),
-      );
+      setDeleteTarget(null);
     },
   });
 

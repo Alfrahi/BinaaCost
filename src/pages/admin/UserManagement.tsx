@@ -195,9 +195,11 @@ export default function UserManagement() {
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={() =>
-          deleteTarget && deleteUserMutation.mutate(deleteTarget)
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            await deleteUserMutation.mutateAsync(deleteTarget);
+          }
+        }}
         itemName={users.find((u) => u.id === deleteTarget)?.email}
         loading={deleteUserMutation.isPending}
       />

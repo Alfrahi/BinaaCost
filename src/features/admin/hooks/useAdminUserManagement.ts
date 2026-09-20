@@ -173,13 +173,28 @@ export function useAdminUserManagement() {
         {},
       );
     },
+    onMutate: async (userId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["admin_users"] });
+      const previousUsers = queryClient.getQueryData<UserProfile[]>(["admin_users"]);
+      if (previousUsers) {
+        queryClient.setQueryData<UserProfile[]>(
+          ["admin_users"],
+          previousUsers.filter((u) => u.id !== userId),
+        );
+      }
+      return { previousUsers };
+    },
+    onError: (error: Error, _userId, context) => {
+      if (context?.previousUsers) {
+        queryClient.setQueryData(["admin_users"], context.previousUsers);
+      }
+      handleError(error);
+    },
     onSuccess: () => {
       void toast.success(t("admin:users.successDeleted"));
       void queryClient.invalidateQueries({ queryKey: ["admin_users"] });
       setIsDeleteDialogOpen(false);
-    },
-    onError: (error: Error) => {
-      handleError(error);
+      setDeleteTarget(null);
     },
   });
 

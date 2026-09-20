@@ -15,6 +15,7 @@ export function useSoftDeleteProject() {
     },
     onSuccess: () => {
       toast.success(t("project_detail:successDeleted"));
+      queryClient.invalidateQueries({ queryKey: ["project"] });
       queryClient.invalidateQueries({ queryKey: ["myProjects"] });
       queryClient.invalidateQueries({ queryKey: ["sharedProjects"] });
       queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });

@@ -392,9 +392,13 @@ export default function CostItemsTable({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() =>
-          deleteTarget && deleteItem.mutate({ id: deleteTarget.id })
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = deleteTarget.id;
+            setDeleteTarget(null);
+            await deleteItem.mutateAsync({ id: targetId });
+          }
+        }}
         itemName={deleteTarget?.description}
         loading={deleteItem.isPending}
       />

@@ -385,7 +385,13 @@ export default function RiskManagementTable({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && deleteRisk(deleteTarget.id)}
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = deleteTarget.id;
+            setDeleteTarget(null);
+            await deleteRisk(targetId);
+          }
+        }}
         itemName={deleteTarget?.description}
         loading={isDeleting}
       />
