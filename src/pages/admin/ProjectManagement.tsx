@@ -5,11 +5,12 @@ import DataTable, {
 } from "@/shared/components/ui/data-table";
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { Button } from "@/shared/components/ui/button";
-import { Trash2, Eye, X, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Trash2, Eye, X, AlertTriangle, ArrowLeft, RotateCcw, ArrowRightLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
 import ConfirmDialog from "@/shared/components/ConfirmDialog";
+import TransferOwnershipModal from "@/features/admin/components/TransferOwnershipModal";
 import { Link } from "react-router-dom";
 import { Input } from "@/shared/components/ui/input";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
@@ -17,7 +18,7 @@ import {
   useAdminProjectManagement,
   Project,
 } from "@/features/admin/hooks/useAdminProjectManagement";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function ProjectManagement() {
   const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
@@ -36,8 +37,12 @@ export default function ProjectManagement() {
     setIsDeleteDialogOpen,
     handleDelete,
     deleteProjectMutation,
+    restoreProjectMutation,
+    transferOwnershipMutation,
     totalPages,
   } = useAdminProjectManagement();
+
+  const [transferTarget, setTransferTarget] = useState<Project | null>(null);
 
   const activeColumns = useMemo<DataTableColumn<Project>[]>(
     () => [
@@ -148,6 +153,16 @@ export default function ProjectManagement() {
                       </Link>
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setTransferTarget(project)}
+                      className="text-sm"
+                      title={t("admin:projects.transferOwnership")}
+                    >
+                      <ArrowRightLeft className={cn("w-4 h-4", getIconMarginClass())} />
+                      <span className="hidden sm:inline">{t("admin:projects.transferOwnership")}</span>
+                    </Button>
+                    <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => handleDelete(project)}
@@ -182,6 +197,16 @@ export default function ProjectManagement() {
                 </TableCell>
                 <TableCell className="text-end">
                   <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => restoreProjectMutation.mutate(project.id)}
+                      disabled={restoreProjectMutation.isPending}
+                      className="text-sm"
+                    >
+                      <RotateCcw className={cn("w-4 h-4", getIconMarginClass())} />
+                      {t("admin:projects.restore")}
+                    </Button>
                     <Button
                       variant="destructive"
                       size="sm"
@@ -232,6 +257,21 @@ export default function ProjectManagement() {
         }
         loading={deleteProjectMutation.isPending}
         destructive
+      />
+
+      <TransferOwnershipModal
+        project={transferTarget}
+        open={!!transferTarget}
+        onOpenChange={(open) => !open && setTransferTarget(null)}
+        onTransfer={(newUserId) => {
+          if (transferTarget) {
+            transferOwnershipMutation.mutate(
+              { projectId: transferTarget.id, newUserId },
+              { onSuccess: () => setTransferTarget(null) },
+            );
+          }
+        }}
+        loading={transferOwnershipMutation.isPending}
       />
     </div>
   );

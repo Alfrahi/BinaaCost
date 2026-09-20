@@ -17,6 +17,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { usePublicShare } from "@/features/projects/project-sharing/hooks/usePublicShare";
 import { calculatePublicShareFinancials } from "@/features/projects/project-sharing/utils/publicShareFinancials";
+import { useReportSettings } from "@/features/settings/hooks/useReportSettings";
 
 export default function PublicShare() {
   const { accessToken } = useParams<{ accessToken: string }>();
@@ -174,11 +175,13 @@ export default function PublicShare() {
     risks,
   );
 
+  const { reportSettings } = useReportSettings();
+
   const companyInfo = {
-    name: t("public_share:sharedProject"),
-    website: window.location.origin,
-    logoUrl: "",
-    email: "",
+    name: reportSettings.company_name || t("public_share:sharedProject"),
+    website: reportSettings.company_website || window.location.origin,
+    logoUrl: reportSettings.company_logo_url || "",
+    email: reportSettings.company_email || "",
   };
 
   return (
@@ -256,7 +259,7 @@ export default function PublicShare() {
               project={project}
               financials={financials}
               companyInfo={companyInfo}
-              terms=""
+              terms={reportSettings.default_terms || ""}
               preparedBy={t("public_share:sharedByOwner")}
               clientName=""
             />

@@ -20,6 +20,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
+import { RoleBadge } from "@/features/admin/components/RoleBadge";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
+import { ShieldCheck, Calendar } from "lucide-react";
 
 const profileSchema = z.object({
   first_name: z.string().min(1, "settings:profile.firstNameRequired"),
@@ -41,7 +51,8 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function ProfileSettings() {
   const { t } = useTranslation(["settings", "common"]);
-  const { user } = useAuth();
+  const { user, role } = useAuth();
+  const { formatDate } = useDateFormatter();
   const { profile, updateProfile } = useProfile();
   const updateEmailMutation = useUserEmailUpdate();
   const updatePasswordMutation = useUserPasswordUpdate();
@@ -108,6 +119,52 @@ export default function ProfileSettings() {
 
   return (
     <div className="space-y-8 text-sm">
+      {/* Role & Permissions Banner */}
+      <Card className="bg-muted/30 border-muted max-w-2xl">
+        <CardHeader className="pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <CardTitle className="text-base font-semibold">
+                {t("settings:profile.accountInfo")}
+              </CardTitle>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-muted-foreground me-1">
+                {t("settings:profile.role")}:
+              </span>
+              <RoleBadge role={role || user?.role || "user"} />
+            </div>
+          </div>
+          <CardDescription className="text-xs">
+            {t("settings:profile.accountInfoDesc")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0 text-xs">
+          <div className="p-3 rounded-md bg-background/60 border text-muted-foreground leading-relaxed">
+            <span className="font-medium text-foreground block mb-1">
+              {t("settings:profile.permissionsTitle")}
+            </span>
+            {role === "super_admin"
+              ? t("settings:profile.superAdminDesc")
+              : role === "admin"
+                ? t("settings:profile.adminDesc")
+                : t("settings:profile.userDesc")}
+          </div>
+          {user?.created && (
+            <div className="flex items-center gap-2 text-muted-foreground pt-1">
+              <Calendar className="h-3.5 w-3.5" />
+              <span>
+                {t("settings:profile.accountCreated")}:{" "}
+                <span className="font-medium text-foreground">
+                  {formatDate(user.created, "short")}
+                </span>
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Form {...profileForm}>
         <form
           onSubmit={profileForm.handleSubmit(saveProfile)}
