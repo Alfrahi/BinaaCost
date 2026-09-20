@@ -5,6 +5,7 @@ import {
   computeVersionComparison,
   getVersionFinancialSettings,
 } from "@/shared/logic/versionCosts";
+import type { ProjectSnapshotData } from "@/features/projects/project-versions/types/version";
 
 describe("computeVersionCostSummary", () => {
   it("computes direct totals from a version snapshot", () => {
@@ -27,7 +28,7 @@ describe("computeVersionCostSummary", () => {
       ],
       additional_costs: [{ amount: 300 }],
     };
-    const summary = computeVersionCostSummary(snapshot);
+    const summary = computeVersionCostSummary(snapshot as unknown as ProjectSnapshotData);
     // materials 55 + 200 = 255; labor 600; equipment 1500+20+5=1525; additional 300
     expect(summary.materials).toBe(255);
     expect(summary.labor).toBe(600);
@@ -146,7 +147,7 @@ describe("computeVersionComparison", () => {
     labor_items: [],
     equipment_items: [],
     additional_costs: [],
-  };
+  } as unknown as ProjectSnapshotData;
   const snapshotB = {
     project: {
       financial_settings: {
@@ -160,7 +161,7 @@ describe("computeVersionComparison", () => {
     labor_items: [],
     equipment_items: [],
     additional_costs: [],
-  };
+  } as unknown as ProjectSnapshotData;
 
   it("computes category totals, grand totals, and deltas (B minus A)", () => {
     const result = computeVersionComparison(snapshotA, snapshotB);

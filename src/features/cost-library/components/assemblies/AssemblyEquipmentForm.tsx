@@ -47,10 +47,19 @@ export function AssemblyEquipmentForm({
   const { t } = useTranslation(["project_equipment", "common"]);
   const { convert, getMissingRates } = useCurrencyConverter();
 
+interface LibraryEquipmentItem {
+  id: string;
+  name: string;
+  type?: string;
+  rental_or_purchase?: string;
+  cost_per_period?: number;
+  period_unit: string;
+}
+
   const { data: libraryItemsData } = useQuery({
     queryKey: ["library_equipment"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_equipment").getFullList()),
+      mapRecords<LibraryEquipmentItem>(await pb.collection("library_equipment").getFullList()),
   });
   const libraryItems = useMemo(
     () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),

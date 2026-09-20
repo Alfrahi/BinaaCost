@@ -43,10 +43,18 @@ export function AssemblyMaterialForm({
   const { t } = useTranslation(["project_materials", "common"]);
   const { convert, getMissingRates } = useCurrencyConverter();
 
+interface LibraryMaterialItem {
+  id: string;
+  name: string;
+  unit: string;
+  description?: string;
+  unit_price?: number;
+}
+
   const { data: libraryItemsData } = useQuery({
     queryKey: ["library_materials"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_materials").getFullList()),
+      mapRecords<LibraryMaterialItem>(await pb.collection("library_materials").getFullList()),
   });
   const libraryItems = useMemo(
     () => (Array.isArray(libraryItemsData) ? libraryItemsData : []),

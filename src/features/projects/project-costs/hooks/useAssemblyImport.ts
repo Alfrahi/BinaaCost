@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import {
   AssemblyItem,
-  AssemblyMaterialDetails,
   AssemblyLaborDetails,
   AssemblyEquipmentDetails,
   AssemblyAdditionalCostDetails,
@@ -156,7 +155,7 @@ export function useAssemblyImport(projectId: string) {
               }
               default:
                 console.warn(
-                  `Unknown item type encountered: ${item.item_type}`,
+                  `Unknown item type encountered: ${(item as any).item_type}`,
                 );
                 errorCount++;
                 continue;

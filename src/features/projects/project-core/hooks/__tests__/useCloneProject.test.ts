@@ -119,18 +119,18 @@ describe("useCloneProject", () => {
       { id: "r1", name: "Weather delay", impact_amount: 5000, probability: "medium" },
     ];
 
-    const projCol = pb.collection("projects");
+    const projCol = pb.collection("projects") as any;
     projCol.getOne.mockResolvedValue(sourceProject);
     projCol.create.mockResolvedValue({ id: "new-proj-999", name: "Villa Construction (Copy)" });
 
-    pb.collection("project_groups").getFullList.mockResolvedValue(sourceGroups);
-    pb.collection("project_groups").create.mockResolvedValue({ id: "new-g-1", name: "Foundation" });
+    (pb.collection("project_groups") as any).getFullList.mockResolvedValue(sourceGroups);
+    (pb.collection("project_groups") as any).create.mockResolvedValue({ id: "new-g-1", name: "Foundation" });
 
-    pb.collection("materials").getFullList.mockResolvedValue(sourceMaterials);
-    pb.collection("labor_items").getFullList.mockResolvedValue(sourceLabor);
-    pb.collection("equipment_items").getFullList.mockResolvedValue(sourceEquipment);
-    pb.collection("additional_costs").getFullList.mockResolvedValue(sourceAdditional);
-    pb.collection("risks").getFullList.mockResolvedValue(sourceRisks);
+    (pb.collection("materials") as any).getFullList.mockResolvedValue(sourceMaterials);
+    (pb.collection("labor_items") as any).getFullList.mockResolvedValue(sourceLabor);
+    (pb.collection("equipment_items") as any).getFullList.mockResolvedValue(sourceEquipment);
+    (pb.collection("additional_costs") as any).getFullList.mockResolvedValue(sourceAdditional);
+    (pb.collection("risks") as any).getFullList.mockResolvedValue(sourceRisks);
 
     const { result } = renderHook(() => useCloneProject());
 

@@ -55,7 +55,10 @@ const periodUnits = [
 describe("EquipmentRow", () => {
   const rentalItem: EquipmentItem = {
     id: "eq-1",
+    user_id: "user-1",
     project_id: "p1",
+    created_at: "2026-01-01",
+    updated_at: "2026-01-01",
     name: "Excavator",
     type: "Heavy",
     rental_or_purchase: "Rental",
@@ -70,7 +73,10 @@ describe("EquipmentRow", () => {
 
   const purchaseItem: EquipmentItem = {
     id: "eq-2",
+    user_id: "user-1",
     project_id: "p1",
+    created_at: "2026-01-01",
+    updated_at: "2026-01-01",
     name: "Generator",
     type: "Power",
     rental_or_purchase: "Purchase",

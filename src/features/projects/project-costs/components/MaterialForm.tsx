@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
   Form,
@@ -25,6 +24,14 @@ import {
   CostItemGroupSelect,
   CostItemFormActions,
 } from "./CostItemFormWrapper";
+
+interface LibraryMaterialItem {
+  id: string;
+  name: string;
+  unit: string;
+  description?: string;
+  unit_price?: number;
+}
 
 type MaterialFormValues = z.infer<typeof materialSchema>;
 
@@ -61,7 +68,7 @@ export function MaterialForm({
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_materials"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_materials").getFullList()),
+      mapRecords<LibraryMaterialItem>(await pb.collection("library_materials").getFullList()),
   });
 
   const form = useForm<MaterialFormValues>({

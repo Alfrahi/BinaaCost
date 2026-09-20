@@ -29,7 +29,7 @@ describe("PocketBase Repositories", () => {
   });
 
   describe("BaseRepository", () => {
-    const repo = new BaseRepository<{ title: string }>("tests");
+    const repo = new BaseRepository<{ title: string; created_at?: string; updated_at?: string }>("tests");
 
     it("getById fetches and maps record", async () => {
       collectionMock.getOne.mockResolvedValue({

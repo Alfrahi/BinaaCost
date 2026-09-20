@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
   Form,
@@ -11,7 +10,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { TranslatedSelect } from "@/shared/components/TranslatedSelect";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
@@ -23,6 +21,12 @@ import {
   CostItemGroupSelect,
   CostItemFormActions,
 } from "./CostItemFormWrapper";
+
+interface LibraryLaborItem {
+  id: string;
+  worker_type: string;
+  daily_rate?: number;
+}
 
 interface LaborFormProps {
   defaultValues?: Partial<LaborFormValues>;
@@ -49,7 +53,7 @@ export function LaborForm({
   const { data: libraryItems = [] } = useQuery({
     queryKey: ["library_labor"],
     queryFn: async () =>
-      mapRecords(await pb.collection("library_labor").getFullList()),
+      mapRecords<LibraryLaborItem>(await pb.collection("library_labor").getFullList()),
   });
 
   const form = useForm<LaborFormValues>({
@@ -94,11 +98,6 @@ export function LaborForm({
     },
     [form, libraryItems, getMissingRates, currency, convert, t],
   );
-
-  const groupOptions = [
-    { value: "ungrouped", label: t("project_detail:groups.ungrouped") },
-    ...groups.map((g) => ({ value: g.id, label: g.name })),
-  ];
 
   return (
     <Form {...form}>

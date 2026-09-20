@@ -19,7 +19,7 @@ export interface PaginatedResult<T> {
   items: T[];
 }
 
-export class BaseRepository<T extends Record<string, unknown> = Record<string, unknown>> {
+export class BaseRepository<T extends object = Record<string, unknown>> {
   constructor(protected readonly collectionName: string) {}
 
   protected get collection() {

@@ -198,7 +198,7 @@ export function EquipmentTable({
           {
             key: "cost_per_period",
             label: `${t("columns.costPerPeriod")} (${currency})`,
-            formatLabel: (values) =>
+            formatLabel: (values: Record<string, any>) =>
               values.rental_or_purchase?.toLowerCase() === "purchase"
                 ? `${t("columns.purchaseCost")} (${currency})`
                 : `${t("columns.costPerPeriod")} (${currency})`,
@@ -211,7 +211,7 @@ export function EquipmentTable({
             type: "select",
             options: periodUnits,
             placeholder: t("columns.periodUnitPlaceholder"),
-            conditional: (values) =>
+            conditional: (values: Record<string, any>) =>
               values.rental_or_purchase?.toLowerCase() !== "purchase",
           },
           {
@@ -219,7 +219,7 @@ export function EquipmentTable({
             label: t("columns.usageDuration"),
             type: "number",
             placeholder: t("columns.usageDurationPlaceholder"),
-            conditional: (values) =>
+            conditional: (values: Record<string, any>) =>
               values.rental_or_purchase?.toLowerCase() !== "purchase",
           },
           {
