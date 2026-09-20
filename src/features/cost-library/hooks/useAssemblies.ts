@@ -8,7 +8,7 @@ import { handleError } from "@/shared/lib/toast";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 20;
 
 export function useAssemblies() {
   const queryClient = useQueryClient();
@@ -132,6 +132,7 @@ export function useAssemblies() {
   return {
     allAssemblies,
     assemblies: paginatedAssemblies,
+    count: filteredAssemblies.length,
     isLoading,
     search,
     setSearch,
