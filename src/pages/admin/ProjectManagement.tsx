@@ -237,9 +237,11 @@ export default function ProjectManagement() {
       <ConfirmDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={() =>
-          deleteTarget && deleteProjectMutation.mutate(deleteTarget.id)
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            await deleteProjectMutation.mutateAsync(deleteTarget.id);
+          }
+        }}
         title={t("admin:projects.deleteConfirmationTitle")}
         body={
           deleteTarget?.deleted_at

@@ -447,9 +447,13 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() =>
-          deleteTarget && deleteItem.mutateAsync({ id: deleteTarget.id })
-        }
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = deleteTarget.id;
+            setDeleteTarget(null);
+            await deleteItem.mutateAsync({ id: targetId });
+          }
+        }}
         itemName={safeGetItemName(deleteTarget)}
         loading={deleteItem.isPending}
       />

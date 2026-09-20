@@ -346,7 +346,13 @@ export default function SettingsSection({
       <DeleteConfirmationDialog
         open={!!deleteTarget}
         onOpenChange={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && handleDeleteOption(deleteTarget.id)}
+        onConfirm={async () => {
+          if (deleteTarget) {
+            const targetId = deleteTarget.id;
+            setDeleteTarget(null);
+            await handleDeleteOption(targetId);
+          }
+        }}
         itemName={deleteTarget?.value}
         loading={isLoading}
       />
