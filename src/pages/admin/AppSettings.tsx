@@ -11,9 +11,11 @@ import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useAppSettings } from "@/features/settings/hooks/useAppSettings";
+import ReportOptionsSection from "@/features/reports/components/ReportOptionsSection";
+import CompanyFinancialDefaultsSection from "@/features/admin/components/CompanyFinancialDefaultsSection";
 
 export default function AppSettings() {
-  const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
+  const { t, i18n } = useTranslation(["admin", "settings", "common", "navigation"]);
   const { settings, isLoading, error, updateSetting } = useAppSettings();
 
   const signupEnabled = settings?.value?.enabled || false;
@@ -83,6 +85,34 @@ export default function AppSettings() {
               ? t("admin:appSettings.signupEnabled")
               : t("admin:appSettings.signupDisabled")}
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {t("admin:appSettings.financialDefaultsTitle")}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {t("admin:appSettings.financialDefaultsDescription")}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <CompanyFinancialDefaultsSection />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {t("settings:reportOptions.title")}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {t("settings:reportOptions.description")}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ReportOptionsSection />
         </CardContent>
       </Card>
     </div>

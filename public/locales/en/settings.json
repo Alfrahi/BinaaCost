@@ -29,7 +29,15 @@
     "position": "Position",
     "phone": "Phone Number",
     "error_update": "Failed to update profile: {{message}}",
-    "success_update": "Profile updated successfully!"
+    "success_update": "Profile updated successfully!",
+    "accountInfo": "Account & Permissions",
+    "accountInfoDesc": "Your enterprise role, permission privileges, and account status.",
+    "role": "Assigned Role",
+    "accountCreated": "Member Since",
+    "permissionsTitle": "Access Privileges",
+    "superAdminDesc": "Full enterprise administrator with all system capabilities: user provisioning & role management, global application settings, financial defaults, project recovery and ownership transfers, and complete system audit logs.",
+    "adminDesc": "Administrator with system access to user management, project recovery, and application configuration.",
+    "userDesc": "Standard estimator access: create, edit, calculate, clone, and export construction cost estimates and proposals."
   },
   "reportOptions": {
     "title": "Report Options",
@@ -52,7 +60,15 @@
     "address": "Company Address",
     "addressPlaceholder": "e.g., 123 Main St, City, Country",
     "taxId": "Tax ID",
-    "taxIdPlaceholder": "e.g., 12-3456789"
+    "taxIdPlaceholder": "e.g., 12-3456789",
+    "email": "Company Email",
+    "emailPlaceholder": "e.g., estimating@company.com",
+    "phone": "Company Phone",
+    "phonePlaceholder": "e.g., +1 (555) 123-4567",
+    "logoUrl": "Company Logo URL",
+    "logoUrlPlaceholder": "e.g., https://example.com/logo.png",
+    "defaultTerms": "Default Proposal Terms & Conditions",
+    "defaultTermsPlaceholder": "Standard contract terms, payment milestones, validity period..."
   },
   "appearance": {
     "title": "Appearance",

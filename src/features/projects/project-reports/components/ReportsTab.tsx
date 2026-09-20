@@ -36,6 +36,7 @@ import { useProjectEquipment } from "@/features/projects/project-costs/hooks/use
 import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
 import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 import { ProjectGroup } from "@/features/projects/project-core/types/project";
+import { useReportSettings } from "@/features/settings/hooks/useReportSettings";
 
 const LazyClientProposalReport = React.lazy(() =>
   import("./ClientProposalReport").then((module) => ({
@@ -95,12 +96,21 @@ export default function ReportsTab({
     "project_tabs",
   ]);
   const { user } = useAuth();
+  const { reportSettings } = useReportSettings();
   const isMobile = useIsMobile();
   const [clientName, setClientName] = useState("");
-  const [terms, setTerms] = useState(t("project_reports:defaultTerms"));
+  const [terms, setTerms] = useState(
+    () => reportSettings.default_terms || t("project_reports:defaultTerms"),
+  );
   const [activeReportTab, setActiveReportTab] = useState("project-cost");
   const clientProposalRef = useRef<HTMLDivElement>(null);
   const projectCostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reportSettings.default_terms && terms === t("project_reports:defaultTerms")) {
+      setTerms(reportSettings.default_terms);
+    }
+  }, [reportSettings.default_terms, t]);
 
   // Use entity hooks directly for data fetching
   const { data: materials = [] } = useProjectMaterials(project.id);
@@ -191,10 +201,10 @@ export default function ReportsTab({
   ]);
 
   const companyInfo = {
-    name: (user?.company_name as string) || "",
-    website: (user?.company_website as string) || "",
-    logoUrl: user ? pb.files.getURL(user, user.avatar) || "" : "",
-    email: user?.email || "",
+    name: reportSettings.company_name || (user?.company_name as string) || "",
+    website: reportSettings.company_website || (user?.company_website as string) || "",
+    logoUrl: reportSettings.company_logo_url || (user ? pb.files.getURL(user, user.avatar) || "" : ""),
+    email: reportSettings.company_email || user?.email || "",
   };
 
   const sanitizedTerms = useMemo(() => sanitizeText(terms) || "", [terms]);

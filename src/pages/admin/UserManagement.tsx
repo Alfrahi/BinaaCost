@@ -3,10 +3,11 @@ import { Input } from "@/shared/components/ui/input";
 import { useTranslation } from "react-i18next";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
 import PageHeader from "@/shared/components/PageHeader";
-import { X, Eye, Trash2, AlertTriangle, ArrowLeft } from "lucide-react";
+import { X, Eye, Trash2, AlertTriangle, ArrowLeft, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RoleBadge } from "@/features/admin/components/RoleBadge";
 import EditRoleModal from "@/features/admin/components/EditRoleModal";
+import AddUserModal from "@/features/admin/components/AddUserModal";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import DataTable, {
   DataTableColumn,
@@ -14,7 +15,7 @@ import DataTable, {
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { useAdminUserManagement, UserProfile } from "@/features/admin/hooks/useAdminUserManagement";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function UserManagement() {
   const { t, i18n } = useTranslation(["admin", "common", "roles", "navigation"]);
@@ -33,11 +34,14 @@ export default function UserManagement() {
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     showFallbackWarning,
+    createUserMutation,
     updateUserRoleMutation,
     deleteUserMutation,
     handleDelete,
     totalPages,
   } = useAdminUserManagement();
+
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   const columns = useMemo<DataTableColumn<UserProfile>[]>(
     () => [
@@ -65,6 +69,12 @@ export default function UserManagement() {
             </Button>
             <span>{t("admin:users.title")}</span>
           </div>
+        }
+        actions={
+          <Button onClick={() => setIsAddUserOpen(true)} className="text-sm">
+            <UserPlus className={cn("w-4 h-4", getIconMarginClass())} />
+            {t("admin:users.addUser")}
+          </Button>
         }
       />
 
@@ -189,6 +199,15 @@ export default function UserManagement() {
         }
         itemName={users.find((u) => u.id === deleteTarget)?.email}
         loading={deleteUserMutation.isPending}
+      />
+
+      <AddUserModal
+        open={isAddUserOpen}
+        onOpenChange={setIsAddUserOpen}
+        onAddUser={async (userData) => {
+          await createUserMutation.mutateAsync(userData);
+        }}
+        loading={createUserMutation.isPending}
       />
     </div>
   );

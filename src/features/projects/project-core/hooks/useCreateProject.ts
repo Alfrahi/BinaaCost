@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { projectSchema, ProjectFormValues } from "@/features/projects/project-core/types/form";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { handleError } from "@/shared/lib/toast";
+import { useCompanyFinancialDefaults } from "@/features/settings/hooks/useCompanyFinancialDefaults";
 
 interface ProjectData {
   id: string;
@@ -23,6 +25,7 @@ export function useCreateProject() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { useMutation: useOfflineMutation } = useOfflinePb();
+  const { defaults } = useCompanyFinancialDefaults();
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -36,9 +39,15 @@ export function useCreateProject() {
       client_requirements: "",
       duration_days: undefined,
       duration_unit: "",
-      currency: "USD",
+      currency: defaults?.default_currency || "USD",
     },
   });
+
+  useEffect(() => {
+    if (defaults?.default_currency && !form.formState.dirtyFields.currency) {
+      form.setValue("currency", defaults.default_currency);
+    }
+  }, [defaults?.default_currency, form]);
 
   const optimisticUpdater = (
     old: { data: ProjectData[]; count: number } | undefined,
@@ -104,10 +113,10 @@ export function useCreateProject() {
         currency: sanitizeText(validatedData.currency),
         user_id: user?.id,
         financial_settings: {
-          overhead_percent: 10,
-          markup_percent: 20,
-          tax_percent: 0,
-          contingency_percent: 5,
+          overhead_percent: defaults?.overhead_percent ?? 10,
+          markup_percent: defaults?.markup_percent ?? 20,
+          tax_percent: defaults?.tax_percent ?? 0,
+          contingency_percent: defaults?.contingency_percent ?? 5,
         },
       };
 

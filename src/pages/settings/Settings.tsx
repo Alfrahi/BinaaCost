@@ -2,10 +2,9 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import ProfileSettings from "@/features/settings/components/ProfileSettings";
-import ReportOptionsSection from "@/features/reports/components/ReportOptionsSection";
 import PageHeader from "@/shared/components/PageHeader";
 import { useTranslation } from "react-i18next";
-import { User, FileText, Bell, Palette, Sun, Moon } from "lucide-react";
+import { User, Bell, Palette, Sun, Moon } from "lucide-react";
 import NotificationsSection from "@/shared/components/NotificationsSection";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 import { useTheme } from "@/app/providers/ThemeContext";
@@ -32,11 +31,6 @@ export default function Settings() {
         value: "appearance",
         labelKey: "settings:appearance.title",
         icon: Palette,
-      },
-      {
-        value: "reports",
-        labelKey: "settings:reportOptions.title",
-        icon: FileText,
       },
       {
         value: "notifications",
@@ -164,17 +158,6 @@ export default function Settings() {
                   </button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("settings:reportOptions.title")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReportOptionsSection />
             </CardContent>
           </Card>
         </TabsContent>

@@ -1,5 +1,13 @@
 {
   "title": "Admin Panel",
+  "stats": {
+    "overview": "System Overview",
+    "totalUsers": "Total Users",
+    "activeProjects": "Active Estimates",
+    "deletedProjects": "In Recovery",
+    "auditEvents": "Audit Events",
+    "systemOnline": "System Online"
+  },
   "users": {
     "title": "Users",
     "description": "View, edit, and manage user accounts and permissions",
@@ -25,7 +33,21 @@
     "noProjectsFound": "No projects found for this user.",
     "noActivityFound": "No activity logs found for this user.",
     "accountCreated": "Account Created",
-    "lastSignIn": "Last Sign In"
+    "lastSignIn": "Last Sign In",
+    "addUser": "Add User",
+    "createUser": "Create User",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Doe",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "passwordHelper": "Must be at least 8 characters long.",
+    "generatePassword": "Generate secure password",
+    "emailRequired": "Valid email address is required",
+    "passwordMinLength": "Password must be at least 8 characters long",
+    "successCreated": "User account created successfully!",
+    "errorCreate": "Failed to create user: {{message}}"
   },
   "projects": {
     "title": "Projects",
@@ -46,7 +68,17 @@
     "permanentDelete": "Permanent Delete",
     "confirm_permanent_delete_title": "Confirm Permanent Project Deletion",
     "confirm_permanent_delete_body": "This action cannot be undone. All project data, including materials, labor, equipment, and additional costs, will be permanently removed. Are you absolutely sure?",
-    "success_permanent_deleted": "Project permanently deleted successfully!"
+    "success_permanent_deleted": "Project permanently deleted successfully!",
+    "restore": "Restore",
+    "restoreProject": "Restore Project",
+    "successRestored": "Project restored successfully!",
+    "errorRestore": "Failed to restore project: {{message}}",
+    "transferOwnership": "Transfer Ownership",
+    "transferDescription": "Transfer ownership of '{{projectName}}' from {{currentOwner}} to another user account.",
+    "selectNewOwner": "Select a new owner",
+    "newOwner": "New Project Owner",
+    "successOwnershipTransferred": "Project ownership transferred successfully!",
+    "errorOwnershipTransfer": "Failed to transfer project ownership: {{message}}"
   },
   "dropdowns": {
     "title": "Project Data Settings",
@@ -112,7 +144,20 @@
     "allowUserSignups": "Allow New User Signups",
     "allowUserSignupsDescription": "Enable or disable new user registrations for the application.",
     "signupEnabled": "New user registration is currently enabled.",
-    "signupDisabled": "New user registration is currently disabled."
+    "signupDisabled": "New user registration is currently disabled.",
+    "financialDefaultsTitle": "Company Financial Defaults",
+    "financialDefaultsDescription": "Set organization-wide default markup, overhead, contingency, and tax percentages, along with the default project currency.",
+    "defaultCurrency": "Default Currency",
+    "selectCurrency": "Select currency",
+    "defaultCurrencyHelp": "The standard currency pre-selected for newly created cost estimates.",
+    "defaultOverhead": "Default Overhead",
+    "defaultOverheadHelp": "Indirect costs such as office operations, management, and insurance.",
+    "defaultMarkup": "Default Markup",
+    "defaultMarkupHelp": "Company profit margin applied to project costs.",
+    "defaultContingency": "Default Contingency",
+    "defaultContingencyHelp": "Buffer reserved for unforeseen risks and variations.",
+    "defaultTax": "Default Tax",
+    "defaultTaxHelp": "Standard sales tax or VAT percentage."
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -126,13 +171,24 @@
     "noLogs": "No audit logs found.",
     "previous": "Previous",
     "next": "Next",
-    "searchPlaceholder": "Search by action or table name",
+    "searchPlaceholder": "Search by action, resource, or user email",
     "noLogsFound": "No audit logs found.",
     "noDetailsAvailable": "No details available for this log entry.",
     "oldData": "Old Data:",
     "newData": "New Data:",
     "rowsPerPage": "Rows per page",
-    "page": "Page"
+    "page": "Page",
+    "actionFilter": "Action Filter",
+    "tableFilter": "Resource Filter",
+    "allActions": "All Actions",
+    "allTables": "All Resources",
+    "exportCsv": "Export CSV",
+    "exporting": "Exporting...",
+    "exportSuccess": "Audit logs exported successfully",
+    "exportFailed": "Failed to export audit logs: {{message}}",
+    "actionInsert": "Create (INSERT)",
+    "actionUpdate": "Update (UPDATE)",
+    "actionDelete": "Delete (DELETE)"
   },
   "editRoleModal": {
     "title": "Edit Role for {{email}}",
