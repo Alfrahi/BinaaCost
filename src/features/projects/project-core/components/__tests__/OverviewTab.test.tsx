@@ -1,5 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { render } from "@testing-library/react";
 import { countIncompleteItems } from "@/shared/logic/overview";
+import OverviewTab from "../OverviewTab";
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: any) => {
+      if (key === "project_overview:lastEdited" && opts?.date) {
+        return `Last edited ${opts.date}`;
+      }
+      return key.split(":").pop();
+    },
+    i18n: { language: "en", dir: () => "ltr" },
+  }),
+}));
 
 const base = {
   project: {
@@ -48,3 +62,29 @@ describe("countIncompleteItems", () => {
     expect(count).toBe(0);
   });
 });
+
+describe("OverviewTab", () => {
+  it("renders last edited date formatted without HTML escaping artifacts", () => {
+    const { container } = render(
+      <OverviewTab
+        {...base}
+        project={{
+          ...base.project,
+          name: "Test Project",
+          type: "residential",
+          size: 100,
+          size_unit: "sqm",
+          duration_days: 30,
+          duration_unit: "days",
+          updated_at: "2026-09-04T22:40:24.000Z",
+        }}
+      />,
+    );
+
+    const text = container.textContent || "";
+    expect(text).not.toContain("&#x2F;");
+    expect(text).not.toContain("&amp;");
+    expect(text).toContain("2026");
+  });
+});
+

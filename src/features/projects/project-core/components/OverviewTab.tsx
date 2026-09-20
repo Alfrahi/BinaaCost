@@ -17,6 +17,7 @@ import { Heading } from "@/shared/components/ui/heading";
 import { Button } from "@/shared/components/ui/button";
 import { Plus } from "lucide-react";
 import { countIncompleteItems } from "@/shared/logic/overview";
+import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 
 interface OverviewTabProps {
   project: any;
@@ -48,6 +49,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
 
   const { t } = useTranslation(["project_overview", "durations", "common"]);
   const { format } = useCurrencyFormatter();
+  const { formatDate } = useDateFormatter();
 
   const translatedType =
     projectTypes.find((pt) => pt.value === project.type)?.label ||
@@ -185,7 +187,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
         {project.updated_at && (
           <p className="mt-3 text-xs text-muted-foreground">
             {t("project_overview:lastEdited", {
-              date: new Date(project.updated_at).toLocaleString(),
+              date: formatDate(project.updated_at, "dateTime"),
             })}
           </p>
         )}
