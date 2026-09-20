@@ -47,7 +47,18 @@
     "emailRequired": "Valid email address is required",
     "passwordMinLength": "Password must be at least 8 characters long",
     "successCreated": "User account created successfully!",
-    "errorCreate": "Failed to create user: {{message}}"
+    "errorCreate": "Failed to create user: {{message}}",
+    "editUser": "Edit User",
+    "editUserDetails": "Edit User Details",
+    "editUserDescription": "Update account details, role permissions, or reset user credentials.",
+    "newPasswordOptional": "New Password (Optional)",
+    "newPasswordPlaceholder": "Leave blank to keep current password",
+    "passwordResetHelper": "Enter a new password (min. 8 characters) to reset it immediately, or send a reset email link.",
+    "sendPasswordResetEmail": "Send Password Reset Email",
+    "sendingResetEmail": "Sending reset email...",
+    "successPasswordResetSent": "Password reset email sent successfully!",
+    "successUpdated": "User account updated successfully!",
+    "never": "Never"
   },
   "projects": {
     "title": "Projects",

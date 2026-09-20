@@ -15,8 +15,6 @@ export interface Profile {
   last_name: string | null;
   email: string | null;
   role: string | null;
-  company_name: string | null;
-  company_website: string | null;
   notification_prefs: Record<string, boolean> | null;
   updated_at?: string;
 }

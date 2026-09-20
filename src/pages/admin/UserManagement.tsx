@@ -6,7 +6,7 @@ import PageHeader from "@/shared/components/PageHeader";
 import { X, Eye, Trash2, AlertTriangle, ArrowLeft, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RoleBadge } from "@/features/admin/components/RoleBadge";
-import EditRoleModal from "@/features/admin/components/EditRoleModal";
+import EditUserModal from "@/features/admin/components/EditUserModal";
 import AddUserModal from "@/features/admin/components/AddUserModal";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import DataTable, {
@@ -35,7 +35,8 @@ export default function UserManagement() {
     setIsDeleteDialogOpen,
     showFallbackWarning,
     createUserMutation,
-    updateUserRoleMutation,
+    updateUserMutation,
+    sendPasswordResetMutation,
     deleteUserMutation,
     handleDelete,
     totalPages,
@@ -174,20 +175,20 @@ export default function UserManagement() {
         ariaLabel={t("admin:users.title")}
       />
 
-      {/* Edit Role Modal */}
-      <EditRoleModal
-        profile={editingUser}
+      {/* Edit User Modal */}
+      <EditUserModal
+        user={editingUser}
         open={!!editingUser}
-        onOpenChange={() => setEditingUser(null)}
-        onSave={async (newRole) => {
-          if (!editingUser) return;
-
-          await updateUserRoleMutation.mutateAsync({
-            user_id_to_update: editingUser.id,
-            new_role: newRole,
-          });
+        onOpenChange={(open) => {
+          if (!open) setEditingUser(null);
         }}
-        loading={updateUserRoleMutation.isPending}
+        onSave={async (data) => {
+          await updateUserMutation.mutateAsync(data);
+        }}
+        onSendPasswordReset={async (email) => {
+          await sendPasswordResetMutation.mutateAsync(email);
+        }}
+        loading={updateUserMutation.isPending}
       />
 
       {/* Delete Confirmation Dialog */}

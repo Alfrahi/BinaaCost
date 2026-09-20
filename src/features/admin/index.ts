@@ -1,5 +1,7 @@
 export { RoleBadge } from "./components/RoleBadge";
 export { default as EditRoleModal } from "./components/EditRoleModal";
+export { default as EditUserModal } from "./components/EditUserModal";
+export { default as AddUserModal } from "./components/AddUserModal";
 export { default as SettingsSection } from "./components/SettingsSection";
 export * from "./hooks/useAdminProjectManagement";
 export * from "./hooks/useAdminUserAuditLogs";

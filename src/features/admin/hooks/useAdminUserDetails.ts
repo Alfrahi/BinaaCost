@@ -36,8 +36,6 @@ export function useAdminUserDetails(userId?: string) {
         last_sign_in_at: null,
         raw_user_meta_data: {
           notification_prefs: record.notification_prefs,
-          company_name: record.company_name,
-          company_website: record.company_website,
         },
       } as UserDetails;
     },

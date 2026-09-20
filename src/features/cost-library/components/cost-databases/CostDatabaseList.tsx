@@ -213,8 +213,7 @@ export default function CostDatabaseList({
           />
         </div>
         <Button onClick={() => setEditingId("new")}>
-          <Plus className="ms-2 h-4 w-4" />
-          {t("common:add")}
+          <Plus className="w-4 h-4" aria-hidden="true" />
         </Button>
       </div>
 

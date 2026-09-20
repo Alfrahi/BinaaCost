@@ -128,6 +128,7 @@ export default function Login() {
           password: values.password,
           passwordConfirm: values.confirmPassword,
           role: "user",
+          emailVisibility: true,
         });
         await pb
           .collection("users")
@@ -201,8 +202,9 @@ export default function Login() {
         )}
 
         {mode === "signin" ? (
-          <Form {...loginForm}>
+          <Form {...loginForm} key="signin-form">
             <form
+              key="signin-form-element"
               onSubmit={loginForm.handleSubmit(onLogin)}
               className="space-y-4"
             >
@@ -248,8 +250,9 @@ export default function Login() {
             </form>
           </Form>
         ) : (
-          <Form {...signupForm}>
+          <Form {...signupForm} key="signup-form">
             <form
+              key="signup-form-element"
               onSubmit={signupForm.handleSubmit(onSignup)}
               className="space-y-4"
             >
