@@ -129,4 +129,76 @@ describe("useAssemblyImport - parametric scale and currency conversion", () => {
       "EUR",
     );
   });
+
+  it("handles rental and purchased equipment correctly with scaleFactor", async () => {
+    const { result } = renderHook(() => useAssemblyImport("p1"));
+
+    const items: AssemblyItem[] = [
+      {
+        id: "item-eq-rental",
+        assembly_id: "as-1",
+        user_id: "u1",
+        item_type: "equipment",
+        description: "Backhoe Loader",
+        quantity: 1,
+        unit: "Day",
+        unit_price: 300, // $300 USD -> 270 EUR
+        details: {
+          rental_or_purchase: "Rental",
+          usage_duration: 4, // scaled: 4 * 2 = 8
+          maintenance_cost: 50,
+          fuel_cost: 20,
+        },
+        created_at: "",
+        updated_at: "",
+      },
+      {
+        id: "item-eq-purchase",
+        assembly_id: "as-1",
+        user_id: "u1",
+        item_type: "equipment",
+        description: "Concrete Mixer",
+        quantity: 1,
+        unit: "Day",
+        unit_price: 2000, // $2000 USD -> 1800 EUR
+        details: {
+          rental_or_purchase: "Purchase",
+          usage_duration: 10, // Must NOT scale or be multiplied; forced to 1 for purchase
+          maintenance_cost: 0,
+          fuel_cost: 0,
+        },
+        created_at: "",
+        updated_at: "",
+      },
+    ];
+
+    await act(async () => {
+      await result.current.importAssemblyItems({
+        assemblyItems: items,
+        scaleFactor: 2,
+      });
+    });
+
+    // Rental equipment scales duration
+    expect(mockAddEquipment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Backhoe Loader",
+        rental_or_purchase: "Rental",
+        cost_per_period: 270,
+        usage_duration: 8,
+      }),
+      "EUR",
+    );
+
+    // Purchased equipment forces usage_duration to 1 regardless of scaleFactor
+    expect(mockAddEquipment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Concrete Mixer",
+        rental_or_purchase: "Purchase",
+        cost_per_period: 1800,
+        usage_duration: 1,
+      }),
+      "EUR",
+    );
+  });
 });

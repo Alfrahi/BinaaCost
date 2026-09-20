@@ -101,11 +101,15 @@ export function useAssemblyImport(projectId: string) {
               }
               case "equipment": {
                 const details = item.details as AssemblyEquipmentDetails | null;
+                const isPurchase =
+                  (details?.rental_or_purchase || "").toLowerCase() === "purchase";
                 const costPerPeriod = convert(item.unit_price, "USD", projectCurrency);
-                const usageDuration = new Decimal(details?.usage_duration ?? 1)
-                  .times(scale)
-                  .toDecimalPlaces(2)
-                  .toNumber();
+                const usageDuration = isPurchase
+                  ? 1
+                  : new Decimal(details?.usage_duration ?? 1)
+                      .times(scale)
+                      .toDecimalPlaces(2)
+                      .toNumber();
                 const maintenanceCost = details?.maintenance_cost
                   ? new Decimal(convert(details.maintenance_cost, "USD", projectCurrency))
                       .times(scale)
