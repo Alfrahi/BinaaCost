@@ -1,16 +1,19 @@
 import { useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Switch } from "@/shared/components/ui/switch";
 import { Label } from "@/shared/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { useTranslation } from "react-i18next";
 import PageHeader from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/lib/utils";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useAppSettings } from "@/features/settings/hooks/useAppSettings";
 
 export default function AppSettings() {
-  const { t } = useTranslation(["admin", "common"]);
+  const { t, i18n } = useTranslation(["admin", "common", "navigation"]);
   const { settings, isLoading, error, updateSetting } = useAppSettings();
 
   const signupEnabled = settings?.value?.enabled || false;
@@ -36,7 +39,21 @@ export default function AppSettings() {
 
   return (
     <div className="space-y-6 text-sm">
-      <PageHeader title={t("admin:appSettings.title")} />
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/admin" aria-label={t("navigation:adminPanel")}>
+                <ArrowLeft
+                  className={cn("w-5 h-5", i18n.dir() === "rtl" && "rotate-180")}
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
+            <span>{t("admin:appSettings.title")}</span>
+          </div>
+        }
+      />
 
       <Card>
         <CardHeader>

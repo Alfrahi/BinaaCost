@@ -3,17 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Home,
-  FolderKanban,
   Package,
   Settings,
   BarChart,
-  Users,
-  SlidersHorizontal,
   LogOut,
   X,
-  FileText,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Heading } from "@/shared/components/ui/heading";
@@ -57,25 +54,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const adminNavigation = [
     {
-      name: t("admin:appSettings.title"),
-      href: "/admin/app-settings",
-      icon: Settings,
-    },
-    { name: t("admin:users.title"), href: "/admin/users", icon: Users },
-    {
-      name: t("admin:projects.title"),
-      href: "/admin/projects",
-      icon: FolderKanban,
-    },
-    {
-      name: t("admin:dropdowns.title"),
-      href: "/admin/settings",
-      icon: SlidersHorizontal,
-    },
-    {
-      name: t("admin:auditLogs.title"),
-      href: "/admin/audit-logs",
-      icon: FileText,
+      name: t("navigation:adminPanel"),
+      href: "/admin",
+      icon: ShieldCheck,
     },
   ];
 
@@ -148,6 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <X className="h-5 w-5" />
           </Button>
         </div>
+
         <ScrollArea className="flex-1 py-4">
           <nav className="space-y-1 px-4">
             {navigation.map((item) => (
@@ -176,33 +158,25 @@ const Sidebar: React.FC<SidebarProps> = ({
           {(isAdmin || isSuperAdmin) && (
             <>
               <Separator className="my-4 bg-border" />
-              {!isCollapsed && (
-                <Heading level={6} className="px-4 uppercase tracking-wider text-muted-foreground mb-2">
-                  {t("navigation:adminPanel")}
-                </Heading>
-              )}
               <nav className="space-y-1 px-4">
-                {adminNavigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                      isActive(item.href)
-                        ? "bg-muted text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      isCollapsed && "justify-center px-0",
-                    )}
-                    onClick={() => isMobile && setSidebarOpen(false)}
-                  >
-                    <item.icon
-                      className={cn("h-4 w-4", isCollapsed && "mx-auto")}
-                    />
-                    {!isCollapsed && (
-                      <span className="whitespace-nowrap">{item.name}</span>
-                    )}
-                  </Link>
-                ))}
+                <Link
+                  to="/admin"
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive("/admin")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    isCollapsed && "justify-center px-0",
+                  )}
+                  onClick={() => isMobile && setSidebarOpen(false)}
+                >
+                  <ShieldCheck
+                    className={cn("h-4 w-4", isCollapsed && "mx-auto")}
+                  />
+                  {!isCollapsed && (
+                    <span className="whitespace-nowrap">{t("navigation:adminPanel")}</span>
+                  )}
+                </Link>
               </nav>
             </>
           )}
