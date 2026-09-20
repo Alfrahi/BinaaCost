@@ -30,25 +30,66 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
 
   const catTotal = (coll, items) => r2(items.reduce((s, it) => safeAdd(s, itemCost(coll, it)), 0));
 
-  const runFinancials = (mt, lt, eq, ad, s) => {
+  const calcRiskContingency = (riskItems) => {
+    let rc = 0;
+    for (let i = 0; i < (riskItems || []).length; i++) {
+      const prob = riskItems[i].probability;
+      const impact = Number(riskItems[i].impact_amount) || 0;
+      const factor =
+        prob === "high" ? 0.3 : prob === "medium" ? 0.2 : prob === "low" ? 0.1 : 0;
+      rc = safeAdd(
+        rc,
+        Number(riskItems[i].contingency_amount) || safeMult(factor, impact),
+      );
+    }
+    return rc;
+  };
+
+  const runFinancials = (mt, lt, eq, ad, riskItems, s) => {
     if (!s) s = {};
-    // integer-cents arithmetic: multiply to cents, operate on integers,
-    // divide once at the end. No intermediate rounding, matching
-    // src/logic/financials.ts (decimal.js) exactly.
     const toCents = (n) => Math.round((Number(n) || 0) * 100);
-    const directC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+    const locationFactor = Number(s.location_factor) || 1;
+    const mtAdj = r2(mt * locationFactor);
+    const ltAdj = r2(lt * locationFactor);
+    const eqAdj = r2(eq * locationFactor);
+
+    const directC = toCents(mtAdj) + toCents(ltAdj) + toCents(eqAdj) + toCents(ad);
+    const directBaseC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+    const locationAdjustmentC = directC - directBaseC;
+
     const overheadC = Math.round(directC * (Number(s.overhead_percent) || 0) / 100);
-    const contingencyC = Math.round(directC * (Number(s.contingency_percent) || 0) / 100);
+    const flatContingencyC = Math.round(directC * (Number(s.contingency_percent) || 0) / 100);
+
+    const rc = calcRiskContingency(riskItems);
+    const riskContingencyC = toCents(rc);
+
+    const basis = s.contingency_basis || "flat";
+    let contingencyC = flatContingencyC;
+    if (basis === "risk_register") {
+      contingencyC = riskContingencyC;
+    } else if (basis === "combined") {
+      contingencyC = flatContingencyC + riskContingencyC;
+    }
+
     const primeC = directC + overheadC + contingencyC;
     const markupC = Math.round(primeC * (Number(s.markup_percent) || 0) / 100);
     const bidC = primeC + markupC;
     const taxC = Math.round(bidC * (Number(s.tax_percent) || 0) / 100);
     const totalC = bidC + taxC;
+
     return {
-      materialsTotal: mt, laborTotal: lt, equipmentTotal: eq, additionalTotal: ad,
+      materialsTotal: mtAdj,
+      laborTotal: ltAdj,
+      equipmentTotal: eqAdj,
+      additionalTotal: ad,
+      directCostsBase: directBaseC / 100,
+      locationAdjustmentAmount: locationAdjustmentC / 100,
       directCosts: directC / 100,
       overheadAmount: overheadC / 100,
       contingencyAmount: contingencyC / 100,
+      contingencyBasis: basis,
+      flatContingencyAmount: flatContingencyC / 100,
+      riskContingencyAmount: riskContingencyC / 100,
       primeCost: primeC / 100,
       markupAmount: markupC / 100,
       bidPrice: bidC / 100,
@@ -127,8 +168,25 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
   let simAdditional = JSON.parse(JSON.stringify(orig.additional_costs));
   const simRisks = JSON.parse(JSON.stringify(orig.risks));
 
-  const rawStr = project.getString("financial_settings");
-  const fin = rawStr ? JSON.parse(rawStr) : {};
+  let baseSettings = null;
+  try {
+    const rawStr = project.getString ? project.getString("financial_settings") : "";
+    if (rawStr) baseSettings = JSON.parse(rawStr);
+  } catch (_) {
+    baseSettings = null;
+  }
+  if (!baseSettings) {
+    try {
+      const g = project.get("financial_settings");
+      if (typeof g === "string") baseSettings = JSON.parse(g);
+      else if (g && typeof g === "object") baseSettings = JSON.parse(JSON.stringify(g));
+    } catch (_) {
+      baseSettings = {};
+    }
+  }
+  if (!baseSettings || typeof baseSettings !== "object") baseSettings = {};
+
+  const fin = JSON.parse(JSON.stringify(baseSettings));
 
   for (const rule of scenario.impact_rules || []) {
     const itemType = rule.item_type;
@@ -171,15 +229,20 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
           updated_at: new Date().toISOString(),
         });
       }
-    } else if (itemType === "financial_settings" && adjType === "fixed_increase") {
-      if (["overhead_percent", "markup_percent", "tax_percent", "contingency_percent"].indexOf(field) !== -1) {
-        fin[field] = r2((Number(fin[field]) || 0) + val);
+    } else if (itemType === "financial_settings") {
+      if (field === "location_factor") {
+        const cur = Number(fin.location_factor) || 1;
+        if (adjType === "fixed_increase") fin.location_factor = r2(cur + val);
+        else if (adjType === "percentage_increase") fin.location_factor = r2(cur * (1 + val / 100));
+      } else if (["overhead_percent", "markup_percent", "tax_percent", "contingency_percent"].indexOf(field) !== -1) {
+        const cur = Number(fin[field]) || 0;
+        if (adjType === "fixed_increase") fin[field] = r2(cur + val);
+        else if (adjType === "percentage_increase") fin[field] = r2(cur * (1 + val / 100));
       }
     }
   }
 
   const currency = project.get("currency");
-  const baseSettings = Object.assign({}, fin);
 
   const origTotals = {
     materialsTotal: catTotal("materials", orig.materials),
@@ -202,6 +265,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
         origTotals.laborTotal,
         origTotals.equipmentTotal,
         origTotals.additionalTotal,
+        orig.risks,
         baseSettings,
       ),
       materials: orig.materials,
@@ -218,6 +282,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
         simTotals.laborTotal,
         simTotals.equipmentTotal,
         simTotals.additionalTotal,
+        simRisks,
         fin,
       ),
       materials: simMaterials,
