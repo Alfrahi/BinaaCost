@@ -607,6 +607,69 @@ describe("pocketbase integration", () => {
       expect(revert.status).toBe(200);
       expect(revert.json.user_id).toBe(uid);
     });
+
+    itLive("editor cannot tamper with project financial_settings or financial_settings_confirmed (AUTH-ADV-02)", async () => {
+      // Ensure editor share is active on pid
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: editorId, role: "editor",
+      }, tok);
+
+      // 1. Editor attempts to update financial_settings
+      const patchSettings = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        financial_settings: { markup_percent: 99, overhead_percent: 50 },
+      }, editorTok);
+      expect([400, 403, 404]).toContain(patchSettings.status);
+
+      // 2. Editor attempts to update financial_settings_confirmed
+      const patchConfirmed = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        financial_settings_confirmed: true,
+      }, editorTok);
+      expect([400, 403, 404]).toContain(patchConfirmed.status);
+
+      // 3. Editor CAN update non-financial project metadata (e.g. description)
+      const patchMeta = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        description: "Updated by editor without touching financials",
+      }, editorTok);
+      expect(patchMeta.status).toBe(200);
+
+      // 4. Project owner CAN update financial_settings
+      const ownerPatch = await api("PATCH", `/api/collections/projects/records/${pid}`, {
+        financial_settings: { markup_percent: 25, overhead_percent: 10, tax_percent: 15, contingency_percent: 5 },
+        financial_settings_confirmed: true,
+      }, tok);
+      expect(ownerPatch.status).toBe(200);
+      expect(ownerPatch.json.financial_settings_confirmed).toBe(true);
+    });
+
+    itLive("authorized editor can delete child records on shared project (AUTH-ADV-03)", async () => {
+      // 1. Owner creates a material in the shared project
+      const mat = await api("POST", "/api/collections/materials/records", {
+        project_id: pid, user_id: uid, name: "Rebar Editor Delete Test", quantity: 10, unit: "ton", unit_price: 800,
+      }, tok);
+      expect(mat.status).toBe(200);
+
+      // 2. Editor successfully deletes owner's material in shared project
+      const delMat = await api("DELETE", `/api/collections/materials/records/${mat.json.id}`, undefined, editorTok);
+      expect(delMat.status).toBe(204);
+
+      // 3. Editor creates and deletes a risk item in shared project
+      const risk = await api("POST", "/api/collections/risks/records", {
+        project_id: pid, user_id: editorId, description: "Editor Risk", probability: "low", impact_amount: 1000,
+      }, editorTok);
+      expect(risk.status).toBe(200);
+
+      const delRisk = await api("DELETE", `/api/collections/risks/records/${risk.json.id}`, undefined, editorTok);
+      expect(delRisk.status).toBe(204);
+
+      // 4. Editor creates and deletes a project group in shared project
+      const grp = await api("POST", "/api/collections/project_groups/records", {
+        project_id: pid, user_id: editorId, name: "Editor Group", sort_order: 1,
+      }, editorTok);
+      expect(grp.status).toBe(200);
+
+      const delGrp = await api("DELETE", `/api/collections/project_groups/records/${grp.json.id}`, undefined, editorTok);
+      expect(delGrp.status).toBe(204);
+    });
   });
 
   describe("H3: users directory restricted", () => {

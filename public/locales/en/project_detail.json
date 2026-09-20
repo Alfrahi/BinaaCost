@@ -186,7 +186,8 @@
     "editing": "editing",
     "locationFactor": "Location Adjustment",
     "locationFactorDesc": "Cost multiplier for the project location (e.g. 1.15 = +15%). Applied to materials, labor, and equipment before overhead and markup.",
-    "locationFactorTooltip": "Multiplies direct costs (materials, labor, equipment) by a location-specific factor. Additional costs are not affected."
+    "locationFactorTooltip": "Multiplies direct costs (materials, labor, equipment) by a location-specific factor. Additional costs are not affected.",
+    "readOnlyNotice": "Only project owners or administrators can modify financial assumptions."
   },
   "comments": {
     "title": "Comments for {{item}}",
