@@ -21,7 +21,7 @@ pb.autoCancellation(false);
 // or when a request for the authenticated user's own record returns 404 (user deleted).
 // Transient 404s on other resources (e.g. a just-deleted project) must NOT log the user out.
 pb.afterSend = (response, data) => {
-  if (!pb.authStore.isValid || pb.authStore.isAdmin || pb.authStore.isSuperuser) {
+  if (!pb.authStore.isValid || pb.authStore.isSuperuser) {
     return data;
   }
   const url = response.url || "";

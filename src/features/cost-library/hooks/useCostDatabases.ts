@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
@@ -53,7 +54,7 @@ export function useCostDatabases() {
     return oldData;
   };
 
-  const createDatabase = useOfflineMutation<
+  const rawCreateDatabase = useOfflineMutation<
     {
       name: string;
       description?: string;
@@ -69,6 +70,45 @@ export function useCostDatabases() {
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {},
   });
+
+  const createDatabase = useMemo(
+    () => ({
+      ...rawCreateDatabase,
+      mutate: (
+        variables: {
+          name: string;
+          description?: string;
+          is_public?: boolean;
+          currency?: string;
+          user_id?: string;
+        },
+        options?: any,
+      ) => {
+        const payload = {
+          ...variables,
+          user_id: variables.user_id || user?.id,
+        };
+        return rawCreateDatabase.mutate(payload, options);
+      },
+      mutateAsync: (
+        variables: {
+          name: string;
+          description?: string;
+          is_public?: boolean;
+          currency?: string;
+          user_id?: string;
+        },
+        options?: any,
+      ) => {
+        const payload = {
+          ...variables,
+          user_id: variables.user_id || user?.id,
+        };
+        return rawCreateDatabase.mutateAsync(payload, options);
+      },
+    }),
+    [rawCreateDatabase, user?.id],
+  );
 
   const updateDatabase = useOfflineMutation<
     Partial<CostDatabase> & { id: string },

@@ -99,6 +99,10 @@ export default function CostItemsTable({
 
   const handleFormSubmit = useCallback(
     async (values: CostItemFormValues) => {
+      if (!user?.id) {
+        toast.error(t("common:mustBeLoggedIn"));
+        return;
+      }
       try {
         if (editingItem) {
           await updateItem.mutateAsync({ id: editingItem.id, ...values });
@@ -107,6 +111,7 @@ export default function CostItemsTable({
           await createItem.mutateAsync({
             id: crypto.randomUUID(),
             database_id: database.id,
+            user_id: user.id,
             csi_division: values.csi_division,
             csi_code: values.csi_code,
             description: values.description,
@@ -121,7 +126,7 @@ export default function CostItemsTable({
         handleError(e);
       }
     },
-    [createItem, database.id, editingItem, t, updateItem],
+    [createItem, database.id, editingItem, t, updateItem, user?.id],
   );
 
   const handleCancelForm = useCallback(() => {

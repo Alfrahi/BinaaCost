@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
 import { callRoute } from "@/integrations/pocketbase/routes";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
+import { useAuth } from "@/features/auth";
 import { handleError } from "@/shared/lib/toast";
 
 export interface CostDatabaseItem {
   id: string;
   database_id: string;
+  user_id?: string;
   csi_division: string;
   csi_code: string;
   description: string;
@@ -21,6 +24,7 @@ export function useCostDatabaseItems(
   pageSize = 50,
   searchTerm?: string,
 ) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const baseQueryKey = ["cost-database-items", databaseId];
   const queryKey = [...baseQueryKey, page, pageSize, searchTerm || ""];
@@ -87,8 +91,8 @@ export function useCostDatabaseItems(
     return { data: oldData, count: oldCount };
   };
 
-  const createItem = useOfflineMutation<
-    Omit<CostDatabaseItem, "id"> & { id?: string },
+  const rawCreateItem = useOfflineMutation<
+    Omit<CostDatabaseItem, "id"> & { id?: string; user_id?: string },
     { data: CostDatabaseItem[]; count: number }
   >({
     queryKey,
@@ -98,6 +102,39 @@ export function useCostDatabaseItems(
     onSuccess: () => queryClient.invalidateQueries({ queryKey: baseQueryKey }),
     onError: (err) => handleError(err),
   });
+
+  const createItem = useMemo(
+    () => ({
+      ...rawCreateItem,
+      mutate: (
+        variables: Omit<CostDatabaseItem, "id"> & {
+          id?: string;
+          user_id?: string;
+        },
+        options?: any,
+      ) => {
+        const payload = {
+          ...variables,
+          user_id: variables.user_id || user?.id,
+        };
+        return rawCreateItem.mutate(payload, options);
+      },
+      mutateAsync: (
+        variables: Omit<CostDatabaseItem, "id"> & {
+          id?: string;
+          user_id?: string;
+        },
+        options?: any,
+      ) => {
+        const payload = {
+          ...variables,
+          user_id: variables.user_id || user?.id,
+        };
+        return rawCreateItem.mutateAsync(payload, options);
+      },
+    }),
+    [rawCreateItem, user?.id],
+  );
 
   const updateItem = useOfflineMutation<
     Partial<CostDatabaseItem> & { id: string },

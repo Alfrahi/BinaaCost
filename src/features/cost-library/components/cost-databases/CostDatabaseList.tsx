@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { useCostDatabases } from "@/features/cost-library/hooks/useCostDatabases";
+import { useAuth } from "@/features/auth";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { toast } from "sonner";
@@ -61,6 +62,7 @@ export default function CostDatabaseList({
   onViewDatabase,
 }: CostDatabaseListProps) {
   const { t } = useTranslation(["resources", "common", "pages"]);
+  const { user } = useAuth();
   const { databasesQuery, createDatabase, updateDatabase, deleteDatabase } =
     useCostDatabases();
   const { options: currencies, isLoading: isLoadingCurrencies } =
@@ -131,6 +133,11 @@ export default function CostDatabaseList({
 
   const handleSubmit = useCallback(
     async (values: CostDatabaseFormValues) => {
+      if (!user?.id) {
+        toast.error(t("common:mustBeLoggedIn"));
+        return;
+      }
+
       try {
         const sanitizedDescription =
           sanitizeText(values.description) ?? undefined;
@@ -150,6 +157,7 @@ export default function CostDatabaseList({
             description: sanitizedDescription,
             is_public: values.is_public,
             currency: values.currency,
+            user_id: user.id,
           });
           toast.success(t("common:success"));
         }
@@ -158,7 +166,7 @@ export default function CostDatabaseList({
         toast.error(t("common:error"));
       }
     },
-    [editingId, updateDatabase, createDatabase, t],
+    [editingId, updateDatabase, createDatabase, t, user?.id],
   );
 
   const handleDelete = useCallback(async () => {
