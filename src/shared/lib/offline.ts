@@ -17,7 +17,7 @@ export type OfflineSyncEvent =
 
 export type OfflineSyncEventHandler = (event: OfflineSyncEvent) => void;
 
-interface OfflineMutation {
+export interface OfflineMutation {
   id: string;
   table: string;
   type:
@@ -144,6 +144,59 @@ class OfflineManager {
 
   public getLastSyncedAt(): string | null {
     return this.lastSyncedAt;
+  }
+
+  public getDeadLetterQueue(): OfflineMutation[] {
+    return [...this.deadLetterQueue];
+  }
+
+  public async retryDeadLetter(mutationId: string): Promise<void> {
+    const mutation = this.deadLetterQueue.find((m) => m.id === mutationId);
+    if (!mutation) return;
+
+    this.deadLetterQueue = this.deadLetterQueue.filter(
+      (m) => m.id !== mutationId,
+    );
+    mutation.retries = 0;
+    delete mutation.error;
+    this.queue.push(mutation);
+    await this.saveQueues();
+    this.notifyListeners();
+
+    if (this._isOnline && !this.isSyncing) {
+      this.processQueue();
+    }
+  }
+
+  public async retryAllDeadLetters(): Promise<void> {
+    if (this.deadLetterQueue.length === 0) return;
+
+    for (const m of this.deadLetterQueue) {
+      m.retries = 0;
+      delete m.error;
+      this.queue.push(m);
+    }
+    this.deadLetterQueue = [];
+    await this.saveQueues();
+    this.notifyListeners();
+
+    if (this._isOnline && !this.isSyncing) {
+      this.processQueue();
+    }
+  }
+
+  public async dismissDeadLetter(mutationId: string): Promise<void> {
+    this.deadLetterQueue = this.deadLetterQueue.filter(
+      (m) => m.id !== mutationId,
+    );
+    await this.saveQueues();
+    this.notifyListeners();
+  }
+
+  public async clearDeadLetters(): Promise<void> {
+    this.deadLetterQueue = [];
+    await this.saveQueues();
+    this.notifyListeners();
   }
 
   public async init(userId?: string) {

@@ -23,6 +23,8 @@ import {
   AssemblyIntegrationRow,
   ImportItemOverrides,
 } from "./AssemblyIntegrationRow";
+import { CostDatabasePickerModal } from "./CostDatabasePickerModal";
+import { CostDatabaseItem } from "@/features/cost-library/hooks/useCostDatabaseItems";
 import { EntityCrud } from "@/features/projects/project-costs/hooks/useEntityCrud";
 
 const PAGE_SIZE = 50;
@@ -54,6 +56,13 @@ export interface EntityTableConfig<T> {
   assemblyImport: {
     itemTypes: EntityItemType[];
     onImport: ImportItemOverrides;
+  };
+  costDatabaseImport?: {
+    onImport: (
+      item: CostDatabaseItem,
+      quantity: number,
+      groupId?: string,
+    ) => Promise<void>;
   };
   csvImport: {
     itemType: any;
@@ -248,10 +257,19 @@ export function EntityTable<T>({
         />
       )}
       {canEdit && !isFormOpen && (
-        <AssemblyIntegrationRow
-          itemTypes={config.assemblyImport.itemTypes}
-          onImport={config.assemblyImport.onImport}
-        />
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <AssemblyIntegrationRow
+            itemTypes={config.assemblyImport.itemTypes}
+            onImport={config.assemblyImport.onImport}
+          />
+          {config.costDatabaseImport && (
+            <CostDatabasePickerModal
+              projectCurrency={currency}
+              groups={groups}
+              onImport={config.costDatabaseImport.onImport}
+            />
+          )}
+        </div>
       )}
       {isFormOpen && (
         <div className="p-4 border rounded-sm bg-card mb-4">

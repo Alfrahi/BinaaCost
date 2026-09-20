@@ -5,6 +5,8 @@
   "loading": "Loading...",
   "appTitle": "Cost Estimator",
   "switchTo": "Switch to {{lng}}",
+  "switchToLightMode": "Switch to light mode",
+  "switchToDarkMode": "Switch to dark mode",
   "accessDenied": "Access Denied",
   "mustBeLoggedIn": "You must be logged in to perform this action.",
   "errorLoadingProjects": "Error loading projects: {{message}}",
@@ -163,5 +165,15 @@
   "offlineOperationNotAllowed": "This operation is not allowed while offline. Please connect to the internet to proceed.",
   "languageNameEn": "English",
   "languageNameAr": "Arabic",
-  "clickToEdit": "Click to edit"
+  "clickToEdit": "Click to edit",
+  "retry": "Retry",
+  "viewFailedChanges": "View failed offline changes",
+  "deadLetterTitle": "Failed Offline Sync Operations",
+  "deadLetterDesc": "These operations exceeded maximum retry attempts. You can inspect payload details, retry individual or all operations, or export data for manual recovery.",
+  "retryAll": "Retry All",
+  "clearAll": "Clear All",
+  "exportData": "Export JSON",
+  "noDeadLetters": "No failed sync operations. All offline changes were synchronized successfully!",
+  "hidePayload": "Hide Details",
+  "viewPayload": "View Details & Payload"
 }

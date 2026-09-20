@@ -142,6 +142,21 @@ export function LaborTable({
           },
         },
       },
+      costDatabaseImport: {
+        onImport: async (item, quantity, groupId) => {
+          await crud.handleAddOrUpdate(
+            {
+              worker_type: item.description,
+              number_of_workers: 1,
+              daily_rate: item.unit_price,
+              total_days: quantity,
+              description: item.csi_code ? `[${item.csi_code}] ${item.description}` : undefined,
+              group_id: groupId || "ungrouped",
+            },
+            currency,
+          );
+        },
+      },
       csvImport: {
         itemType: "labor",
         onImport: (values) =>

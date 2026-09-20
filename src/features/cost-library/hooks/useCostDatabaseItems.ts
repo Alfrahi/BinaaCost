@@ -19,10 +19,11 @@ export function useCostDatabaseItems(
   databaseId?: string,
   page = 0,
   pageSize = 50,
+  searchTerm?: string,
 ) {
   const queryClient = useQueryClient();
   const baseQueryKey = ["cost-database-items", databaseId];
-  const queryKey = [...baseQueryKey, page, pageSize];
+  const queryKey = [...baseQueryKey, page, pageSize, searchTerm || ""];
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
     useOfflinePb();
 
@@ -30,10 +31,14 @@ export function useCostDatabaseItems(
     queryKey,
     queryFn: async () => {
       if (!databaseId) return { data: [], count: 0 };
+      const trimmed = searchTerm?.trim().replace(/["\\]/g, "");
+      const filter = trimmed
+        ? `database_id="${databaseId}" && (csi_code ~ "${trimmed}" || description ~ "${trimmed}" || csi_division ~ "${trimmed}")`
+        : `database_id="${databaseId}"`;
       const result = await pb.collection("cost_database_items").getList(
         page + 1, // pb is 1-based
         pageSize,
-        { filter: `database_id="${databaseId}"`, sort: "csi_code" },
+        { filter, sort: "csi_code" },
       );
       return {
         data: mapRecords<CostDatabaseItem>(result.items),
