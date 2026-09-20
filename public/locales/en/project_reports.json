@@ -57,5 +57,7 @@
   "internalLabel": "Internal",
   "clientFacingLabel": "Client-facing",
   "internalReportHint": "Detailed internal cost report — includes line-item costs and financial assumptions.",
-  "clientFacingReportHint": "Client-facing proposal — omits internal cost detail and assumptions."
+  "clientFacingReportHint": "Client-facing proposal — omits internal cost detail and assumptions.",
+  "liveEstimate": "Current Estimate (Live)",
+  "versionToExport": "Version to Export"
 }

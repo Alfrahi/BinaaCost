@@ -9,8 +9,14 @@ import { Label } from "@/shared/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useAuth } from "@/features/auth";
 import { pb } from "@/integrations/pocketbase/client";
-import { calculateProjectFinancials } from "@/shared/logic/financials";
+import { calculateProjectFinancials, DEFAULT_FINANCIAL_SETTINGS } from "@/shared/logic/financials";
 import { calculateCategoryTotal } from "@/shared/logic/shared";
+import {
+  computeVersionCostSummary,
+  getVersionFinancialSettings,
+} from "@/shared/logic/versionCosts";
+import type { ProjectSnapshotData } from "@/features/projects/project-versions/types/version";
+import { toast } from "sonner";
 import {
   FinancialAssumptionsStrip,
   DefaultAssumptionsWarning,
@@ -120,36 +126,101 @@ export default function ReportsTab({
   const { data: risks = [] } = useProjectRisks(project.id);
 
   const { generatePdf, isGenerating } = usePdfExport();
-  const { versions } = useProjectVersions(project.id);
-  const [selectedVersionId, setSelectedVersionId] = useState<string | undefined>(undefined);
+  const { versions, fetchVersionSnapshot } = useProjectVersions(project.id);
+  const [selectedVersionId, setSelectedVersionId] = useState<string>("current");
+  const [snapshotData, setSnapshotData] = useState<ProjectSnapshotData | null>(null);
+  const [isLoadingSnapshot, setIsLoadingSnapshot] = useState(false);
 
-  // Set default selected version to latest finalized, otherwise latest by date
+  // If a selected version is no longer in the list (e.g. deleted), fall back to "current"
   useEffect(() => {
-    if (versions.length === 0) {
-      setSelectedVersionId(undefined);
+    if (
+      selectedVersionId !== "current" &&
+      versions.length > 0 &&
+      !versions.some((v) => v.id === selectedVersionId)
+    ) {
+      setSelectedVersionId("current");
+    }
+  }, [versions, selectedVersionId]);
+
+  useEffect(() => {
+    if (!selectedVersionId || selectedVersionId === "current") {
+      setSnapshotData(null);
+      setIsLoadingSnapshot(false);
       return;
     }
-    const finalized = versions.find(v => v.is_final);
-    if (finalized) {
-      setSelectedVersionId(finalized.id);
-    } else {
-      // sort by created_at descending
-      const sorted = [...versions].sort((a, b) => 
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      setSelectedVersionId(sorted[0]?.id ?? undefined);
+
+    const version = versions.find((v) => v.id === selectedVersionId);
+    if (!version) {
+      setSnapshotData(null);
+      setIsLoadingSnapshot(false);
+      return;
     }
-  }, [versions]);
+
+    const parseSnapshot = (raw: unknown): ProjectSnapshotData | null => {
+      if (!raw) return null;
+      if (typeof raw === "string") {
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+      return raw as ProjectSnapshotData;
+    };
+
+    const parsed = parseSnapshot(version.data);
+    if (parsed) {
+      setSnapshotData(parsed);
+      setIsLoadingSnapshot(false);
+      return;
+    }
+
+    if (!fetchVersionSnapshot) {
+      setSnapshotData(null);
+      setIsLoadingSnapshot(false);
+      return;
+    }
+
+    let isCancelled = false;
+    setIsLoadingSnapshot(true);
+    Promise.resolve(fetchVersionSnapshot(selectedVersionId))
+      .then((data) => {
+        if (!isCancelled) {
+          setSnapshotData(parseSnapshot(data));
+        }
+      })
+      .catch((err: any) => {
+        if (!isCancelled) {
+          toast.error(
+            t("common:error") + ": " + (err?.message || "Failed to load snapshot"),
+          );
+          setSnapshotData(null);
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingSnapshot(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedVersionId, versions, fetchVersionSnapshot, t]);
+
+  const isHistorical = selectedVersionId !== "current" && !!selectedVersionId;
 
   const selectedVersion = useMemo(() => {
-    if (!selectedVersionId || versions.length === 0) return null;
-    return versions.find(v => v.id === selectedVersionId) ?? null;
-  }, [selectedVersionId, versions]);
+    if (!isHistorical || versions.length === 0) return null;
+    return versions.find((v) => v.id === selectedVersionId) ?? null;
+  }, [isHistorical, selectedVersionId, versions]);
 
   const selectedVersionLabel = useMemo(() => {
-    if (!selectedVersion) return undefined;
+    if (!isHistorical || !selectedVersion) {
+      return t("project_reports:liveEstimate", "Current Estimate (Live)");
+    }
     return `${selectedVersion.name} (${new Date(selectedVersion.created_at).toLocaleDateString(i18n.language)})`;
-  }, [selectedVersion, i18n.language]);
+  }, [isHistorical, selectedVersion, i18n.language, t]);
 
   const activeReportTabLabel = useMemo(() => {
     const item = reportTabItems.find((i) => i.value === activeReportTab);
@@ -157,12 +228,12 @@ export default function ReportsTab({
   }, [activeReportTab, t]);
 
   const versionStampForExport = useMemo<{ name: string; date: string } | undefined>(() => {
-    if (!selectedVersion) return undefined;
+    if (!isHistorical || !selectedVersion) return undefined;
     return {
       name: selectedVersion.name,
       date: new Date(selectedVersion.created_at).toLocaleDateString(i18n.language),
     };
-  }, [selectedVersion, i18n.language]);
+  }, [isHistorical, selectedVersion, i18n.language]);
 
   const allSettingsOptions = useMemo(
     () => ({
@@ -174,7 +245,70 @@ export default function ReportsTab({
     [materialUnits, periodUnits, additionalCategories, riskProbabilities],
   );
 
-  const financials = useMemo(() => {
+  // Derive active items and settings (historical snapshot when a version is selected, otherwise live)
+  const activeMaterials = useMemo(() => {
+    return isHistorical && snapshotData ? snapshotData.materials || [] : materials;
+  }, [isHistorical, snapshotData, materials]);
+
+  const activeLabor = useMemo(() => {
+    return isHistorical && snapshotData ? snapshotData.labor_items || [] : labor;
+  }, [isHistorical, snapshotData, labor]);
+
+  const activeEquipment = useMemo(() => {
+    return isHistorical && snapshotData ? snapshotData.equipment_items || [] : equipment;
+  }, [isHistorical, snapshotData, equipment]);
+
+  const activeAdditional = useMemo(() => {
+    return isHistorical && snapshotData ? snapshotData.additional_costs || [] : additional;
+  }, [isHistorical, snapshotData, additional]);
+
+  const activeRisks = useMemo(() => {
+    return isHistorical && snapshotData ? snapshotData.risks || [] : risks;
+  }, [isHistorical, snapshotData, risks]);
+
+  const activeGroups = useMemo(() => {
+    if (isHistorical && snapshotData?.project_groups && snapshotData.project_groups.length > 0) {
+      return snapshotData.project_groups;
+    }
+    return groups;
+  }, [isHistorical, snapshotData, groups]);
+
+  const activeFinancialSettings = useMemo(() => {
+    if (isHistorical && snapshotData) {
+      return getVersionFinancialSettings(snapshotData);
+    }
+    return project.financial_settings || DEFAULT_FINANCIAL_SETTINGS;
+  }, [isHistorical, snapshotData, project.financial_settings]);
+
+  const activeProject = useMemo(() => {
+    if (isHistorical && snapshotData?.project) {
+      return {
+        ...project,
+        ...snapshotData.project,
+        financial_settings: activeFinancialSettings,
+      };
+    }
+    return {
+      ...project,
+      financial_settings: activeFinancialSettings,
+    };
+  }, [isHistorical, snapshotData, project, activeFinancialSettings]);
+
+  const activeFinancials = useMemo(() => {
+    if (isHistorical && snapshotData) {
+      const summary = computeVersionCostSummary(snapshotData);
+      const riskContingency = calculateCategoryTotal.risks(activeRisks);
+      return calculateProjectFinancials(
+        {
+          materialsTotal: summary.materials,
+          laborTotal: summary.labor,
+          equipmentTotal: summary.equipment,
+          additionalTotal: summary.additional,
+          riskContingency,
+        },
+        activeFinancialSettings,
+      );
+    }
     const riskContingency = calculateCategoryTotal.risks(risks);
     return calculateProjectFinancials(
       {
@@ -184,20 +318,18 @@ export default function ReportsTab({
         additionalTotal,
         riskContingency,
       },
-      project.financial_settings || {
-        overhead_percent: 10,
-        markup_percent: 20,
-        tax_percent: 0,
-        contingency_percent: 5,
-      },
+      activeFinancialSettings,
     );
   }, [
+    isHistorical,
+    snapshotData,
+    activeRisks,
+    activeFinancialSettings,
     materialsTotal,
     laborTotal,
     equipmentTotal,
     additionalTotal,
     risks,
-    project.financial_settings,
   ]);
 
   const companyInfo = {
@@ -227,9 +359,9 @@ export default function ReportsTab({
         </CardHeader>
         <CardContent>
           <div className="space-y-3 mb-4">
-            <DefaultAssumptionsWarning project={project} />
+            <DefaultAssumptionsWarning project={activeProject} />
             <FinancialAssumptionsStrip
-              settings={project.financial_settings}
+              settings={activeFinancialSettings}
             />
           </div>
           <Tabs
@@ -296,24 +428,23 @@ export default function ReportsTab({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {versions.length > 0 ? versions.map(v => (
+                    <SelectItem value="current">
+                      {t("project_reports:liveEstimate", "Current Estimate (Live)")}
+                    </SelectItem>
+                    {versions.map((v) => (
                       <SelectItem
                         key={v.id}
                         value={v.id}
                       >
                         {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
                       </SelectItem>
-                    )) : (
-                      <SelectItem value="none" disabled>
-                        {t("common:none")}
-                      </SelectItem>
-                    )}
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <Button
                 onClick={() => handleGeneratePdf("projectCost")}
-                disabled={isGenerating}
+                disabled={isGenerating || isLoadingSnapshot}
                 className="text-sm"
               >
                 {isGenerating ? (
@@ -337,21 +468,27 @@ export default function ReportsTab({
                       </div>
                     }
                   >
-                    <LazyProjectCostReport
-                      ref={projectCostRef}
-                      project={project}
-                      financials={financials}
-                      materials={materials}
-                      labor={labor}
-                      equipment={equipment}
-                      additional={additional}
-                      risks={risks}
-                      groups={groups}
-                      companyInfo={companyInfo}
-                      preparedBy={user?.email || t("common:unknownUser")}
-                      versionStamp={versionStampForExport}
-                      allSettingsOptions={allSettingsOptions}
-                    />
+                    {isLoadingSnapshot ? (
+                      <div className="flex items-center justify-center h-40">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : (
+                      <LazyProjectCostReport
+                        ref={projectCostRef}
+                        project={activeProject}
+                        financials={activeFinancials}
+                        materials={activeMaterials}
+                        labor={activeLabor}
+                        equipment={activeEquipment}
+                        additional={activeAdditional}
+                        risks={activeRisks}
+                        groups={activeGroups}
+                        companyInfo={companyInfo}
+                        preparedBy={user?.email || t("common:unknownUser")}
+                        versionStamp={versionStampForExport}
+                        allSettingsOptions={allSettingsOptions}
+                      />
+                    )}
                   </Suspense>
                 </div>
               </div>
@@ -372,18 +509,17 @@ export default function ReportsTab({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {versions.length > 0 ? versions.map(v => (
+                    <SelectItem value="current">
+                      {t("project_reports:liveEstimate", "Current Estimate (Live)")}
+                    </SelectItem>
+                    {versions.map((v) => (
                       <SelectItem
                         key={v.id}
                         value={v.id}
                       >
                         {v.name} ({new Date(v.created_at).toLocaleDateString(i18n.language)})
                       </SelectItem>
-                    )) : (
-                      <SelectItem value="none" disabled>
-                        {t("common:none")}
-                      </SelectItem>
-                    )}
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -414,7 +550,7 @@ export default function ReportsTab({
               </div>
               <Button
                 onClick={() => handleGeneratePdf("clientProposal")}
-                disabled={isGenerating}
+                disabled={isGenerating || isLoadingSnapshot}
                 className="text-sm"
               >
                 {isGenerating ? (
@@ -438,16 +574,22 @@ export default function ReportsTab({
                       </div>
                     }
                   >
-                    <LazyClientProposalReport
-                      ref={clientProposalRef}
-                      project={project}
-                      financials={financials}
-                      companyInfo={companyInfo}
-                      terms={sanitizedTerms}
-                      preparedBy={companyInfo.name || t("common:ourTeam")}
-                      clientName={clientName}
-                      versionStamp={versionStampForExport}
-                    />
+                    {isLoadingSnapshot ? (
+                      <div className="flex items-center justify-center h-40">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : (
+                      <LazyClientProposalReport
+                        ref={clientProposalRef}
+                        project={activeProject}
+                        financials={activeFinancials}
+                        companyInfo={companyInfo}
+                        terms={sanitizedTerms}
+                        preparedBy={companyInfo.name || t("common:ourTeam")}
+                        clientName={clientName}
+                        versionStamp={versionStampForExport}
+                      />
+                    )}
                   </Suspense>
                 </div>
               </div>
