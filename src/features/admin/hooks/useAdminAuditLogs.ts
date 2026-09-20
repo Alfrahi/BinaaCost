@@ -2,18 +2,8 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 
-export interface AuditLog {
-  id: string;
-  user_id: string;
-  user_email: string;
-  action: string;
-  table_name: string;
-  record_id: string;
-  old_data: any;
-  new_data: any;
-  created_at: string;
-  total_rows: number;
-}
+import type { AuditLog } from "../types/audit";
+export type { AuditLog };
 
 export function useAdminAuditLogs(
   search: string,

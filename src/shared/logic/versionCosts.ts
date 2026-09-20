@@ -7,6 +7,8 @@ import {
   FinancialSummary,
 } from "./financials";
 
+import type { ProjectSnapshotData } from "@/features/projects/project-versions/types/version";
+
 export interface VersionCostSummary {
   materials: number;
   labor: number;
@@ -23,7 +25,7 @@ export interface VersionCostSummary {
  * cost matches what the project showed at snapshot time.
  */
 export function computeVersionCostSummary(
-  snapshot: any,
+  snapshot: ProjectSnapshotData | null | undefined,
 ): VersionCostSummary {
   const materials = calculateCategoryTotal.materials(snapshot?.materials || []);
   const labor = calculateCategoryTotal.labor(snapshot?.labor_items || []);
@@ -68,9 +70,14 @@ export function computeVersionDelta(
  * project defaults when the snapshot predates explicit settings.
  */
 export function getVersionFinancialSettings(
-  snapshot: any,
+  snapshot: ProjectSnapshotData | null | undefined,
 ): FinancialSettings {
-  const s = snapshot?.project?.financial_settings;
+  const s = snapshot?.project?.financial_settings as {
+    overhead_percent?: number;
+    markup_percent?: number;
+    tax_percent?: number;
+    contingency_percent?: number;
+  } | undefined;
   return {
     overhead_percent:
       s?.overhead_percent ?? DEFAULT_FINANCIAL_SETTINGS.overhead_percent,
@@ -108,8 +115,8 @@ export interface VersionComparisonResult {
  * decimal-exact arithmetic so they match the stored snapshots exactly.
  */
 export function computeVersionComparison(
-  aSnapshot: any,
-  bSnapshot: any,
+  aSnapshot: ProjectSnapshotData | null | undefined,
+  bSnapshot: ProjectSnapshotData | null | undefined,
 ): VersionComparisonResult {
   const aSummary = computeVersionCostSummary(aSnapshot);
   const bSummary = computeVersionCostSummary(bSnapshot);

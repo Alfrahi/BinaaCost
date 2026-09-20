@@ -10,11 +10,12 @@ import { offlineManager } from "@/shared/lib/offline";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { useOfflineSyncNotifications } from "@/shared/hooks/useOfflineSyncNotifications";
 import { createRoot } from "react-dom/client";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60,
+      staleTime: STALE_TIME.DYNAMIC,
       gcTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
