@@ -109,5 +109,26 @@ describe("Risk Logic", () => {
       expect(generalContingency.contingencyAmount).toBe(75);
       expect(generalContingency.grandTotal).toBe(1075);
     });
+
+    it("sums risk contingencies calculated with configured numeric_value via calculateCategoryTotal.risks", () => {
+      const configuredOptions = [
+        { value: "critical", label: "Critical", numeric_value: 0.8 },
+        { value: "minor", label: "Minor", numeric_value: 0.05 },
+      ];
+
+      const risk1 = {
+        contingency_amount: calculateRiskContingency(10000, "critical", configuredOptions),
+      };
+      const risk2 = {
+        contingency_amount: calculateRiskContingency(4000, "minor", configuredOptions),
+      };
+
+      // 10000 * 0.8 = 8000, 4000 * 0.05 = 200
+      expect(risk1.contingency_amount).toBe(8000);
+      expect(risk2.contingency_amount).toBe(200);
+
+      const totalRisk = calculateCategoryTotal.risks([risk1, risk2]);
+      expect(totalRisk).toBe(8200);
+    });
   });
 });

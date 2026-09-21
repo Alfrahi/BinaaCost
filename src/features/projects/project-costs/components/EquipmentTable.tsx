@@ -107,7 +107,7 @@ export function EquipmentTable({
         },
         {
           key: "maintenance_cost",
-          label: t("columns.maintenance"),
+          label: t("columns.maintenanceLumpSum"),
           align: "end",
           isCurrency: true,
           minWidth: "100px",
@@ -115,7 +115,7 @@ export function EquipmentTable({
         },
         {
           key: "fuel_cost",
-          label: t("columns.fuel"),
+          label: t("columns.fuelLumpSum"),
           align: "end",
           isCurrency: true,
           minWidth: "100px",
@@ -126,27 +126,27 @@ export function EquipmentTable({
           label: t("columns.estTotalCost"),
           align: "end",
           minWidth: "120px",
-          format: (_, row: EquipmentItem) =>
-            format(
-              calculateItemCost.equipment({
-                quantity: row.quantity,
-                costPerPeriod: row.cost_per_period,
-                usageDuration: row.usage_duration,
-                maintenanceCost: row.maintenance_cost,
-                fuelCost: row.fuel_cost,
-                rentalOrPurchase: row.rental_or_purchase,
-              }).totalCost * locationFactor,
-              currency,
-            ),
-          sortValue: (row) =>
-            calculateItemCost.equipment({
+          format: (_, row: EquipmentItem) => {
+            const { baseCost } = calculateItemCost.equipment({
               quantity: row.quantity,
               costPerPeriod: row.cost_per_period,
               usageDuration: row.usage_duration,
-              maintenanceCost: row.maintenance_cost,
-              fuelCost: row.fuel_cost,
               rentalOrPurchase: row.rental_or_purchase,
-            }).totalCost * locationFactor,
+            });
+            return format(
+              baseCost * locationFactor + (row.maintenance_cost || 0) + (row.fuel_cost || 0),
+              currency,
+            );
+          },
+          sortValue: (row) => {
+            const { baseCost } = calculateItemCost.equipment({
+              quantity: row.quantity,
+              costPerPeriod: row.cost_per_period,
+              usageDuration: row.usage_duration,
+              rentalOrPurchase: row.rental_or_purchase,
+            });
+            return baseCost * locationFactor + (row.maintenance_cost || 0) + (row.fuel_cost || 0);
+          },
         },
         {
           key: "actions",
@@ -160,15 +160,15 @@ export function EquipmentTable({
       selectAllLabel: t("common:selectAllEquipment"),
       emptyMessage: t("noItems"),
       grandTotalLabel: t("columns.grandTotal"),
-      calculateTotal: (item) =>
-        calculateItemCost.equipment({
+      calculateTotal: (item) => {
+        const { baseCost } = calculateItemCost.equipment({
           quantity: item.quantity,
           costPerPeriod: item.cost_per_period,
           usageDuration: item.usage_duration,
-          maintenanceCost: item.maintenance_cost,
-          fuelCost: item.fuel_cost,
           rentalOrPurchase: item.rental_or_purchase,
-        }).totalCost * locationFactor,
+        });
+        return baseCost * locationFactor + (item.maintenance_cost || 0) + (item.fuel_cost || 0);
+      },
       getDeleteName: (item) => item.name,
       quickAdd: {
         fields: [
@@ -224,13 +224,13 @@ export function EquipmentTable({
           },
           {
             key: "maintenance_cost",
-            label: t("columns.maintenance"),
+            label: t("columns.maintenanceLumpSum"),
             type: "number",
             placeholder: t("columns.maintenancePlaceholder"),
           },
           {
             key: "fuel_cost",
-            label: t("columns.fuel"),
+            label: t("columns.fuelLumpSum"),
             type: "number",
             placeholder: t("columns.fuelPlaceholder"),
           },

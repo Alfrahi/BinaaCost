@@ -56,29 +56,34 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
           ...oldData,
           {
             ...variables,
-            contingency_amount: calculateOptimisticContingency(
-              variables.impact_amount,
-              variables.probability,
-            ),
+            contingency_amount:
+              variables.contingency_amount !== undefined
+                ? variables.contingency_amount
+                : calculateOptimisticContingency(
+                    variables.impact_amount,
+                    variables.probability,
+                  ),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
         ];
       }
       if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          item.id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                contingency_amount: calculateOptimisticContingency(
-                  variables.impact_amount,
-                  variables.probability,
-                ),
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
+        return oldData.map((item) => {
+          if (item.id !== variables.id) return item;
+          const merged = { ...item, ...variables };
+          return {
+            ...merged,
+            contingency_amount:
+              variables.contingency_amount !== undefined
+                ? variables.contingency_amount
+                : calculateOptimisticContingency(
+                    merged.impact_amount,
+                    merged.probability,
+                  ),
+            updated_at: new Date().toISOString(),
+          };
+        });
       }
       if (operation === "DELETE") {
         return oldData.filter((item) => item.id !== variables.id);
