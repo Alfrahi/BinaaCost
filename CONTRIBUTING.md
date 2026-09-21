@@ -127,3 +127,37 @@ Server hooks reside in `pocketbase/pb_hooks/`.
 2. **Tests Included**: Add unit or integration tests for new business calculations, components, or API endpoints.
 3. **No Unused Imports**: ESLint is configured with `--max-warnings 0` and strict unused import detection.
 4. **Documentation**: If your change modifies an API endpoint, calculation formula, or user workflow, update the corresponding documentation under `docs/`.
+
+## 7. CI/CD Pipeline
+
+When you submit a Pull Request, GitHub Actions will automatically run the following validation:
+
+1. **Validation Workflow (`ci.yml`)**:
+   - Install dependencies.
+   - Run typecheck (`pnpm typecheck`).
+   - Run linter (`pnpm lint`).
+   - Run unit and integration tests with coverage (`pnpm coverage`).
+   - Run the frontend build (`pnpm build`).
+   - Verify PocketBase migrations (`./pocketbase migrate up`).
+
+2. **End-to-End Tests (`e2e.yml`)**:
+   - Starts a fresh PocketBase instance in the background.
+   - Runs the Playwright test suite against Chromium (`pnpm e2e`).
+
+If CI fails:
+- Check the Actions tab for the specific job that failed.
+- You can reproduce CI errors locally by running `pnpm check` (which runs typecheck, lint, and unit tests) or `pnpm e2e`.
+- For Playwright failures, download the `playwright-report` artifact from the Actions page to view traces and screenshots of the failure.
+
+## 8. Git Hooks
+
+To maintain code quality and prevent pushing failing code, this repository uses Git hooks managed by **Husky**:
+
+- **Pre-commit**: Runs `lint-staged` to automatically format and fix ESLint issues on your staged files.
+- **Pre-push**: Runs `pnpm check` (typecheck, lint, and unit tests) before you can push your branch to GitHub.
+
+If you ever need to bypass these hooks (e.g., to push a draft work-in-progress branch), you can append `--no-verify` to your git command:
+```bash
+git commit -m "wip" --no-verify
+git push origin my-branch --no-verify
+```
