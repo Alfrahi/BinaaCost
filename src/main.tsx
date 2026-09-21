@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
       staleTime: STALE_TIME.DYNAMIC,
       gcTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
     },
   },
 });

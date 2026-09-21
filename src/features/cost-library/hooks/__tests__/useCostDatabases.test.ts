@@ -7,6 +7,10 @@ const mockRawMutate = vi.fn();
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: () => ({ data: [], isLoading: false }),
+  useQueryClient: () => ({
+    invalidateQueries: vi.fn(),
+    setQueryData: vi.fn(),
+  }),
 }));
 
 vi.mock("@/integrations/pocketbase/client", () => ({

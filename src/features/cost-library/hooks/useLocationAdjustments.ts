@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
@@ -7,6 +8,7 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { LocationAdjustment } from "@/features/cost-library/databases/types/databases";
 
 export function useLocationAdjustments(databaseId?: string) {
+  const queryClient = useQueryClient();
   const { t } = useTranslation("pages");
   const { user } = useAuth();
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
@@ -72,6 +74,7 @@ export function useLocationAdjustments(databaseId?: string) {
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
       toast.success(t("cost_databases.success_location_added"));
     },
     onError: (err: any) =>
@@ -87,6 +90,7 @@ export function useLocationAdjustments(databaseId?: string) {
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
       toast.success(t("cost_databases.success_location_updated"));
     },
     onError: (err: any) =>
@@ -102,6 +106,7 @@ export function useLocationAdjustments(databaseId?: string) {
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
       toast.success(t("cost_databases.success_location_deleted"));
     },
     onError: (err: any) =>

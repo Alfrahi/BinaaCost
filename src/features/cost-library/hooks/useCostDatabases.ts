@@ -1,12 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/integrations/pocketbase/mappers";
+import { mapRecord, mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { CostDatabase } from "@/features/cost-library/databases/types/databases";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export function useCostDatabases() {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { useMutation: useOfflineMutation } = useOfflinePb();
 
@@ -68,7 +69,23 @@ export function useCostDatabases() {
     table: "cost_databases",
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: (data: any) => {
+      if (data && data.id) {
+        queryClient.setQueryData<CostDatabase[]>(queryKey, (old) => {
+          if (!old) return old;
+          const mapped = mapRecord<CostDatabase>(data);
+          let replaced = false;
+          return old.map((db) => {
+            if (!replaced && !/^[a-zA-Z0-9]{15}$/.test(db.id)) {
+              replaced = true;
+              return mapped;
+            }
+            return db;
+          });
+        });
+      }
+      queryClient.invalidateQueries({ queryKey });
+    },
   });
 
   const createDatabase = useMemo(
@@ -118,7 +135,9 @@ export function useCostDatabases() {
     table: "cost_databases",
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
   });
 
   const deleteDatabase = useOfflineMutation<{ id: string }, CostDatabase[]>({
@@ -126,7 +145,9 @@ export function useCostDatabases() {
     table: "cost_databases",
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
   });
 
   return {
