@@ -52,5 +52,12 @@ describe("sanitizeText & sanitizeHtml", () => {
       const normal = "Concrete Pour - Foundation Block A (500m3)";
       expect(sanitizeText(normal)).toBe(normal);
     });
+
+    it("preserves newlines in multiline plain text strings", () => {
+      const multiline = "1. Item 1\n2. Item 2\r\n3. Item 3";
+      expect(sanitizeText(multiline)).toBe(multiline);
+      expect(sanitizeHtml(multiline)).toBe(multiline);
+    });
   });
 });
+
