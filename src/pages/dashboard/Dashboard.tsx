@@ -128,6 +128,7 @@ export default function Dashboard() {
                   key={project.id}
                   id={project.id}
                   name={project.name}
+                  createdAt={project.created_at}
                   updatedAt={project.updated_at}
                   currency={project.currency}
                   financialSettings={project.financial_settings}
@@ -172,6 +173,7 @@ export default function Dashboard() {
                   key={project.id}
                   id={project.id}
                   name={project.name}
+                  createdAt={project.created_at}
                   updatedAt={project.updated_at}
                   currency={project.currency}
                   financialSettings={project.financial_settings}

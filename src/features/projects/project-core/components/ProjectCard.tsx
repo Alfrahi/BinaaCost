@@ -12,6 +12,7 @@ import { useCloneProject } from "@/features/projects/project-core/hooks/useClone
 interface ProjectCardProps {
   id: string;
   name: string;
+  createdAt?: string;
   updatedAt?: string;
   currency: string;
   financialSettings?: Record<string, number> | null;
@@ -24,6 +25,7 @@ interface ProjectCardProps {
 export function ProjectCard({
   id,
   name,
+  createdAt,
   updatedAt,
   currency,
   financialSettings,
@@ -86,8 +88,8 @@ export function ProjectCard({
 
         <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
           <FileText className="w-3 h-3" aria-hidden="true" />
-          {updatedAt
-            ? formatDate(updatedAt, "short")
+          {createdAt || updatedAt
+            ? formatDate(createdAt || updatedAt!, "short")
             : t("dashboard:noDate")}
           {isShared && sharedBy && (
             <span className="ms-1">

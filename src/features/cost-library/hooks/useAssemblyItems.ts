@@ -1,11 +1,13 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/integrations/pocketbase/mappers";
+import { mapRecord, mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
 import { handleError } from "@/shared/lib/toast";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 
 export function useAssemblyItems(assemblyId?: string) {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { useMutation: useOfflineMutation, useQuery: useOfflineQuery } =
     useOfflinePb();
@@ -68,7 +70,23 @@ export function useAssemblyItems(assemblyId?: string) {
     table: "cost_assembly_items",
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: (data: any) => {
+      if (data && data.id) {
+        queryClient.setQueryData<AssemblyItem[]>(queryKey, (old) => {
+          if (!old) return old;
+          const mapped = mapRecord<AssemblyItem>(data);
+          let replaced = false;
+          return old.map((item) => {
+            if (!replaced && !/^[a-zA-Z0-9]{15}$/.test(item.id)) {
+              replaced = true;
+              return mapped;
+            }
+            return item;
+          });
+        });
+      }
+      queryClient.invalidateQueries({ queryKey });
+    },
     onError: (err) => handleError(err),
   });
 
@@ -80,7 +98,9 @@ export function useAssemblyItems(assemblyId?: string) {
     table: "cost_assembly_items",
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
     onError: (err) => handleError(err),
   });
 
@@ -89,7 +109,9 @@ export function useAssemblyItems(assemblyId?: string) {
     table: "cost_assembly_items",
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
     onError: (err) => handleError(err),
   });
 

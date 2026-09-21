@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
-import { mapRecords } from "@/integrations/pocketbase/mappers";
+import { mapRecord, mapRecords } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import { Assembly } from "@/features/cost-library/assemblies/types/assemblies";
 import { handleError } from "@/shared/lib/toast";
@@ -102,7 +102,23 @@ export function useAssemblies() {
     table: "cost_assemblies",
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: (data: any) => {
+      if (data && data.id) {
+        queryClient.setQueryData<Assembly[]>(["all_assemblies", user?.id], (old) => {
+          if (!old) return old;
+          const mapped = mapRecord<Assembly>(data);
+          let replaced = false;
+          return old.map((a) => {
+            if (!replaced && !/^[a-zA-Z0-9]{15}$/.test(a.id)) {
+              replaced = true;
+              return mapped;
+            }
+            return a;
+          });
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ["all_assemblies", user?.id] });
+    },
     onError: (err) => handleError(err),
   });
 
@@ -114,7 +130,9 @@ export function useAssemblies() {
     table: "cost_assemblies",
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all_assemblies", user?.id] });
+    },
     onError: (err) => handleError(err),
   });
 
@@ -124,6 +142,7 @@ export function useAssemblies() {
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all_assemblies", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["assembly_items"] });
     },
     onError: (err) => handleError(err),

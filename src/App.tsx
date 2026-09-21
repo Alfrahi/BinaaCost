@@ -78,6 +78,7 @@ function AppContent() {
                     <Route path="/cost-library" element={<CostLibrary />} />
                     <Route path="/analytics" element={<Analytics />} />
                     {/* Legacy route redirects */}
+                    <Route path="/projects" element={<Navigate to="/" replace />} />
                     <Route path="/resources" element={<Navigate to="/cost-library" replace />} />
                     <Route path="/cost-databases" element={<Navigate to="/cost-library" replace />} />
                   </Route>

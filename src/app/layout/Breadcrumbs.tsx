@@ -63,7 +63,10 @@ export default function Breadcrumbs() {
           </Link>
         </li>
         {segments.map((seg, idx) => {
-          const path = `/${segments.slice(0, idx + 1).join("/")}`;
+          const path =
+            seg === "projects" && idx === 0
+              ? "/"
+              : `/${segments.slice(0, idx + 1).join("/")}`;
           const isLast = idx === segments.length - 1;
 
           let translatedSeg: string;
