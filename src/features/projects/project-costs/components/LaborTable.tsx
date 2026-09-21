@@ -227,7 +227,15 @@ export function LaborTable({
       getMobileName: (item) => item.worker_type,
       getMobileSubtitle: (item) =>
         `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days}`,
-      getMobileTotal: (item) => format(item.total_cost || 0, currency),
+      getMobileTotal: (item) =>
+        format(
+          calculateItemCost.labor(
+            item.number_of_workers,
+            item.daily_rate,
+            item.total_days,
+          ) * locationFactor,
+          currency,
+        ),
     }),
     [t, currency, format, locationFactor, crud],
   );

@@ -372,7 +372,19 @@ export function EquipmentTable({
               periodUnits.find((u) => u.value === item.period_unit)?.value || item.period_unit || "day",
               { defaultValue: item.period_unit || "day" },
             )} × ${item.usage_duration}`,
-      getMobileTotal: (item) => format(item.total_cost || 0, currency),
+      getMobileTotal: (item) => {
+        const { baseCost } = calculateItemCost.equipment({
+          quantity: item.quantity,
+          costPerPeriod: item.cost_per_period,
+          usageDuration: item.usage_duration,
+          rentalOrPurchase: item.rental_or_purchase,
+        });
+        const total =
+          baseCost * locationFactor +
+          (item.maintenance_cost || 0) +
+          (item.fuel_cost || 0);
+        return format(total, currency);
+      },
     }),
     [
       t,

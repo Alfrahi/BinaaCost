@@ -36,6 +36,45 @@ interface UseEntityCrudOptions {
   calculateOptimisticTotalCost?: (item: any) => number;
 }
 
+export function createOptimisticSingleUpdater<T>(
+  calculateOptimisticTotalCost?: (item: any) => number,
+) {
+  return (old: T[] | undefined, variables: any, operation: string): T[] => {
+    const oldData = old ?? [];
+    if (operation === "INSERT") {
+      return [
+        ...oldData,
+        {
+          ...variables,
+          id: variables.id || crypto.randomUUID(),
+          ...(calculateOptimisticTotalCost
+            ? { total_cost: calculateOptimisticTotalCost(variables) }
+            : {}),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ];
+    }
+    if (operation === "UPDATE") {
+      return oldData.map((item) => {
+        if ((item as any).id !== variables.id) return item;
+        const merged = { ...item, ...variables };
+        return {
+          ...merged,
+          ...(calculateOptimisticTotalCost
+            ? { total_cost: calculateOptimisticTotalCost(merged) }
+            : {}),
+          updated_at: new Date().toISOString(),
+        };
+      });
+    }
+    if (operation === "DELETE") {
+      return oldData.filter((item) => (item as any).id !== variables.id);
+    }
+    return oldData;
+  };
+}
+
 /**
  * Shared offline-first CRUD mutations for a project line-item table.
  * Encapsulates the optimistic updaters, bulk operations, success toast and
@@ -53,41 +92,8 @@ export function useEntityCrud<T>({
 
   const queryKey = useMemo(() => [table, projectId], [table, projectId]);
 
-  const optimisticSingleUpdater = useCallback(
-    (old: T[] | undefined, variables: any, operation: string) => {
-      const oldData = old ?? [];
-      if (operation === "INSERT") {
-        return [
-          ...oldData,
-          {
-            ...variables,
-            id: variables.id || crypto.randomUUID(),
-            ...(calculateOptimisticTotalCost
-              ? { total_cost: calculateOptimisticTotalCost(variables) }
-              : {}),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ];
-      }
-      if (operation === "UPDATE") {
-        return oldData.map((item) => {
-          if ((item as any).id !== variables.id) return item;
-          const merged = { ...item, ...variables };
-          return {
-            ...merged,
-            ...(calculateOptimisticTotalCost
-              ? { total_cost: calculateOptimisticTotalCost(merged) }
-              : {}),
-            updated_at: new Date().toISOString(),
-          };
-        });
-      }
-      if (operation === "DELETE") {
-        return oldData.filter((item) => (item as any).id !== variables.id);
-      }
-      return oldData;
-    },
+  const optimisticSingleUpdater = useMemo(
+    () => createOptimisticSingleUpdater<T>(calculateOptimisticTotalCost),
     [calculateOptimisticTotalCost],
   );
 
