@@ -12,9 +12,7 @@ node_modules/
 
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
 # Keep example environment files
 !.env.example
@@ -28,6 +26,9 @@ node_modules/
 dist/
 build/
 .vite/
+dev-dist/
+stats.html
+bundle-analysis.html
 
 
 # ============================================================
@@ -50,20 +51,9 @@ blob-report/
 # PocketBase generated/local database data
 pocketbase/pb_data/
 
-# Local PocketBase executable
-pocketbase/pocketbase
-
-# PocketBase temporary/runtime files
-pocketbase/pb_data/**/*.db-shm
-pocketbase/pb_data/**/*.db-wal
-
-
-# ============================================================
-# Supabase
-# ============================================================
-
-# Local Supabase runtime/config generated files
-.supabase/
+# pocketbase/pocketbase is intentionally tracked in this repo
+# Uncomment the following line if you decide NOT to version the binary
+# pocketbase/pocketbase
 
 
 # ============================================================
@@ -79,7 +69,7 @@ lerna-debug.log*
 
 
 # ============================================================
-# OS / Editor
+# OS / Editor / AI
 # ============================================================
 
 .DS_Store
@@ -87,7 +77,13 @@ Thumbs.db
 Desktop.ini
 
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.qwen/
+
 *.swp
 *.swo
 *~
@@ -110,12 +106,6 @@ tmp/
 # ============================================================
 
 *.tsbuildinfo
-
-# Vite/PWA generated files
-dev-dist/
-
-# Visualizer output
-stats.html
 
 
 # ============================================================
