@@ -7,6 +7,7 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { AdditionalCostItem } from "@/features/projects/project-costs/types/items";
 import { AdditionalCostFormValues } from "@/features/projects/project-costs/types/schemas";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface UseProjectAdditionalCostsReturn extends EntityCrud<AdditionalCostItem> {
   data: AdditionalCostItem[];
@@ -26,7 +27,7 @@ export function useProjectAdditionalCosts(
       await pb.collection("additional_costs").getFullList({ filter: `project_id="${projectId}"` }),
     ),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const {

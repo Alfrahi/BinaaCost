@@ -10,6 +10,7 @@ import { handleError } from "@/shared/lib/toast";
 import { calculateRiskContingency } from "@/shared/logic/risk";
 import { Risk } from "@/features/projects/project-core/types/project";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface UseProjectRisksReturn {
   data: Risk[];
@@ -37,7 +38,7 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
       await pb.collection("risks").getFullList({ filter: `project_id="${projectId}"` }),
     ),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const calculateOptimisticContingency = useCallback(
@@ -100,7 +101,9 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
       toast.success(t("common:success"));
+      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
     },
     onError: (err: any) => handleError(err),
   });
@@ -113,7 +116,9 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
       optimisticUpdater: optimisticSingleUpdater,
       onSuccess: () => {
         toast.success(t("common:success"));
+        queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
         queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+        queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
       },
       onError: (err: any) => handleError(err),
     },
@@ -126,7 +131,9 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess: () => {
       toast.success(t("common:success"));
+      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
     },
     onError: (err: any) => handleError(err),
   });

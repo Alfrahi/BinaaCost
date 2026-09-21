@@ -192,6 +192,9 @@ export function useAssemblyImport(projectId: string) {
         await queryClient.invalidateQueries({
           queryKey: ["analytics_projects_data"],
         });
+        await queryClient.invalidateQueries({
+          queryKey: ["projectCardSummary", projectId],
+        });
       },
       onSuccess: () => {},
       onError: (error: any) => {

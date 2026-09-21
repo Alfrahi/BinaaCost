@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface TransferOwnershipModalProps {
   project: { id: string; name: string; user_id: string; owner_email?: string } | null;
@@ -51,7 +52,7 @@ export default function TransferOwnershipModal({
       }));
     },
     enabled: open,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.DYNAMIC,
   });
 
   useEffect(() => {
