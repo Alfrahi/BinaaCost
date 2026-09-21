@@ -68,7 +68,9 @@ export const ClientProposalReport = React.forwardRef<
             <p className="text-lg font-semibold text-foreground">
               {project.name}
             </p>
-            <p className="text-sm text-muted-foreground">{project.description}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
+              {project.description}
+            </p>
           </div>
         </div>
 
@@ -124,7 +126,7 @@ export const ClientProposalReport = React.forwardRef<
         <h3 className="text-xl font-bold text-foreground mb-4">
           {t("project_reports:projectSummary")}
         </h3>
-        <p className="text-sm text-foreground mb-8">
+        <p className="text-sm text-foreground mb-8 whitespace-pre-line break-words">
           {project.client_requirements ||
             t("project_reports:noClientRequirements")}
         </p>
@@ -149,7 +151,7 @@ export const ClientProposalReport = React.forwardRef<
           {t("project_reports:termsAndConditions")}
         </h3>
         <div
-          className="text-sm text-foreground leading-relaxed"
+          className="text-sm text-foreground leading-relaxed whitespace-pre-line break-words"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(terms) }}
         />
       </div>
