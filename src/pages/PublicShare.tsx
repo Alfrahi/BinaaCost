@@ -261,7 +261,7 @@ export default function PublicShare() {
               project={project}
               financials={financials}
               companyInfo={companyInfo}
-              terms={reportSettings.default_terms || ""}
+              terms={reportSettings.default_terms || t("project_reports:defaultTerms")}
               preparedBy={t("public_share:sharedByOwner")}
               clientName=""
             />

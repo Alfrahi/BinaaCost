@@ -56,7 +56,9 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
           <p className="text-lg font-semibold text-foreground">
             {project.name}
           </p>
-          <p className="text-sm text-muted-foreground">{project.description}</p>
+          <p className="text-sm text-muted-foreground whitespace-pre-line break-words">
+            {project.description}
+          </p>
         </div>
       </div>
 

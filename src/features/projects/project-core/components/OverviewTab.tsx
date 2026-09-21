@@ -284,7 +284,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:clientRequirements")}
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-muted-foreground whitespace-pre-line break-words">
               {project.client_requirements || t("common:notSpecified")}
             </div>
           </div>
@@ -292,7 +292,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             <div className="font-semibold">
               {t("project_overview:description")}
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-muted-foreground whitespace-pre-line break-words">
               {project.description || t("common:notSpecified")}
             </div>
           </div>

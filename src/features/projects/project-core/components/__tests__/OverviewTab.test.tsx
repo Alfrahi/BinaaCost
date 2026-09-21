@@ -95,5 +95,33 @@ describe("OverviewTab", () => {
     expect(text).not.toContain("&amp;");
     expect(text).toContain("2026");
   });
+
+  it("renders multiline client requirements and description with whitespace-pre-line styling", () => {
+    const multilineReqs = "1. First Requirement\n2. Second Requirement\n3. Third Requirement";
+    const multilineDesc = "Line 1\nLine 2";
+
+    const { container } = render(
+      <OverviewTab
+        {...base}
+        project={{
+          ...base.project,
+          name: "Test Project",
+          client_requirements: multilineReqs,
+          description: multilineDesc,
+        }}
+      />,
+    );
+
+    const elements = container.querySelectorAll(".whitespace-pre-line");
+    expect(elements.length).toBeGreaterThanOrEqual(2);
+
+    const reqEl = Array.from(elements).find((el) =>
+      el.textContent?.includes("1. First Requirement"),
+    );
+    expect(reqEl).toBeTruthy();
+    expect(reqEl?.className).toContain("whitespace-pre-line");
+    expect(reqEl?.className).toContain("break-words");
+    expect(reqEl?.textContent).toContain(multilineReqs);
+  });
 });
 
