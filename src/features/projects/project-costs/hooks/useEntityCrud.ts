@@ -71,18 +71,17 @@ export function useEntityCrud<T>({
         ];
       }
       if (operation === "UPDATE") {
-        return oldData.map((item) =>
-          (item as any).id === variables.id
-            ? {
-                ...item,
-                ...variables,
-                ...(calculateOptimisticTotalCost
-                  ? { total_cost: calculateOptimisticTotalCost(variables) }
-                  : {}),
-                updated_at: new Date().toISOString(),
-              }
-            : item,
-        );
+        return oldData.map((item) => {
+          if ((item as any).id !== variables.id) return item;
+          const merged = { ...item, ...variables };
+          return {
+            ...merged,
+            ...(calculateOptimisticTotalCost
+              ? { total_cost: calculateOptimisticTotalCost(merged) }
+              : {}),
+            updated_at: new Date().toISOString(),
+          };
+        });
       }
       if (operation === "DELETE") {
         return oldData.filter((item) => (item as any).id !== variables.id);

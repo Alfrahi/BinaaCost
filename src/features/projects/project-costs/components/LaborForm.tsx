@@ -188,6 +188,7 @@ export function LaborForm({
                 <FormControl>
                   <Input
                     type="number"
+                    step="any"
                     {...field}
                     placeholder={t("columns.totalDaysPlaceholder")}
                     aria-label={t("columns.totalDays")}

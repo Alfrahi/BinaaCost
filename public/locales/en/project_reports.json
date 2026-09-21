@@ -59,5 +59,7 @@
   "internalReportHint": "Detailed internal cost report — includes line-item costs and financial assumptions.",
   "clientFacingReportHint": "Client-facing proposal — omits internal cost detail and assumptions.",
   "liveEstimate": "Current Estimate (Live)",
-  "versionToExport": "Version to Export"
+  "versionToExport": "Version to Export",
+  "incompleteItemsWarning_one": "This estimate contains {{count}} item with missing or zero cost data. Review before sharing with clients.",
+  "incompleteItemsWarning_other": "This estimate contains {{count}} items with missing or zero cost data. Review before sharing with clients."
 }

@@ -26,16 +26,46 @@ export const ClientProposalFinancialSummary: React.FC<ClientProposalFinancialSum
   const directTotal = financials.directCosts > 0 ? financials.directCosts : 1;
   const markupRatio = new Decimal(financials.bidPrice).dividedBy(directTotal);
 
-  const materialsAllocated = new Decimal(financials.materialsTotal).times(markupRatio).toDecimalPlaces(2).toNumber();
-  const laborAllocated = new Decimal(financials.laborTotal).times(markupRatio).toDecimalPlaces(2).toNumber();
-  const equipmentAllocated = new Decimal(financials.equipmentTotal).times(markupRatio).toDecimalPlaces(2).toNumber();
-  // Allocate remaining cents to additional so line items reconcile exactly to bidPrice
-  const additionalAllocated = new Decimal(financials.bidPrice)
-    .minus(materialsAllocated)
-    .minus(laborAllocated)
-    .minus(equipmentAllocated)
-    .toDecimalPlaces(2)
-    .toNumber();
+  let matAlloc = financials.materialsTotal > 0
+    ? new Decimal(financials.materialsTotal).times(markupRatio).toDecimalPlaces(2)
+    : new Decimal(0);
+  let labAlloc = financials.laborTotal > 0
+    ? new Decimal(financials.laborTotal).times(markupRatio).toDecimalPlaces(2)
+    : new Decimal(0);
+  let eqAlloc = financials.equipmentTotal > 0
+    ? new Decimal(financials.equipmentTotal).times(markupRatio).toDecimalPlaces(2)
+    : new Decimal(0);
+  let addAlloc = financials.additionalTotal > 0
+    ? new Decimal(financials.additionalTotal).times(markupRatio).toDecimalPlaces(2)
+    : new Decimal(0);
+
+  // If there's a penny difference due to independent 2dp roundings,
+  // absorb it into the largest non-zero allocated category so line items sum exactly to bidPrice.
+  const allocatedSum = matAlloc.plus(labAlloc).plus(eqAlloc).plus(addAlloc);
+  const diff = new Decimal(financials.bidPrice).minus(allocatedSum);
+
+  if (!diff.isZero()) {
+    const categories = [
+      { key: "materials", val: matAlloc, base: financials.materialsTotal },
+      { key: "labor", val: labAlloc, base: financials.laborTotal },
+      { key: "equipment", val: eqAlloc, base: financials.equipmentTotal },
+      { key: "additional", val: addAlloc, base: financials.additionalTotal },
+    ].filter((c) => c.base > 0);
+
+    if (categories.length > 0) {
+      categories.sort((a, b) => b.val.minus(a.val).toNumber());
+      const largest = categories[0].key;
+      if (largest === "materials") matAlloc = matAlloc.plus(diff);
+      else if (largest === "labor") labAlloc = labAlloc.plus(diff);
+      else if (largest === "equipment") eqAlloc = eqAlloc.plus(diff);
+      else if (largest === "additional") addAlloc = addAlloc.plus(diff);
+    }
+  }
+
+  const materialsAllocated = matAlloc.toNumber();
+  const laborAllocated = labAlloc.toNumber();
+  const equipmentAllocated = eqAlloc.toNumber();
+  const additionalAllocated = addAlloc.toNumber();
 
   const taxPercent = project?.financial_settings?.tax_percent || 0;
 

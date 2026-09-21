@@ -65,6 +65,8 @@ export interface FinancialSummary {
   bidPrice: number;
   taxAmount: number;
   grandTotal: number;
+  /** Effective gross margin percentage based on pre-tax Bid Price (Revenue): (Markup / Bid Price) * 100. */
+  grossMarginPercent: number;
 }
 
 export interface CostInputs {
@@ -158,6 +160,10 @@ export function calculateProjectFinancials(
 
   const grandTotal = bidPrice.plus(taxAmount).toDecimalPlaces(2);
 
+  const grossMarginPercent = bidPrice.isZero()
+    ? new Decimal(0)
+    : markupAmount.dividedBy(bidPrice).times(100).toDecimalPlaces(2);
+
   return {
     materialsTotal: materialsTotal.toNumber(),
     laborTotal: laborTotal.toNumber(),
@@ -176,5 +182,6 @@ export function calculateProjectFinancials(
     bidPrice: bidPrice.toNumber(),
     taxAmount: taxAmount.toNumber(),
     grandTotal: grandTotal.toNumber(),
+    grossMarginPercent: grossMarginPercent.toNumber(),
   };
 }

@@ -9,6 +9,7 @@ import { laborSchema, LaborFormValues } from "@/features/projects/project-costs/
 import { LaborItem } from "@/features/projects/project-costs/types/items";
 import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
 import { EntityTable, EntityTableConfig } from "./EntityTable";
+import { calculateItemCost } from "@/shared/logic/shared";
 
 export function LaborTable({
   projectId,
@@ -70,8 +71,20 @@ export function LaborTable({
           align: "end",
           minWidth: "120px",
           format: (_, row: LaborItem) =>
-            format((row.total_cost || 0) * locationFactor, currency),
-          sortValue: (row) => (row.total_cost || 0) * locationFactor,
+            format(
+              calculateItemCost.labor(
+                row.number_of_workers,
+                row.daily_rate,
+                row.total_days,
+              ) * locationFactor,
+              currency,
+            ),
+          sortValue: (row) =>
+            calculateItemCost.labor(
+              row.number_of_workers,
+              row.daily_rate,
+              row.total_days,
+            ) * locationFactor,
         },
         {
           key: "actions",
@@ -85,7 +98,12 @@ export function LaborTable({
       selectAllLabel: t("common:selectAllLabor"),
       emptyMessage: t("noItems"),
       grandTotalLabel: t("columns.grandTotal"),
-      calculateTotal: (item) => (item.total_cost || 0) * locationFactor,
+      calculateTotal: (item) =>
+        calculateItemCost.labor(
+          item.number_of_workers,
+          item.daily_rate,
+          item.total_days,
+        ) * locationFactor,
       getDeleteName: (item) => item.worker_type,
       quickAdd: {
         fields: [

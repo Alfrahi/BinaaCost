@@ -64,6 +64,7 @@ interface FinancialSummaryTableProps {
     riskContingencyAmount?: number;
     primeCost: number;
     markupAmount: number;
+    grossMarginPercent?: number;
     bidPrice: number;
     taxAmount: number;
     grandTotal: number;
@@ -232,6 +233,13 @@ export function FinancialSummaryTable({
               <div className="flex-1">
                 <SummaryRow
                   label={t("project_detail:profit_pricing.markupWithPercent", { percent: settings.markup_percent })}
+                  subLabel={
+                    financials.grossMarginPercent !== undefined && financials.bidPrice > 0
+                      ? t("project_detail:profit_pricing.effectiveGrossMargin", {
+                          percent: financials.grossMarginPercent.toFixed(1),
+                        })
+                      : undefined
+                  }
                   value={format(financials.markupAmount, currency)}
                   className="text-foreground font-medium"
                   valueClassName="text-success"

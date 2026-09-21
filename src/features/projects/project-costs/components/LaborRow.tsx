@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { LaborItem } from "@/features/projects/project-costs/types/items";
 import { Checkbox } from "@/shared/components/ui/checkbox";
+import { calculateItemCost } from "@/shared/logic/shared";
 import { InlineEditableCell } from "./InlineEditableCell";
 import {
   Tooltip,
@@ -50,7 +51,11 @@ export const LaborRow = memo(function LaborRow({
   const { t } = useTranslation(["project_labor", "common"]);
   const { format } = useCurrencyFormatter();
 
-  const baseCost = item.total_cost || 0;
+  const baseCost = calculateItemCost.labor(
+    item.number_of_workers,
+    item.daily_rate,
+    item.total_days,
+  );
   const adjustedTotal = baseCost * locationFactor;
   const formula = locationFactor !== 1
     ? `${item.number_of_workers} × ${format(item.daily_rate, currency)} × ${item.total_days} × ${locationFactor}${locationLabel ? ` (${locationLabel})` : ""} = ${format(adjustedTotal, currency)}`

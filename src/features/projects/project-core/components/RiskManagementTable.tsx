@@ -56,7 +56,7 @@ export default function RiskManagementTable({
   projectId: string;
   currency?: string;
   canEdit: boolean;
-  riskProbabilities: { value: string; label: string }[];
+  riskProbabilities: { value: string; label: string; numeric_value?: number | null }[];
   isLoadingRiskProbabilities: boolean;
   onNavigateToPricing?: () => void;
 }) {
@@ -91,9 +91,13 @@ export default function RiskManagementTable({
 
   useEffect(() => {
     const impact = Number(watchedImpact) || 0;
-    const calculated = calculateRiskContingency(impact, watchedProbability);
+    const calculated = calculateRiskContingency(
+      impact,
+      watchedProbability,
+      riskProbabilities,
+    );
     form.setValue("contingency_amount", calculated);
-  }, [watchedProbability, watchedImpact, form]);
+  }, [watchedProbability, watchedImpact, form, riskProbabilities]);
 
   const resetForm = useCallback(() => {
     form.reset({
