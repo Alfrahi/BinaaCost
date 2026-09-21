@@ -89,7 +89,6 @@ export function LibraryResourceManager<T extends z.ZodTypeAny>({
 }: ResourceManagerConfig<T>) {
   const { t, i18n } = useTranslation(["resources", "common"]);
   const { user } = useAuth();
-  // const { format } = useCurrencyFormatter();
   const [search, setSearch] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
