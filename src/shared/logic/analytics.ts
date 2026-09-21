@@ -34,7 +34,8 @@ export function prepareProjectChartData(
     totals.additionalTotal,
   );
 
-  return { chartData, totalCost };
+  return {
+    chartData, totalCost };
 }
 
 export function getPieChartOptions(
@@ -47,6 +48,7 @@ export function getPieChartOptions(
   ) => string,
 ) {
   return {
+    backgroundColor: "transparent",
     tooltip: {
       trigger: "item",
       formatter: (params: any) => {
@@ -81,6 +83,7 @@ export function getBarChartOptions(
   t: (key: string, options?: any) => string,
 ) {
   return {
+    backgroundColor: "transparent",
     tooltip: {
       trigger: "axis",
       axisPointer: {
