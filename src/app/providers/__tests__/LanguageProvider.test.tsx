@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import LanguageProvider, { isRtlLanguage } from "../LanguageProvider";
+import LanguageProvider from "../LanguageProvider";
+import { isRtlLanguage } from "@/shared/lib/utils";
 
 let mockLanguage = "en";
 const mockI18n = {

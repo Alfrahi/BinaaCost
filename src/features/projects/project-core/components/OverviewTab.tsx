@@ -187,7 +187,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
             })}
           </div>
 
-          <div className="lg:col-span-5 h-[220px] flex items-center justify-center border-t lg:border-t-0 lg:border-s lg:ps-6 pt-4 lg:pt-0">
+          <div className="lg:col-span-5 h-[220px] justify-center border-t lg:border-t-0 lg:border-s lg:ps-6 pt-4 lg:pt-0">
             {financials.directCosts === 0 ? (
               <p className="text-xs text-muted-foreground text-center">
                 {t("common:noData")}

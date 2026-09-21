@@ -14,7 +14,7 @@ import { Risk, ProjectGroup } from "@/features/projects/project-core/types/proje
 import { AnyItem, CategoryKey, getDisplayLabel } from "../utils/versionDiff";
 import { ResolutionMap } from "./VersionConflictResolver";
 
-export const getDetailsDisplay = (
+const getDetailsDisplay = (
   item: AnyItem,
   type: CategoryKey,
   t: TFunction,

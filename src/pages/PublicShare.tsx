@@ -65,6 +65,8 @@ export default function PublicShare() {
     handlePasswordSubmit,
   } = usePublicShare(accessToken);
 
+  const { reportSettings } = useReportSettings();
+
   if (isLoading) {
     return <LoadingState className="min-h-screen" />;
   }
@@ -176,8 +178,6 @@ export default function PublicShare() {
       additional,
       risks,
     );
-
-  const { reportSettings } = useReportSettings();
 
   const companyInfo = {
     name: reportSettings.company_name || t("public_share:sharedProject"),

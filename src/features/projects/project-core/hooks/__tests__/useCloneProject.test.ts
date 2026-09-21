@@ -37,13 +37,9 @@ vi.mock("@tanstack/react-query", () => ({
   }),
   useMutation: ({ mutationFn, onSuccess }: any) => ({
     mutate: async (vars: any) => {
-      try {
-        const res = await mutationFn(vars);
-        onSuccess(res);
-        return res;
-      } catch (e) {
-        throw e;
-      }
+      const res = await mutationFn(vars);
+      onSuccess(res);
+      return res;
     },
     isPending: false,
   }),

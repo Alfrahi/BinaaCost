@@ -116,7 +116,7 @@ export default function ReportsTab({
     if (reportSettings.default_terms && terms === t("project_reports:defaultTerms")) {
       setTerms(reportSettings.default_terms);
     }
-  }, [reportSettings.default_terms, t]);
+  }, [reportSettings.default_terms, t, terms]);
 
   // Use entity hooks directly for data fetching
   const { data: materials = [] } = useProjectMaterials(project.id);
