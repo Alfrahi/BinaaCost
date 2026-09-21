@@ -151,6 +151,7 @@ routerAdd("POST", "/api/share/{token}", (e) => {
   const eqAdj = r2(eq * locationFactor);
 
   const directC = toCents(mtAdj) + toCents(ltAdj) + toCents(eqAdj) + toCents(ad);
+  const directBaseC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
   const overheadC = Math.round(
     (directC * (Number(fs.overhead_percent) || 0)) / 100,
   );
@@ -159,10 +160,11 @@ routerAdd("POST", "/api/share/{token}", (e) => {
   );
   const riskContingencyC = toCents(rc);
 
+  const basis = fs.contingency_basis || "flat";
   let contingencyC = flatContingencyC;
-  if (fs.contingency_basis === "risk_register") {
+  if (basis === "risk_register") {
     contingencyC = riskContingencyC;
-  } else if (fs.contingency_basis === "combined") {
+  } else if (basis === "combined") {
     contingencyC = flatContingencyC + riskContingencyC;
   }
 
@@ -177,9 +179,14 @@ routerAdd("POST", "/api/share/{token}", (e) => {
     laborTotal: ltAdj,
     equipmentTotal: eqAdj,
     additionalTotal: ad,
+    directCostsBase: directBaseC / 100,
+    locationAdjustmentAmount: (directC - directBaseC) / 100,
     directCosts: directC / 100,
     overheadAmount: overheadC / 100,
     contingencyAmount: contingencyC / 100,
+    contingencyBasis: basis,
+    flatContingencyAmount: flatContingencyC / 100,
+    riskContingencyAmount: riskContingencyC / 100,
     primeCost: primeC / 100,
     markupAmount: markupC / 100,
     bidPrice: bidC / 100,
