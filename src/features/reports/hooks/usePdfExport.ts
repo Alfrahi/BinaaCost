@@ -35,7 +35,16 @@ export function usePdfExport() {
             pdf: {
               compress: true,
             },
-            canvas: {},
+            canvas: {
+              useCORS: true,
+              backgroundColor: "#ffffff",
+              onclone: (clonedDoc: Document) => {
+                clonedDoc.documentElement.classList.remove("dark");
+                clonedDoc.body?.classList.remove("dark");
+                const darkElements = clonedDoc.querySelectorAll(".dark");
+                darkElements.forEach((el) => el.classList.remove("dark"));
+              },
+            },
           },
         });
         toast.success(t("project_reports:success_pdfExport"));

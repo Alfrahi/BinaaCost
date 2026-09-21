@@ -13,6 +13,28 @@ export function useSoftDeleteProject() {
         deleted_at: new Date().toISOString(),
       });
     },
+    onMutate: async (projectId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["myProjects"] });
+      await queryClient.cancelQueries({ queryKey: ["sharedProjects"] });
+
+      queryClient.setQueriesData({ queryKey: ["myProjects"] }, (old: any) => {
+        if (!old || !old.data) return old;
+        return {
+          ...old,
+          data: old.data.filter((p: any) => p.id !== projectId),
+          count: Math.max(0, (old.count || 1) - 1),
+        };
+      });
+
+      queryClient.setQueriesData({ queryKey: ["sharedProjects"] }, (old: any) => {
+        if (!old || !old.data) return old;
+        return {
+          ...old,
+          data: old.data.filter((p: any) => p.id !== projectId),
+          count: Math.max(0, (old.count || 1) - 1),
+        };
+      });
+    },
     onSuccess: () => {
       toast.success(t("project_detail:successDeleted"));
       queryClient.invalidateQueries({ queryKey: ["project"] });

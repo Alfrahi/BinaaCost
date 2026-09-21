@@ -53,10 +53,7 @@ export function useMyProjects(globalSearchTerm: string) {
         });
 
       return {
-        data: mapRecords<MyProjectData>(result.items).map((p) => ({
-          ...p,
-          updated_at: (p as any).updated,
-        })),
+        data: mapRecords<MyProjectData>(result.items),
         count: result.totalItems,
       };
     },

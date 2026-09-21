@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { offlineManager, isNetworkOrTransientError } from "@/shared/lib/offline";
 import { executePbMutation } from "@/integrations/pocketbase/executor";
 import { ClientResponseError } from "pocketbase";
+import { mapRecord } from "@/integrations/pocketbase/mappers";
 import { useAuth } from "@/features/auth";
 import i18n from "@/i18n";
 import {
@@ -126,6 +127,63 @@ export function useOfflinePb() {
         }
       },
       onSuccess: (data, variables, context) => {
+        if (queryKey) {
+          if (
+            operation === "INSERT" &&
+            data &&
+            typeof data === "object" &&
+            "id" in data &&
+            typeof (data as any).id === "string"
+          ) {
+            const serverId = (data as any).id;
+            queryClient.setQueriesData({ queryKey }, (old: any) => {
+              if (!old) return old;
+              let mapped: any;
+              try {
+                mapped = mapRecord(data as any);
+              } catch {
+                mapped = data;
+              }
+              if (Array.isArray(old)) {
+                let replaced = false;
+                return old.map((item) => {
+                  if (
+                    !replaced &&
+                    item &&
+                    typeof item === "object" &&
+                    "id" in item &&
+                    !/^[a-zA-Z0-9]{15}$/.test(String(item.id))
+                  ) {
+                    replaced = true;
+                    return { ...item, ...mapped, id: serverId };
+                  }
+                  return item;
+                });
+              }
+              if (old && typeof old === "object" && Array.isArray(old.data)) {
+                let replaced = false;
+                return {
+                  ...old,
+                  data: old.data.map((item: any) => {
+                    if (
+                      !replaced &&
+                      item &&
+                      typeof item === "object" &&
+                      "id" in item &&
+                      !/^[a-zA-Z0-9]{15}$/.test(String(item.id))
+                    ) {
+                      replaced = true;
+                      return { ...item, ...mapped, id: serverId };
+                    }
+                    return item;
+                  }),
+                };
+              }
+              return old;
+            });
+          }
+          queryClient.invalidateQueries({ queryKey });
+        }
         onSuccess?.(data, variables, context);
       },
     });

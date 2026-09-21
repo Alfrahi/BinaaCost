@@ -64,6 +64,15 @@ describe("ProjectCard", () => {
     expect(screen.getByText("finalized")).toBeTruthy();
   });
 
+  it("renders creation date when createdAt is provided", () => {
+    render(
+      <MemoryRouter>
+        <ProjectCard {...baseProps} createdAt="2026-02-15T00:00:00Z" updatedAt={undefined} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Jan 1, 2026")).toBeTruthy();
+  });
+
   it("shows a shared badge and role for shared projects", () => {
     render(
       <MemoryRouter>
