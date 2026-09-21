@@ -45,7 +45,7 @@
     "mapCsvColumns": "تعيين أعمدة CSV"
   },
   "analytics": {
-    "title": "لوحة تحكم التحليلات",
+    "title": "لوحة التحليلات",
     "selectProject": "اختر المشروع",
     "allProjects": "جميع المشاريع",
     "selectCurrency": "اختر العملة",
