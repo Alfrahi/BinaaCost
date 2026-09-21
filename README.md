@@ -219,6 +219,15 @@ For in-depth architectural and backend documentation, refer to:
 
 We welcome contributions to BinaaCost. Please review [CONTRIBUTING.md](CONTRIBUTING.md) for code style standards, migration workflows, translation requirements, and pull request guidelines.
 
+### Local Validation and CI Parity
+
+Before submitting a pull request, ensure your changes pass the CI validation checks. You can run these locally:
+
+- **Full validation check**: `pnpm check` (Runs typecheck, lint, and unit tests)
+- **End-to-End Tests**: Start PocketBase (`./pocketbase serve --dev`) then run `pnpm e2e`
+
+When you submit a PR, GitHub Actions will automatically run these checks along with Playwright E2E tests and PocketBase migration verification. If CI fails, you can download the artifacts from the GitHub Actions page to inspect the logs, code coverage, or Playwright traces.
+
 ---
 
 ## Security
