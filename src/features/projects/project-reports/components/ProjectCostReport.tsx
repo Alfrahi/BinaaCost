@@ -119,12 +119,17 @@ export const ProjectCostReport = React.forwardRef<
                 key: "description",
                 label: t("project_materials:columns.description"),
               },
-              { key: "quantity", label: t("project_materials:columns.quantity") },
+              {
+                key: "quantity",
+                label: t("project_materials:columns.quantity"),
+                align: "end",
+              },
               { key: "unit", label: t("project_materials:columns.unit") },
               {
                 key: "unit_price",
                 label: t("project_materials:columns.unitPrice"),
                 isCurrency: true,
+                align: "end",
               },
             ]}
             groups={groups}
@@ -150,13 +155,19 @@ export const ProjectCostReport = React.forwardRef<
               {
                 key: "number_of_workers",
                 label: t("project_labor:columns.numWorkers"),
+                align: "end",
               },
               {
                 key: "daily_rate",
                 label: t("project_labor:columns.dailyRate"),
                 isCurrency: true,
+                align: "end",
               },
-              { key: "total_days", label: t("project_labor:columns.totalDays") },
+              {
+                key: "total_days",
+                label: t("project_labor:columns.totalDays"),
+                align: "end",
+              },
             ]}
             groups={groups}
             currency={project.currency}
@@ -180,11 +191,16 @@ export const ProjectCostReport = React.forwardRef<
                 key: "rental_or_purchase",
                 label: t("project_equipment:columns.rentalPurchase"),
               },
-              { key: "quantity", label: t("project_equipment:columns.quantity") },
+              {
+                key: "quantity",
+                label: t("project_equipment:columns.quantity"),
+                align: "end",
+              },
               {
                 key: "cost_per_period",
                 label: t("project_equipment:columns.costPerPeriod"),
                 isCurrency: true,
+                align: "end",
               },
               {
                 key: "period_unit",
@@ -193,16 +209,19 @@ export const ProjectCostReport = React.forwardRef<
               {
                 key: "usage_duration",
                 label: t("project_equipment:columns.usageDuration"),
+                align: "end",
               },
               {
                 key: "maintenance_cost",
                 label: t("project_equipment:columns.maintenance"),
                 isCurrency: true,
+                align: "end",
               },
               {
                 key: "fuel_cost",
                 label: t("project_equipment:columns.fuel"),
                 isCurrency: true,
+                align: "end",
               },
             ]}
             groups={groups}
@@ -233,6 +252,7 @@ export const ProjectCostReport = React.forwardRef<
                 key: "amount",
                 label: t("project_additional:columns.amount"),
                 isCurrency: true,
+                align: "end",
               },
             ]}
             groups={groups}
@@ -277,10 +297,10 @@ export const ProjectCostReport = React.forwardRef<
                     <TableCell className="text-foreground">
                       {getOptionLabel("risk_probability", risk.probability)}
                     </TableCell>
-                    <TableCell className="text-end text-foreground">
+                    <TableCell className="text-end tabular-nums text-foreground">
                       {formatCurrency(risk.impact_amount, project.currency)}
                     </TableCell>
-                    <TableCell className="text-end font-medium text-foreground">
+                    <TableCell className="text-end font-medium tabular-nums text-foreground">
                       {formatCurrency(
                         risk.contingency_amount,
                         project.currency,
@@ -307,7 +327,7 @@ export const ProjectCostReport = React.forwardRef<
                   >
                     {t("project_risk:totalRiskContingency")}
                   </TableCell>
-                  <TableCell className="text-end font-bold text-foreground">
+                  <TableCell className="text-end font-bold tabular-nums text-foreground">
                     {formatCurrency(
                       calculateCategoryTotal.risks(risks),
                       project.currency,

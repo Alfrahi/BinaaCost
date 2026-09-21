@@ -59,7 +59,7 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
             {columns.map((col) => (
               <TableHead
                 key={col.key}
-                className={`${ALIGN_CLASS[col.align || "start"]} text-xs font-medium text-muted-foreground uppercase`}
+                className={`${ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")]} text-xs font-medium text-muted-foreground uppercase`}
               >
                 {col.label}
               </TableHead>
@@ -76,7 +76,7 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
                 <TableRow className="bg-muted">
                   <TableCell
                     colSpan={columns.length + 1}
-                    className="font-semibold text-foreground"
+                    className="font-semibold text-foreground text-start"
                   >
                     {groups.find((g) => g.id === groupId)?.name}
                   </TableCell>
@@ -118,31 +118,34 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
                     key={item.id || index}
                     className="border-t border-border"
                   >
-                    {columns.map((col) => (
-                      <TableCell
-                        key={col.key}
-                        className={`${ALIGN_CLASS[col.align || "start"]} text-foreground`}
-                      >
-                        {col.isCurrency
-                          ? formatCurrency(item[col.key], currency)
-                          : col.key === "unit" && itemType === "materials"
-                            ? getOptionLabel("material_unit", item[col.key])
-                            : col.key === "period_unit" &&
-                                itemType === "equipment"
-                              ? getOptionLabel(
-                                  "equipment_period_unit",
-                                  item[col.key],
-                                )
-                              : col.key === "category" &&
-                                  itemType === "additional"
+                    {columns.map((col) => {
+                      const isEndAligned = col.align === "end" || col.isCurrency;
+                      return (
+                        <TableCell
+                          key={col.key}
+                          className={`${ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")]} ${isEndAligned ? "tabular-nums" : ""} text-foreground`}
+                        >
+                          {col.isCurrency
+                            ? formatCurrency(item[col.key], currency)
+                            : col.key === "unit" && itemType === "materials"
+                              ? getOptionLabel("material_unit", item[col.key])
+                              : col.key === "period_unit" &&
+                                  itemType === "equipment"
                                 ? getOptionLabel(
-                                    "additional_cost_category",
+                                    "equipment_period_unit",
                                     item[col.key],
                                   )
-                                : item[col.key] || t("common:notSpecified")}
-                      </TableCell>
-                    ))}
-                    <TableCell className="text-end font-medium text-foreground">
+                                : col.key === "category" &&
+                                    itemType === "additional"
+                                  ? getOptionLabel(
+                                      "additional_cost_category",
+                                      item[col.key],
+                                    )
+                                  : item[col.key] || t("common:notSpecified")}
+                        </TableCell>
+                      );
+                    })}
+                    <TableCell className="text-end font-medium tabular-nums text-foreground">
                       {formatCurrency(itemTotal, currency)}
                     </TableCell>
                   </TableRow>
@@ -169,7 +172,7 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
             >
               {t("common:subtotal")}
             </TableCell>
-            <TableCell className="text-end font-bold text-foreground">
+            <TableCell className="text-end font-bold tabular-nums text-foreground">
               {formatCurrency(
                 calculateCategoryTotal[itemType](items as any),
                 currency,
