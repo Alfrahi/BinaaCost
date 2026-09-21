@@ -10,6 +10,7 @@ const ROUTE_PATHS: Record<string, string> = {
   "import/cost_database_items": "/api/import/cost_database_items",
   "users/resolve": "/api/users/resolve",
   "users/minimal": "/api/users/minimal",
+  "admin/users/create": "/api/admin/users/create",
 };
 
 // Dynamic path templates — resolved per call.
