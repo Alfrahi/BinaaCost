@@ -16,7 +16,7 @@ export default defineConfig({
         sourcemap: true,
       },
       manifest: {
-        name: "Construction Cost Estimator",
+        name: "BinaaCost",
         short_name: "Cost Estimator",
         description:
           "An application for managing construction cost estimations.",

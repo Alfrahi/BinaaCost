@@ -1,6 +1,6 @@
 # Design System Theme Tokens
 
-## CSS Custom Properties (defined in `src/index.css` or `tailwind.config.ts`)
+## CSS Custom Properties (defined in `src/globals.css` or `tailwind.config.ts`)
 
 ### Colors
 | Token | Light | Dark | Usage |
