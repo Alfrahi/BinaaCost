@@ -165,6 +165,27 @@ export function isNetworkOrTransientError(error: unknown): boolean {
   return false;
 }
 
+/**
+ * Detects whether an error represents a 404 / record not found on the server.
+ */
+export function isRecordNotFoundError(error: unknown): boolean {
+  if (!error) return false;
+  if (typeof error === "object" && error !== null) {
+    const err = error as Record<string, unknown>;
+    if (err.status === 404 || err.statusCode === 404) return true;
+    if (typeof err.response === "object" && err.response !== null) {
+      const resp = err.response as Record<string, unknown>;
+      if (resp.code === 404 || resp.status === 404) return true;
+    }
+    const msg = String(err.message || "");
+    if (/not found|missing/i.test(msg)) return true;
+    if (err.originalError && isRecordNotFoundError(err.originalError)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 class OfflineManager {
   private static instance: OfflineManager;
   private queue: OfflineMutation[] = [];
@@ -620,6 +641,36 @@ class OfflineManager {
               // Ignore lookup error if record cannot be fetched
             }
           }
+          successfulMutations++;
+          this.queue = this.queue.filter((q) => q.id !== mutation.id);
+          if (this.queryClient) {
+            await this.queryClient.invalidateQueries({
+              queryKey: mutation.queryKey,
+            });
+            if (
+              originalQueryKey &&
+              JSON.stringify(originalQueryKey) !== JSON.stringify(mutation.queryKey)
+            ) {
+              await this.queryClient.invalidateQueries({
+                queryKey: originalQueryKey,
+              });
+            }
+          }
+          continue;
+        }
+
+        // OFFL-05: If a DELETE (or BULK_DELETE) operation fails with 404 / Not Found,
+        // the record was already deleted on the server (by another user, cascading deletion,
+        // or a prior successful attempt). Treat as successful idempotent deletion and drain
+        // instead of dead-lettering.
+        if (
+          (mutation.type === "DELETE" || mutation.type === "BULK_DELETE") &&
+          isRecordNotFoundError(err)
+        ) {
+          console.log(
+            "Record already deleted on server (404 on DELETE):",
+            mutation.id,
+          );
           successfulMutations++;
           this.queue = this.queue.filter((q) => q.id !== mutation.id);
           if (this.queryClient) {

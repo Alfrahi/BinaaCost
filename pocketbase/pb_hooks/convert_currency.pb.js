@@ -59,6 +59,8 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
 
   const safeProjectId = projectId.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
+  const r2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+
   // stage updates then apply inside a transaction
   $app.runInTransaction((txApp) => {
     for (const coll of Object.keys(TABLE_FIELDS)) {
@@ -73,14 +75,14 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
         for (const f of TABLE_FIELDS[coll]) {
           const cur = row.get(f);
           if (typeof cur === "number") {
-            row.set(f, Math.round(cur * factor * 100) / 100);
+            row.set(f, r2(cur * factor));
           }
         }
         if (coll === "labor_items") {
           const workers = Number(row.get("number_of_workers")) || 0;
           const rate = Number(row.get("daily_rate")) || 0;
           const days = Number(row.get("total_days")) || 0;
-          row.set("total_cost", Math.round(workers * rate * days * 100) / 100);
+          row.set("total_cost", r2(workers * rate * days));
         } else if (coll === "equipment_items") {
           const qty = Number(row.get("quantity")) || 0;
           const costPerPeriod = Number(row.get("cost_per_period")) || 0;
@@ -88,8 +90,8 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
           const duration = isPurchase ? 1 : (Number(row.get("usage_duration")) || 0);
           const maintenance = Number(row.get("maintenance_cost")) || 0;
           const fuel = Number(row.get("fuel_cost")) || 0;
-          const base = Math.round(qty * costPerPeriod * duration * 100) / 100;
-          row.set("total_cost", Math.round((base + maintenance + fuel) * 100) / 100);
+          const base = r2(qty * costPerPeriod * duration);
+          row.set("total_cost", r2(base + maintenance + fuel));
         }
         txApp.save(row);
       }

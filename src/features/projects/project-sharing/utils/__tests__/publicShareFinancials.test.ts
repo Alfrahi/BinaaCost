@@ -106,4 +106,21 @@ describe("calculatePublicShareFinancials", () => {
     expect(summary.directCosts).toBe(500);
     expect(summary.grandTotal).toBe(500);
   });
+
+  it("includes directCostsBase and locationAdjustmentAmount with location_factor", () => {
+    const materials: MaterialItem[] = [
+      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 100, unit: "bag", created_at: "", updated_at: "" },
+    ];
+    const summary = calculatePublicShareFinancials(
+      { location_factor: 1.1, overhead_percent: 0, contingency_percent: 0, markup_percent: 0, tax_percent: 0 },
+      materials,
+      [],
+      [],
+      [],
+    );
+    expect(summary.directCostsBase).toBe(1000);
+    expect(summary.directCosts).toBe(1100);
+    expect(summary.locationAdjustmentAmount).toBe(100);
+    expect(summary.grandTotal).toBe(1100);
+  });
 });
