@@ -35,7 +35,9 @@ export function useAnalyticsData() {
           fields: "id,name,currency",
         });
 
-      // Fetch each cost table once for the whole user (not once per project)
+      if (projects.length === 0) return [];
+
+      // Fetch each cost table once for the fetched projects
       // to avoid an N+1 query storm, then group by project in memory.
       // All cost calculations use the same Decimal.js-backed helpers as the
       // project detail view so totals match across screens.
@@ -70,11 +72,14 @@ export function useAnalyticsData() {
         },
       ];
 
+      // Build a filter to fetch items only for the retrieved projects
+      const projectFilter = projects.map((p) => `project_id="${p.id}"`).join(" || ");
+
       const byProject: Record<string, Record<string, number>> = {};
       for (const { coll, key, fn } of tables) {
         const items = await pb
           .collection(coll)
-          .getFullList({ filter: `user_id="${user.id}"` });
+          .getFullList({ filter: projectFilter });
         for (const item of items as any[]) {
           const pid = item.project_id;
           if (!pid) continue;
