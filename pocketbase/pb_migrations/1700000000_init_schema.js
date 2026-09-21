@@ -1,5 +1,5 @@
 /// <reference path="../pb_data/types.d.ts" />
-// PocketBase schema for Construction Cost Estimator (Supabase -> PB, plan §6/§7).
+// PocketBase schema for BinaaCost (Supabase -> PB, plan §6/§7).
 // Field names mirror Supabase columns so existing app types/queries map 1:1.
 migrate((app) => {
   console.log("=== MIGRATION START ===");
