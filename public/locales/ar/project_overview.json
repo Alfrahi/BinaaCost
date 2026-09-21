@@ -9,7 +9,7 @@
   "notSpecified": "غير محدد",
   "grandTotal": "الإجمالي الكلي",
   "directCosts": "التكاليف المباشرة",
-  "profit": "الربح",
+  "profit": "الزيادة (Markup)",
   "grossMarginHint": "هامش ربح إجمالي {{percent}}%",
   "costBreakdown": "تفصيل التكاليف",
   "attention": "يحتاج إلى انتباه",

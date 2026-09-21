@@ -164,7 +164,7 @@
     "defaultOverhead": "Default Overhead",
     "defaultOverheadHelp": "Indirect costs such as office operations, management, and insurance.",
     "defaultMarkup": "Default Markup",
-    "defaultMarkupHelp": "Company profit margin applied to project costs.",
+    "defaultMarkupHelp": "Company profit markup applied to project costs.",
     "defaultContingency": "Default Contingency",
     "defaultContingencyHelp": "Buffer reserved for unforeseen risks and variations.",
     "defaultTax": "Default Tax",
