@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
@@ -20,7 +20,7 @@ export function useProjectGroupsManager(
   const { t } = useTranslation(["common", "project_detail"]);
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ["project_groups", projectId];
+  const queryKey = useMemo(() => ["project_groups", projectId], [projectId]);
 
   const { data: groups = initialGroups } = useQuery<ProjectGroup[]>({
     queryKey,

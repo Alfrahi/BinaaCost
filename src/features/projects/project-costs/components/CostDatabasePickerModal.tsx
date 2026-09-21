@@ -76,7 +76,7 @@ export function CostDatabasePickerModal({
 
   // Databases query
   const { databasesQuery } = useCostDatabases();
-  const databases = databasesQuery.data ?? [];
+  const databases = useMemo(() => databasesQuery.data ?? [], [databasesQuery.data]);
 
   // Auto-select first database when available
   useEffect(() => {

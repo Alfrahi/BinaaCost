@@ -2,15 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { DirectionProvider } from "@radix-ui/react-direction";
 
-const RTL_LANGUAGES = ["ar", "he", "fa"];
-
-export function isRtlLanguage(language?: string): boolean {
-  if (!language) return false;
-  const lang = language.toLowerCase();
-  return RTL_LANGUAGES.some(
-    (rtlLang) => lang === rtlLang || lang.startsWith(`${rtlLang}-`) || lang.startsWith(`${rtlLang}_`),
-  );
-}
+import { isRtlLanguage } from "@/shared/lib/utils";
 
 export default function LanguageProvider({
   children,
