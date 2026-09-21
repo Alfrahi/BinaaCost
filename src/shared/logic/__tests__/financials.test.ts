@@ -37,6 +37,8 @@ describe("Financial Logic", () => {
     expect(result.taxAmount).toBe(552);
 
     expect(result.grandTotal).toBe(6072);
+
+    expect(result.grossMarginPercent).toBeCloseTo(16.67, 2);
   });
 
   it("handles zero values", () => {
@@ -179,6 +181,37 @@ describe("Financial Logic", () => {
       expect(result.bidPrice).toBe(5940); // 4950 + 990
       expect(result.taxAmount).toBe(594); // 5940 * 10%
       expect(result.grandTotal).toBe(6534);
+    });
+  });
+
+  describe("gross margin calculation", () => {
+    it("computes true gross margin based on bid price excluding taxes", () => {
+      // 100k cost + 20% markup on prime cost -> 120k bid price -> 16.67% gross margin
+      const resultNoTax = calculateProjectFinancials(
+        { materialsTotal: 100000, laborTotal: 0, equipmentTotal: 0, additionalTotal: 0 },
+        { overhead_percent: 0, contingency_percent: 0, markup_percent: 20, tax_percent: 0 },
+      );
+      expect(resultNoTax.primeCost).toBe(100000);
+      expect(resultNoTax.markupAmount).toBe(20000);
+      expect(resultNoTax.bidPrice).toBe(120000);
+      expect(resultNoTax.grossMarginPercent).toBeCloseTo(16.67, 2);
+
+      // Adding 15% tax increases grandTotal but does NOT alter grossMarginPercent
+      const resultWithTax = calculateProjectFinancials(
+        { materialsTotal: 100000, laborTotal: 0, equipmentTotal: 0, additionalTotal: 0 },
+        { overhead_percent: 0, contingency_percent: 0, markup_percent: 20, tax_percent: 15 },
+      );
+      expect(resultWithTax.bidPrice).toBe(120000);
+      expect(resultWithTax.grandTotal).toBe(138000);
+      expect(resultWithTax.grossMarginPercent).toBe(resultNoTax.grossMarginPercent);
+    });
+
+    it("returns 0 for zero bid price", () => {
+      const result = calculateProjectFinancials(
+        { materialsTotal: 0, laborTotal: 0, equipmentTotal: 0, additionalTotal: 0 },
+        mockSettings,
+      );
+      expect(result.grossMarginPercent).toBe(0);
     });
   });
 });

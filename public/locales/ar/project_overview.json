@@ -10,6 +10,7 @@
   "grandTotal": "الإجمالي الكلي",
   "directCosts": "التكاليف المباشرة",
   "profit": "الربح",
+  "grossMarginHint": "هامش ربح إجمالي {{percent}}%",
   "costBreakdown": "تفصيل التكاليف",
   "attention": "يحتاج إلى انتباه",
   "allGood": "لا شيء يحتاج إلى انتباه.",

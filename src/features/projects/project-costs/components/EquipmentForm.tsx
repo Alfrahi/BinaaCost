@@ -370,7 +370,8 @@ export function EquipmentForm({
                   <FormControl>
                     <Input
                       type="number"
-                      min="1"
+                      step="any"
+                      min="0.01"
                       {...field}
                       aria-label={t("columns.usageDuration")}
                       className="text-sm"
@@ -388,7 +389,7 @@ export function EquipmentForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm">
-                  {t("columns.maintenance")} ({currency})
+                  {t("columns.maintenanceLumpSum")} ({currency})
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -396,10 +397,13 @@ export function EquipmentForm({
                     step="0.01"
                     {...field}
                     value={field.value ?? ""}
-                    aria-label={t("columns.maintenance")}
+                    aria-label={t("columns.maintenanceLumpSum")}
                     className="text-sm"
                   />
                 </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  {t("columns.maintenanceHelp")}
+                </p>
                 <FormMessage className="text-sm" />
               </FormItem>
             )}
@@ -411,7 +415,7 @@ export function EquipmentForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm">
-                  {t("columns.fuel")} ({currency})
+                  {t("columns.fuelLumpSum")} ({currency})
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -419,10 +423,13 @@ export function EquipmentForm({
                     step="0.01"
                     {...field}
                     value={field.value ?? ""}
-                    aria-label={t("columns.fuel")}
+                    aria-label={t("columns.fuelLumpSum")}
                     className="text-sm"
                   />
                 </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  {t("columns.fuelHelp")}
+                </p>
                 <FormMessage className="text-sm" />
               </FormItem>
             )}

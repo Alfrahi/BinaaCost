@@ -56,7 +56,8 @@ vi.mock("@/shared/components/ui/select", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string, defaultValue?: string) => defaultValue || key.split(":").pop() || key,
+    t: (key: string, defaultValue?: any) =>
+      typeof defaultValue === "string" ? defaultValue : key.split(":").pop() || key,
     i18n: { language: "en", dir: () => "ltr" },
   }),
 }));

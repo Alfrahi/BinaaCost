@@ -20,7 +20,9 @@ import { toast } from "sonner";
 import {
   FinancialAssumptionsStrip,
   DefaultAssumptionsWarning,
+  IncompleteItemsWarning,
 } from "./FinancialAssumptions";
+import { countIncompleteItems } from "@/shared/logic/overview";
 import { Loader2, FileText, Users, DollarSign } from "lucide-react";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import LoadingState from "@/shared/components/ui/LoadingState";
@@ -266,6 +268,17 @@ export default function ReportsTab({
     return isHistorical && snapshotData ? snapshotData.risks || [] : risks;
   }, [isHistorical, snapshotData, risks]);
 
+  const incompleteCount = useMemo(
+    () =>
+      countIncompleteItems({
+        materials: activeMaterials,
+        labor: activeLabor,
+        equipment: activeEquipment,
+        additional: activeAdditional,
+      }),
+    [activeMaterials, activeLabor, activeEquipment, activeAdditional],
+  );
+
   const activeGroups = useMemo(() => {
     if (isHistorical && snapshotData?.project_groups && snapshotData.project_groups.length > 0) {
       return snapshotData.project_groups;
@@ -365,6 +378,7 @@ export default function ReportsTab({
         </CardHeader>
         <CardContent>
           <div className="space-y-3 mb-4">
+            <IncompleteItemsWarning count={incompleteCount} />
             <DefaultAssumptionsWarning project={activeProject} />
             <FinancialAssumptionsStrip
               settings={activeFinancialSettings}

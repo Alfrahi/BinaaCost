@@ -128,8 +128,10 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
           label={t("project_overview:profit")}
           value={format(financials.markupAmount, project.currency)}
           hint={
-            financials.grandTotal > 0
-              ? `${((financials.markupAmount / financials.grandTotal) * 100).toFixed(1)}%`
+            financials.bidPrice > 0
+              ? t("project_overview:grossMarginHint", {
+                  percent: financials.grossMarginPercent.toFixed(1),
+                })
               : undefined
           }
         />

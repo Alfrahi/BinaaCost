@@ -156,7 +156,8 @@
     "viewPricing": "View Pricing",
     "markup": "Markup",
     "markupWithPercent": "Markup ({{percent}}%)",
-    "markupDesc": "Profit margin added to the project cost.",
+    "markupDesc": "Profit markup applied to prime cost.",
+    "effectiveGrossMargin": "Gross Margin: {{percent}}% of bid price",
     "taxes": "Taxes",
     "taxesWithPercent": "Taxes ({{percent}}%)",
     "totalDirectCosts": "Total Direct Costs",
@@ -169,7 +170,7 @@
     "tooltips": {
       "overhead": "Overhead is calculated as a percentage of the total direct costs.",
       "generalContingency": "General Contingency is a flat percentage of direct costs to cover unexpected expenses. It is additive with Risk Contingency, not interchangeable.",
-      "markup": "Markup is applied as a percentage of the Prime Cost (Direct Costs + Overhead + Contingency) to determine the profit margin.",
+      "markup": "Markup is applied as a percentage of Prime Cost (Direct Costs + Overhead + Contingency) to determine the contractor fee.",
       "subtotal": "The subtotal before tax is the sum of the Prime Cost and the Markup.",
       "tax": "Taxes are applied as a percentage of the Subtotal (Before Tax).",
       "grandTotal": "The Grand Total is the final price including all direct costs, overhead, contingency, markup, and taxes."

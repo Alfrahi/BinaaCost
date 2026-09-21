@@ -228,6 +228,7 @@ describe("computeVersionComparison", () => {
         riskContingencyAmount: 0,
         primeCost: 57.5,
         markupAmount: 11.5,
+        grossMarginPercent: 16.67,
         bidPrice: 69,
         taxAmount: 0,
         grandTotal: 999.99, // Custom frozen grandTotal
