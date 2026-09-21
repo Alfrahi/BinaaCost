@@ -92,7 +92,11 @@ export const ProjectCostReport = React.forwardRef<
     }, [allSettingsOptions]);
 
     return (
-      <div ref={ref} className="bg-background p-6 sm:p-8 lg:p-10 print:p-0">
+      <div
+        ref={ref}
+        data-report-root="true"
+        className="bg-background p-6 sm:p-8 lg:p-10 print:p-0"
+      >
         <ReportHeader
           companyInfo={companyInfo}
           project={project}
@@ -271,16 +275,16 @@ export const ProjectCostReport = React.forwardRef<
             <Table className="w-full text-sm">
               <TableHeader>
                 <TableRow className="bg-muted">
-                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider px-2.5 py-2 h-9">
                     {t("project_risk:fields.description")}
                   </TableHead>
-                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="text-start text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap px-2.5 py-2 h-9">
                     {t("project_risk:fields.probability")}
                   </TableHead>
-                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap px-2.5 py-2 h-9">
                     {t("project_risk:fields.impactAmount")} ({project.currency})
                   </TableHead>
-                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap px-2.5 py-2 h-9">
                     {t("project_risk:fields.riskContingency")} ({project.currency})
                   </TableHead>
                 </TableRow>
@@ -291,16 +295,16 @@ export const ProjectCostReport = React.forwardRef<
                     key={risk.id || index}
                     className="border-t border-border"
                   >
-                    <TableCell className="text-foreground">
+                    <TableCell className="text-foreground px-2.5 py-2 text-xs">
                       {risk.description}
                     </TableCell>
-                    <TableCell className="text-foreground">
+                    <TableCell className="text-foreground whitespace-nowrap px-2.5 py-2 text-xs">
                       {getOptionLabel("risk_probability", risk.probability)}
                     </TableCell>
-                    <TableCell className="text-end tabular-nums text-foreground">
+                    <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-2.5 py-2 text-xs">
                       {formatCurrency(risk.impact_amount, project.currency)}
                     </TableCell>
-                    <TableCell className="text-end font-medium tabular-nums text-foreground">
+                    <TableCell className="text-end font-medium tabular-nums text-foreground whitespace-nowrap px-2.5 py-2 text-xs">
                       {formatCurrency(
                         risk.contingency_amount,
                         project.currency,
@@ -312,7 +316,7 @@ export const ProjectCostReport = React.forwardRef<
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-muted-foreground py-4"
+                      className="text-center text-muted-foreground py-3 text-xs"
                     >
                       {t("common:noItems")}
                     </TableCell>
@@ -323,11 +327,11 @@ export const ProjectCostReport = React.forwardRef<
                 <TableRow className="bg-muted">
                   <TableCell
                     colSpan={3}
-                    className="text-end font-semibold uppercase text-foreground"
+                    className="text-end font-semibold uppercase text-foreground whitespace-nowrap px-2.5 py-2 text-xs"
                   >
                     {t("project_risk:totalRiskContingency")}
                   </TableCell>
-                  <TableCell className="text-end font-bold tabular-nums text-foreground">
+                  <TableCell className="text-end font-bold tabular-nums text-foreground whitespace-nowrap px-2.5 py-2 text-xs">
                     {formatCurrency(
                       calculateCategoryTotal.risks(risks),
                       project.currency,

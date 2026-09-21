@@ -43,7 +43,11 @@ export const ClientProposalReport = React.forwardRef<
     const { formatDate } = useDateFormatter();
 
     return (
-      <div ref={ref} className="bg-background p-6 sm:p-8 lg:p-10 print:p-0">
+      <div
+        ref={ref}
+        data-report-root="true"
+        className="bg-background p-6 sm:p-8 lg:p-10 print:p-0"
+      >
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -80,20 +84,6 @@ export const ClientProposalReport = React.forwardRef<
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-foreground">
           <div>
             <p>
-              <strong>{t("project_reports:client")}:</strong>{" "}
-              {clientName || t("common:notSpecified")}
-            </p>
-            <p>
-              <strong>{t("project_detail:overview.type")}:</strong>{" "}
-              {project.type}
-            </p>
-            <p>
-              <strong>{t("project_detail:overview.location")}:</strong>{" "}
-              {project.location || t("common:notSpecified")}
-            </p>
-          </div>
-          <div>
-            <p>
               <strong>{t("project_detail:overview.duration")}:</strong>{" "}
               {project.duration_days}{" "}
               {t(`durations:${project.duration_unit.toLowerCase()}`)}
@@ -116,6 +106,20 @@ export const ClientProposalReport = React.forwardRef<
             <p>
               <strong>{t("project_reports:date")}:</strong>{" "}
               {formatDate(new Date(), "long")}
+            </p>
+          </div>
+          <div>
+            <p>
+              <strong>{t("project_reports:client")}:</strong>{" "}
+              {clientName || t("common:notSpecified")}
+            </p>
+            <p>
+              <strong>{t("project_detail:overview.type")}:</strong>{" "}
+              {project.type}
+            </p>
+            <p>
+              <strong>{t("project_detail:overview.location")}:</strong>{" "}
+              {project.location || t("common:notSpecified")}
             </p>
           </div>
         </div>

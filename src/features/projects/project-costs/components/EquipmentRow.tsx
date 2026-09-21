@@ -104,7 +104,7 @@ export const EquipmentRow = memo(function EquipmentRow({
           />
         )}
       </TableCell>
-      <TableCell className="text-start text-sm">{item.name}</TableCell>
+      <TableCell className="text-start text-sm whitespace-normal break-words max-w-[150px] min-w-[90px]">{item.name}</TableCell>
       <TableCell className="text-start text-sm">
         {item.type || t("common:notSpecified")}
       </TableCell>
