@@ -3,6 +3,7 @@ import { pb } from "@/integrations/pocketbase/client";
 import { mapRecords } from "@/integrations/pocketbase/mappers";
 import { Decimal } from "@/shared/lib/math";
 import { useCallback } from "react";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 export interface CurrencyRate {
   currency_code: string;
@@ -17,7 +18,7 @@ export function useCurrencyConverter() {
       mapRecords<CurrencyRate>(
         await pb.collection("currency_rates").getFullList(),
       ),
-    staleTime: 1000 * 60 * 60,
+    staleTime: STALE_TIME.STATIC,
   });
 
   const getRate = useCallback(
