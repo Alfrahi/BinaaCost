@@ -2,6 +2,52 @@
 // Admin user management routes. super_admin only; delete blocks self-delete
 // and deletion of the last remaining super_admin.
 
+routerAdd("POST", "/api/admin/users/create", (e) => {
+  const auth = e.auth;
+  if (!auth || !(auth.get("role") === "super_admin")) {
+    throw new ForbiddenError("super_admin only");
+  }
+  const body = e.requestInfo().body;
+  const email = body.email;
+  const password = body.password;
+  const role = body.role || "user";
+  const firstName = body.first_name || "";
+  const lastName = body.last_name || "";
+
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    throw new BadRequestError("Valid email is required");
+  }
+  if (!password || typeof password !== "string" || password.length < 8) {
+    throw new BadRequestError("Password must be at least 8 characters");
+  }
+  if (["user", "super_admin"].indexOf(role) === -1) {
+    throw new BadRequestError("role must be 'user' or 'super_admin'");
+  }
+
+  const existing = $app.findRecordsByFilter("users", `email="${email}"`);
+  if (existing.length > 0) {
+    throw new BadRequestError("Email is already in use");
+  }
+
+  const usersColl = $app.findCollectionByNameOrId("users");
+  const record = new Record(usersColl);
+  record.setEmail(email);
+  record.setPassword(password);
+  record.set("first_name", firstName);
+  record.set("last_name", lastName);
+  record.set("role", role);
+  record.setEmailVisibility(true);
+  $app.save(record);
+
+  return e.json(200, {
+    id: record.id,
+    email: record.email(),
+    first_name: record.get("first_name"),
+    last_name: record.get("last_name"),
+    role: record.get("role"),
+  });
+});
+
 routerAdd("POST", "/api/admin/users/{id}/role", (e) => {
   const auth = e.auth;
   if (!auth || !(auth.get("role") === "super_admin")) {

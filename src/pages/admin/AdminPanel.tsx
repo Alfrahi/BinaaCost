@@ -110,13 +110,13 @@ export default function AdminPanel() {
                   <p className="text-xs text-muted-foreground font-medium">
                     {stat.label}
                   </p>
-                  <p className="text-2xl font-bold tracking-tight">
+                  <div className="text-2xl font-bold tracking-tight">
                     {statsLoading ? (
                       <Skeleton className="h-7 w-12" />
                     ) : (
                       stat.value ?? 0
                     )}
-                  </p>
+                  </div>
                 </div>
                 <div
                   className={`p-2.5 rounded-lg ${stat.color} group-hover:scale-105 transition-transform`}

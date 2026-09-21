@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { pb } from "@/integrations/pocketbase/client";
-import { callRouteWithParams } from "@/integrations/pocketbase/routes";
+import { callRoute, callRouteWithParams } from "@/integrations/pocketbase/routes";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -212,14 +212,12 @@ export function useAdminUserManagement() {
       last_name?: string;
       role: string;
     }) => {
-      await pb.collection("users").create({
+      await callRoute("admin/users/create", {
         email,
         password,
-        passwordConfirm: password,
         first_name: first_name || "",
         last_name: last_name || "",
         role: role || "user",
-        emailVisibility: true,
       });
     },
     onSuccess: () => {

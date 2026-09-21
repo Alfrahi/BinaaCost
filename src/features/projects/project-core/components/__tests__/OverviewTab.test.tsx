@@ -15,6 +15,15 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
+vi.mock("@/app/providers/ThemeContext", () => ({
+  useTheme: () => ({
+    theme: "light",
+    setTheme: vi.fn(),
+    toggleTheme: vi.fn(),
+    mounted: true,
+  }),
+}));
+
 const base = {
   project: {
     currency: "USD",
