@@ -117,12 +117,8 @@ export function useUpdateProject() {
     optimisticUpdater: optimisticUpdater,
     onSuccess: () => {
       toast.success(t("project_form:success_updated"));
-      queryClient.invalidateQueries({ queryKey: ["materials", id] });
-      queryClient.invalidateQueries({ queryKey: ["labor_items", id] });
-      queryClient.invalidateQueries({ queryKey: ["equipment_items", id] });
-      queryClient.invalidateQueries({ queryKey: ["additional_costs", id] });
-      queryClient.invalidateQueries({ queryKey: ["risks", id] });
-      queryClient.invalidateQueries({ queryKey: ["project_groups", id] });
+      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", id] });
       queryClient.invalidateQueries({ queryKey: ["myProjects"] });
       queryClient.invalidateQueries({ queryKey: ["sharedProjects"] });
       queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
@@ -136,6 +132,15 @@ export function useUpdateProject() {
   const onCurrencyConversionConfirmed = useCallback(
     async (_newCurrency: string, _formData: ProjectFormValues) => {
       queryClient.invalidateQueries({ queryKey: ["project", id] });
+      queryClient.invalidateQueries({ queryKey: ["materials", id] });
+      queryClient.invalidateQueries({ queryKey: ["labor_items", id] });
+      queryClient.invalidateQueries({ queryKey: ["equipment_items", id] });
+      queryClient.invalidateQueries({ queryKey: ["additional_costs", id] });
+      queryClient.invalidateQueries({ queryKey: ["risks", id] });
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", id] });
+      queryClient.invalidateQueries({ queryKey: ["myProjects"] });
+      queryClient.invalidateQueries({ queryKey: ["sharedProjects"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
     },
     [id, queryClient],
   );

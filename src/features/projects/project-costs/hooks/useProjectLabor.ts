@@ -10,6 +10,7 @@ import { calculateItemCost } from "@/shared/logic/shared";
 import { LaborItem } from "@/features/projects/project-costs/types/items";
 import { LaborFormValues } from "@/features/projects/project-costs/types/schemas";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface UseProjectLaborReturn extends EntityCrud<LaborItem> {
   data: LaborItem[];
@@ -28,7 +29,7 @@ export function useProjectLabor(projectId: string): UseProjectLaborReturn {
       await pb.collection("labor_items").getFullList({ filter: `project_id="${projectId}"` }),
     ),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const {

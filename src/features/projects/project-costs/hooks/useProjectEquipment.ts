@@ -10,6 +10,7 @@ import { calculateItemCost } from "@/shared/logic/shared";
 import { EquipmentItem } from "@/features/projects/project-costs/types/items";
 import { EquipmentFormValues } from "@/features/projects/project-costs/types/schemas";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface UseProjectEquipmentReturn extends EntityCrud<EquipmentItem> {
   data: EquipmentItem[];
@@ -28,7 +29,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
       await pb.collection("equipment_items").getFullList({ filter: `project_id="${projectId}"` }),
     ),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const {

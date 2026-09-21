@@ -10,6 +10,7 @@ import { calculateItemCost } from "@/shared/logic/shared";
 import { MaterialItem } from "@/features/projects/project-costs/types/items";
 import { MaterialFormValues } from "@/features/projects/project-costs/types/schemas";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
+import { STALE_TIME } from "@/shared/lib/queryDefaults";
 
 interface UseProjectMaterialsReturn extends EntityCrud<MaterialItem> {
   data: MaterialItem[];
@@ -28,7 +29,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
       await pb.collection("materials").getFullList({ filter: `project_id="${projectId}"` }),
     ),
     enabled: !!projectId,
-    staleTime: 1000 * 60 * 2,
+    staleTime: STALE_TIME.ENTITY,
   });
 
   const {

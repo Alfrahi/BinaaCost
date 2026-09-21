@@ -39,6 +39,12 @@ export function useApplyProjectVersion() {
       queryClient.invalidateQueries({
         queryKey: ["project_versions", variables.projectId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["projectCardSummary", variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["analytics_projects_data"],
+      });
     },
     onError: (err: any) => {
       handleError(err);
