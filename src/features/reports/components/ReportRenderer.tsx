@@ -99,7 +99,10 @@ export function ReportRenderer({
   ];
 
   return (
-    <div className="bg-background p-6 sm:p-8 lg:p-10 print:p-0">
+    <div
+      data-report-root="true"
+      className="bg-background p-6 sm:p-8 lg:p-10 print:p-0"
+    >
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
         <div>
@@ -122,7 +125,6 @@ export function ReportRenderer({
 
       {/* Project Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-foreground">
-        <div>{projectDetails}</div>
         <div>
           <p><strong>{t("project_detail:overview.duration")}:</strong> {project.duration_days} {t(`durations:${project.duration_unit.toLowerCase()}`)}</p>
           <p><strong>{t("project_detail:overview.currency")}:</strong> {project.currency}</p>
@@ -132,6 +134,7 @@ export function ReportRenderer({
           )}
           <p><strong>{t("project_reports:date")}:</strong> {formatDate(new Date(), "long")}</p>
         </div>
+        <div>{projectDetails}</div>
       </div>
 
       <Separator className="my-6 bg-border" />
@@ -173,17 +176,17 @@ export function ReportRenderer({
                     className={[
                       row.isSubtotal && "font-semibold uppercase",
                       row.isBold && "font-semibold",
-                      row.isPrimary && "text-lg font-bold uppercase",
-                      "text-foreground",
+                      row.isPrimary && "text-base font-bold uppercase",
+                      "text-foreground px-3 py-2 text-xs",
                     ].filter(Boolean).join(" ")}
                   >
                     {row.label}
                   </td>
                   <td
                     className={[
-                      "text-end",
+                      "text-end tabular-nums whitespace-nowrap px-3 py-2 text-xs",
                       row.isBold && "font-bold",
-                      row.isPrimary && "text-lg font-bold",
+                      row.isPrimary && "text-base font-bold",
                       "text-foreground",
                     ].filter(Boolean).join(" ")}
                   >

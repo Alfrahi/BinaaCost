@@ -65,20 +65,6 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-sm text-foreground">
         <div>
           <p>
-            <strong>{t("project_detail:overview.type")}:</strong>{" "}
-            {project.type}
-          </p>
-          <p>
-            <strong>{t("project_detail:overview.location")}:</strong>{" "}
-            {project.location || t("common:notSpecified")}
-          </p>
-          <p>
-            <strong>{t("project_detail:overview.size")}:</strong>{" "}
-            {project.size} {project.size_unit}
-          </p>
-        </div>
-        <div>
-          <p>
             <strong>{t("project_detail:overview.duration")}:</strong>{" "}
             {project.duration_days}{" "}
             {t(`durations:${project.duration_unit.toLowerCase()}`)}
@@ -101,6 +87,20 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
           <p>
             <strong>{t("project_reports:date")}:</strong>{" "}
             {formatDate(new Date(), "long")}
+          </p>
+        </div>
+        <div>
+          <p>
+            <strong>{t("project_detail:overview.type")}:</strong>{" "}
+            {project.type}
+          </p>
+          <p>
+            <strong>{t("project_detail:overview.location")}:</strong>{" "}
+            {project.location || t("common:notSpecified")}
+          </p>
+          <p>
+            <strong>{t("project_detail:overview.size")}:</strong>{" "}
+            {project.size} {project.size_unit}
           </p>
         </div>
       </div>
