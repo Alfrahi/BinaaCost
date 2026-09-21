@@ -8,6 +8,7 @@ import { Button } from "@/shared/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
+import { useTheme } from "@/app/providers/ThemeContext";
 import ReactECharts from "echarts-for-react";
 import { SCENARIO_COLORS } from "@/shared/logic/chartPalette";
 import ChartContainer from "@/shared/components/ChartContainer";
@@ -20,12 +21,14 @@ interface SimulationResultsProps {
 }
 
 export function SimulationResults({
+
   simulationResult,
   currency,
   onClose,
 }: SimulationResultsProps) {
   const { t, i18n } = useTranslation(["scenario_analysis", "project_tabs", "project_detail"]);
   const { format } = useCurrencyFormatter();
+  const { theme } = useTheme();
 
   const originalFinancials = simulationResult?.original?.financials;
   const simulatedFinancials = simulationResult?.simulated?.financials;
@@ -40,6 +43,7 @@ export function SimulationResults({
   const chartOptions = useMemo(() => {
     if (!hasData || !of || !sf) return {};
 
+    const chartBg = "transparent";
     const categories = [
       t("project_tabs:materials"),
       t("project_tabs:labor"),
@@ -74,6 +78,7 @@ export function SimulationResults({
     ];
 
     return {
+      backgroundColor: chartBg,
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
@@ -189,7 +194,7 @@ export function SimulationResults({
           <h4 className="font-semibold text-base mb-2">{t("costComparison")}</h4>
           <ChartContainer>
             <div dir="ltr" className="h-full w-full">
-              <ReactECharts option={chartOptions} style={{ height: "100%", width: "100%" }} opts={{ renderer: "canvas" }} />
+              <ReactECharts theme={theme === "dark" ? "dark" : undefined} option={chartOptions} style={{ height: "100%", width: "100%" }} opts={{ renderer: "canvas" }} />
             </div>
           </ChartContainer>
         </div>

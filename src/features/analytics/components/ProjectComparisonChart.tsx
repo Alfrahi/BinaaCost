@@ -14,6 +14,7 @@ import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { ProjectCostData } from "../types";
 import { cn } from "@/shared/lib/utils";
 import { COST_CATEGORY_COLORS } from "@/shared/logic/chartPalette";
+import { useTheme } from "@/app/providers/ThemeContext";
 
 import LoadingState from "@/shared/components/ui/LoadingState";
 
@@ -32,6 +33,7 @@ export default function ProjectComparisonChart({
 }) {
   const { t } = useTranslation(["pages", "project_tabs", "common"]);
   const { format } = useCurrencyFormatter();
+  const { theme } = useTheme();
 
   const sortedProjects = [...projects].sort(
     (a, b) => b.total_cost - a.total_cost,
@@ -75,59 +77,76 @@ export default function ProjectComparisonChart({
                   Axis labels and legend use translated keys, so they render correctly. */}
               <div dir="ltr" className="h-full w-full">
                 <ReactECharts
-                option={{
-                  tooltip: {
-                    trigger: "axis",
-                    axisPointer: {
-                      type: "shadow",
-                    },
-                    formatter: (params: any) => {
-                      const project = sortedProjects[params[0].dataIndex];
-                      return `
-                        <div>
-                          <strong>${project.name}</strong><br/>
-                          ${t("project_tabs:materials")}: ${format(project.materials_cost, displayCurrency)}<br/>
-                          ${t("project_tabs:labor")}: ${format(project.labor_cost, displayCurrency)}<br/>
-                          ${t("project_tabs:equipment")}: ${format(project.equipment_cost, displayCurrency)}<br/>
-                          ${t("project_tabs:additional")}: ${format(project.additional_cost, displayCurrency)}<br/>
-                          <strong>${t("common:total")}: ${format(project.total_cost, displayCurrency)}</strong>
-                        </div>
-                      `;
-                    },
-                  },
-                  legend: {
-                    data: [
-                      t("project_tabs:materials"),
-                      t("project_tabs:labor"),
-                      t("project_tabs:equipment"),
-                      t("project_tabs:additional"),
-                    ],
-                    bottom: "0%",
-                  },
-                  grid: {
-                    left: "3%",
-                    right: "4%",
-                    bottom: "15%",
-                    containLabel: true,
-                  },
-                  xAxis: {
-                    type: "value",
-                    axisLabel: {
-                      formatter: (value: number) =>
-                        format(value, displayCurrency, { notation: "compact" }),
-                    },
-                  },
-                  yAxis: {
-                    type: "category",
-                    data: sortedProjects.map((p) => p.name),
-                    axisLabel: {
-                      formatter: (value: string) => {
-                        return value.length > 20
-                          ? value.substring(0, 17) + "..."
-                          : value;
+                  theme={theme === "dark" ? "dark" : undefined}
+                  option={{
+                    backgroundColor: "transparent",
+                    tooltip: {
+                      trigger: "axis",
+                      backgroundColor: theme === "dark" ? "#0F172A" : "#FFFFFF",
+                      borderColor: theme === "dark" ? "#1E293B" : "#E5E7EB",
+                      textStyle: {
+                        color: theme === "dark" ? "#FAFAFA" : "#000000",
+                      },
+                      axisPointer: {
+                        type: "shadow",
+                      },
+                      formatter: (params: any) => {
+                        const project = sortedProjects[params[0].dataIndex];
+                        return `
+                          <div>
+                            <strong>${project.name}</strong><br/>
+                            ${t("project_tabs:materials")}: ${format(project.materials_cost, displayCurrency)}<br/>
+                            ${t("project_tabs:labor")}: ${format(project.labor_cost, displayCurrency)}<br/>
+                            ${t("project_tabs:equipment")}: ${format(project.equipment_cost, displayCurrency)}<br/>
+                            ${t("project_tabs:additional")}: ${format(project.additional_cost, displayCurrency)}<br/>
+                            <strong>${t("common:total")}: ${format(project.total_cost, displayCurrency)}</strong>
+                          </div>
+                        `;
                       },
                     },
-                  },
+                    legend: {
+                      data: [
+                        t("project_tabs:materials"),
+                        t("project_tabs:labor"),
+                        t("project_tabs:equipment"),
+                        t("project_tabs:additional"),
+                      ],
+                      bottom: "0%",
+                      textStyle: {
+                        color: theme === "dark" ? "#9CA3AF" : undefined,
+                      },
+                    },
+                    grid: {
+                      left: "3%",
+                      right: "4%",
+                      bottom: "15%",
+                      containLabel: true,
+                    },
+                    xAxis: {
+                      type: "value",
+                      splitLine: {
+                        lineStyle: {
+                          color: theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "#E5E7EB",
+                        },
+                      },
+                      axisLabel: {
+                        color: theme === "dark" ? "#9CA3AF" : undefined,
+                        formatter: (value: number) =>
+                          format(value, displayCurrency, { notation: "compact" }),
+                      },
+                    },
+                    yAxis: {
+                      type: "category",
+                      data: sortedProjects.map((p) => p.name),
+                      axisLabel: {
+                        color: theme === "dark" ? "#9CA3AF" : undefined,
+                        formatter: (value: string) => {
+                          return value.length > 20
+                            ? value.substring(0, 17) + "..."
+                            : value;
+                        },
+                      },
+                    },
                   series: [
                     {
                       name: t("project_tabs:materials"),

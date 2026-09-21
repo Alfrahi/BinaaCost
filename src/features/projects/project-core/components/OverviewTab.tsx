@@ -20,6 +20,7 @@ import {
   prepareProjectChartData,
   getPieChartOptions,
 } from "@/shared/logic/analytics";
+import { useTheme } from "@/app/providers/ThemeContext";
 import ReactECharts from "echarts-for-react";
 import LoadingState from "@/shared/components/ui/LoadingState";
 
@@ -46,6 +47,7 @@ interface OverviewTabProps {
 }
 
 export default React.memo(function OverviewTab(props: OverviewTabProps) {
+  const { theme } = useTheme();
   const {
     project,
     sizeUnits,
@@ -202,7 +204,7 @@ export default React.memo(function OverviewTab(props: OverviewTabProps) {
               >
                 <LazyChartContainer>
                   <div dir="ltr" className="h-[220px] w-full">
-                    <ReactECharts
+                    <ReactECharts theme={theme === "dark" ? "dark" : undefined}
                       option={pieChartOptions}
                       style={{ height: "100%", width: "100%" }}
                     />
