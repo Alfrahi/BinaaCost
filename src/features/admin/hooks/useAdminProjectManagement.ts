@@ -139,9 +139,20 @@ export function useAdminProjectManagement() {
     }) => {
       await pb.collection("projects").update(projectId, { user_id: newUserId });
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       void toast.success(t("admin:projects.successOwnershipTransferred"));
-      queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+      if (variables?.projectId) {
+        void queryClient.invalidateQueries({ queryKey: ["project", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["project_groups", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["materials", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["labor_items", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["equipment_items", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["additional_costs", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["risks", variables.projectId] });
+        void queryClient.invalidateQueries({ queryKey: ["project_versions", variables.projectId] });
+      }
     },
     onError: (error: Error) => {
       void toast.error(
