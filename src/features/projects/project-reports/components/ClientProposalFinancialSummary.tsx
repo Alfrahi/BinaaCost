@@ -74,64 +74,64 @@ export const ClientProposalFinancialSummary: React.FC<ClientProposalFinancialSum
       <Table className="w-full text-sm mb-8">
         <TableBody>
           <TableRow className="border-t border-border">
-            <TableCell className="text-foreground font-medium">
+            <TableCell className="text-foreground font-medium px-3 py-2 text-xs">
               {t("project_tabs:materials")}
             </TableCell>
-            <TableCell className="text-end tabular-nums text-foreground">
+            <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
               {formatCurrency(materialsAllocated, project.currency)}
             </TableCell>
           </TableRow>
           <TableRow className="border-t border-border">
-            <TableCell className="text-foreground font-medium">
+            <TableCell className="text-foreground font-medium px-3 py-2 text-xs">
               {t("project_tabs:labor")}
             </TableCell>
-            <TableCell className="text-end tabular-nums text-foreground">
+            <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
               {formatCurrency(laborAllocated, project.currency)}
             </TableCell>
           </TableRow>
           <TableRow className="border-t border-border">
-            <TableCell className="text-foreground font-medium">
+            <TableCell className="text-foreground font-medium px-3 py-2 text-xs">
               {t("project_tabs:equipment")}
             </TableCell>
-            <TableCell className="text-end tabular-nums text-foreground">
+            <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
               {formatCurrency(equipmentAllocated, project.currency)}
             </TableCell>
           </TableRow>
           {additionalAllocated > 0 && (
             <TableRow className="border-t border-border">
-              <TableCell className="text-foreground font-medium">
+              <TableCell className="text-foreground font-medium px-3 py-2 text-xs">
                 {t("project_tabs:additional")}
               </TableCell>
-              <TableCell className="text-end tabular-nums text-foreground">
+              <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
                 {formatCurrency(additionalAllocated, project.currency)}
               </TableCell>
             </TableRow>
           )}
           <TableRow className="bg-muted border-t border-border">
-            <TableCell className="font-semibold uppercase text-foreground">
+            <TableCell className="font-semibold uppercase text-foreground px-3 py-2 text-xs">
               {t("project_reports:subtotal")}
             </TableCell>
-            <TableCell className="text-end font-bold tabular-nums text-foreground">
+            <TableCell className="text-end font-bold tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
               {formatCurrency(financials.bidPrice, project.currency)}
             </TableCell>
           </TableRow>
           {financials.taxAmount > 0 && (
             <TableRow className="border-t border-border">
-              <TableCell className="text-foreground">
+              <TableCell className="text-foreground px-3 py-2 text-xs">
                 {t("project_detail:profit_pricing.taxesWithPercent", {
                   percent: taxPercent,
                 })}
               </TableCell>
-              <TableCell className="text-end tabular-nums text-foreground">
+              <TableCell className="text-end tabular-nums text-foreground whitespace-nowrap px-3 py-2 text-xs">
                 {formatCurrency(financials.taxAmount, project.currency)}
               </TableCell>
             </TableRow>
           )}
           <TableRow className="bg-primary text-primary-foreground">
-            <TableCell className="text-lg font-bold uppercase">
+            <TableCell className="text-base font-bold uppercase px-3 py-2.5">
               {t("project_reports:totalProjectPrice")}
             </TableCell>
-            <TableCell className="text-end text-lg font-bold tabular-nums">
+            <TableCell className="text-end text-base font-bold tabular-nums whitespace-nowrap px-3 py-2.5">
               {formatCurrency(financials.grandTotal, project.currency)}
             </TableCell>
           </TableRow>

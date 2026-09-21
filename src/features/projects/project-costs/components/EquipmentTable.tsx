@@ -55,19 +55,19 @@ export function EquipmentTable({
           key: "name",
           label: t("columns.name"),
           align: "start",
-          minWidth: "150px",
+          minWidth: "110px",
         },
         {
           key: "type",
           label: t("columns.type"),
           align: "start",
-          minWidth: "100px",
+          minWidth: "80px",
         },
         {
           key: "rental_or_purchase",
           label: t("columns.rentalPurchase"),
           align: "start",
-          minWidth: "120px",
+          minWidth: "80px",
           format: (value: string) =>
             rentalOptions.find((opt) => opt.value === value)?.label || value,
         },
@@ -75,14 +75,14 @@ export function EquipmentTable({
           key: "quantity",
           label: t("columns.quantity"),
           align: "end",
-          minWidth: "100px",
+          minWidth: "60px",
         },
         {
           key: "cost_per_period",
           label: t("columns.costPerPeriod"),
           align: "end",
           isCurrency: true,
-          minWidth: "120px",
+          minWidth: "100px",
           format: (value: number) =>
             format(value, currency) +
             (value &&
@@ -95,7 +95,7 @@ export function EquipmentTable({
           key: "period_unit",
           label: t("columns.periodUnit"),
           align: "start",
-          minWidth: "100px",
+          minWidth: "60px",
           format: (value: string) =>
             periodUnits.find((u) => u.value === value)?.label || value,
         },
@@ -103,14 +103,14 @@ export function EquipmentTable({
           key: "usage_duration",
           label: t("columns.usageDuration"),
           align: "end",
-          minWidth: "100px",
+          minWidth: "70px",
         },
         {
           key: "maintenance_cost",
           label: t("columns.maintenanceLumpSum"),
           align: "end",
           isCurrency: true,
-          minWidth: "100px",
+          minWidth: "70px",
           format: (value: number) => format(value, currency),
         },
         {
@@ -118,14 +118,14 @@ export function EquipmentTable({
           label: t("columns.fuelLumpSum"),
           align: "end",
           isCurrency: true,
-          minWidth: "100px",
+          minWidth: "70px",
           format: (value: number) => format(value, currency),
         },
         {
           key: "total",
           label: t("columns.estTotalCost"),
           align: "end",
-          minWidth: "120px",
+          minWidth: "90px",
           format: (_, row: EquipmentItem) => {
             const { baseCost } = calculateItemCost.equipment({
               quantity: row.quantity,

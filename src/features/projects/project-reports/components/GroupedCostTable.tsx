@@ -9,6 +9,7 @@ import {
   TableFooter,
 } from "@/shared/components/ui/table";
 import { ALIGN_CLASS } from "@/shared/components/ui/data-table";
+import { cn } from "@/shared/lib/utils";
 import { calculateItemCost, calculateCategoryTotal } from "@/shared/logic/shared";
 import { ProjectGroup } from "@/features/projects/project-core/types/project";
 
@@ -56,16 +57,29 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
       <Table className="w-full text-sm">
         <TableHeader>
           <TableRow className="bg-muted">
-            {columns.map((col) => (
-              <TableHead
-                key={col.key}
-                className={`${ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")]} text-xs font-medium text-muted-foreground uppercase`}
-              >
-                {col.label}
-              </TableHead>
-            ))}
-            <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase">
-              {t("common:total")} ({currency})
+            {columns.map((col) => {
+              const isDescription = col.key === "description";
+              const isEquipmentName = itemType === "equipment" && col.key === "name";
+
+              return (
+                <TableHead
+                  key={col.key}
+                  className={cn(
+                    ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")],
+                    !isDescription && !isEquipmentName && "whitespace-nowrap",
+                    isDescription && "min-w-[140px]",
+                    isEquipmentName && "w-[110px] min-w-[90px] max-w-[130px] whitespace-normal break-words",
+                    "text-xs font-medium text-muted-foreground uppercase px-2 py-2 h-9",
+                  )}
+                >
+                  {col.label}
+                </TableHead>
+              );
+            })}
+            <TableHead className="text-end text-xs font-medium text-muted-foreground uppercase whitespace-nowrap px-2 py-2 h-9">
+              {itemType === "equipment"
+                ? `${t("project_equipment:columns.estTotalCost", "Est. Total")} (${currency})`
+                : `${t("common:total")} (${currency})`}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -76,7 +90,7 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
                 <TableRow className="bg-muted">
                   <TableCell
                     colSpan={columns.length + 1}
-                    className="font-semibold text-foreground text-start"
+                    className="font-semibold text-foreground text-start px-2 py-2 text-xs"
                   >
                     {groups.find((g) => g.id === groupId)?.name}
                   </TableCell>
@@ -120,10 +134,20 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
                   >
                     {columns.map((col) => {
                       const isEndAligned = col.align === "end" || col.isCurrency;
+                      const isDescription = col.key === "description";
+                      const isEquipmentName = itemType === "equipment" && col.key === "name";
+
                       return (
                         <TableCell
                           key={col.key}
-                          className={`${ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")]} ${isEndAligned ? "tabular-nums" : ""} text-foreground`}
+                          className={cn(
+                            ALIGN_CLASS[col.align || (col.isCurrency ? "end" : "start")],
+                            isEndAligned && "tabular-nums",
+                            !isDescription && !isEquipmentName && "whitespace-nowrap",
+                            isDescription && "min-w-[140px]",
+                            isEquipmentName && "w-[110px] min-w-[90px] max-w-[130px] whitespace-normal break-words",
+                            "text-foreground px-2 py-2 text-xs",
+                          )}
                         >
                           {col.isCurrency
                             ? formatCurrency(item[col.key], currency)
@@ -141,11 +165,19 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
                                       "additional_cost_category",
                                       item[col.key],
                                     )
-                                  : item[col.key] || t("common:notSpecified")}
+                                  : col.key === "rental_or_purchase"
+                                    ? getOptionLabel(
+                                        "rental_or_purchase",
+                                        item[col.key],
+                                      ) ||
+                                      (item[col.key]?.toLowerCase() === "purchase"
+                                        ? t("project_equipment:columns.Purchase", "Purchase")
+                                        : t("project_equipment:columns.Rental", "Rental"))
+                                    : item[col.key] || t("common:notSpecified")}
                         </TableCell>
                       );
                     })}
-                    <TableCell className="text-end font-medium tabular-nums text-foreground">
+                    <TableCell className="text-end font-medium tabular-nums text-foreground whitespace-nowrap px-2 py-2 text-xs">
                       {formatCurrency(itemTotal, currency)}
                     </TableCell>
                   </TableRow>
@@ -157,7 +189,7 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
             <TableRow>
               <TableCell
                 colSpan={columns.length + 1}
-                className="text-center text-muted-foreground py-4"
+                className="text-center text-muted-foreground py-3 text-xs"
               >
                 {t("common:noItems")}
               </TableCell>
@@ -168,11 +200,11 @@ export const GroupedCostTable = React.memo<GroupedCostTableProps>(({
           <TableRow className="bg-muted">
             <TableCell
               colSpan={columns.length}
-              className="text-end font-semibold uppercase text-foreground"
+              className="text-end font-semibold uppercase text-foreground whitespace-nowrap px-2 py-2 text-xs"
             >
               {t("common:subtotal")}
             </TableCell>
-            <TableCell className="text-end font-bold tabular-nums text-foreground">
+            <TableCell className="text-end font-bold tabular-nums text-foreground whitespace-nowrap px-2 py-2 text-xs">
               {formatCurrency(
                 calculateCategoryTotal[itemType](items as any),
                 currency,

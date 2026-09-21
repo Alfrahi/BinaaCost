@@ -45,20 +45,48 @@ describe("usePdfExport", () => {
 
     expect(options.filename).toBe("TestProject_Detailed_Cost_Report.pdf");
     expect(options.overrides?.canvas?.backgroundColor).toBe("#ffffff");
+    expect(options.overrides?.canvas?.windowWidth).toBe(1200);
     expect(typeof options.overrides?.canvas?.onclone).toBe("function");
 
     // Test onclone function
     const mockDoc = document.implementation.createHTMLDocument();
     mockDoc.documentElement.classList.add("dark");
     mockDoc.body.classList.add("dark");
-    const innerDarkEl = mockDoc.createElement("div");
-    innerDarkEl.classList.add("dark");
-    mockDoc.body.appendChild(innerDarkEl);
+
+    const ancestor = mockDoc.createElement("div");
+    ancestor.style.maxHeight = "600px";
+    ancestor.style.overflow = "hidden";
+    mockDoc.body.appendChild(ancestor);
+
+    const reportRoot = mockDoc.createElement("div");
+    reportRoot.setAttribute("data-report-root", "true");
+    reportRoot.classList.add("dark");
+    ancestor.appendChild(reportRoot);
+
+    const tableWrapper = mockDoc.createElement("div");
+    tableWrapper.classList.add("overflow-x-auto");
+    reportRoot.appendChild(tableWrapper);
+
+    const tableEl = mockDoc.createElement("table");
+    reportRoot.appendChild(tableEl);
 
     options.overrides.canvas.onclone(mockDoc);
 
     expect(mockDoc.documentElement.classList.contains("dark")).toBe(false);
     expect(mockDoc.body.classList.contains("dark")).toBe(false);
-    expect(innerDarkEl.classList.contains("dark")).toBe(false);
+    expect(reportRoot.classList.contains("dark")).toBe(false);
+
+    expect(mockDoc.documentElement.style.width).toBe("1120px");
+    expect(mockDoc.body.style.width).toBe("1120px");
+    expect(reportRoot.style.width).toBe("1120px");
+    expect(reportRoot.style.minWidth).toBe("1120px");
+    expect(reportRoot.style.backgroundColor).toBe("rgb(255, 255, 255)");
+    expect(ancestor.style.maxHeight).toBe("none");
+    expect(ancestor.style.overflow).toBe("visible");
+    expect(ancestor.style.width).toBe("1120px");
+    expect(tableWrapper.style.overflow).toBe("visible");
+    expect(tableWrapper.style.width).toBe("100%");
+    expect(tableEl.style.width).toBe("100%");
+    expect(tableEl.style.tableLayout).toBe("auto");
   });
 });
