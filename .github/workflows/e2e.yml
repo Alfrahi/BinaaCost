@@ -33,6 +33,9 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Setup environment variables
+        run: cp .env.example .env
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
