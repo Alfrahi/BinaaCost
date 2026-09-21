@@ -101,6 +101,7 @@ export default function ProfitPricingSummaryCard({
             riskContingencyAmount: financials.riskContingencyAmount,
             primeCost: financials.primeCost,
             markupAmount: financials.markupAmount,
+            grossMarginPercent: financials.grossMarginPercent,
             bidPrice: financials.bidPrice,
             taxAmount: financials.taxAmount,
             grandTotal: financials.grandTotal,

@@ -10,6 +10,7 @@
   "grandTotal": "Grand Total",
   "directCosts": "Direct Costs",
   "profit": "Profit",
+  "grossMarginHint": "{{percent}}% Gross Margin",
   "costBreakdown": "Cost Breakdown",
   "attention": "Needs Attention",
   "allGood": "Nothing needs attention.",

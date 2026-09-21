@@ -89,3 +89,41 @@ export function DefaultAssumptionsWarning({ project }: WarningProps) {
     </Alert>
   );
 }
+
+interface IncompleteWarningProps {
+  count: number;
+}
+
+export function IncompleteItemsWarning({ count }: IncompleteWarningProps) {
+  const { t } = useTranslation(["project_reports", "common"]);
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed || count <= 0) {
+    return null;
+  }
+
+  const rawText = t("project_reports:incompleteItemsWarning", { count });
+  const message = typeof rawText === "string" ? rawText : `${count} items have missing or zero cost data`;
+
+  return (
+    <Alert
+      data-testid="incomplete-items-warning"
+      className="border-amber-500/50 bg-amber-500/10 text-start"
+    >
+      <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+      <AlertDescription className="flex items-center justify-between gap-2 text-sm text-amber-900 dark:text-amber-200">
+        <span>{message}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 shrink-0 text-amber-900 dark:text-amber-200 hover:bg-amber-500/20"
+          onClick={() => setDismissed(true)}
+          aria-label={t("common:dismiss")}
+        >
+          <X className="h-4 w-4" aria-hidden="true" />
+        </Button>
+      </AlertDescription>
+    </Alert>
+  );
+}
+

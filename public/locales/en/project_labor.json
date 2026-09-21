@@ -18,7 +18,7 @@
   "workerTypeRequired": "Worker type is required",
   "numWorkersMin": "Number of workers must be at least 1",
   "dailyRateNonNegative": "Daily rate must be non-negative",
-  "totalDaysMin": "Total days must be at least 1",
+  "totalDaysMin": "Total days must be greater than 0",
   "add": "Add labor item",
   "edit": "Edit labor item",
   "tableLabel": "Labor cost table",

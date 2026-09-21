@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { getProbabilityWeight, calculateRiskContingency } from "../risk";
+import {
+  getProbabilityWeight,
+  resolveProbabilityWeight,
+  calculateRiskContingency,
+} from "../risk";
 import { calculateCategoryTotal } from "../shared";
 import { calculateProjectFinancials } from "../financials";
 
@@ -20,11 +24,47 @@ describe("Risk Logic", () => {
     });
   });
 
+  describe("resolveProbabilityWeight", () => {
+    const customOptions = [
+      { value: "very_high", label: "Very High", numeric_value: 0.8 },
+      { value: "منخفض", label: "منخفض", numeric_value: 0.15 },
+      { value: "medium", label: "Medium" }, // without numeric_value
+    ];
+
+    it("uses numeric_value from matching option if available", () => {
+      expect(resolveProbabilityWeight("very_high", customOptions)).toBe(0.8);
+      expect(resolveProbabilityWeight("منخفض", customOptions)).toBe(0.15);
+    });
+
+    it("falls back to standard keyword mapping when option lacks numeric_value", () => {
+      expect(resolveProbabilityWeight("medium", customOptions)).toBe(0.3);
+    });
+
+    it("falls back to standard keyword mapping when option is not found in options array", () => {
+      expect(resolveProbabilityWeight("high", customOptions)).toBe(0.5);
+      expect(resolveProbabilityWeight("low", customOptions)).toBe(0.1);
+    });
+
+    it("works normally when options array is empty or undefined", () => {
+      expect(resolveProbabilityWeight("high")).toBe(0.5);
+      expect(resolveProbabilityWeight("high", [])).toBe(0.5);
+    });
+  });
+
   describe("calculateRiskContingency", () => {
     it("calculates contingency based on impact and probability", () => {
       expect(calculateRiskContingency(1000, "high")).toBe(500);
       expect(calculateRiskContingency(1000, "medium")).toBe(300);
       expect(calculateRiskContingency(1000, "low")).toBe(100);
+    });
+
+    it("calculates contingency using configured option numeric_value", () => {
+      const options = [
+        { value: "critical", label: "Critical", numeric_value: 0.75 },
+        { value: "منخفض", label: "منخفض", numeric_value: 0.15 },
+      ];
+      expect(calculateRiskContingency(1000, "critical", options)).toBe(750);
+      expect(calculateRiskContingency(2000, "منخفض", options)).toBe(300);
     });
   });
 

@@ -21,6 +21,11 @@ describe("Cost Calculations", () => {
       expect(calculateItemCost.labor(5, 100, 10)).toBe(5000);
     });
 
+    it("handles decimal days (e.g. half-day tasks)", () => {
+      expect(calculateItemCost.labor(2, 500, 0.5)).toBe(500); // 2 * 500 * 0.5
+      expect(calculateItemCost.labor(1, 400, 2.75)).toBe(1100);
+    });
+
     it("calculates total", () => {
       const items = [
         { number_of_workers: 1, daily_rate: 1000, total_days: 1 },
@@ -42,6 +47,19 @@ describe("Cost Calculations", () => {
       const result = calculateItemCost.equipment(input);
       expect(result.baseCost).toBe(1000);
       expect(result.totalCost).toBe(1150);
+    });
+
+    it("handles decimal usage duration (Rental)", () => {
+      const input = {
+        quantity: 1,
+        costPerPeriod: 1200,
+        usageDuration: 1.5,
+        maintenanceCost: 100,
+        fuelCost: 50,
+      };
+      const result = calculateItemCost.equipment(input);
+      expect(result.baseCost).toBe(1800); // 1 * 1200 * 1.5
+      expect(result.totalCost).toBe(1950); // 1800 + 100 + 50
     });
 
     it("calculates item cost (Purchase - duration is not multiplied)", () => {
