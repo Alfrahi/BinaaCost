@@ -605,4 +605,28 @@ describe("offline queue replay (PocketBase executor)", () => {
       expect(executePbMutation).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe("OFFL-05: 404 on DELETE replay", () => {
+    it("drains DELETE mutation as successful when server returns 404 (already deleted)", async () => {
+      (executePbMutation as any).mockRejectedValueOnce({
+        status: 404,
+        message: "The requested resource wasn't found.",
+      });
+
+      await offlineManager.addMutation({
+        table: "materials",
+        type: "DELETE",
+        payload: { id: "already_deleted_id" },
+        queryKey: ["materials"],
+        userId: "u1",
+      });
+
+      await flush();
+
+      // Mutation must be drained from queue and NOT placed into dead letter queue
+      expect(offlineManager.getQueueSize()).toBe(0);
+      expect(offlineManager.getDeadLetterSize()).toBe(0);
+      expect(executePbMutation).toHaveBeenCalledTimes(1);
+    });
+  });
 });
