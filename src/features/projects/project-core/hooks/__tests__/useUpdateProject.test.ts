@@ -4,6 +4,9 @@ import { useUpdateProject } from "../useUpdateProject";
 
 const mockNavigate = vi.fn();
 const mockMutate = vi.fn();
+const mockInvalidateQueries = vi.fn();
+let lastMutationOptions: any = null;
+let lastCurrencyDialogProps: any = null;
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -50,7 +53,7 @@ vi.mock("@tanstack/react-query", () => ({
     error: null,
   }),
   useQueryClient: () => ({
-    invalidateQueries: vi.fn(),
+    invalidateQueries: mockInvalidateQueries,
   }),
 }));
 
@@ -62,30 +65,38 @@ vi.mock("@/integrations/pocketbase/client", () => ({
 
 vi.mock("@/integrations/pocketbase/hooks/useOfflinePb", () => ({
   useOfflinePb: () => ({
-    useMutation: () => ({
-      mutate: mockMutate,
-      isPending: false,
-      error: null,
-    }),
+    useMutation: (options: any) => {
+      lastMutationOptions = options;
+      return {
+        mutate: mockMutate,
+        isPending: false,
+        error: null,
+      };
+    },
   }),
 }));
 
 vi.mock("../useCurrencyConversionDialog", () => ({
-  useCurrencyConversionDialog: () => ({
-    showCurrencyConversionDialog: false,
-    setShowCurrencyConversionDialog: vi.fn(),
-    pendingNewCurrency: null,
-    originalCurrency: null,
-    isConverting: false,
-    openConversionDialog: vi.fn(),
-    handleConfirmConversion: vi.fn(),
-    handleCancelConversion: vi.fn(),
-  }),
+  useCurrencyConversionDialog: (props: any) => {
+    lastCurrencyDialogProps = props;
+    return {
+      showCurrencyConversionDialog: false,
+      setShowCurrencyConversionDialog: vi.fn(),
+      pendingNewCurrency: null,
+      originalCurrency: null,
+      isConverting: false,
+      openConversionDialog: vi.fn(),
+      handleConfirmConversion: vi.fn(),
+      handleCancelConversion: vi.fn(),
+    };
+  },
 }));
 
 describe("useUpdateProject", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    lastMutationOptions = null;
+    lastCurrencyDialogProps = null;
   });
 
   it("submits updated project details without user_id or updated in the payload", async () => {
@@ -120,5 +131,53 @@ describe("useUpdateProject", () => {
     // user_id and updated MUST NOT be in the mutation payload (SEC-001 immutability & concurrency)
     expect(mutationPayload.user_id).toBeUndefined();
     expect(mutationPayload.updated).toBeUndefined();
+  });
+
+  it("does not invalidate child collections on regular metadata update, but invalidates project and card summary", () => {
+    renderHook(() => useUpdateProject());
+
+    expect(lastMutationOptions).not.toBeNull();
+    lastMutationOptions.onSuccess();
+
+    const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
+      (c) => c[0].queryKey,
+    );
+
+    // Verified invalidations:
+    expect(invalidatedKeys).toContainEqual(["project", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["projectCardSummary", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["myProjects"]);
+    expect(invalidatedKeys).toContainEqual(["sharedProjects"]);
+    expect(invalidatedKeys).toContainEqual(["analytics_projects_data"]);
+
+    // Must NOT invalidate child collections on metadata update
+    expect(invalidatedKeys).not.toContainEqual(["materials", "proj-123"]);
+    expect(invalidatedKeys).not.toContainEqual(["labor_items", "proj-123"]);
+    expect(invalidatedKeys).not.toContainEqual(["equipment_items", "proj-123"]);
+    expect(invalidatedKeys).not.toContainEqual(["additional_costs", "proj-123"]);
+    expect(invalidatedKeys).not.toContainEqual(["risks", "proj-123"]);
+    expect(invalidatedKeys).not.toContainEqual(["project_groups", "proj-123"]);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/projects/proj-123");
+  });
+
+  it("invalidates all child collections when currency conversion is confirmed", async () => {
+    renderHook(() => useUpdateProject());
+
+    expect(lastCurrencyDialogProps).not.toBeNull();
+    await lastCurrencyDialogProps.onConfirmConversion("SAR", { currency: "SAR" });
+
+    const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
+      (c) => c[0].queryKey,
+    );
+
+    expect(invalidatedKeys).toContainEqual(["project", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["materials", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["labor_items", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["equipment_items", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["additional_costs", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["risks", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["projectCardSummary", "proj-123"]);
+    expect(invalidatedKeys).toContainEqual(["analytics_projects_data"]);
   });
 });

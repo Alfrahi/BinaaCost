@@ -89,6 +89,7 @@ export function useProjectVersions(projectId: string) {
     optimisticUpdater: optimisticDeleteUpdater,
     onSuccess: () => {
       toast.success(t("success_deleted"));
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
     },
     onError: (err: any) => handleError(err),
   });
@@ -116,6 +117,7 @@ export function useProjectVersions(projectId: string) {
     onSuccess: () => {
       toast.success(t("success_finalized"));
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
     },
   });
 

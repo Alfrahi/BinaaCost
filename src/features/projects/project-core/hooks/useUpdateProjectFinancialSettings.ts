@@ -27,6 +27,12 @@ export function useUpdateProjectFinancialSettings() {
       queryClient.invalidateQueries({
         queryKey: ["project", variables.projectId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["projectCardSummary", variables.projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["analytics_projects_data"],
+      });
     },
     onError: (err: any) => {
       handleError(err);

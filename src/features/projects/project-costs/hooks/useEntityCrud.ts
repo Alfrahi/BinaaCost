@@ -118,6 +118,7 @@ export function useEntityCrud<T>({
     toast.success(t("common:success"));
     queryClient.invalidateQueries({ queryKey: ["analytics_projects_data"] });
     queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["projectCardSummary", projectId] });
     queryClient.invalidateQueries({ queryKey: queryKey });
   }, [t, queryClient, projectId, queryKey]);
 
