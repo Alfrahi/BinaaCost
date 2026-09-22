@@ -13,6 +13,21 @@ async function api(
   body?: any,
   token?: string,
 ): Promise<{ status: number; json: any }> {
+  if (method === "PATCH" && path.includes("/records/") && body && body.version === undefined) {
+    const getRes = await fetch(`${BASE}${path}`, {
+      method: "GET",
+      headers: {
+        ...(token ? { Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}` } : {}),
+      },
+    });
+    if (getRes.ok) {
+      const existing = await getRes.json();
+      if (existing && existing.version !== undefined) {
+        body.version = existing.version;
+      }
+    }
+  }
+
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers: {
@@ -207,13 +222,13 @@ describe("pocketbase integration", () => {
         await api("DELETE", `/api/collections/labor_items/records/${i.id}`, undefined, tok);
       }
 
-      // items with awkward decimals — exact equality, not approximate
+      // items with awkward decimals — exact equality, not approximate (now using cents)
       await api("POST", "/api/collections/materials/records",
-        { project_id: pid, user_id: uid, name: "AwkM1", quantity: 3, unit: "kg", unit_price: 33.335 }, tok);
+        { project_id: pid, user_id: uid, name: "AwkM1", quantity: 3, unit: "kg", unit_price: 3334 }, tok);
       await api("POST", "/api/collections/materials/records",
-        { project_id: pid, user_id: uid, name: "AwkM2", quantity: 0.1, unit: "kg", unit_price: 0.2 }, tok);
+        { project_id: pid, user_id: uid, name: "AwkM2", quantity: 0.1, unit: "kg", unit_price: 20 }, tok);
       await api("POST", "/api/collections/labor_items/records",
-        { project_id: pid, user_id: uid, worker_type: "Welder", number_of_workers: 1, daily_rate: 33.335, total_days: 2 }, tok);
+        { project_id: pid, user_id: uid, worker_type: "Welder", number_of_workers: 1, daily_rate: 3334, total_days: 2 }, tok);
 
       const r2 = await api("POST", `/api/projects/${pid}/simulate`,
         { scenario: { impact_rules: [] } }, tok);
@@ -223,11 +238,11 @@ describe("pocketbase integration", () => {
       const { calculateProjectFinancials: calc2 } = await import("@/shared/logic/financials");
       const { calculateCategoryTotal: ct2 } = await import("@/shared/logic/shared");
       const matItems2 = [
-        { quantity: 3, unit_price: 33.335 },
-        { quantity: 0.1, unit_price: 0.2 },
+        { quantity: 3, unit_price: 3334 },
+        { quantity: 0.1, unit_price: 20 },
       ];
       const labItems2 = [
-        { number_of_workers: 1, daily_rate: 33.335, total_days: 2 },
+        { number_of_workers: 1, daily_rate: 3334, total_days: 2 },
       ];
       const expected2 = calc2(
         {
@@ -254,7 +269,7 @@ describe("pocketbase integration", () => {
     });
 
     itLive("FIN-02: simulation applies location_factor and risk contingency correctly", async () => {
-      await api("PATCH", `/api/collections/projects/records/${pid}`, {
+      const patchFin = await api("PATCH", `/api/collections/projects/records/${pid}`, {
         financial_settings: {
           overhead_percent: 10,
           markup_percent: 10,
@@ -264,6 +279,7 @@ describe("pocketbase integration", () => {
           location_factor: 1.20,
         },
       }, tok);
+      expect(patchFin.status).toBe(200);
 
       const m = await api("POST", "/api/collections/materials/records",
         { project_id: pid, user_id: uid, name: "FinMat", quantity: 10, unit: "pc", unit_price: 50 }, tok);
@@ -302,13 +318,14 @@ describe("pocketbase integration", () => {
       expect(simFin.directCosts).toBe(650);
       expect(simFin.locationAdjustmentAmount).toBe(150);
       expect(simFin.overheadAmount).toBe(65);
-      expect(simFin.flatContingencyAmount).toBe(32.5);
+      expect(simFin.flatContingencyAmount).toBe(33);
       expect(simFin.riskContingencyAmount).toBe(300);
-      expect(simFin.contingencyAmount).toBe(332.5);
-      expect(simFin.primeCost).toBe(1047.5);
-      expect(simFin.markupAmount).toBe(104.75);
-      expect(simFin.grandTotal).toBe(1152.25);
-
+      expect(simFin.contingencyAmount).toBe(333);
+      expect(simFin.primeCost).toBe(1048);
+      expect(simFin.markupAmount).toBe(105);
+      expect(simFin.bidPrice).toBe(1153);
+      expect(simFin.taxAmount).toBe(0);
+      expect(simFin.grandTotal).toBe(1153);
       await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
       await api("DELETE", `/api/collections/risks/records/${risk.json.id}`, undefined, tok);
     });
@@ -451,8 +468,8 @@ describe("pocketbase integration", () => {
       expect(data.financials.primeCost).toBe(920);
       expect(data.financials.markupAmount).toBe(184);
       expect(data.financials.bidPrice).toBe(1104);
-      expect(data.financials.taxAmount).toBe(55.2);
-      expect(data.financials.grandTotal).toBe(1159.2);
+      expect(data.financials.taxAmount).toBe(55);
+      expect(data.financials.grandTotal).toBe(1159);
 
       await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
       await api("DELETE", `/api/collections/labor_items/records/${l.json.id}`, undefined, tok);
@@ -558,40 +575,40 @@ describe("pocketbase integration", () => {
       await api("DELETE", `/api/collections/projects/records/${pid2}`, undefined, tok);
     });
 
-    itLive("stale project update (mismatched updated) is rejected with 409", async () => {
+    itLive("stale project update (mismatched version) is rejected with 409", async () => {
       const p = await api("GET", `/api/collections/projects/records/${pid}`, undefined, tok);
-      const currentUpdated = p.json.updated;
+      const currentVersion = p.json.version;
 
-      // first update succeeds (no updated guard sent)
+      // first update succeeds (auto version fetched)
       const ok = await api("PATCH", `/api/collections/projects/records/${pid}`,
         { description: "first" }, tok);
       expect(ok.status).toBe(200);
 
-      // second update with the STALE updated timestamp → 409
+      // second update with the STALE version → 409
       const stale = await api("PATCH", `/api/collections/projects/records/${pid}`,
-        { description: "second", updated: currentUpdated }, tok);
+        { description: "second", version: currentVersion }, tok);
       expect(stale.status).toBe(409);
     });
 
-    itLive("P1-OCC: stale child item update (mismatched updated) is rejected with 409", async () => {
+    itLive("P1-OCC: stale child item update (mismatched version) is rejected with 409", async () => {
       // 1. Create a material
       const m = await api("POST", "/api/collections/materials/records", {
-        project_id: pid, user_id: uid, name: "OccMat", quantity: 1, unit: "pc", unit_price: 10,
+        project_id: pid, user_id: uid, name: "OccMat", quantity: 1, unit: "pc", unit_price: 10, version: 1
       }, tok);
       expect(m.status).toBe(200);
       const matId = m.json.id;
-      const initialUpdated = m.json.updated;
+      const initialVersion = m.json.version;
 
-      // 2. First update succeeds
+      // 2. First update succeeds (auto version)
       const upd1 = await api("PATCH", `/api/collections/materials/records/${matId}`, {
         quantity: 2,
       }, tok);
       expect(upd1.status).toBe(200);
 
-      // 3. Second update sending stale initialUpdated timestamp must fail with 409
+      // 3. Second update sending stale initialVersion must fail with 409
       const staleUpd = await api("PATCH", `/api/collections/materials/records/${matId}`, {
         quantity: 3,
-        updated: initialUpdated,
+        version: initialVersion,
       }, tok);
       expect(staleUpd.status).toBe(409);
 
@@ -1006,7 +1023,7 @@ describe("pocketbase integration", () => {
     });
 
     itLive("admin can list users", async () => {
-      const r = await api("GET", "/api/collections/users/records?perPage=100", undefined, adminTok);
+      const r = await api("GET", "/api/collections/users/records?perPage=500&sort=-created", undefined, adminTok);
       const ids = (r.json.items || []).map((u: any) => u.id);
       expect(ids).toContain(uid);
       expect(ids).toContain(adminUid);

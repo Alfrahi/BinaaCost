@@ -14,6 +14,7 @@ vi.mock("@tanstack/react-query", async () => {
       invalidateQueries: mockInvalidateQueries,
       setQueriesData: mockSetQueriesData,
       cancelQueries: mockCancelQueries,
+      getQueryData: vi.fn().mockReturnValue({ version: 1 }),
     }),
     useMutation: (options: any) => ({
       mutateAsync: vi.fn(async (id: string) => {

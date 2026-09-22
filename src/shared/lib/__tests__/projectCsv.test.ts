@@ -32,13 +32,13 @@ describe("parseAndValidateProjectCsv", () => {
       name: "Concrete",
       quantity: 10,
       unit: "m3",
-      unit_price: 5.5,
+      unit_price: 550,
     });
     expect(parsedData[1]).toMatchObject({
       name: "Steel",
       quantity: 2,
       unit: "kg",
-      unit_price: 100,
+      unit_price: 10000,
     });
   });
 
@@ -89,7 +89,7 @@ describe("parseAndValidateProjectCsv", () => {
     expect(parsedData[0]).toMatchObject({
       name: "Excavator",
       quantity: 1,
-      cost_per_period: 150,
+      cost_per_period: 15000,
       rental_or_purchase: "Rental",
       period_unit: "Day",
       usage_duration: 10,
