@@ -14,6 +14,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
         cleanupOutdatedCaches: true,
         sourcemap: true,
+        navigateFallbackDenylist: [/^\/_/, /^\/api/],
       },
       manifest: {
         name: "BinaaCost",
@@ -60,6 +61,10 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 8080,
+    proxy: {
+      '/api': 'http://127.0.0.1:8090',
+      '/_/': 'http://127.0.0.1:8090',
+    }
   },
   resolve: {
     alias: {

@@ -1,0 +1,36 @@
+services:
+  pocketbase:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: binaacost_pocketbase
+    restart: unless-stopped
+    volumes:
+      # Mount data locally to easily access it for backups
+      - ./pb_data:/pb_data:z
+    command: pocketbase serve --http=0.0.0.0:8090 --dir=/pb_data
+    expose:
+      - "8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: binaacost_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:z
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - pocketbase
+
+volumes:
+  caddy_data:
+  caddy_config:
