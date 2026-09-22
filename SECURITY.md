@@ -30,15 +30,8 @@ The application enforces defense-in-depth security across both client and server
 
 ### Authentication & Sessions
 - User authentication is handled securely by PocketBase using industry-standard password hashing (bcrypt).
-- **Session Protection (HttpOnly Cookies)**: To mitigate XSS token exfiltration, JWT session tokens are **not** stored in `localStorage`. 
-  - A custom PocketBase hook (`pocketbase/pb_hooks/auth_cookie.pb.js`) issues an `HttpOnly`, `Secure` (in production), `SameSite=Strict` cookie (`pb_auth`) upon login.
-  - The frontend uses a custom `CookieAuthStore` that saves only the user metadata to `localStorage` (as `pb_auth_record`) and relies on the browser to automatically transmit the secure cookie via `credentials: 'include'`.
-  - A middleware hook automatically translates the cookie into an `Authorization` header for PocketBase's native auth engine.
+- Session tokens are stored in the PocketBase auth store and attached to requests as Bearer tokens.
 - Authentication changes reactively clear query caches and reset offline queues to prevent cross-account session leaks.
-
-### Content Security & XSS Mitigation
-- A strict Content-Security-Policy (CSP) is enforced via `index.html` to restrict script execution, resource loading, and network connections (`connect-src`), mitigating the impact of Cross-Site Scripting (XSS).
-- During production builds, `'unsafe-inline'` and `'unsafe-eval'` relaxations used for local Vite HMR should be stripped.
 
 ### Authorization & Collection Rules
 - All database collections have strict access rules defined in PocketBase migrations.
