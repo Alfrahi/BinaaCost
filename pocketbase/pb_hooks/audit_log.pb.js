@@ -9,6 +9,19 @@
 // old_data/new_data carry a compact field-diff (only changed keys). Fields
 // are whitelisted per collection to keep rows small; denylisted credential
 // fields are never logged.
+//
+// FIX (2026-09-23): Consolidated audit logging into request hooks only.
+// The previous implementation used onRecordAfterCreateSuccess/UpdateSuccess/
+// DeleteSuccess (model-level hooks) which receive a different event object
+// (core.RecordEvent) that does NOT share e.get()/e.set()/e.auth with the
+// request hooks (core.RecordRequestEvent). This caused:
+//   TypeError: Object has no member 'get'
+// ...which crashed AFTER the DB commit, returning 400 to the client even
+// though the operation actually succeeded.
+//
+// The fix uses only onRecordCreateRequest / onRecordUpdateRequest /
+// onRecordDeleteRequest. Code before e.next() captures old state; e.next()
+// performs the DB operation; code after e.next() logs the audit row.
 
 const TRACKED = {
   projects: ["name", "description", "type", "size", "location", "client_requirements", "duration_days", "size_unit", "duration_unit", "currency", "financial_settings", "deleted_at", "user_id"],
@@ -36,120 +49,73 @@ const TRACKED = {
   app_settings: ["key", "value"],
 };
 
-FIELDS_DENYLIST = ["password","passwordConfirm","oldPassword","token","tokenKey","token_hash","password_hash","verificationToken","verification_token","emailVisibility"];
+var FIELDS_DENYLIST = ["password","passwordConfirm","oldPassword","token","tokenKey","token_hash","password_hash","verificationToken","verification_token","emailVisibility"];
 
-// Build the inline source of one audit row-writer. Every value referenced by
-// the body is either (a) a JS literal baked in here, or (b) a PB runtime
-// global ($app, $newRecord / e.record). Nothing is captured from module
-// scope — PB re-parses the body per request.
-function buildWriteBody(collection, action, fields) {
+// Shared helper source: snapshot whitelisted fields from a record,
+// and write an audit_logs row. Inlined as string literals so each
+// handler body is self-contained (PB JSVM constraint).
+function buildHelpers(collection, fields) {
   const fLit = JSON.stringify(fields);
   const cLit = JSON.stringify(collection);
-  let body = "";
-  body += "var F=" + fLit + ",C=" + cLit + ";\n";
-  body += "function snap(r){var o={};for(var i=0;i<F.length;i++){var k=F[i];";
-  body += "var v=r.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}return o;}\n";
-  body += "function log(rec,od,nd,actorId){try{var c=$app.findCollectionByNameOrId('audit_logs');";
-  body += "var L=new Record(c);L.set('action'," + JSON.stringify(action) + ");";
-  body += "L.set('table_name',C);L.set('record_id',rec.id);";
-  body += "if(od&&Object.keys(od).length)L.set('old_data',od);";
-  body += "if(nd&&Object.keys(nd).length)L.set('new_data',nd);";
-  body += "var u=actorId||(rec.getString?rec.getString('user_id'):'');if(u)L.set('user_id',u);";
-  body += "$app.save(L);}catch(err){";
-  body += "$app.logger().error('audit write failed ('+C+')','err',String(err));}}\n";
-  return body;
+  let src = "";
+  src += "var F=" + fLit + ",C=" + cLit + ";\n";
+  src += "function snap(r){var o={};for(var i=0;i<F.length;i++){var k=F[i];";
+  src += "try{var v=r.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}catch(_){}}return o;}\n";
+  src += "function log(rec,action,od,nd,actorId){try{var c=$app.findCollectionByNameOrId('audit_logs');";
+  src += "var L=new Record(c);L.set('action',action);";
+  src += "L.set('table_name',C);L.set('record_id',rec.id);";
+  src += "if(od&&Object.keys(od).length)L.set('old_data',od);";
+  src += "if(nd&&Object.keys(nd).length)L.set('new_data',nd);";
+  src += "var u=actorId||(rec.getString?rec.getString('user_id'):'');if(u)L.set('user_id',u);";
+  src += "$app.save(L);}catch(err){";
+  src += "$app.logger().error('audit write failed ('+C+')','err',String(err));}}\n";
+  return src;
 }
 
-// before-create: stash actorId from request auth
-function buildBeforeCreate(collection) {
-  const actKey = JSON.stringify("audit_act_create_" + collection + "_");
-  let body = "";
-  body += "var st=e.get('stash')||{};if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;e.set('stash',st);}\n";
+// CREATE handler: runs inside onRecordCreateRequest.
+// After e.next() the record is committed; snapshot and log it.
+function buildCreateHandler(collection, fields) {
+  let body = buildHelpers(collection, fields);
+  body += "var actorId=(e.auth&&e.auth.id)||null;\n";
   body += "e.next();\n";
+  body += "var nd=snap(e.record);log(e.record,'CREATE',null,nd,actorId);\n";
   return new Function("e", body);
 }
 
-// after-create: new_data = snapshot of the created row
-function buildCreate(collection, fields) {
-  let body = buildWriteBody(collection, "CREATE", fields);
-  const actKey = JSON.stringify("audit_act_create_" + collection + "_");
-  body += "var ak=" + actKey + "+e.record.id;var st=e.get('stash')||{};\n";
-  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
-  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
-  body += "var nd=snap(e.record);log(e.record,null,nd,actorId);\n";
+// UPDATE handler: runs inside onRecordUpdateRequest.
+// Before e.next(): fetch the old row from DB for diffing.
+// After e.next(): snapshot new values and log the diff.
+function buildUpdateHandler(collection, fields) {
+  let body = buildHelpers(collection, fields);
+  body += "var actorId=(e.auth&&e.auth.id)||null;\n";
+  body += "var od={};\n";
+  body += "try{var old=$app.findRecordById(" + JSON.stringify(collection) + ",e.record.id);od=snap(old);}catch(_){}\n";
   body += "e.next();\n";
+  body += "var nd={};for(var i=0;i<F.length;i++){var k=F[i];\n";
+  body += "  try{var n=e.record.get(k);var o=od[k];\n";
+  body += "  if(n===undefined){delete od[k];continue;}\n";
+  body += "  if(String(n)===String(o))continue;\n";
+  body += "  nd[k]=n;if(o===undefined)delete od[k];}catch(_){}}\n";
+  body += "log(e.record,'UPDATE',od,nd,actorId);\n";
   return new Function("e", body);
 }
 
-// before-delete: stash actorId from request auth
-function buildBeforeDelete(collection) {
-  const actKey = JSON.stringify("audit_act_del_" + collection + "_");
-  let body = "";
-  body += "var st=e.get('stash')||{};if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;e.set('stash',st);}\n";
+// DELETE handler: runs inside onRecordDeleteRequest.
+// Before e.next(): snapshot the row about to be deleted.
+// After e.next(): log with old_data.
+function buildDeleteHandler(collection, fields) {
+  let body = buildHelpers(collection, fields);
+  body += "var actorId=(e.auth&&e.auth.id)||null;\n";
+  body += "var od=snap(e.record);\n";
   body += "e.next();\n";
+  body += "log(e.record,'DELETE',od,null,actorId);\n";
   return new Function("e", body);
 }
 
-// after-delete: old_data = snapshot of the row just deleted
-function buildDelete(collection, fields) {
-  let body = buildWriteBody(collection, "DELETE", fields);
-  const actKey = JSON.stringify("audit_act_del_" + collection + "_");
-  body += "var ak=" + actKey + "+e.record.id;var st=e.get('stash')||{};\n";
-  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
-  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
-  body += "var od=snap(e.record);log(e.record,od,null,actorId);\n";
-  body += "e.next();\n";
-  return new Function("e", body);
-}
-
-// update-request: stash a snapshot of the STORED row under a namespaced key;
-// onRecordUpdateRequest sees the new values already merged, so the old row
-// must be read via findRecordById before the write commits.
-function buildBeforeUpdate(collection, fields) {
-  const fLit = JSON.stringify(fields);
-  const key = JSON.stringify("audit_old_" + collection + "_");
-  const actKey = JSON.stringify("audit_act_update_" + collection + "_");
-  let body = "";
-  body += "var F=" + fLit + ";\n";
-  body += "var st=e.get('stash')||{};\n";
-  body += "try{var old=$app.findRecordById(" + JSON.stringify(collection) + ",e.record.id);";
-  body += "var o={};for(var i=0;i<F.length;i++){var k=F[i];";
-  body += "var v=old.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}";
-  body += "st[" + key + "+e.record.id]=o;}catch(e2){}\n";
-  body += "if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;}\n";
-  body += "e.set('stash',st);\n";
-  body += "e.next();\n";
-  return new Function("e", body);
-}
-
-// after-update: pull the stashed old snapshot, diff whitelisted fields,
-// log only the changed keys. stale store entries are removed regardless.
-function buildAfterUpdate(collection, fields) {
-  let body = buildWriteBody(collection, "UPDATE", fields);
-  const key = JSON.stringify("audit_old_" + collection + "_");
-  const actKey = JSON.stringify("audit_act_update_" + collection + "_");
-  body += "var sk=" + key + "+e.record.id;var st=e.get('stash')||{};\n";
-  body += "var od=st[sk];delete st[sk];od=od||{};\n";
-  body += "var ak=" + actKey + "+e.record.id;\n";
-  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
-  body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
-  body += "var nd={};for(var i=0;i<F.length;i++){var k=F[i];";
-  body += "var n=e.record.get(k);var o=od[k];";
-  body += "if(n===undefined){delete od[k];continue;}";
-  body += "if(String(n)===String(o))continue;";
-  body += "nd[k]=n;if(o===undefined)delete od[k];}\n";
-  body += "log(e.record,od,nd,actorId);\n";
-  body += "e.next();\n";
-  return new Function("e", body);
-}
-
-// Register the handlers for every tracked collection.
+// Register one request-level handler per (collection, action).
 for (const collection of Object.keys(TRACKED)) {
-  const fields = TRACKED[collection].filter((f) => FIELDS_DENYLIST.indexOf(f) === -1);
-  onRecordCreateRequest(buildBeforeCreate(collection), collection);
-  onRecordUpdateRequest(buildBeforeUpdate(collection, fields), collection);
-  onRecordDeleteRequest(buildBeforeDelete(collection), collection);
-  onRecordAfterCreateSuccess(buildCreate(collection, fields), collection);
-  onRecordAfterUpdateSuccess(buildAfterUpdate(collection, fields), collection);
-  onRecordAfterDeleteSuccess(buildDelete(collection, fields), collection);
+  const fields = TRACKED[collection].filter(function(f) { return FIELDS_DENYLIST.indexOf(f) === -1; });
+  onRecordCreateRequest(buildCreateHandler(collection, fields), collection);
+  onRecordUpdateRequest(buildUpdateHandler(collection, fields), collection);
+  onRecordDeleteRequest(buildDeleteHandler(collection, fields), collection);
 }
