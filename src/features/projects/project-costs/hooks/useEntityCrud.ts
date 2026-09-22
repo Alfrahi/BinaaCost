@@ -52,6 +52,7 @@ export function createOptimisticSingleUpdater<T>(
             : {}),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          version: 1,
         },
       ];
     }

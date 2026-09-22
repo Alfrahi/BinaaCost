@@ -73,7 +73,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
         const currentItem = materials.find((m) => m.id === editingId);
         await updateItem({ id: editingId, ...payload, version: currentItem?.version });
       } else {
-        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
+        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload, version: 1 });
       }
       if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ name: payload.name, description: payload.description ?? "", unit: payload.unit, unit_price: payload.unit_price }, currentCurrency);
@@ -86,7 +86,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
   const handleDuplicate = useCallback(
     (item: MaterialItem) => {
       const { id: _id, created_at: _ca, updated_at: _ua, ...rest } = item;
-      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id });
+      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, version: 1 });
     },
     [addItem, projectId, user?.id],
   );

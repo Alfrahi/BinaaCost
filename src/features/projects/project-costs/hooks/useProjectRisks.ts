@@ -65,6 +65,7 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
                   ),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
+            version: 1,
           },
         ];
       }
@@ -163,6 +164,7 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
         impact_amount: values.impact_amount,
         mitigation_plan: sanitizeText(values.mitigation_plan),
         contingency_amount: values.contingency_amount,
+        version: 1,
       });
     },
     [addRisk, projectId, user?.id, t],

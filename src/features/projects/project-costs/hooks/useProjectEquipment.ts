@@ -85,7 +85,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
         const currentItem = equipment.find((e) => e.id === editingId);
         await updateItem({ id: editingId, ...payload, version: currentItem?.version });
       } else {
-        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
+        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload, version: 1 });
       }
       if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ name: payload.name, type: payload.type, rental_or_purchase: payload.rental_or_purchase, cost_per_period: payload.cost_per_period, period_unit: payload.period_unit }, currentCurrency);
@@ -98,7 +98,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
   const handleDuplicate = useCallback(
     (item: EquipmentItem) => {
       const { id: _id, total_cost: _tc, created_at: _ca, updated_at: _ua, ...rest } = item;
-      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id });
+      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, version: 1 });
     },
     [addItem, projectId, user?.id],
   );

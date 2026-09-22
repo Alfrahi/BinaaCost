@@ -55,6 +55,7 @@ export function useProjectGroupsManager(
             id: variables.id || crypto.randomUUID(),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
+            version: 1,
           },
         ];
       }
@@ -84,6 +85,7 @@ export function useProjectGroupsManager(
         user_id: user?.id,
         name: sanitizeText(name),
         sort_order: groups.length,
+        version: 1,
       });
     },
     onMutate: async (name) => {
@@ -97,6 +99,7 @@ export function useProjectGroupsManager(
             project_id: projectId,
             user_id: user?.id,
             sort_order: old?.length || 0,
+            version: 1,
           },
           "INSERT",
         ),

@@ -64,6 +64,7 @@ export function useCreateProject() {
             ...variables,
             id: variables.id || crypto.randomUUID(),
             created_at: new Date().toISOString(),
+            version: 1,
           },
         ],
         count: oldCount + 1,
@@ -120,6 +121,7 @@ export function useCreateProject() {
           tax_percent: defaults?.tax_percent ?? 0,
           contingency_percent: defaults?.contingency_percent ?? 5,
         },
+        version: 1,
       };
 
       createProjectMutation.mutate(projectData);

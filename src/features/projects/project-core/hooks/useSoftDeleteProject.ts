@@ -9,8 +9,10 @@ export function useSoftDeleteProject() {
 
   const softDeleteMutation = useMutation({
     mutationFn: async (projectId: string) => {
+      const cachedProject = queryClient.getQueryData<any>(["project", projectId]);
       await pb.collection("projects").update(projectId, {
         deleted_at: new Date().toISOString(),
+        version: cachedProject?.version,
       });
     },
     onMutate: async (projectId: string) => {
