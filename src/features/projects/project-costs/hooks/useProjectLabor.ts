@@ -71,7 +71,7 @@ export function useProjectLabor(projectId: string): UseProjectLaborReturn {
         const currentItem = labor.find((l) => l.id === editingId);
         await updateItem({ id: editingId, ...payload, version: currentItem?.version });
       } else {
-        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
+        await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload, version: 1 });
       }
       if (saveToLibrary && currentCurrency) {
         await syncToLibrary({ worker_type: payload.worker_type, daily_rate: payload.daily_rate }, currentCurrency);
@@ -84,7 +84,7 @@ export function useProjectLabor(projectId: string): UseProjectLaborReturn {
   const handleDuplicate = useCallback(
     (item: LaborItem) => {
       const { id: _id, total_cost: _tc, created_at: _ca, updated_at: _ua, ...rest } = item;
-      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id });
+      addItem({ ...rest, id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, version: 1 });
     },
     [addItem, projectId, user?.id],
   );

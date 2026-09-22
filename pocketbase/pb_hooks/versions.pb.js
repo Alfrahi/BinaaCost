@@ -528,6 +528,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
           rec.set(k, g[k]);
         }
       }
+      rec.set("version", 1);
       txApp.save(rec);
       if (g.id) {
         groupIdMap[g.id] = rec.id;
@@ -563,6 +564,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
             rec.set("group_id", "");
           }
         }
+        rec.set("version", 1);
         txApp.save(rec);
       }
     }
@@ -585,6 +587,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
           projectChanged = true;
         }
         if (projectChanged) {
+          pRec.set("version", (Number(pRec.get("version")) || 0) + 1);
           txApp.save(pRec);
         }
       } catch (err) {

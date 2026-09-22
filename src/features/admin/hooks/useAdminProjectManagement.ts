@@ -114,18 +114,21 @@ export function useAdminProjectManagement() {
     },
   });
 
+  const handleError = (error: any) => {
+    void toast.error(error?.message || "An error occurred");
+  };
+
   const restoreProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
-      await pb.collection("projects").update(projectId, { deleted_at: null });
+      const p = await pb.collection("projects").getOne(projectId);
+      await pb.collection("projects").update(projectId, { deleted_at: null, version: p.version });
     },
     onSuccess: () => {
       void toast.success(t("admin:projects.successRestored"));
       queryClient.invalidateQueries({ queryKey: ["admin_projects"] });
     },
-    onError: (error: Error) => {
-      void toast.error(
-        t("admin:projects.errorRestore", { message: error.message }),
-      );
+    onError: (e: any) => {
+      handleError(e);
     },
   });
 
@@ -137,7 +140,8 @@ export function useAdminProjectManagement() {
       projectId: string;
       newUserId: string;
     }) => {
-      await pb.collection("projects").update(projectId, { user_id: newUserId });
+      const p = await pb.collection("projects").getOne(projectId);
+      await pb.collection("projects").update(projectId, { user_id: newUserId, version: p.version });
     },
     onSuccess: (_data, variables) => {
       void toast.success(t("admin:projects.successOwnershipTransferred"));

@@ -71,6 +71,7 @@ export function useProjectAdditionalCosts(
           project_id: projectId,
           user_id: user?.id,
           ...payload,
+          version: 1,
         });
       }
     },
@@ -86,6 +87,7 @@ export function useProjectAdditionalCosts(
         id: crypto.randomUUID(),
         project_id: projectId,
         user_id: user?.id,
+        version: 1,
       });
     },
     [addItem, projectId, user?.id],

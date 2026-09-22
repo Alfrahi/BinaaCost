@@ -71,6 +71,7 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
               existing.set(k, item[k]);
             }
           }
+          existing.set("version", (Number(existing.get("version")) || 0) + 1);
           txApp.save(existing);
           updated += 1;
         } else {
@@ -86,6 +87,7 @@ routerAdd("POST", "/api/import/cost_database_items", (e) => {
             rec.set(k, item[k]);
           }
         }
+        rec.set("version", 1);
         txApp.save(rec);
         inserted += 1;
       }

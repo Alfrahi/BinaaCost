@@ -37,6 +37,7 @@ routerAdd("POST", "/api/projects/:id/clone", (c) => {
     newProject.set("financial_settings", source.get("financial_settings"));
     newProject.set("financial_settings_confirmed", source.get("financial_settings_confirmed"));
     newProject.set("user_id", user.id);
+    newProject.set("version", 1);
 
     txApp.save(newProject);
     const newProjectId = newProject.id;
@@ -53,6 +54,7 @@ routerAdd("POST", "/api/projects/:id/clone", (c) => {
       newGroup.set("sort_order", group.get("sort_order"));
       newGroup.set("project_id", newProjectId);
       newGroup.set("user_id", user.id);
+      newGroup.set("version", 1);
       txApp.save(newGroup);
       groupMap[group.id] = newGroup.id;
     }
@@ -79,6 +81,7 @@ routerAdd("POST", "/api/projects/:id/clone", (c) => {
         newItem.set("group_id", oldGroupId ? (groupMap[oldGroupId] || "") : "");
         newItem.set("project_id", newProjectId);
         newItem.set("user_id", user.id);
+        newItem.set("version", 1);
         txApp.save(newItem);
       }
     }

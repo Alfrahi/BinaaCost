@@ -93,12 +93,14 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
           const base = r2(qty * costPerPeriod * duration);
           row.set("total_cost", r2(base + maintenance + fuel));
         }
+        row.set("version", (Number(row.get("version")) || 0) + 1);
         txApp.save(row);
       }
     }
 
     const p = txApp.findRecordById("projects", projectId);
     p.set("currency", newCurrency);
+    p.set("version", (Number(p.get("version")) || 0) + 1);
     txApp.save(p);
   });
 

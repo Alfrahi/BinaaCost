@@ -68,4 +68,8 @@ function makeConcurrencyHandler(collName) {
 
 for (const collName of CONCURRENCY_COLLECTIONS) {
   onRecordUpdateRequest(makeConcurrencyHandler(collName), collName);
+  onRecordCreateRequest((e) => {
+    e.record.set("version", 1);
+    e.next();
+  }, collName);
 }
