@@ -659,14 +659,9 @@ class OfflineManager {
           continue;
         }
 
-        // OFFL-05: If a DELETE (or BULK_DELETE) operation fails with 404 / Not Found,
-        // the record was already deleted on the server (by another user, cascading deletion,
-        // or a prior successful attempt). Treat as successful idempotent deletion and drain
-        // instead of dead-lettering.
-        if (
-          (mutation.type === "DELETE" || mutation.type === "BULK_DELETE") &&
-          isRecordNotFoundError(err)
-        ) {
+        // OFFL-05: If a DELETE operation fails with 404 / Not Found,
+        // the record was already deleted on the server. Treat as successful.
+        if (mutation.type === "DELETE" && isRecordNotFoundError(err)) {
           console.log(
             "Record already deleted on server (404 on DELETE):",
             mutation.id,
@@ -687,6 +682,36 @@ class OfflineManager {
             }
           }
           continue;
+        }
+
+        if (mutation.type === "BULK_DELETE" && isRecordNotFoundError(err)) {
+          const urlStr = typeof err === "object" && err !== null ? String((err as any).url || "") : "";
+          const failedId = urlStr.split("/").filter(Boolean).pop();
+          if (failedId && Array.isArray(actualPayload)) {
+            const remaining = actualPayload.filter((id) => id !== failedId);
+            if (remaining.length < actualPayload.length) {
+              if (remaining.length === 0) {
+                console.log("All items in BULK_DELETE already deleted (404):", mutation.id);
+                successfulMutations++;
+                this.queue = this.queue.filter((q) => q.id !== mutation.id);
+                if (this.queryClient) {
+                  await this.queryClient.invalidateQueries({ queryKey: mutation.queryKey });
+                }
+                continue;
+              }
+              console.log(`Partial 404 on BULK_DELETE, removed ${failedId}, retrying remainder:`, mutation.id);
+              mutation.payload = remaining;
+              mutation.retries = Math.max(0, mutation.retries - 1);
+              failedAttempts.push(mutation);
+              this.emitSyncEvent({ type: "mutation_retrying", mutationId: mutation.id });
+              
+              const remainingIndex = currentQueue.indexOf(mutation) + 1;
+              for (let r = remainingIndex; r < currentQueue.length; r++) {
+                failedAttempts.push(currentQueue[r]);
+              }
+              break;
+            }
+          }
         }
 
         // OFFL-04: If this was a network disconnection / transient error during replay,
@@ -717,13 +742,20 @@ class OfflineManager {
         } else {
           failedAttempts.push(mutation);
           this.emitSyncEvent({ type: "mutation_retrying", mutationId: mutation.id });
+          
+          const remainingIndex = currentQueue.indexOf(mutation) + 1;
+          for (let r = remainingIndex; r < currentQueue.length; r++) {
+            failedAttempts.push(currentQueue[r]);
+          }
+          break;
         }
       }
     }
 
-    this.queue = this.queue
-      .filter((q) => !currentQueue.some((cq) => cq.id === q.id))
-      .concat(failedAttempts);
+    this.queue = [
+      ...failedAttempts,
+      ...this.queue.filter((q) => !currentQueue.some((cq) => cq.id === q.id))
+    ];
 
     if (successfulMutations > 0) {
       this.lastSyncedAt = new Date().toISOString();
@@ -735,7 +767,8 @@ class OfflineManager {
       this.emitSyncEvent({ type: "sync_success", count: successfulMutations });
     }
     if (failedAttempts.length > 0) {
-      this.emitSyncEvent({ type: "sync_partial_failure", failedCount: failedAttempts.length });
+      const actualFailures = failedAttempts.filter(m => m.error).length || 1;
+      this.emitSyncEvent({ type: "sync_partial_failure", failedCount: actualFailures });
     }
 
     this.isSyncing = false;
