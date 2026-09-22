@@ -55,7 +55,6 @@ export function AdditionalCostForm({
     defaultValues: {
       category: additionalCategories[0]?.value || "",
       description: undefined,
-      amount: 0,
       group_id: "ungrouped",
       ...editingItem,
       amount: editingItem?.amount !== undefined ? editingItem.amount / 100 : 0,

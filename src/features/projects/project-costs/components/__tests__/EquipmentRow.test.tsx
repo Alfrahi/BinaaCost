@@ -68,7 +68,7 @@ describe("EquipmentRow", () => {
     usage_duration: 10,
     maintenance_cost: 50,
     fuel_cost: 30,
-    total_cost: 3080,
+    total_cost: 3080, version: 1,
   };
 
   const purchaseItem: EquipmentItem = {
@@ -86,7 +86,7 @@ describe("EquipmentRow", () => {
     usage_duration: 1,
     maintenance_cost: 100,
     fuel_cost: 40,
-    total_cost: 5140,
+    total_cost: 5140, version: 1,
   };
 
   it("renders all 12 cells in exact column order for rental equipment", () => {

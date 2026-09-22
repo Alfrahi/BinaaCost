@@ -10,10 +10,10 @@ import type {
 describe("calculatePublicShareFinancials", () => {
   it("calculates totals accurately from items and financial settings", () => {
     const materials: MaterialItem[] = [
-      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 50, unit: "bag", created_at: "", updated_at: "" },
+      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 50, unit: "bag", created_at: "", updated_at: "", version: 1 },
     ];
     const labor: LaborItem[] = [
-      { id: "l1", project_id: "p1", user_id: "u1", worker_type: "Carpenter", number_of_workers: 2, daily_rate: 100, total_days: 5, created_at: "", updated_at: "" },
+      { id: "l1", project_id: "p1", user_id: "u1", worker_type: "Carpenter", number_of_workers: 2, daily_rate: 100, total_days: 5, created_at: "", updated_at: "", version: 1 },
     ];
     const equipment: EquipmentItem[] = [
       {
@@ -29,11 +29,11 @@ describe("calculatePublicShareFinancials", () => {
         fuel_cost: 50,
         period_unit: "day",
         created_at: "",
-        updated_at: "",
+        updated_at: "", version: 1,
       },
     ];
     const additional: AdditionalCostItem[] = [
-      { id: "a1", project_id: "p1", user_id: "u1", description: "Permit", amount: 300, category: "permits", created_at: "", updated_at: "" },
+      { id: "a1", project_id: "p1", user_id: "u1", description: "Permit", amount: 300, category: "permits", created_at: "", updated_at: "", version: 1 },
     ];
 
     const financialSettings = {
@@ -75,7 +75,7 @@ describe("calculatePublicShareFinancials", () => {
         fuel_cost: 50,
         period_unit: "day",
         created_at: "",
-        updated_at: "",
+        updated_at: "", version: 1,
       },
     ];
 
@@ -94,7 +94,7 @@ describe("calculatePublicShareFinancials", () => {
 
   it("safely handles undefined financialSettings without throwing", () => {
     const materials: MaterialItem[] = [
-      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 50, unit: "bag", created_at: "", updated_at: "" },
+      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 50, unit: "bag", created_at: "", updated_at: "", version: 1 },
     ];
     const summary = calculatePublicShareFinancials(
       undefined,
@@ -109,7 +109,7 @@ describe("calculatePublicShareFinancials", () => {
 
   it("includes directCostsBase and locationAdjustmentAmount with location_factor", () => {
     const materials: MaterialItem[] = [
-      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 100, unit: "bag", created_at: "", updated_at: "" },
+      { id: "m1", project_id: "p1", user_id: "u1", name: "Cement", quantity: 10, unit_price: 100, unit: "bag", created_at: "", updated_at: "", version: 1 },
     ];
     const summary = calculatePublicShareFinancials(
       { location_factor: 1.1, overhead_percent: 0, contingency_percent: 0, markup_percent: 0, tax_percent: 0 },

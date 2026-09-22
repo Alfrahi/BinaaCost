@@ -120,6 +120,7 @@ export default function RiskManagementTable({
         mitigation_plan:
           values.mitigation_plan === "" ? null : (values.mitigation_plan ?? null),
         contingency_amount: values.contingency_amount,
+        version: editingItem ? editingItem.version : 1,
       };
 
       if (editingItem) {

@@ -78,7 +78,6 @@ export function MaterialForm({
       description: undefined,
       quantity: 0,
       unit: materialUnits[0]?.value || "",
-      unit_price: 0,
       group_id: "ungrouped",
       ...defaultValues,
       unit_price: defaultValues?.unit_price !== undefined ? defaultValues.unit_price / 100 : 0,

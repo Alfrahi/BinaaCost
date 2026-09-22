@@ -92,7 +92,7 @@ export function useProjectEquipment(projectId: string): UseProjectEquipmentRetur
         queryClient.invalidateQueries({ queryKey: ["library_equipment"] });
       }
     },
-    [addItem, updateItem, projectId, user?.id, syncToLibrary, queryClient],
+    [addItem, updateItem, projectId, user?.id, syncToLibrary, queryClient, equipment],
   );
 
   const handleDuplicate = useCallback(
