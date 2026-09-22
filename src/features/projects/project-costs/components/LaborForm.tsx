@@ -66,6 +66,7 @@ export function LaborForm({
       total_days: 1,
       group_id: "ungrouped",
       ...defaultValues,
+      daily_rate: defaultValues?.daily_rate !== undefined ? defaultValues.daily_rate / 100 : 0,
     },
   });
 
@@ -164,10 +165,10 @@ export function LaborForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    step="0.01"
+                    id="daily_rate"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
-                    placeholder={t("columns.dailyRatePlaceholder")}
                     aria-label={t("columns.dailyRate")}
                     className="text-sm"
                   />

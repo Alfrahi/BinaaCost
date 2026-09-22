@@ -58,6 +58,7 @@ export function AdditionalCostForm({
       amount: 0,
       group_id: "ungrouped",
       ...editingItem,
+      amount: editingItem?.amount !== undefined ? editingItem.amount / 100 : 0,
     },
   });
 
@@ -140,8 +141,8 @@ export function AdditionalCostForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
                     aria-label={t("columns.amount")}
                     className="text-sm"

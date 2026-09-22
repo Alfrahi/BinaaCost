@@ -80,15 +80,18 @@ export function EquipmentForm({
     defaultValues: {
       name: "",
       type: undefined,
-      rental_or_purchase: rentalOptions[0]?.value || "Rental",
+      rental_or_purchase: "rental",
       quantity: 1,
       cost_per_period: 0,
-      period_unit: periodUnits[0]?.value || "Day",
+      period_unit: "Day",
       usage_duration: 1,
       maintenance_cost: 0,
       fuel_cost: 0,
       group_id: "ungrouped",
       ...defaultValues,
+      cost_per_period: defaultValues?.cost_per_period !== undefined ? defaultValues.cost_per_period / 100 : 0,
+      maintenance_cost: defaultValues?.maintenance_cost !== undefined ? defaultValues.maintenance_cost / 100 : 0,
+      fuel_cost: defaultValues?.fuel_cost !== undefined ? defaultValues.fuel_cost / 100 : 0,
     },
   });
 
@@ -134,7 +137,7 @@ export function EquipmentForm({
             "USD",
             currency,
           );
-          form.setValue("cost_per_period", convertedCost);
+          form.setValue("cost_per_period", convertedCost / 100);
         }
       }
     },
@@ -312,8 +315,8 @@ export function EquipmentForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
                     aria-label={
                       isPurchase
@@ -393,8 +396,8 @@ export function EquipmentForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
                     value={field.value ?? ""}
                     aria-label={t("columns.maintenanceLumpSum")}
@@ -419,8 +422,8 @@ export function EquipmentForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
                     value={field.value ?? ""}
                     aria-label={t("columns.fuelLumpSum")}

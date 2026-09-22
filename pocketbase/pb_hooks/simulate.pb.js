@@ -5,13 +5,12 @@
 
 routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
   // ---- local math helpers (plain JS, round-half-up at 2dp) ----
-  const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
-  const safeAdd = (...args) => r2(args.reduce((s, v) => s + (Number(v) || 0), 0));
-  const safeMult = (...args) => r2(args.reduce((p, v) => p * (Number(v) || 0), 1));
-  const safeDiv = (a, b, decimals = 2) => {
+  const r2 = (n) => Math.round(n);
+  const safeAdd = (...args) => Math.round(args.reduce((s, v) => s + (Number(v) || 0), 0));
+  const safeMult = (...args) => Math.round(args.reduce((p, v) => p * (Number(v) || 0), 1));
+  const safeDiv = (a, b) => {
     if (!b) return 0;
-    const f = Math.pow(10, decimals);
-    return Math.round(((a / b) + Number.EPSILON) * f) / f;
+    return Math.round(a / b);
   };
 
   const itemCost = (coll, item) => {
@@ -47,21 +46,20 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
 
   const runFinancials = (mt, lt, eq, ad, riskItems, s) => {
     if (!s) s = {};
-    const toCents = (n) => Math.round((Number(n) || 0) * 100);
     const locationFactor = Number(s.location_factor) || 1;
-    const mtAdj = r2(mt * locationFactor);
-    const ltAdj = r2(lt * locationFactor);
-    const eqAdj = r2(eq * locationFactor);
+    const mtAdj = Math.round(mt * locationFactor);
+    const ltAdj = Math.round(lt * locationFactor);
+    const eqAdj = Math.round(eq * locationFactor);
 
-    const directC = toCents(mtAdj) + toCents(ltAdj) + toCents(eqAdj) + toCents(ad);
-    const directBaseC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+    const directC = mtAdj + ltAdj + eqAdj + Math.round(ad);
+    const directBaseC = Math.round(mt) + Math.round(lt) + Math.round(eq) + Math.round(ad);
     const locationAdjustmentC = directC - directBaseC;
 
     const overheadC = Math.round(directC * (Number(s.overhead_percent) || 0) / 100);
     const flatContingencyC = Math.round(directC * (Number(s.contingency_percent) || 0) / 100);
 
     const rc = calcRiskContingency(riskItems);
-    const riskContingencyC = toCents(rc);
+    const riskContingencyC = Math.round(rc);
 
     const basis = s.contingency_basis || "flat";
     let contingencyC = flatContingencyC;

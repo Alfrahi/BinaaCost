@@ -9,8 +9,12 @@ export const materialSchema = z.object({
   ),
   unit: z.string().min(1, "project_materials:unitRequired"),
   unit_price: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0.01, "project_materials:priceNonNegative"),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(1, "project_materials:priceNonNegative"),
   ),
   group_id: z.string().optional(),
 });
@@ -25,8 +29,12 @@ export const laborSchema = z.object({
     z.number().int().min(1, "project_labor:numWorkersMin"),
   ),
   daily_rate: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0.01, "project_labor:dailyRateNonNegative"),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(1, "project_labor:dailyRateNonNegative"),
   ),
   total_days: z.preprocess(
     (val) => (val === "" ? undefined : Number(val)),
@@ -46,8 +54,12 @@ export const equipmentSchema = z.object({
     z.number().int().min(1, "project_equipment:quantityMin"),
   ),
   cost_per_period: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0.01, "project_equipment:costNonNegative"),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(1, "project_equipment:costNonNegative"),
   ),
   period_unit: z.string().optional().default("Day"),
   usage_duration: z.preprocess(
@@ -55,12 +67,20 @@ export const equipmentSchema = z.object({
     z.number().min(0.01, "project_equipment:usageDurationMin").optional().default(1),
   ),
   maintenance_cost: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0).optional().default(0),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(0).optional().default(0),
   ),
   fuel_cost: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0).optional().default(0),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(0).optional().default(0),
   ),
   group_id: z.string().optional(),
 }).superRefine((data, ctx) => {
@@ -89,8 +109,12 @@ export const additionalCostSchema = z.object({
   category: z.string().min(1, "project_additional:categoryRequired"),
   description: z.string().optional(),
   amount: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().min(0.01, "project_additional:amountNonNegative"),
+    (val) => {
+      if (val === "" || val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : Math.round(parsed * 100);
+    },
+    z.number().int().min(1, "project_additional:amountNonNegative"),
   ),
   group_id: z.string().optional(),
 });

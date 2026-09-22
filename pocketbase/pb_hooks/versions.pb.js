@@ -52,9 +52,9 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
   }
 
   // HIST-01: Pre-calculate and freeze calculated summaries and financials
-  const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
-  const safeAdd = (...args) => r2(args.reduce((s, v) => s + (Number(v) || 0), 0));
-  const safeMult = (...args) => r2(args.reduce((p, v) => p * (Number(v) || 0), 1));
+  const r2 = (n) => Math.round(n);
+  const safeAdd = (...args) => Math.round(args.reduce((s, v) => s + (Number(v) || 0), 0));
+  const safeMult = (...args) => Math.round(args.reduce((p, v) => p * (Number(v) || 0), 1));
 
   const rawMaterials = snapshot.materials || [];
   const rawLabor = snapshot.labor_items || [];
@@ -133,21 +133,20 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
   }
   if (!fs || typeof fs !== "object") fs = {};
 
-  const toCents = (n) => Math.round((Number(n) || 0) * 100);
   const locationFactor = Number(fs.location_factor) || 1;
-  const mtAdj = r2(mt * locationFactor);
-  const ltAdj = r2(lt * locationFactor);
-  const eqAdj = r2(eq * locationFactor);
+  const mtAdj = Math.round(mt * locationFactor);
+  const ltAdj = Math.round(lt * locationFactor);
+  const eqAdj = Math.round(eq * locationFactor);
 
-  const directC = toCents(mtAdj) + toCents(ltAdj) + toCents(eqAdj) + toCents(ad);
-  const directBaseC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+  const directC = mtAdj + ltAdj + eqAdj + Math.round(ad);
+  const directBaseC = Math.round(mt) + Math.round(lt) + Math.round(eq) + Math.round(ad);
   const overheadC = Math.round(
     (directC * (Number(fs.overhead_percent) || 0)) / 100,
   );
   const flatContingencyC = Math.round(
     (directC * (Number(fs.contingency_percent) || 0)) / 100,
   );
-  const riskContingencyC = toCents(rc);
+  const riskContingencyC = Math.round(rc);
 
   const basis = fs.contingency_basis || "flat";
   let contingencyC = flatContingencyC;
@@ -315,9 +314,9 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       }
     }
 
-    const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
-    const safeAdd = (...args) => r2(args.reduce((s, v) => s + (Number(v) || 0), 0));
-    const safeMult = (...args) => r2(args.reduce((p, v) => p * (Number(v) || 0), 1));
+    const r2 = (n) => Math.round(n);
+    const safeAdd = (...args) => Math.round(args.reduce((s, v) => s + (Number(v) || 0), 0));
+    const safeMult = (...args) => Math.round(args.reduce((p, v) => p * (Number(v) || 0), 1));
 
     const rawMaterials = snap.materials || [];
     const rawLabor = snap.labor_items || [];
@@ -396,21 +395,20 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
     }
     if (!fs || typeof fs !== "object") fs = {};
 
-    const toCents = (n) => Math.round((Number(n) || 0) * 100);
     const locationFactor = Number(fs.location_factor) || 1;
-    const mtAdj = r2(mt * locationFactor);
-    const ltAdj = r2(lt * locationFactor);
-    const eqAdj = r2(eq * locationFactor);
+    const mtAdj = Math.round(mt * locationFactor);
+    const ltAdj = Math.round(lt * locationFactor);
+    const eqAdj = Math.round(eq * locationFactor);
 
-    const directC = toCents(mtAdj) + toCents(ltAdj) + toCents(eqAdj) + toCents(ad);
-    const directBaseC = toCents(mt) + toCents(lt) + toCents(eq) + toCents(ad);
+    const directC = mtAdj + ltAdj + eqAdj + Math.round(ad);
+    const directBaseC = Math.round(mt) + Math.round(lt) + Math.round(eq) + Math.round(ad);
     const overheadC = Math.round(
       (directC * (Number(fs.overhead_percent) || 0)) / 100,
     );
     const flatContingencyC = Math.round(
       (directC * (Number(fs.contingency_percent) || 0)) / 100,
     );
-    const riskContingencyC = toCents(rc);
+    const riskContingencyC = Math.round(rc);
 
     const basis = fs.contingency_basis || "flat";
     let contingencyC = flatContingencyC;
