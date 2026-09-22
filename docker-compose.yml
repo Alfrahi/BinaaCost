@@ -8,7 +8,7 @@ services:
     volumes:
       # Mount data locally to easily access it for backups
       - ./pb_data:/pb_data:z
-    command: pocketbase serve --http=0.0.0.0:8090 --dir=/pb_data
+    command: pocketbase serve --http=0.0.0.0:8090 --dir=/pb_data --publicDir=/app/pb_public --hooksDir=/app/pb_hooks --migrationsDir=/app/pb_migrations
     expose:
       - "8090"
     healthcheck:

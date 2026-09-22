@@ -20,8 +20,9 @@ export function usePublicShare(accessToken?: string) {
   const doFetch = useCallback(
     async (pw: string): Promise<PublicQueryResult> => {
       if (!accessToken) throw new Error("Access token is missing.");
-      const base = import.meta.env.VITE_POCKETBASE_URL;
-      const res = await fetch(`${base}/api/share/${accessToken}`, {
+      const base = import.meta.env.VITE_POCKETBASE_URL || "";
+      const baseUrl = base.replace(/\/+$/, "");
+      const res = await fetch(`${baseUrl}/api/share/${accessToken}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: pw }),
