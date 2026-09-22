@@ -1,8 +1,9 @@
 /// <reference path="../pb_data/types.d.ts" />
-// OCC: optimistic concurrency for projects and child items. The client sends the
-// record's `updated` timestamp it read; if the stored `updated` differs, the
-// write is stale and rejected with 409 so the client can surface a
-// conflict dialog instead of silently overwriting.
+// OCC: strict optimistic concurrency control for projects and child items.
+// The client must submit the 'version' integer it read. The hook checks it
+// and increments it. A SQLite BEFORE UPDATE trigger provides a bulletproof
+// DB-level guarantee that NEW.version == OLD.version + 1. If it mismatches,
+// the client receives a 409 Conflict.
 
 const CONCURRENCY_COLLECTIONS = [
   "projects",
@@ -28,10 +29,16 @@ function makeConcurrencyHandler(collName) {
     "e",
     `
     var body = e.requestInfo().body || {};
-    var supplied = body.updated;
-    if (supplied == null || supplied === "") {
-      e.next();
-      return;
+    var suppliedVersion = body.version;
+
+    // Require the version field for OCC
+    if (suppliedVersion == null || suppliedVersion === "") {
+      throw new ApiError(400, "Missing 'version' field for concurrency check.", {});
+    }
+
+    suppliedVersion = parseInt(suppliedVersion, 10);
+    if (isNaN(suppliedVersion)) {
+      throw new ApiError(400, "Invalid 'version' field.", {});
     }
 
     var stored = null;
@@ -40,15 +47,19 @@ function makeConcurrencyHandler(collName) {
     } catch (_) {
       stored = null;
     }
-    if (!stored) {
-      e.next();
-      return;
+    
+    // If updating an existing record, perform a quick JS-level check
+    // to return a friendly 409 Conflict before the DB trigger catches it.
+    if (stored) {
+      var storedVersion = stored.get("version");
+      if (storedVersion && storedVersion !== suppliedVersion) {
+        throw new ApiError(409, ${msgLit}, {});
+      }
     }
 
-    var storedUpdated = stored.get("updated");
-    if (storedUpdated && storedUpdated !== supplied) {
-      throw new ApiError(409, ${msgLit}, {});
-    }
+    // Increment the version for the update query.
+    // The SQLite BEFORE UPDATE trigger will strictly enforce NEW.version == OLD.version + 1.
+    e.record.set("version", suppliedVersion + 1);
 
     e.next();
   `,
