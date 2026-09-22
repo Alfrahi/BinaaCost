@@ -91,7 +91,7 @@ export default function AuditLogs() {
       const term = search.trim().replace(/"/g, '\\"');
       if (term) {
         parts.push(
-          `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`,
+          `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}" || record_id = "${term}")`,
         );
       }
       if (actionFilter && actionFilter !== "ALL") {
