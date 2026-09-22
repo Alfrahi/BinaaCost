@@ -45,17 +45,20 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Setup & Boot PocketBase
+        run: |
+          wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.21/pocketbase_0.22.21_linux_amd64.zip
+          unzip pocketbase_0.22.21_linux_amd64.zip -d pb_temp
+          cd pocketbase
+          ../pb_temp/pocketbase migrate up
+          ../pb_temp/pocketbase serve &
+          sleep 3
+
       - name: Unit & Integration Tests
         run: pnpm coverage
 
       - name: Build
         run: pnpm build
-
-      - name: Verify PocketBase Migrations
-        run: |
-          cd pocketbase
-          chmod +x ./pocketbase
-          ./pocketbase migrate up
 
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
