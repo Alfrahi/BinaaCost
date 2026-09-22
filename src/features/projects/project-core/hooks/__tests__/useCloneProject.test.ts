@@ -69,6 +69,7 @@ vi.mock("@/integrations/pocketbase/client", () => {
         }
         return collections[name];
       },
+      send: vi.fn(),
     },
   };
 });
@@ -78,116 +79,23 @@ describe("useCloneProject", () => {
     vi.clearAllMocks();
   });
 
-  it("clones project record and copies child items with mapped group IDs", async () => {
-    const sourceProject = {
-      id: "source-proj-1",
-      name: "Villa Construction",
-      description: "2-story villa",
-      type: "Residential",
-      size: 350,
-      size_unit: "sqm",
-      location: "Riyadh",
-      client_requirements: "Fast-track",
-      duration_days: 120,
-      duration_unit: "days",
-      currency: "SAR",
-      financial_settings: { overhead_percent: 10, markup_percent: 15 },
-      financial_settings_confirmed: true,
-      user_id: "other-user",
-    };
-
-    const sourceGroups = [
-      { id: "g1", name: "Foundation", color: "#3b82f6", sort_order: 1 },
-    ];
-    const sourceMaterials = [
-      { id: "m1", name: "Cement", quantity: 100, unit: "bag", unit_price: 15, group_id: "g1" },
-    ];
-    const sourceLabor = [
-      { id: "l1", worker_type: "Mason", number_of_workers: 4, daily_rate: 150, total_days: 10, group_id: "g1" },
-    ];
-    const sourceEquipment = [
-      { id: "e1", name: "Excavator", quantity: 1, cost_per_period: 500, period_unit: "day", usage_duration: 5, rental_or_purchase: "rental", group_id: null },
-    ];
-    const sourceAdditional = [
-      { id: "a1", category: "Permits", amount: 2000, group_id: null },
-    ];
-    const sourceRisks = [
-      { id: "r1", name: "Weather delay", impact_amount: 5000, probability: "medium" },
-    ];
-
-    const projCol = pb.collection("projects") as any;
-    projCol.getOne.mockResolvedValue(sourceProject);
-    projCol.create.mockResolvedValue({ id: "new-proj-999", name: "Villa Construction (Copy)" });
-
-    (pb.collection("project_groups") as any).getFullList.mockResolvedValue(sourceGroups);
-    (pb.collection("project_groups") as any).create.mockResolvedValue({ id: "new-g-1", name: "Foundation" });
-
-    (pb.collection("materials") as any).getFullList.mockResolvedValue(sourceMaterials);
-    (pb.collection("labor_items") as any).getFullList.mockResolvedValue(sourceLabor);
-    (pb.collection("equipment_items") as any).getFullList.mockResolvedValue(sourceEquipment);
-    (pb.collection("additional_costs") as any).getFullList.mockResolvedValue(sourceAdditional);
-    (pb.collection("risks") as any).getFullList.mockResolvedValue(sourceRisks);
+  it("calls the clone endpoint via pb.send", async () => {
+    (pb as any).send.mockResolvedValue({ id: "new-proj-999" });
 
     const { result } = renderHook(() => useCloneProject());
 
     await act(async () => {
-      await result.current.mutate({ projectId: "source-proj-1" });
+      await result.current.mutate({ projectId: "source-proj-1", customName: "My Custom Clone" });
     });
 
-    // Check project creation
-    expect(projCol.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Villa Construction (Copy)",
-        currency: "SAR",
-        location: "Riyadh",
-        user_id: "user-123",
-      }),
-    );
+    expect(pb.send).toHaveBeenCalledWith("/api/projects/source-proj-1/clone", {
+      method: "POST",
+      body: {
+        customName: "My Custom Clone",
+        copySuffix: "Copy",
+      },
+    });
 
-    // Check group creation
-    expect(pb.collection("project_groups").create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Foundation",
-        project_id: "new-proj-999",
-        user_id: "user-123",
-      }),
-    );
-
-    // Check line item mapped group
-    expect(pb.collection("materials").create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Cement",
-        project_id: "new-proj-999",
-        group_id: "new-g-1",
-        user_id: "user-123",
-      }),
-    );
-
-    expect(pb.collection("labor_items").create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        worker_type: "Mason",
-        project_id: "new-proj-999",
-        group_id: "new-g-1",
-        user_id: "user-123",
-      }),
-    );
-
-    expect(pb.collection("equipment_items").create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Excavator",
-        project_id: "new-proj-999",
-        group_id: null,
-      }),
-    );
-
-    expect(pb.collection("risks").create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Weather delay",
-        project_id: "new-proj-999",
-      }),
-    );
-
-    // Navigation and query invalidation
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["myProjects"] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["projects"] });
     expect(mockNavigate).toHaveBeenCalledWith("/projects/new-proj-999");

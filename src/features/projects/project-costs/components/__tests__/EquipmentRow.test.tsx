@@ -273,7 +273,7 @@ describe("EquipmentForm", () => {
     const submittedData = onSubmit.mock.calls[0][0];
     expect(submittedData.name).toBe("Bulldozer");
     expect(submittedData.rental_or_purchase).toBe("Purchase");
-    expect(submittedData.cost_per_period).toBe(75000);
+    expect(submittedData.cost_per_period).toBe(7500000);
     expect(submittedData.period_unit).toBeTruthy();
     expect(submittedData.usage_duration).toBe(1);
   });

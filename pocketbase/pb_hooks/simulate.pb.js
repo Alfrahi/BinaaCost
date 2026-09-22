@@ -80,19 +80,19 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
       laborTotal: ltAdj,
       equipmentTotal: eqAdj,
       additionalTotal: ad,
-      directCostsBase: directBaseC / 100,
-      locationAdjustmentAmount: locationAdjustmentC / 100,
-      directCosts: directC / 100,
-      overheadAmount: overheadC / 100,
-      contingencyAmount: contingencyC / 100,
+      directCostsBase: directBaseC,
+      locationAdjustmentAmount: locationAdjustmentC,
+      directCosts: directC,
+      overheadAmount: overheadC,
+      contingencyAmount: contingencyC,
       contingencyBasis: basis,
-      flatContingencyAmount: flatContingencyC / 100,
-      riskContingencyAmount: riskContingencyC / 100,
-      primeCost: primeC / 100,
-      markupAmount: markupC / 100,
-      bidPrice: bidC / 100,
-      taxAmount: taxC / 100,
-      grandTotal: totalC / 100,
+      flatContingencyAmount: flatContingencyC,
+      riskContingencyAmount: riskContingencyC,
+      primeCost: primeC,
+      markupAmount: markupC,
+      bidPrice: bidC,
+      taxAmount: taxC,
+      grandTotal: totalC,
     };
   };
 
@@ -230,12 +230,12 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
     } else if (itemType === "financial_settings") {
       if (field === "location_factor") {
         const cur = Number(fin.location_factor) || 1;
-        if (adjType === "fixed_increase") fin.location_factor = r2(cur + val);
-        else if (adjType === "percentage_increase") fin.location_factor = r2(cur * (1 + val / 100));
+        if (adjType === "fixed_increase") fin.location_factor = Math.round((cur + val) * 100) / 100;
+        else if (adjType === "percentage_increase") fin.location_factor = Math.round((cur * (1 + val / 100)) * 100) / 100;
       } else if (["overhead_percent", "markup_percent", "tax_percent", "contingency_percent"].indexOf(field) !== -1) {
         const cur = Number(fin[field]) || 0;
-        if (adjType === "fixed_increase") fin[field] = r2(cur + val);
-        else if (adjType === "percentage_increase") fin[field] = r2(cur * (1 + val / 100));
+        if (adjType === "fixed_increase") fin[field] = Math.round((cur + val) * 100) / 100;
+        else if (adjType === "percentage_increase") fin[field] = Math.round((cur * (1 + val / 100)) * 100) / 100;
       }
     }
   }
