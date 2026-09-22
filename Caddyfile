@@ -6,7 +6,7 @@
     
     # CSP Headers for security
     header {
-        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; img-src 'self' data: https:; font-src 'self' data:;"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https: wss:; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com;"
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         X-Content-Type-Options "nosniff"
         X-Frame-Options "DENY"
@@ -17,5 +17,9 @@
     reverse_proxy pocketbase:8090 {
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
+        header_down -Content-Security-Policy
+        header_down -X-Frame-Options
+        header_down -X-XSS-Protection
+        header_down -X-Content-Type-Options
     }
 }

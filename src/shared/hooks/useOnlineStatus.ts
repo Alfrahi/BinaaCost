@@ -22,7 +22,8 @@ export function useOnlineStatus() {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`${POCKETBASE_URL}/api/health`, {
+      const baseUrl = POCKETBASE_URL.replace(/\/+$/, "");
+      const res = await fetch(`${baseUrl}/api/health`, {
         signal: controller.signal,
         cache: "no-store",
       });

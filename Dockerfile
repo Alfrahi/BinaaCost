@@ -21,4 +21,4 @@ COPY ./pocketbase/pb_hooks ./pb_hooks
 COPY --from=frontend-builder /app/dist ./pb_public
 
 EXPOSE 8090
-CMD ["pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb_data"]
+CMD ["pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb_data", "--publicDir=/app/pb_public", "--hooksDir=/app/pb_hooks", "--migrationsDir=/app/pb_migrations"]
