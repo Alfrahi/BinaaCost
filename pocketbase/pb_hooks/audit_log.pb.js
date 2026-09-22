@@ -64,7 +64,7 @@ function buildWriteBody(collection, action, fields) {
 function buildBeforeCreate(collection) {
   const actKey = JSON.stringify("audit_act_create_" + collection + "_");
   let body = "";
-  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
+  body += "var st=e.get('stash')||{};if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;e.set('stash',st);}\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -73,8 +73,8 @@ function buildBeforeCreate(collection) {
 function buildCreate(collection, fields) {
   let body = buildWriteBody(collection, "CREATE", fields);
   const actKey = JSON.stringify("audit_act_create_" + collection + "_");
-  body += "var ak=" + actKey + "+e.record.id;\n";
-  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var ak=" + actKey + "+e.record.id;var st=e.get('stash')||{};\n";
+  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
   body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
   body += "var nd=snap(e.record);log(e.record,null,nd,actorId);\n";
   body += "e.next();\n";
@@ -85,7 +85,7 @@ function buildCreate(collection, fields) {
 function buildBeforeDelete(collection) {
   const actKey = JSON.stringify("audit_act_del_" + collection + "_");
   let body = "";
-  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
+  body += "var st=e.get('stash')||{};if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;e.set('stash',st);}\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -94,8 +94,8 @@ function buildBeforeDelete(collection) {
 function buildDelete(collection, fields) {
   let body = buildWriteBody(collection, "DELETE", fields);
   const actKey = JSON.stringify("audit_act_del_" + collection + "_");
-  body += "var ak=" + actKey + "+e.record.id;\n";
-  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var ak=" + actKey + "+e.record.id;var st=e.get('stash')||{};\n";
+  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
   body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
   body += "var od=snap(e.record);log(e.record,od,null,actorId);\n";
   body += "e.next();\n";
@@ -111,11 +111,13 @@ function buildBeforeUpdate(collection, fields) {
   const actKey = JSON.stringify("audit_act_update_" + collection + "_");
   let body = "";
   body += "var F=" + fLit + ";\n";
+  body += "var st=e.get('stash')||{};\n";
   body += "try{var old=$app.findRecordById(" + JSON.stringify(collection) + ",e.record.id);";
   body += "var o={};for(var i=0;i<F.length;i++){var k=F[i];";
   body += "var v=old.get(k);if(v!==null&&v!==undefined&&v!=='')o[k]=v;}";
-  body += "$app.store().set(" + key + "+e.record.id,o);}catch(e2){}\n";
-  body += "if(e.auth&&e.auth.id){$app.store().set(" + actKey + "+e.record.id,e.auth.id);}\n";
+  body += "st[" + key + "+e.record.id]=o;}catch(e2){}\n";
+  body += "if(e.auth&&e.auth.id){st[" + actKey + "+e.record.id]=e.auth.id;}\n";
+  body += "e.set('stash',st);\n";
   body += "e.next();\n";
   return new Function("e", body);
 }
@@ -126,14 +128,14 @@ function buildAfterUpdate(collection, fields) {
   let body = buildWriteBody(collection, "UPDATE", fields);
   const key = JSON.stringify("audit_old_" + collection + "_");
   const actKey = JSON.stringify("audit_act_update_" + collection + "_");
-  body += "var sk=" + key + "+e.record.id;\n";
-  body += "var od=$app.store().get(sk);$app.store().remove(sk);od=od||{};\n";
+  body += "var sk=" + key + "+e.record.id;var st=e.get('stash')||{};\n";
+  body += "var od=st[sk];delete st[sk];od=od||{};\n";
   body += "var ak=" + actKey + "+e.record.id;\n";
-  body += "var act=$app.store().get(ak);$app.store().remove(ak);\n";
+  body += "var act=st[ak];delete st[ak];e.set('stash',st);\n";
   body += "var actorId=act||(e.auth&&e.auth.id)||null;\n";
   body += "var nd={};for(var i=0;i<F.length;i++){var k=F[i];";
   body += "var n=e.record.get(k);var o=od[k];";
-  body += "if(n===null||n===undefined){delete od[k];continue;}";
+  body += "if(n===undefined){delete od[k];continue;}";
   body += "if(String(n)===String(o))continue;";
   body += "nd[k]=n;if(o===undefined)delete od[k];}\n";
   body += "log(e.record,od,nd,actorId);\n";
