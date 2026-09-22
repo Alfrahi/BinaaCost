@@ -50,6 +50,7 @@ blob-report/
 
 # PocketBase generated/local database data
 pocketbase/pb_data/
+/pb_data/
 
 # pocketbase/pocketbase is intentionally tracked in this repo
 # Uncomment the following line if you decide NOT to version the binary

@@ -116,25 +116,25 @@ cp .env.example .env
 
 Ensure `.env` contains:
 ```bash
-VITE_POCKETBASE_URL=http://127.0.0.1:8090
+VITE_POCKETBASE_URL=/
 ```
 
-### 3. Start the PocketBase Backend
+### 3. Production Deployment (Recommended)
+BinaaCost includes a fully automated production deployment via Docker Compose.
+```bash
+docker compose up -d --build
+```
+This spins up PocketBase (with your data bound to `./pb_data`) and a Caddy reverse proxy serving over HTTPS on port 443.
+
+### 4. Start the Development Server
+If you prefer running locally without Docker:
+
 In your first terminal:
 ```bash
 cd pocketbase
 ./pocketbase serve --dev
 ```
-- Migrations in `pocketbase/pb_migrations/` apply automatically on startup.
-- Backend API base: `http://127.0.0.1:8090`
-- PocketBase Admin UI: `http://127.0.0.1:8090/_/`
 
-*(Optional)* To automatically seed an initial `super_admin` user on initial database creation:
-```bash
-PB_ADMIN_EMAIL=admin@example.com PB_ADMIN_PASSWORD=secret123 ./pocketbase serve --dev
-```
-
-### 4. Start the Frontend Development Server
 In your second terminal:
 ```bash
 pnpm dev

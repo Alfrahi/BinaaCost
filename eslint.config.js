@@ -13,7 +13,7 @@ export default tseslint.config(
       "dev-dist",
       "node_modules",
       "coverage",
-      "pocketbase",
+      "pocketbase", "pb_data",
       "supabase",
       "playwright.config.cjs",
       "vite.config.ts.legacy",

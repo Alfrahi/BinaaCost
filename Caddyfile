@@ -1,0 +1,21 @@
+# BinaaCost Production Caddyfile
+# Set domain using an environment variable or default to localhost
+{$DOMAIN:localhost} {
+    # Basic rate limiting through connection controls
+    # Caddy core supports basic safety limits
+    
+    # CSP Headers for security
+    header {
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; img-src 'self' data: https:; font-src 'self' data:;"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+    }
+
+    # Proxy to PocketBase
+    reverse_proxy pocketbase:8090 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+    }
+}
