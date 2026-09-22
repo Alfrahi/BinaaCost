@@ -42,7 +42,7 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
         coll,
         `project_id="${esc(projectId)}"`,
         "",
-        0,
+        5000,
         0,
       );
       snapshot[coll] = rows.map((r) => r.publicExport());
@@ -306,7 +306,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
           coll,
           `project_id="${esc(projectId)}"`,
           "",
-          0,
+          5000,
           0,
         );
         snap[coll] = rows.map((r) => r.publicExport());
@@ -509,7 +509,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
         coll,
         `project_id="${esc(projectId)}"`,
         "",
-        0,
+        5000,
         0,
       );
       for (const row of existing) {
