@@ -69,36 +69,30 @@ onRecordAfterUpdateSuccess((e) => {
           "comments",
         ];
 
-        for (const collName of childCollections) {
-          try {
-            const records = $app.findRecordsByFilter(
+        $app.runInTransaction((txApp) => {
+          for (const collName of childCollections) {
+            const records = txApp.findRecordsByFilter(
               collName,
               `project_id="${projectId}"`,
             );
             for (const rec of records) {
               if (rec.get("user_id") !== newUserId) {
                 rec.set("user_id", newUserId);
-                $app.saveNoValidate(rec);
+                txApp.saveNoValidate(rec);
               }
             }
-          } catch (err) {
-            $app.logger().error("Failed to transfer child items", "collection", collName, "err", String(err));
           }
-        }
 
-        // 3. Transfer shared_project_links created by previous owner
-        try {
-          const links = $app.findRecordsByFilter(
+          // 3. Transfer shared_project_links created by previous owner
+          const links = txApp.findRecordsByFilter(
             "shared_project_links",
             `project_id="${projectId}" && created_by_user_id="${oldUserId}"`,
           );
           for (const link of links) {
             link.set("created_by_user_id", newUserId);
-            $app.saveNoValidate(link);
+            txApp.saveNoValidate(link);
           }
-        } catch (err) {
-          $app.logger().error("Failed to transfer shared_project_links", "err", String(err));
-        }
+        });
 
         $app.logger().info("Transferred project and all items to new owner", "projectId", projectId, "from", oldUserId, "to", newUserId);
       }
