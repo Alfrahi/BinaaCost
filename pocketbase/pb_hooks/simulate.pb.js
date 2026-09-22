@@ -158,7 +158,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
   const orig = {};
   const tables = ["materials", "labor_items", "equipment_items", "additional_costs", "risks"];
   for (const c of tables) {
-    const rows = $app.findRecordsByFilter(c, `project_id="${projectId}"`, "", 0, 0);
+    const rows = $app.findRecordsByFilter(c, `project_id="${projectId}"`, "", 5000, 0);
     orig[c] = rows.map((r) => JSON.parse(JSON.stringify(r.publicExport())));
   }
 
