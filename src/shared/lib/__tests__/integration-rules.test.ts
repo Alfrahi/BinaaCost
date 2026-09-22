@@ -1172,6 +1172,62 @@ describe("pocketbase integration", () => {
   });
 
   describe("T1: authz matrix", () => {
+    itLive("SEC-01: editor on Project A cannot mutate Project B child records", async () => {
+      const RUN = String(Date.now());
+
+      // 1. Create a second project owned by user A → Project B
+      const pB = await api("POST", "/api/collections/projects/records", {
+        name: "Project B " + RUN, currency: "USD", user_id: uid,
+      }, tok);
+      expect(pB.status).toBe(200);
+      const pidB = pB.json.id;
+
+      // Add a material to Project B
+      const mB = await api("POST", "/api/collections/materials/records", {
+        project_id: pidB, user_id: uid, name: "Material B", category: "Raw",
+        quantity: 1, unit: "kg", unit_cost: 10,
+      }, tok);
+      expect(mB.status).toBe(200);
+      const midB = mB.json.id;
+
+      // 2. Create user B
+      const emailB = `it-sec01-b-${RUN}@local.dev`;
+      const bId = await makeUser(emailB);
+      const lb = await login(emailB);
+      const bTok = "Bearer " + lb.token;
+
+      // 3. User A shares Project A (pid) with User B as EDITOR
+      const shareA = await api("POST", "/api/collections/project_shares/records", {
+        project_id: pid, shared_with_user_id: bId, shared_with_email: emailB, role: "editor",
+      }, tok);
+      expect(shareA.status).toBe(200);
+
+      // 4. User A shares Project B (pidB) with User B as VIEWER only
+      await api("POST", "/api/collections/project_shares/records", {
+        project_id: pidB, shared_with_user_id: bId, shared_with_email: emailB, role: "viewer",
+      }, tok);
+
+      // 5. User B (viewer on B, editor on A) attempts to mutate Material B
+      //    With the old @collection cross-join rules this would succeed because
+      //    PB would independently match role="editor" from the Project A share
+      //    row against project_id from the Project B share row.
+      const patchB = await api("PATCH", `/api/collections/materials/records/${midB}`, {
+        name: "Material B - Hacked",
+      }, bTok);
+      expect([403, 404]).toContain(patchB.status);
+
+      // 6. User B also cannot mutate Project B itself
+      const patchProj = await api("PATCH", `/api/collections/projects/records/${pidB}`, {
+        name: "Hacked",
+      }, bTok);
+      expect([403, 404]).toContain(patchProj.status);
+
+      // cleanup
+      await api("DELETE", `/api/collections/materials/records/${midB}`, undefined, tok);
+      await api("DELETE", `/api/collections/projects/records/${pidB}`, undefined, tok);
+      await api("DELETE", `/api/collections/users/records/${bId}`, undefined, "Bearer " + su);
+    });
+
     itLive("user B cannot read/write user A's version snapshots", async () => {
       // owner creates a version snapshot
       const v = await api("POST", `/api/projects/${pid}/versions`, { name: "authz-v1" }, tok);
