@@ -35,6 +35,7 @@ interface FinancialInputsProps {
   projectId: string;
   initialSettings?: FinancialSettings;
   settingsConfirmed?: boolean;
+  projectVersion?: number;
   canEdit?: boolean;
 }
 
@@ -42,6 +43,7 @@ export function FinancialInputs({
   projectId,
   initialSettings,
   settingsConfirmed,
+  projectVersion,
   canEdit = true,
 }: FinancialInputsProps) {
   const { t } = useTranslation(["project_detail", "common"]);
@@ -60,20 +62,21 @@ export function FinancialInputs({
 
   const updateFinancialSettings = useUpdateProjectFinancialSettings();
 
-  const handleChange = useCallback((key: keyof FinancialSettings, value: string) => {
-    if (!canEdit) return;
-    const numValue = value === "" ? 0 : parseFloat(value);
-    setSettings((prev) => ({ ...prev, [key]: numValue }));
+  const handleChange = useCallback((field: keyof FinancialSettings, value: string) => {
+    const numValue = parseFloat(value);
+    setSettings((prev) => ({
+      ...prev,
+      [field]: isNaN(numValue) ? 0 : numValue,
+    }));
     setIsDirty(true);
-  }, [canEdit]);
+  }, []);
 
   const handleSave = useCallback(() => {
-    if (!canEdit) return;
     const result = settingsSchema.safeParse(settings);
     if (!result.success) return;
-    updateFinancialSettings.mutate({ projectId, newSettings: settings });
+    updateFinancialSettings.mutate({ projectId, newSettings: settings, version: projectVersion });
     setIsDirty(false);
-  }, [canEdit, settings, projectId, updateFinancialSettings]);
+  }, [settings, projectId, projectVersion, updateFinancialSettings]);
 
   return (
     <div className="space-y-4">

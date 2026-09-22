@@ -384,6 +384,7 @@ function ProjectTabsComponent({
                     currency={project.currency}
                     initialSettings={project.financial_settings}
                     settingsConfirmed={project.financial_settings_confirmed}
+                    projectVersion={project.version}
                     scenarioCount={scenarios.length}
                     canEditFinancials={canEditFinancials}
                     onNavigateToRisks={() => setActiveTab("risks")}

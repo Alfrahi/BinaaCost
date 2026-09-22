@@ -23,8 +23,9 @@ interface ProfitPricingSummaryCardProps {
   additionalTotal: number;
   currency?: string;
   initialSettings?: FinancialSettings;
-  scenarioCount?: number;
   settingsConfirmed?: boolean;
+  projectVersion?: number;
+  scenarioCount?: number;
   canEditFinancials?: boolean;
   onNavigateToRisks?: () => void;
 }
@@ -37,8 +38,9 @@ export default function ProfitPricingSummaryCard({
   additionalTotal,
   currency = "USD",
   initialSettings,
-  scenarioCount,
   settingsConfirmed,
+  projectVersion,
+  scenarioCount,
   canEditFinancials = true,
   onNavigateToRisks,
 }: ProfitPricingSummaryCardProps) {
@@ -80,6 +82,7 @@ export default function ProfitPricingSummaryCard({
           projectId={projectId}
           initialSettings={initialSettings}
           settingsConfirmed={settingsConfirmed}
+          projectVersion={projectVersion}
           canEdit={canEditFinancials}
         />
 

@@ -19,6 +19,7 @@ export interface Project {
   duration_days: number | null;
   created_at: string;
   updated_at: string;
+  version: number;
   size_unit: string | null;
   duration_unit: string | null;
   currency: string;
@@ -36,6 +37,7 @@ export interface ProjectGroup {
   sort_order: number;
   created_at: string;
   updated_at: string;
+  version: number;
 }
 
 export interface Risk {
@@ -48,6 +50,7 @@ export interface Risk {
   contingency_amount: number;
   created_at: string;
   updated_at: string;
+  version: number;
   user_id: string;
 }
 

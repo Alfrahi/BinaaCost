@@ -119,6 +119,7 @@ export function useProjectGroupsManager(
     mutationFn: async (group: ProjectGroup) => {
       await pb.collection("project_groups").update(group.id, {
         name: sanitizeText(group.name),
+        version: group.version,
       });
     },
     onMutate: async (group) => {
@@ -172,12 +173,12 @@ export function useProjectGroupsManager(
   const reorderGroupsMutation = useMutation({
     mutationFn: async (newGroups: ProjectGroup[]) => {
       const updates = newGroups
-        .map((g, index) => ({ id: g.id, sort_order: index, changed: g.sort_order !== index }))
+        .map((g, index) => ({ id: g.id, sort_order: index, version: g.version, changed: g.sort_order !== index }))
         .filter((u) => u.changed);
 
       await Promise.all(
         updates.map((u) =>
-          pb.collection("project_groups").update(u.id, { sort_order: u.sort_order }),
+          pb.collection("project_groups").update(u.id, { sort_order: u.sort_order, version: u.version }),
         ),
       );
     },

@@ -180,6 +180,7 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
         toast.error(t("common:mustBeLoggedIn"));
         return;
       }
+      const currentItem = risks.find((r) => r.id === id);
       await updateRisk.mutateAsync({
         id,
         description: sanitizeText(values.description),
@@ -187,9 +188,10 @@ export function useProjectRisks(projectId: string): UseProjectRisksReturn {
         impact_amount: values.impact_amount,
         mitigation_plan: sanitizeText(values.mitigation_plan),
         contingency_amount: values.contingency_amount,
-      });
+        version: currentItem?.version,
+      } as any);
     },
-    [updateRisk, user?.id, t],
+    [updateRisk, risks, user?.id, t],
   );
 
   const handleDeleteRisk = useCallback(

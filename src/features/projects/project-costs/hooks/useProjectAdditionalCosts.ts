@@ -63,7 +63,8 @@ export function useProjectAdditionalCosts(
       };
 
       if (editingAdditionalCostId) {
-        await updateItem({ id: editingAdditionalCostId, ...payload });
+        const currentItem = additionalCosts.find(c => c.id === editingAdditionalCostId);
+        await updateItem({ id: editingAdditionalCostId, ...payload, version: currentItem?.version });
       } else {
         await addItem({
           id: crypto.randomUUID(),
@@ -73,7 +74,7 @@ export function useProjectAdditionalCosts(
         });
       }
     },
-    [addItem, updateItem, projectId, user?.id],
+    [addItem, updateItem, additionalCosts, projectId, user?.id],
   );
 
   const handleDuplicate = useCallback(
@@ -99,9 +100,10 @@ export function useProjectAdditionalCosts(
 
   const handleUpdateField = useCallback(
     async (id: string, field: Partial<AdditionalCostItem>) => {
-      await updateItem({ id, ...field });
+      const currentItem = additionalCosts.find(c => c.id === id);
+      await updateItem({ id, ...field, version: currentItem?.version });
     },
-    [updateItem],
+    [updateItem, additionalCosts],
   );
 
   const handleBulkDelete = useCallback(

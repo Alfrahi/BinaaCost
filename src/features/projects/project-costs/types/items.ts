@@ -4,6 +4,7 @@ interface BaseItem {
   project_id: string;
   created_at: string;
   updated_at: string;
+  version: number;
 }
 
 export type MaterialItem = BaseItem & {
