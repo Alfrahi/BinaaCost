@@ -70,7 +70,8 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
         group_id: data.group_id === "ungrouped" || !data.group_id ? null : data.group_id,
       };
       if (editingId) {
-        await updateItem({ id: editingId, ...payload });
+        const currentItem = materials.find((m) => m.id === editingId);
+        await updateItem({ id: editingId, ...payload, version: currentItem?.version });
       } else {
         await addItem({ id: crypto.randomUUID(), project_id: projectId, user_id: user?.id, ...payload });
       }
@@ -79,7 +80,7 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
         queryClient.invalidateQueries({ queryKey: ["library_materials"] });
       }
     },
-    [addItem, updateItem, projectId, user?.id, syncToLibrary, queryClient],
+    [addItem, updateItem, materials, projectId, user?.id, syncToLibrary, queryClient],
   );
 
   const handleDuplicate = useCallback(
@@ -91,7 +92,10 @@ export function useProjectMaterials(projectId: string): UseProjectMaterialsRetur
   );
 
   const handleDelete = useCallback(async (id: string) => { await deleteItem({ id }); }, [deleteItem]);
-  const handleUpdateField = useCallback(async (id: string, field: Partial<MaterialItem>) => { await updateItem({ id, ...field }); }, [updateItem]);
+  const handleUpdateField = useCallback(async (id: string, field: Partial<MaterialItem>) => {
+    const currentItem = materials.find((m) => m.id === id);
+    await updateItem({ id, ...field, version: currentItem?.version });
+  }, [updateItem, materials]);
   const handleBulkDelete = useCallback(async (ids: string[]) => { await bulkDeleteMutation(ids); }, [bulkDeleteMutation]);
   const handleBulkMove = useCallback(async (ids: string[], groupId: string | null) => { await bulkMoveMutation({ ids, data: { group_id: groupId } }); }, [bulkMoveMutation]);
 

@@ -31,6 +31,7 @@ interface ProjectData {
   financial_settings: any;
   created_at: string;
   updated_at: string;
+  version: number;
   deleted_at: string | null;
 }
 
@@ -203,6 +204,7 @@ export function useUpdateProject() {
         updateProjectMutation.mutate({
           id,
           ...validatedData,
+          version: initialData?.version,
         });
       } catch (error) {
         if (error instanceof z.ZodError) {

@@ -13,13 +13,16 @@ export function useUpdateProjectFinancialSettings() {
     mutationFn: async ({
       projectId,
       newSettings,
+      version,
     }: {
       projectId: string;
       newSettings: FinancialSettings;
+      version?: number;
     }) => {
       await pb.collection("projects").update(projectId, {
         financial_settings: newSettings,
         financial_settings_confirmed: true,
+        version,
       });
     },
     onSuccess: (_, variables) => {

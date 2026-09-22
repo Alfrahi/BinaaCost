@@ -5,16 +5,17 @@ import { RecordModel } from "pocketbase";
 // including the 15-char string `id`, passes through unchanged.
 export function mapRecord<T = Record<string, unknown>>(
   record: RecordModel,
-): T & { id: string } {
-  const { created, updated, collectionId, collectionName, expand, ...rest } =
+): T & { id: string; version?: number } {
+  const { created, updated, version, collectionId, collectionName, expand, ...rest } =
     record as RecordModel & Record<string, unknown>;
 
   return {
     ...rest,
     ...(expand ? { expand } : {}),
+    version,
     created_at: created,
     updated_at: updated,
-  } as unknown as T & { id: string };
+  } as unknown as T & { id: string; version?: number };
 }
 
 export function mapRecords<T = Record<string, unknown>>(
