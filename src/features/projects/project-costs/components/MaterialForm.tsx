@@ -81,6 +81,7 @@ export function MaterialForm({
       unit_price: 0,
       group_id: "ungrouped",
       ...defaultValues,
+      unit_price: defaultValues?.unit_price !== undefined ? defaultValues.unit_price / 100 : 0,
     },
   });
 
@@ -115,7 +116,7 @@ export function MaterialForm({
             "USD",
             currency,
           );
-          form.setValue("unit_price", convertedPrice);
+          form.setValue("unit_price", convertedPrice / 100);
         }
       }
     },
@@ -280,8 +281,8 @@ export function MaterialForm({
                 <FormControl>
                   <Input
                     id="unit_price"
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     {...field}
                     aria-label={t("columns.unitPrice")}
                     className="text-sm"
