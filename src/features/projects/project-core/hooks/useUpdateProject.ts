@@ -223,6 +223,7 @@ export function useUpdateProject() {
       id,
       updateProjectMutation,
       openConversionDialog,
+      initialData?.version,
     ],
   );
 

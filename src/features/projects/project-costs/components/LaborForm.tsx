@@ -62,7 +62,6 @@ export function LaborForm({
       worker_type: "",
       description: undefined,
       number_of_workers: 1,
-      daily_rate: 0,
       total_days: 1,
       group_id: "ungrouped",
       ...defaultValues,

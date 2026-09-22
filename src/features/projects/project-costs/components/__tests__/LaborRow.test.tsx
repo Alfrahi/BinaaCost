@@ -31,7 +31,7 @@ describe("LaborRow", () => {
     total_days: 4,
     total_cost: 999999, // Stale total_cost that should be ignored
     created_at: "2026-01-01",
-    updated_at: "2026-01-01",
+    updated_at: "2026-01-01", version: 1,
   };
 
   it("derives row total from source fields rather than trusting stale cached total_cost", () => {
