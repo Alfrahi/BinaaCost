@@ -30,7 +30,11 @@ export function formatCurrency(
   locale = "en",
   options?: FormatCurrencyOptions,
 ): string {
-  const numericAmount = Number.isFinite(amount) ? amount : 0;
+  // The database and all domain logic store monetary values multiplied by 100 (fixed-point scale 2).
+  // We divide by 100 to convert back to the true decimal amount before handing off to Intl.NumberFormat,
+  // which is natively currency-aware and knows how to format the decimal value correctly.
+  const rawAmount = Number.isFinite(amount) ? amount : 0;
+  const numericAmount = rawAmount / 100;
 
   const defaultOptions: Intl.NumberFormatOptions = {
     style: "currency",
