@@ -33,9 +33,11 @@ export function useAdminAuditLogs(
       const parts: string[] = [];
       const term = search.trim().replace(/"/g, '\\"');
       if (term) {
-        parts.push(
-          `(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}" || record_id = "${term}")`,
-        );
+        if (/^[a-z0-9]{15}$/i.test(term)) {
+          parts.push(`(record_id = "${term}")`);
+        } else {
+          parts.push(`(action ~ "${term}" || table_name ~ "${term}" || user_id.email ~ "${term}")`);
+        }
       }
       if (actionFilter && actionFilter !== "ALL") {
         parts.push(`action = "${actionFilter}"`);

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { pb } from "@/integrations/pocketbase/client";
 
 export function usePdfExport() {
   const { t } = useTranslation(["project_reports", "common"]);
@@ -16,115 +17,69 @@ export function usePdfExport() {
       const toastId = toast.loading(t("common:generating"));
 
       try {
-        const { default: generatePDF } = await import("react-to-pdf");
-
         const filename =
           reportType === "clientProposal"
             ? `${filenamePrefix}_Client_Proposal.pdf`
             : `${filenamePrefix}_Detailed_Cost_Report.pdf`;
 
-        await generatePDF(targetRef, {
-          filename: filename,
-          method: "save",
-          page: {
-            format: "letter",
-            orientation: "portrait",
-            margin: 10,
+        if (!targetRef.current) throw new Error("No target ref");
+
+        // Prepare HTML for backend
+        const cloned = targetRef.current.cloneNode(true) as HTMLElement;
+        
+        const headHtml = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'))
+          .map(el => el.outerHTML)
+          .join('\n');
+
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html dir="${document.documentElement.dir || 'rtl'}" lang="${document.documentElement.lang || 'ar'}">
+            <head>
+              <meta charset="utf-8">
+              <base href="http://127.0.0.1:8090/">
+              ${headHtml}
+              <style>
+                body { padding: 20px; background: white; color: black; }
+                /* Ensure background colors and borders print correctly in headless chromium */
+                * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                /* Fix table breaking and overflow issues */
+                .overflow-x-auto, .overflow-auto, .overflow-hidden, [class*='overflow'] { overflow: visible !important; max-height: none !important; }
+                table { page-break-inside: auto; break-inside: auto; width: 100% !important; max-width: 100% !important; }
+                tr { page-break-inside: avoid; break-inside: avoid; page-break-after: auto; }
+                thead { display: table-header-group; }
+                tfoot { display: table-footer-group; }
+                td, th { white-space: normal !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+                .whitespace-nowrap { white-space: normal !important; }
+              </style>
+            </head>
+            <body>${cloned.outerHTML}</body>
+          </html>`;
+
+
+
+        // The response might be a blob if using fetch, but pb.send might return JSON or blob.
+        // Wait, pb.send automatically parses JSON. If we want a blob, we might need a custom fetch.
+        const res = await fetch(pb.buildUrl("/api/generate-pdf"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": pb.authStore.token
           },
-          overrides: {
-            pdf: {
-              compress: true,
-            },
-            canvas: {
-              useCORS: true,
-              backgroundColor: "#ffffff",
-              windowWidth: 1200,
-              onclone: (clonedDoc: Document, element?: HTMLElement) => {
-                // Force light mode
-                clonedDoc.documentElement.classList.remove("dark");
-                clonedDoc.body?.classList.remove("dark");
-                const darkElements = clonedDoc.querySelectorAll(".dark");
-                darkElements.forEach((el) => el.classList.remove("dark"));
-
-                // Ensure cloned document body has full printable width
-                clonedDoc.documentElement.style.width = "1120px";
-                clonedDoc.documentElement.style.minWidth = "1120px";
-                if (clonedDoc.body) {
-                  clonedDoc.body.style.width = "1120px";
-                  clonedDoc.body.style.minWidth = "1120px";
-                  clonedDoc.body.style.backgroundColor = "#ffffff";
-                }
-
-                // Locate the report root
-                const reportRoot =
-                  (clonedDoc.querySelector('[data-report-root="true"]') as HTMLElement | null) ||
-                  (element as HTMLElement | null);
-
-                if (reportRoot) {
-                  reportRoot.style.width = "1120px";
-                  reportRoot.style.minWidth = "1120px";
-                  reportRoot.style.maxWidth = "none";
-                  reportRoot.style.boxSizing = "border-box";
-                  reportRoot.style.backgroundColor = "#ffffff";
-                  reportRoot.style.color = "#0f172a";
-
-                  // Remove overflow, max-width and height restrictions from ancestor elements in the cloned DOM
-                  let current = reportRoot.parentElement;
-                  while (current && current !== clonedDoc.body) {
-                    current.style.maxHeight = "none";
-                    current.style.height = "auto";
-                    current.style.overflow = "visible";
-                    current.style.width = "1120px";
-                    current.style.minWidth = "1120px";
-                    current.style.maxWidth = "none";
-                    current.style.padding = "0";
-                    current.style.margin = "0";
-                    current.style.border = "none";
-                    current = current.parentElement;
-                  }
-
-                  // Unconstrain all scroll wrappers within the report
-                  const scrollContainers = reportRoot.querySelectorAll(
-                    ".overflow-x-auto, .overflow-auto, [class*='overflow']",
-                  );
-                  scrollContainers.forEach((el) => {
-                    const htmlEl = el as HTMLElement;
-                    htmlEl.style.overflow = "visible";
-                    htmlEl.style.width = "100%";
-                    htmlEl.style.maxWidth = "none";
-                  });
-
-                  // Ensure all tables occupy full width with auto layout
-                  let maxTableWidth = 1120;
-                  const tables = reportRoot.querySelectorAll("table");
-                  tables.forEach((tbl) => {
-                    const htmlTable = tbl as HTMLElement;
-                    htmlTable.style.width = "100%";
-                    htmlTable.style.minWidth = "100%";
-                    htmlTable.style.tableLayout = "auto";
-                    if (tbl.scrollWidth > maxTableWidth) {
-                      maxTableWidth = tbl.scrollWidth;
-                    }
-                  });
-
-                  if (maxTableWidth > 1120) {
-                    const expandedWidth = `${maxTableWidth + 64}px`;
-                    reportRoot.style.width = expandedWidth;
-                    reportRoot.style.minWidth = expandedWidth;
-                    if (clonedDoc.body) {
-                      clonedDoc.body.style.width = expandedWidth;
-                      clonedDoc.body.style.minWidth = expandedWidth;
-                    }
-                    if (clonedDoc.documentElement) {
-                      clonedDoc.documentElement.style.width = expandedWidth;
-                      clonedDoc.documentElement.style.minWidth = expandedWidth;
-                    }
-                  }
-                }
-              },
-            },
-          },
+          body: JSON.stringify({ html: htmlContent })
         });
+        
+        if (!res.ok) throw new Error("Failed to generate PDF");
+        
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
         toast.success(t("project_reports:success_pdfExport"));
       } catch (error) {
         console.error("Error generating PDF:", error);

@@ -8,7 +8,7 @@ RUN pnpm vite build
 
 FROM alpine:3.19
 ARG PB_VERSION=0.39.4
-RUN apk add --no-cache unzip ca-certificates curl sqlite
+RUN apk add --no-cache unzip ca-certificates curl sqlite chromium font-noto font-noto-arabic
 # Download Pocketbase
 RUN curl -L -o /tmp/pb.zip https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip \
     && unzip /tmp/pb.zip -d /usr/local/bin/ \
