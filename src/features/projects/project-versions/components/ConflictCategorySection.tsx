@@ -10,7 +10,7 @@ import {
 import { TFunction } from "i18next";
 import { CategoryKey, AnyItem, compareItems, getDisplayLabel } from "../utils/versionDiff";
 import { ConflictDiffRow } from "./ConflictDiffRow";
-import { ResolutionMap } from "./VersionConflictResolver";
+import { ResolutionMap } from "../types";
 
 interface ConflictCategorySectionProps {
   category: CategoryKey;
@@ -22,7 +22,7 @@ interface ConflictCategorySectionProps {
     type: CategoryKey,
     action: "add" | "remove" | "update" | "keep_current" | "ignore",
   ) => void;
-  formatCurrency: any;
+  formatCurrency: (amount: number, currencyCode: string, options?: any) => string;
   currentCurrency: string;
   versionCurrency: string;
   t: TFunction;

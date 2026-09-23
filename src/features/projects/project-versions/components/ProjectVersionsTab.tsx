@@ -1,3 +1,4 @@
+import { ResolutionMap } from "../types";
 import { useState, useMemo, useCallback } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -24,7 +25,7 @@ import { useProjectEquipment } from "@/features/projects/project-costs/hooks/use
 import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
 import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 import VersionConflictResolver, {
-  ResolutionMap,
+  
 } from "./VersionConflictResolver";
 import {
   Loader2,
@@ -174,7 +175,7 @@ export default function ProjectVersionsTab({
             resolution[category as keyof ResolutionMap];
           const removeSet = new Set(toRemove);
           const updateMap = new Map(
-            toUpdate.map((i) => [i.id, i] as [string, any]),
+            toUpdate.map((i: any) => [i.id, i] as [string, any]),
           );
           const keptItems = currentItems
             .filter((i) => !removeSet.has(i.id))

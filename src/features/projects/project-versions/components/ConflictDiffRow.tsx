@@ -12,15 +12,15 @@ import {
 } from "@/features/projects/project-costs/types/items";
 import { Risk, ProjectGroup } from "@/features/projects/project-core/types/project";
 import { AnyItem, CategoryKey, getDisplayLabel } from "../utils/versionDiff";
-import { ResolutionMap } from "./VersionConflictResolver";
+import { ResolutionMap } from "../types";
 
 const getDetailsDisplay = (
   item: AnyItem,
   type: CategoryKey,
   t: TFunction,
-  formatCurrency: any,
+  formatCurrency: (amount: number, currencyCode: string, options?: any) => string,
   currency: string,
-  options: any,
+  options: any, // or unknown, but leave it for now
 ) => {
   switch (type) {
     case "materials": {
@@ -97,7 +97,7 @@ interface ConflictDiffRowProps {
     type: CategoryKey,
     action: "add" | "remove" | "update" | "keep_current" | "ignore",
   ) => void;
-  formatCurrency: any;
+  formatCurrency: (amount: number, currencyCode: string, options?: any) => string;
   currentCurrency: string;
   versionCurrency: string;
   t: TFunction;

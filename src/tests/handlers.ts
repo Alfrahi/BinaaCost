@@ -58,7 +58,7 @@ export const handlers = [
     });
   }),
   
-  http.post("*/api/projects/:id/clone", async ({ request, params }) => {
+  http.post("*/api/projects/:id/clone", async ({ request}) => {
     const data = await request.json() as any;
     if (!data.customName) {
         return HttpResponse.json({ message: "customName is required" }, { status: 400 });

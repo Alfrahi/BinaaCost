@@ -5,12 +5,15 @@ import { useTranslation } from "react-i18next";
 import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { handleError } from "@/shared/lib/toast";
 
-/**
- * Normalized CRUD surface shared by every project line-item entity
- * (materials, labor, equipment, additional costs). Entity hooks build this
- * from `useEntityCrud` and add their own payload mapping / library sync.
- */
-export interface EntityCrud<T> {
+export interface BaseEntity {
+  id: string;
+  created_at?: string;
+  updated_at?: string;
+  version?: number;
+  total_cost?: number | null;
+}
+
+export interface EntityCrud<T extends BaseEntity> {
   handleAddOrUpdate: (
     data: any,
     currency?: string,
@@ -29,64 +32,60 @@ export interface EntityCrud<T> {
   isBulkMoving: boolean;
 }
 
-interface UseEntityCrudOptions {
+interface UseEntityCrudOptions<T> {
   table: string;
   projectId: string;
-  /** Optional: compute the optimistic `total_cost` for INSERT/UPDATE. */
-  calculateOptimisticTotalCost?: (item: any) => number;
+  calculateOptimisticTotalCost?: (item: Partial<T>) => number;
 }
 
-export function createOptimisticSingleUpdater<T>(
-  calculateOptimisticTotalCost?: (item: any) => number,
+export function createOptimisticSingleUpdater<T extends BaseEntity>(
+  calculateOptimisticTotalCost?: (item: Partial<T>) => number,
 ) {
-  return (old: T[] | undefined, variables: any, operation: string): T[] => {
+  return (old: T[] | undefined, variables: Partial<T>, operation: string): T[] => {
     const oldData = old ?? [];
     if (operation === "INSERT") {
+      const newId = variables.id || crypto.randomUUID();
+      const insertVars = { ...variables, id: newId } as unknown as Partial<T>;
       return [
         ...oldData,
         {
           ...variables,
-          id: variables.id || crypto.randomUUID(),
+          id: newId,
           ...(calculateOptimisticTotalCost
-            ? { total_cost: calculateOptimisticTotalCost(variables) }
+            ? { total_cost: calculateOptimisticTotalCost(insertVars) }
             : {}),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           version: 1,
-        },
+        } as unknown as T,
       ];
     }
     if (operation === "UPDATE") {
       return oldData.map((item) => {
-        if ((item as any).id !== variables.id) return item;
-        const merged = { ...item, ...variables };
+        if (item.id !== variables.id) return item;
+        const merged = { ...item, ...variables } as unknown as Partial<T>;
         return {
-          ...merged,
+          ...item,
+          ...variables,
           ...(calculateOptimisticTotalCost
             ? { total_cost: calculateOptimisticTotalCost(merged) }
             : {}),
           updated_at: new Date().toISOString(),
-        };
+        } as unknown as T;
       });
     }
     if (operation === "DELETE") {
-      return oldData.filter((item) => (item as any).id !== variables.id);
+      return oldData.filter((item) => item.id !== variables.id);
     }
     return oldData;
   };
 }
 
-/**
- * Shared offline-first CRUD mutations for a project line-item table.
- * Encapsulates the optimistic updaters, bulk operations, success toast and
- * analytics invalidation that were previously duplicated across the four
- * entity hooks.
- */
-export function useEntityCrud<T>({
+export function useEntityCrud<T extends BaseEntity>({
   table,
   projectId,
   calculateOptimisticTotalCost,
-}: UseEntityCrudOptions) {
+}: UseEntityCrudOptions<T>) {
   const { t } = useTranslation(["common"]);
   const queryClient = useQueryClient();
   const { useMutation: useOfflineMutation } = useOfflinePb();
@@ -99,19 +98,19 @@ export function useEntityCrud<T>({
   );
 
   const optimisticBulkUpdater = useCallback(
-    (old: T[] | undefined, variables: any, operation: string) => {
+    (old: T[] | undefined, variables: unknown, operation: string) => {
       const oldData = old ?? [];
       if (operation === "BULK_DELETE") {
         const idsToDelete = variables as string[];
         return oldData.filter(
-          (item) => !idsToDelete.includes((item as any).id),
+          (item) => !idsToDelete.includes(item.id),
         );
       }
       if (operation === "BULK_UPDATE") {
-        const { ids, data } = variables as { ids: string[]; data: any };
+        const { ids, data } = variables as { ids: string[]; data: Partial<T> };
         return oldData.map((item) =>
-          ids.includes((item as any).id)
-            ? { ...item, ...data, updated_at: new Date().toISOString() }
+          ids.includes(item.id)
+            ? ({ ...item, ...data, updated_at: new Date().toISOString() } as unknown as T)
             : item,
         );
       }
@@ -129,7 +128,7 @@ export function useEntityCrud<T>({
   }, [t, queryClient, projectId, queryKey]);
 
   const { mutate: addItem, isPending: isAdding } = useOfflineMutation<
-    any,
+    Partial<T>,
     T[]
   >({
     queryKey,
@@ -137,11 +136,11 @@ export function useEntityCrud<T>({
     operation: "INSERT",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess,
-    onError: (err: any) => handleError(err),
+    onError: (err: Error) => handleError(err),
   });
 
   const { mutate: updateItem, isPending: isUpdating } = useOfflineMutation<
-    any,
+    Partial<T>,
     T[]
   >({
     queryKey,
@@ -149,20 +148,20 @@ export function useEntityCrud<T>({
     operation: "UPDATE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess,
-    onError: (err: any) => handleError(err),
+    onError: (err: Error) => handleError(err),
   });
 
   const {
     mutate: deleteItem,
     mutateAsync: deleteItemAsync,
     isPending: isDeleting,
-  } = useOfflineMutation<any, T[]>({
+  } = useOfflineMutation<Partial<T>, T[]>({
     queryKey,
     table,
     operation: "DELETE",
     optimisticUpdater: optimisticSingleUpdater,
     onSuccess,
-    onError: (err: any) => handleError(err),
+    onError: (err: Error) => handleError(err),
   });
 
   const {
@@ -173,19 +172,19 @@ export function useEntityCrud<T>({
     queryKey,
     table,
     operation: "BULK_DELETE",
-    optimisticUpdater: optimisticBulkUpdater,
+    optimisticUpdater: optimisticBulkUpdater as any, // Type coercion required for multi-type offline mutation
     onSuccess,
-    onError: (err: any) => handleError(err),
+    onError: (err: Error) => handleError(err),
   });
 
   const { mutate: bulkMoveMutation, isPending: isBulkMoving } =
-    useOfflineMutation<{ ids: string[]; data: any }, T[]>({
+    useOfflineMutation<{ ids: string[]; data: Partial<T> }, T[]>({
       queryKey,
       table,
       operation: "BULK_UPDATE",
-      optimisticUpdater: optimisticBulkUpdater,
+      optimisticUpdater: optimisticBulkUpdater as any,
       onSuccess,
-      onError: (err: any) => handleError(err),
+      onError: (err: Error) => handleError(err),
     });
 
   return {
