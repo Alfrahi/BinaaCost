@@ -81,7 +81,7 @@ test.describe("Project transfer", () => {
     if (adminUid) await api(request, "DELETE", `/api/collections/users/records/${adminUid}`, undefined, `Bearer ${suToken}`);
   });
 
-  test("Admin can transfer ownership of a project", async ({ page }) => {
+  test("Admin can transfer ownership of a project", async ({ page, request }) => {
     test.skip(!canRun, "backend unavailable");
 
     // Login as Admin
@@ -93,21 +93,27 @@ test.describe("Project transfer", () => {
 
     // Go to admin projects
     await page.goto("/admin/projects");
-    await expect(page.getByText(/Project Management/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("tab", { name: /Active Projects|المشاريع/i })).toBeVisible({ timeout: 10000 });
 
     // Find the row and click transfer ownership
-    const row = page.locator('tr', { hasText: projectName });
-    await row.getByRole("button", { name: /transfer/i }).click();
+    const row = page.locator("tr", { hasText: projectName });
+    await expect(row).toBeVisible({ timeout: 10000 });
+    await row.locator('button[title*="Transfer"], button[title*="نقل"], button:has(.lucide-arrow-right-left)').first().click();
 
-    // Confirm transfer dialog (we need to enter the email or pick the user)
-    // Let's assume it's a combobox or input for email
+    // Confirm transfer dialog opens
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible({ timeout: 5000 });
-    
-    // Fill the new user ID or email
-    const input = dialog.locator('input[type="text"]').first();
-    await input.fill(uid2); // or maybe it's a combobox
-    // It might be a Combobox searching by email, we'd need to type emailU2
-    // I should check how transfer works!
+
+    // Select the new owner
+    await dialog.locator("#new-owner-select").click();
+    await page.getByRole("option", { name: new RegExp(emailU2) }).click();
+
+    // Submit transfer
+    await dialog.getByRole("button", { name: /transfer ownership|نقل الملكية/i }).click();
+    await expect(dialog).toBeHidden({ timeout: 10000 });
+
+    // Verify ownership was transferred to user 2
+    const updated = await api(request, "GET", `/api/collections/projects/records/${pid}`, undefined, `Bearer ${suToken}`);
+    expect(updated.json?.user_id).toBe(uid2);
   });
 });

@@ -48,11 +48,26 @@ jobs:
       - name: Setup & Boot PocketBase
         run: |
           wget https://github.com/pocketbase/pocketbase/releases/download/v0.39.4/pocketbase_0.39.4_linux_amd64.zip
-          unzip pocketbase_0.39.4_linux_amd64.zip -d pb_temp
+          unzip -o pocketbase_0.39.4_linux_amd64.zip -d pocketbase
+          chmod +x pocketbase/pocketbase
           cd pocketbase
-          ../pb_temp/pocketbase migrate up
-          ../pb_temp/pocketbase serve &
-          sleep 3
+          ./pocketbase migrate up
+          ./pocketbase serve &
+          
+          # Wait for PocketBase to start
+          echo "Waiting for PocketBase to start..."
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8090/api/health > /dev/null; then
+              echo "PocketBase is up!"
+              break
+            fi
+            sleep 1
+          done
+          
+          if ! curl -s http://127.0.0.1:8090/api/health > /dev/null; then
+            echo "PocketBase failed to start."
+            exit 1
+          fi
 
       - name: Unit & Integration Tests
         run: pnpm coverage

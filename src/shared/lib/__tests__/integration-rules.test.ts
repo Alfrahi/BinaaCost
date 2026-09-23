@@ -306,12 +306,12 @@ describe("pocketbase integration", () => {
       expect(origFin.locationAdjustmentAmount).toBe(100);
       expect(origFin.overheadAmount).toBe(60);
       expect(origFin.flatContingencyAmount).toBe(30);
-      expect(origFin.riskContingencyAmount).toBe(300);
-      expect(origFin.contingencyAmount).toBe(330);
+      expect(origFin.riskContingencyAmount).toBe(500);
+      expect(origFin.contingencyAmount).toBe(530);
       expect(origFin.contingencyBasis).toBe("combined");
-      expect(origFin.primeCost).toBe(990);
-      expect(origFin.markupAmount).toBe(99);
-      expect(origFin.grandTotal).toBe(1089);
+      expect(origFin.primeCost).toBe(1190);
+      expect(origFin.markupAmount).toBe(119);
+      expect(origFin.grandTotal).toBe(1309);
 
       const simFin = simRes.json.simulated.financials;
       expect(simFin.directCostsBase).toBe(500);
@@ -319,13 +319,13 @@ describe("pocketbase integration", () => {
       expect(simFin.locationAdjustmentAmount).toBe(150);
       expect(simFin.overheadAmount).toBe(65);
       expect(simFin.flatContingencyAmount).toBe(33);
-      expect(simFin.riskContingencyAmount).toBe(300);
-      expect(simFin.contingencyAmount).toBe(333);
-      expect(simFin.primeCost).toBe(1048);
-      expect(simFin.markupAmount).toBe(105);
-      expect(simFin.bidPrice).toBe(1153);
+      expect(simFin.riskContingencyAmount).toBe(500);
+      expect(simFin.contingencyAmount).toBe(533);
+      expect(simFin.primeCost).toBe(1248);
+      expect(simFin.markupAmount).toBe(125);
+      expect(simFin.bidPrice).toBe(1373);
       expect(simFin.taxAmount).toBe(0);
-      expect(simFin.grandTotal).toBe(1153);
+      expect(simFin.grandTotal).toBe(1373);
       await api("DELETE", `/api/collections/materials/records/${m.json.id}`, undefined, tok);
       await api("DELETE", `/api/collections/risks/records/${risk.json.id}`, undefined, tok);
     });
