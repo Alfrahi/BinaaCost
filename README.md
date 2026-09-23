@@ -6,6 +6,8 @@
 [![PocketBase](https://img.shields.io/badge/Backend-PocketBase%200.28.0-4285F4.svg)](https://pocketbase.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6.svg?logo=typescript)](https://www.typescriptlang.org/)
 
+> 🇾🇪 **متوفر باللغة العربية:** يمكنك الاطلاع على هذه الصفحة باللغة العربية [عبر هذا الرابط](README.ar.md).
+
 An enterprise-ready web application for construction project cost estimation, budgeting, proposal generation, and financial risk modeling. Built with **React 18**, **TypeScript**, **Tailwind CSS**, and **PocketBase**, it delivers cent-exact financial calculations, bilingual (English & Arabic) RTL/LTR interfaces, offline-first PWA resilience, parametric cost libraries, and secure client sharing.
 
 ---
