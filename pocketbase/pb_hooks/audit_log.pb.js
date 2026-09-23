@@ -94,8 +94,10 @@ function buildUpdateHandler(collection, fields) {
   body += "var nd={};for(var i=0;i<F.length;i++){var k=F[i];\n";
   body += "  try{var n=e.record.get(k);var o=od[k];\n";
   body += "  if(n===undefined){delete od[k];continue;}\n";
-  body += "  if(String(n)===String(o))continue;\n";
-  body += "  nd[k]=n;if(o===undefined)delete od[k];}catch(_){}}\n";
+  body += "  var eO=(o===undefined);var eN=(n===null||n==='');\n";
+  body += "  if(eO&&eN){delete od[k];continue;}\n";
+  body += "  if(!eO&&!eN&&String(n)===String(o)){delete od[k];continue;}\n";
+  body += "  nd[k]=n;if(eO)delete od[k];}catch(_){}}\n";
   body += "log(e.record,'UPDATE',od,nd,actorId);\n";
   return new Function("e", body);
 }
