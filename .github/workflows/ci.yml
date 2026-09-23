@@ -25,12 +25,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Setup environment variables
@@ -47,8 +47,8 @@ jobs:
 
       - name: Setup & Boot PocketBase
         run: |
-          wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.21/pocketbase_0.22.21_linux_amd64.zip
-          unzip pocketbase_0.22.21_linux_amd64.zip -d pb_temp
+          wget https://github.com/pocketbase/pocketbase/releases/download/v0.39.4/pocketbase_0.39.4_linux_amd64.zip
+          unzip pocketbase_0.39.4_linux_amd64.zip -d pb_temp
           cd pocketbase
           ../pb_temp/pocketbase migrate up
           ../pb_temp/pocketbase serve &
