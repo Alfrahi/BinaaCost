@@ -10,9 +10,9 @@ import { cn } from "@/shared/lib/utils";
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
-import { useAppSettings } from "@/features/settings/hooks/useAppSettings";
-import ReportOptionsSection from "@/features/reports/components/ReportOptionsSection";
-import CompanyFinancialDefaultsSection from "@/features/admin/components/CompanyFinancialDefaultsSection";
+import { useAppSettings } from "@/features/settings";
+import { ReportOptionsSection } from "@/features/reports";
+import { CompanyFinancialDefaultsSection } from "@/features/admin";
 
 export default function AppSettings() {
   const { t, i18n } = useTranslation(["admin", "settings", "common", "navigation"]);

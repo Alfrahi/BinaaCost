@@ -10,14 +10,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/aler
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
 import ConfirmDialog from "@/shared/components/ConfirmDialog";
-import TransferOwnershipModal from "@/features/admin/components/TransferOwnershipModal";
 import { Link } from "react-router-dom";
 import { Input } from "@/shared/components/ui/input";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import {
+  TransferOwnershipModal,
   useAdminProjectManagement,
   Project,
-} from "@/features/admin/hooks/useAdminProjectManagement";
+} from "@/features/admin";
 import { useMemo, useState } from "react";
 
 export default function ProjectManagement() {

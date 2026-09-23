@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import ProfileSettings from "@/features/settings/components/ProfileSettings";
+import { ProfileSettings } from "@/features/settings";
 import PageHeader from "@/shared/components/PageHeader";
 import { useTranslation } from "react-i18next";
 import { User, Bell, Palette, Sun, Moon } from "lucide-react";

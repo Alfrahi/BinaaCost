@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAssemblyImport } from "../useAssemblyImport";
-import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
+import type { AssemblyItem } from "@/features/cost-library";
 
 const mockAddMaterial = vi.fn();
 const mockAddLabor = vi.fn();

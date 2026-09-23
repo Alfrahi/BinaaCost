@@ -1,15 +1,28 @@
-import {
-  MaterialItem,
-  LaborItem,
-  EquipmentItem,
-  AdditionalCostItem,
-} from "@/features/projects/project-costs/types/items";
+export interface IncompleteItemMaterial {
+  unit_price?: number | null;
+  quantity?: number | null;
+}
 
-interface IncompleteItemsInput {
-  materials?: MaterialItem[];
-  labor?: LaborItem[];
-  equipment?: EquipmentItem[];
-  additional?: AdditionalCostItem[];
+export interface IncompleteItemLabor {
+  daily_rate?: number | null;
+  number_of_workers?: number | null;
+  total_days?: number | null;
+}
+
+export interface IncompleteItemEquipment {
+  cost_per_period?: number | null;
+  quantity?: number | null;
+}
+
+export interface IncompleteItemAdditional {
+  amount?: number | null;
+}
+
+export interface IncompleteItemsInput {
+  materials?: IncompleteItemMaterial[];
+  labor?: IncompleteItemLabor[];
+  equipment?: IncompleteItemEquipment[];
+  additional?: IncompleteItemAdditional[];
 }
 
 /** Count of items that need attention (missing/zero cost data). */

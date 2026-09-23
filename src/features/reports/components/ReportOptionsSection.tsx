@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { useTranslation } from "react-i18next";
-import { useReportSettings } from "@/features/settings/hooks/useReportSettings";
+import { useReportSettings } from "@/features/settings";
 
 export default function ReportOptionsSection() {
   const { t } = useTranslation(["settings", "common"]);

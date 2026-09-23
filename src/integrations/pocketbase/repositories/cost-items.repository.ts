@@ -1,11 +1,11 @@
 import { BaseRepository } from "./base.repository";
-import {
+import type {
   MaterialItem,
   LaborItem,
   EquipmentItem,
   AdditionalCostItem,
-} from "@/features/projects/project-costs/types/items";
-import { Risk } from "@/features/projects/project-core/types/project";
+  Risk,
+} from "@/features/projects";
 import { RecordListOptions } from "pocketbase";
 
 export class MaterialsRepository extends BaseRepository<MaterialItem> {

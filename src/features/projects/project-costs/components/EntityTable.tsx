@@ -23,8 +23,8 @@ import {
   ImportItemOverrides,
 } from "./AssemblyIntegrationRow";
 import { CostDatabasePickerModal } from "./CostDatabasePickerModal";
-import { CostDatabaseItem } from "@/features/cost-library/hooks/useCostDatabaseItems";
-import { EntityCrud, BaseEntity } from "@/features/projects/project-costs/hooks/useEntityCrud";
+import type { CostDatabaseItem } from "@/features/cost-library";
+import { EntityCrud, BaseEntity } from "../hooks/useEntityCrud";
 
 const PAGE_SIZE = 50;
 

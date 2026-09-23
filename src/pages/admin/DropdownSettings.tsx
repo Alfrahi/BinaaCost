@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import SettingsSection from "@/features/admin/components/SettingsSection";
+import { SettingsSection } from "@/features/admin";
 import { useRole } from "@/features/auth";
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";

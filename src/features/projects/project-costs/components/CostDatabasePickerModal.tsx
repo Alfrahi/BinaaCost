@@ -25,11 +25,11 @@ import {
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import LoadingState from "@/shared/components/ui/LoadingState";
-import { useCostDatabases } from "@/features/cost-library/hooks/useCostDatabases";
 import {
+  useCostDatabases,
   useCostDatabaseItems,
-  CostDatabaseItem,
-} from "@/features/cost-library/hooks/useCostDatabaseItems";
+  type CostDatabaseItem,
+} from "@/features/cost-library";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { Decimal } from "@/shared/lib/math";

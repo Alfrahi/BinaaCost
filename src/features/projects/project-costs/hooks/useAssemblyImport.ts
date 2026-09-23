@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import {
+import type {
   AssemblyItem,
   AssemblyLaborDetails,
   AssemblyEquipmentDetails,
   AssemblyAdditionalCostDetails,
-} from "@/features/cost-library/assemblies/types/assemblies";
-import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
+} from "@/features/cost-library";
+import { useProjectData } from "@/features/projects";
 import { handleError } from "@/shared/lib/toast";
-import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
-import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
-import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
-import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
+import { useProjectMaterials } from "./useProjectMaterials";
+import { useProjectLabor } from "./useProjectLabor";
+import { useProjectEquipment } from "./useProjectEquipment";
+import { useProjectAdditionalCosts } from "./useProjectAdditionalCosts";
 import { useCurrencyConverter } from "@/shared/hooks/useCurrencyConverter";
 import { Decimal } from "@/shared/lib/math";
 import { Project } from "@/features/projects/project-core/types/project";

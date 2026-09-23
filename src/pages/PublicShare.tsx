@@ -8,16 +8,18 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/aler
 import { Badge } from "@/shared/components/ui/badge";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
-import { ProjectCostReport } from "@/features/projects/project-reports/components/ProjectCostReport";
-import { ClientProposalReport } from "@/features/projects/project-reports/components/ClientProposalReport";
+import {
+  ProjectCostReport,
+  ClientProposalReport,
+  usePublicShare,
+  calculatePublicShareFinancials,
+} from "@/features/projects";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { usePublicShare } from "@/features/projects/project-sharing/hooks/usePublicShare";
-import { calculatePublicShareFinancials } from "@/features/projects/project-sharing/utils/publicShareFinancials";
-import { useReportSettings } from "@/features/settings/hooks/useReportSettings";
+import { useReportSettings } from "@/features/settings";
 
 export default function PublicShare() {
   const { accessToken } = useParams<{ accessToken: string }>();

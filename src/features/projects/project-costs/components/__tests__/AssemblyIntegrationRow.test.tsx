@@ -1,15 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { AssemblyIntegrationRow } from "@/features/projects/project-costs/components/AssemblyIntegrationRow";
-import { filterAssemblyItemsByType } from "@/features/cost-library/utils/assemblyUtils";
-import { AssemblyItem } from "@/features/cost-library/assemblies/types/assemblies";
+import { AssemblyIntegrationRow } from "../AssemblyIntegrationRow";
+import { filterAssemblyItemsByType, type AssemblyItem } from "@/features/cost-library";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key.split(".").pop(),
-    i18n: { language: "en", dir: () => "ltr" },
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-i18next")>();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key.split(".").pop(),
+      i18n: { language: "en", dir: () => "ltr" },
+    }),
+  };
+});
 
 vi.mock("@/features/cost-library/hooks/useAssemblies", () => ({
   useAssemblies: () => ({

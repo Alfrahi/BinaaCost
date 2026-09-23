@@ -36,15 +36,17 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
-import { usePdfExport } from "@/features/reports/hooks/usePdfExport";
-import { useProjectVersions } from "@/features/projects/project-versions/hooks/useProjectVersions";
-import { useProjectMaterials } from "@/features/projects/project-costs/hooks/useProjectMaterials";
-import { useProjectLabor } from "@/features/projects/project-costs/hooks/useProjectLabor";
-import { useProjectEquipment } from "@/features/projects/project-costs/hooks/useProjectEquipment";
-import { useProjectAdditionalCosts } from "@/features/projects/project-costs/hooks/useProjectAdditionalCosts";
-import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
-import { ProjectGroup } from "@/features/projects/project-core/types/project";
-import { useReportSettings } from "@/features/settings/hooks/useReportSettings";
+import { usePdfExport } from "@/features/reports";
+import {
+  useProjectVersions,
+  useProjectMaterials,
+  useProjectLabor,
+  useProjectEquipment,
+  useProjectAdditionalCosts,
+  useProjectRisks,
+  type ProjectGroup,
+} from "@/features/projects";
+import { useReportSettings } from "@/features/settings";
 
 const LazyClientProposalReport = React.lazy(() =>
   import("./ClientProposalReport").then((module) => ({

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { useTranslation } from "react-i18next";
-import { useCompanyFinancialDefaults } from "@/features/settings/hooks/useCompanyFinancialDefaults";
+import { useCompanyFinancialDefaults } from "@/features/settings";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 
 const POPULAR_CURRENCIES = [

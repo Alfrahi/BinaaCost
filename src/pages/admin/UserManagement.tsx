@@ -5,16 +5,19 @@ import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDial
 import PageHeader from "@/shared/components/PageHeader";
 import { X, Eye, Trash2, AlertTriangle, ArrowLeft, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RoleBadge } from "@/features/admin/components/RoleBadge";
-import EditUserModal from "@/features/admin/components/EditUserModal";
-import AddUserModal from "@/features/admin/components/AddUserModal";
+import {
+  RoleBadge,
+  EditUserModal,
+  AddUserModal,
+  useAdminUserManagement,
+  UserProfile,
+} from "@/features/admin";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import DataTable, {
   DataTableColumn,
 } from "@/shared/components/ui/data-table";
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
-import { useAdminUserManagement, UserProfile } from "@/features/admin/hooks/useAdminUserManagement";
 import { useMemo, useState } from "react";
 
 export default function UserManagement() {

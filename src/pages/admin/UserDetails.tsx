@@ -9,16 +9,18 @@ import { Calendar, Activity, AlertTriangle, ArrowLeft, Edit } from "lucide-react
 import LoadingState from "@/shared/components/ui/LoadingState";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert";
 import { useTranslation } from "react-i18next";
-import { RoleBadge } from "@/features/admin/components/RoleBadge";
 import { Button } from "@/shared/components/ui/button";
 import { PaginationControls } from "@/shared/components/PaginationControls";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
-import { useAdminUserProjects } from "@/features/admin/hooks/useAdminUserProjects";
-import { useAdminUserAuditLogs } from "@/features/admin/hooks/useAdminUserAuditLogs";
-import { useAdminUserDetails } from "@/features/admin/hooks/useAdminUserDetails";
-import { useAdminUserManagement } from "@/features/admin/hooks/useAdminUserManagement";
-import EditUserModal from "@/features/admin/components/EditUserModal";
+import {
+  RoleBadge,
+  useAdminUserProjects,
+  useAdminUserAuditLogs,
+  useAdminUserDetails,
+  useAdminUserManagement,
+  EditUserModal,
+} from "@/features/admin";
 
 const formatJsonForDisplay = (data: any) => {
   if (!data) return null;

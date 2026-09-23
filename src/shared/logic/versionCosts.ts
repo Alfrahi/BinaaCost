@@ -7,7 +7,48 @@ import {
   FinancialSummary,
 } from "./financials";
 
-import type { ProjectSnapshotData } from "@/features/projects/project-versions/types/version";
+export interface SnapshotMaterialInput {
+  quantity: number;
+  unit_price: number;
+}
+
+export interface SnapshotLaborInput {
+  number_of_workers: number;
+  daily_rate: number;
+  total_days: number;
+}
+
+export interface SnapshotEquipmentInput {
+  quantity: number;
+  cost_per_period: number;
+  usage_duration: number;
+  maintenance_cost?: number | null;
+  fuel_cost?: number | null;
+  rental_or_purchase?: string | null;
+}
+
+export interface SnapshotAdditionalInput {
+  amount: number;
+}
+
+export interface SnapshotRiskInput {
+  contingency_amount: number;
+}
+
+export interface VersionSnapshotInput {
+  project?: {
+    financial_settings?: unknown;
+    [key: string]: unknown;
+  } | null;
+  materials?: SnapshotMaterialInput[];
+  labor_items?: SnapshotLaborInput[];
+  equipment_items?: SnapshotEquipmentInput[];
+  additional_costs?: SnapshotAdditionalInput[];
+  risks?: SnapshotRiskInput[];
+  summary?: VersionCostSummary;
+  financials?: FinancialSummary;
+  [key: string]: unknown;
+}
 
 export interface VersionCostSummary {
   materials: number;
@@ -25,7 +66,7 @@ export interface VersionCostSummary {
  * cost matches what the project showed at snapshot time.
  */
 export function computeVersionCostSummary(
-  snapshot: ProjectSnapshotData | null | undefined,
+  snapshot: VersionSnapshotInput | null | undefined,
 ): VersionCostSummary {
   if (
     snapshot?.summary &&
@@ -80,7 +121,7 @@ export function computeVersionDelta(
  * project defaults when the snapshot predates explicit settings.
  */
 export function getVersionFinancialSettings(
-  snapshot: ProjectSnapshotData | null | undefined,
+  snapshot: VersionSnapshotInput | null | undefined,
 ): FinancialSettings {
   const s = snapshot?.project?.financial_settings as {
     overhead_percent?: number;
@@ -131,8 +172,8 @@ export interface VersionComparisonResult {
  * decimal-exact arithmetic so they match the stored snapshots exactly.
  */
 export function computeVersionComparison(
-  aSnapshot: ProjectSnapshotData | null | undefined,
-  bSnapshot: ProjectSnapshotData | null | undefined,
+  aSnapshot: VersionSnapshotInput | null | undefined,
+  bSnapshot: VersionSnapshotInput | null | undefined,
 ): VersionComparisonResult {
   const aSummary = computeVersionCostSummary(aSnapshot);
   const bSummary = computeVersionCostSummary(bSnapshot);

@@ -1,18 +1,20 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import PageLoader from "@/shared/components/PageLoader";
-import ProjectTabs from "@/features/projects/project-core/components/ProjectTabs";
+import {
+  ProjectTabs,
+  useProjectData,
+  ShareProjectDialog,
+  useSoftDeleteProject,
+  useCloneProject,
+} from "@/features/projects";
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import { ArrowLeft, Share2, Edit, Trash2, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useProjectData } from "@/features/projects/project-core/hooks/useProjectData";
 import { useState, useEffect } from "react";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
-import ShareProjectDialog from "@/features/projects/project-sharing/components/ShareProjectDialog";
 import DeleteConfirmationDialog from "@/shared/components/DeleteConfirmationDialog";
-import { useSoftDeleteProject } from "@/features/projects/project-core/hooks/useSoftDeleteProject";
-import { useCloneProject } from "@/features/projects/project-core/hooks/useCloneProject";
 import { offlineManager } from "@/shared/lib/offline";
 
 export default function ProjectDetail() {

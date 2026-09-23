@@ -14,7 +14,7 @@ import {
 import PageHeader from "@/shared/components/PageHeader";
 import { Badge } from "@/shared/components/ui/badge";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useAdminStats } from "@/features/admin/hooks/useAdminStats";
+import { useAdminStats } from "@/features/admin";
 
 export default function AdminPanel() {
   const { t } = useTranslation(["admin", "common"]);

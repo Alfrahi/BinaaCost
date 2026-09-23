@@ -24,8 +24,20 @@ export type * from "./project-costs/types/items";
 export type * from "./project-costs/types/schemas";
 
 export * from "./project-sharing/hooks/useProjectSharing";
+export * from "./project-sharing/hooks/usePublicShare";
+export * from "./project-sharing/utils/publicShareFinancials";
+export { default as ShareProjectDialog } from "./project-sharing/components/ShareProjectDialog";
+
 export * from "./project-versions/hooks/useProjectVersions";
 export * from "./project-versions/hooks/useApplyProjectVersion";
 export type * from "./project-versions/types/version";
 export * from "./project-analytics/hooks/useProjectSimulator";
 export * from "./project-analytics/hooks/useScenarioManager";
+
+export { ProjectCard } from "./project-core/components/ProjectCard";
+export { default as ProjectForm } from "./project-core/components/ProjectForm";
+export { default as ProjectTabs } from "./project-core/components/ProjectTabs";
+export { CurrencyConversionDialog } from "./project-costs/components/CurrencyConversionDialog";
+export { ProjectCostReport } from "./project-reports/components/ProjectCostReport";
+export { ClientProposalReport } from "./project-reports/components/ClientProposalReport";
+

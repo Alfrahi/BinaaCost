@@ -2,15 +2,19 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CostDatabasePickerModal } from "@/features/projects/project-costs/components/CostDatabasePickerModal";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, options?: any) => {
-      if (options?.name) return `Imported "${options.name}"`;
-      return key.split(".").pop();
-    },
-    i18n: { language: "en", dir: () => "ltr" },
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-i18next")>();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string, options?: any) => {
+        if (options?.name) return `Imported "${options.name}"`;
+        return key.split(".").pop();
+      },
+      i18n: { language: "en", dir: () => "ltr" },
+    }),
+  };
+});
 
 const mockDatabases = [
   { id: "db-1", name: "MasterFormat 2024", currency: "USD" },

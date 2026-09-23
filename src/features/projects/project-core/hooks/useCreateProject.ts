@@ -7,10 +7,10 @@ import { useOfflinePb } from "@/integrations/pocketbase/hooks/useOfflinePb";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema, ProjectFormValues } from "@/features/projects/project-core/types/form";
+import { projectSchema, ProjectFormValues } from "../types/form";
 import { sanitizeText } from "@/shared/lib/sanitizeText";
 import { handleError } from "@/shared/lib/toast";
-import { useCompanyFinancialDefaults } from "@/features/settings/hooks/useCompanyFinancialDefaults";
+import { useCompanyFinancialDefaults } from "@/features/settings";
 
 interface ProjectData {
   id: string;

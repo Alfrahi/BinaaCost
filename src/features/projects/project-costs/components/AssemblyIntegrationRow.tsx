@@ -15,10 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { useAssemblies } from "@/features/cost-library/hooks/useAssemblies";
-import { useAssemblyItems } from "@/features/cost-library/hooks/useAssemblyItems";
+import {
+  useAssemblies,
+  useAssemblyItems,
+  filterAssemblyItemsByType,
+} from "@/features/cost-library";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
-import { filterAssemblyItemsByType } from "@/features/cost-library/utils/assemblyUtils";
 import {
   Select,
   SelectContent,

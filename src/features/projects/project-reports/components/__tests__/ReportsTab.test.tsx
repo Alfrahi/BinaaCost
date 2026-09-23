@@ -54,13 +54,17 @@ vi.mock("@/shared/components/ui/select", () => ({
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, defaultValue?: any) =>
-      typeof defaultValue === "string" ? defaultValue : key.split(":").pop() || key,
-    i18n: { language: "en", dir: () => "ltr" },
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-i18next")>();
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string, defaultValue?: any) =>
+        typeof defaultValue === "string" ? defaultValue : key.split(":").pop() || key,
+      i18n: { language: "en", dir: () => "ltr" },
+    }),
+  };
+});
 
 vi.mock("@/shared/hooks/useMobile", () => ({
   useIsMobile: () => false,

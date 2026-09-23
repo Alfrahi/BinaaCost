@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { useAuth } from "@/features/auth";
-import { useProfile } from "@/features/settings/hooks/useProfile";
+import { useProfile } from "@/features/settings";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 import { useTheme } from "@/app/providers/ThemeContext";
 

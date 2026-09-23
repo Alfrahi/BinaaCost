@@ -1,7 +1,6 @@
 
-import ProjectForm from "@/features/projects/project-core/components/ProjectForm";
+import { ProjectForm, useCreateProject } from "@/features/projects";
 import Breadcrumbs from "@/app/layout/Breadcrumbs";
-import { useCreateProject } from "@/features/projects/project-core/hooks/useCreateProject";
 
 export default function CreateProject() {
   const { form, handleSubmit, isPending, error } = useCreateProject();

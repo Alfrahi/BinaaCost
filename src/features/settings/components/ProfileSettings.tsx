@@ -27,7 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-import { RoleBadge } from "@/features/admin/components/RoleBadge";
+import { RoleBadge } from "@/features/admin";
 import { useDateFormatter } from "@/shared/hooks/useDateFormatter";
 import { ShieldCheck, Calendar } from "lucide-react";
 

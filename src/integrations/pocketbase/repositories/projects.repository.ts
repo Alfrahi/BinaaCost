@@ -1,5 +1,5 @@
 import { BaseRepository } from "./base.repository";
-import { Project, ProjectGroup } from "@/features/projects/project-core/types/project";
+import type { Project, ProjectGroup } from "@/features/projects";
 import { RecordListOptions } from "pocketbase";
 
 export class ProjectsRepository extends BaseRepository<Project> {

@@ -1,10 +1,12 @@
 
 import { useTranslation } from "react-i18next";
-import ProjectForm from "@/features/projects/project-core/components/ProjectForm";
+import {
+  ProjectForm,
+  useUpdateProject,
+  CurrencyConversionDialog,
+} from "@/features/projects";
 import Breadcrumbs from "@/app/layout/Breadcrumbs";
-import { useUpdateProject } from "@/features/projects/project-core/hooks/useUpdateProject";
 import { FormProvider } from "react-hook-form";
-import { CurrencyConversionDialog } from "@/features/projects/project-costs/components/CurrencyConversionDialog";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 

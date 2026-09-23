@@ -4,8 +4,8 @@ import {
   computeVersionDelta,
   computeVersionComparison,
   getVersionFinancialSettings,
+  VersionSnapshotInput,
 } from "@/shared/logic/versionCosts";
-import type { ProjectSnapshotData } from "@/features/projects/project-versions/types/version";
 
 describe("computeVersionCostSummary", () => {
   it("computes direct totals from a version snapshot", () => {
@@ -28,7 +28,7 @@ describe("computeVersionCostSummary", () => {
       ],
       additional_costs: [{ amount: 300 }],
     };
-    const summary = computeVersionCostSummary(snapshot as unknown as ProjectSnapshotData);
+    const summary = computeVersionCostSummary(snapshot as unknown as VersionSnapshotInput);
     // materials 55 + 200 = 255; labor 600; equipment 1500+20+5=1525; additional 300
     expect(summary.materials).toBe(255);
     expect(summary.labor).toBe(600);
@@ -38,7 +38,7 @@ describe("computeVersionCostSummary", () => {
   });
 
   it("returns frozen snapshot.summary directly when present", () => {
-    const snapshot: ProjectSnapshotData = {
+    const snapshot: VersionSnapshotInput = {
       summary: {
         materials: 123.45,
         labor: 200,
@@ -169,7 +169,7 @@ describe("computeVersionComparison", () => {
     labor_items: [],
     equipment_items: [],
     additional_costs: [],
-  } as unknown as ProjectSnapshotData;
+  } as unknown as VersionSnapshotInput;
   const snapshotB = {
     project: {
       financial_settings: {
@@ -183,7 +183,7 @@ describe("computeVersionComparison", () => {
     labor_items: [],
     equipment_items: [],
     additional_costs: [],
-  } as unknown as ProjectSnapshotData;
+  } as unknown as VersionSnapshotInput;
 
   it("computes category totals, grand totals, and deltas (B minus A)", () => {
     const result = computeVersionComparison(snapshotA, snapshotB);
@@ -211,7 +211,7 @@ describe("computeVersionComparison", () => {
   });
 
   it("uses frozen snapshot.financials directly when present", () => {
-    const snapAWithFrozen: ProjectSnapshotData = {
+    const snapAWithFrozen: VersionSnapshotInput = {
       ...snapshotA,
       financials: {
         materialsTotal: 50,

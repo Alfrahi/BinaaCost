@@ -15,15 +15,14 @@ import {
 import { Loader2, X, PackagePlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
-import {
+import type {
   AssemblyItem,
   AssemblyLaborDetails,
   AssemblyEquipmentDetails,
   AssemblyAdditionalCostDetails,
-} from "@/features/cost-library/assemblies/types/assemblies";
+} from "@/features/cost-library";
 import { Label } from "@/shared/components/ui/label";
-import { useAssemblies } from "@/features/cost-library/hooks/useAssemblies";
-import { useAssemblyItems } from "@/features/cost-library/hooks/useAssemblyItems";
+import { useAssemblies, useAssemblyItems } from "@/features/cost-library";
 import { useSettingsOptions } from "@/shared/hooks/useSettingsOptions";
 import { useCurrencyFormatter } from "@/shared/lib/formatCurrency";
 import { useAssemblyImport } from "@/features/projects/project-costs/hooks/useAssemblyImport";

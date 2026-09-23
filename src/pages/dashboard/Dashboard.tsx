@@ -15,9 +15,11 @@ import { pb } from "@/integrations/pocketbase/client";
 import { mapRecord } from "@/integrations/pocketbase/mappers";
 import { cn, getIconMarginClass } from "@/shared/lib/utils";
 import { STALE_TIME } from "@/shared/lib/queryDefaults";
-import { useMyProjects } from "@/features/projects/project-core/hooks/useMyProjects";
-import { useSharedProjects } from "@/features/projects/project-core/hooks/useSharedProjects";
-import { ProjectCard } from "@/features/projects/project-core/components/ProjectCard";
+import {
+  useMyProjects,
+  useSharedProjects,
+  ProjectCard,
+} from "@/features/projects";
 
 export default function Dashboard() {
   const { t } = useTranslation(["dashboard", "common"]);
