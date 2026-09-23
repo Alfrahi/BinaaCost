@@ -56,8 +56,8 @@ routerAdd("GET", "/api/projects/{id}/summary", (e) => {
       CASE WHEN contingency_amount > 0 THEN contingency_amount 
       ELSE 
         CASE LOWER(probability)
-          WHEN 'high' THEN 0.3
-          WHEN 'medium' THEN 0.2
+          WHEN 'high' THEN 0.5
+          WHEN 'medium' THEN 0.3
           WHEN 'low' THEN 0.1
           ELSE 0
         END * impact_amount

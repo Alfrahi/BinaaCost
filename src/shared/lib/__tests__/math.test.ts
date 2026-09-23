@@ -3,9 +3,9 @@ import { round, safeAdd, safeMult, safeSub, safeDiv } from "../math";
 
 describe("Math Utils", () => {
   describe("round", () => {
-    it("rounds to 2 decimal places by default", () => {
-      expect(round(10.555)).toBe(10.56);
-      expect(round(10.554)).toBe(10.55);
+    it("rounds to 0 decimal places by default", () => {
+      expect(round(10.555)).toBe(11);
+      expect(round(10.4)).toBe(10);
     });
 
     it("rounds to specified decimal places", () => {
@@ -20,8 +20,8 @@ describe("Math Utils", () => {
   });
 
   describe("safeAdd", () => {
-    it("adds numbers correctly with floating point precision", () => {
-      expect(safeAdd(0.1, 0.2)).toBe(0.3);
+    it("adds numbers and rounds to integer", () => {
+      expect(safeAdd(10.5, 20.4)).toBe(31);
     });
 
     it("adds multiple numbers", () => {
@@ -30,9 +30,9 @@ describe("Math Utils", () => {
   });
 
   describe("safeMult", () => {
-    it("multiplies numbers correctly", () => {
-      expect(safeMult(10, 0.1)).toBe(1);
-      expect(safeMult(3, 0.33)).toBe(0.99);
+    it("multiplies numbers correctly and rounds to integer", () => {
+      expect(safeMult(10, 1.15)).toBe(12); // 11.5 rounds to 12
+      expect(safeMult(3, 3.33)).toBe(10); // 9.99 rounds to 10
     });
 
     it("handles zero", () => {
@@ -41,16 +41,16 @@ describe("Math Utils", () => {
   });
 
   describe("safeSub", () => {
-    it("subtracts numbers correctly", () => {
+    it("subtracts numbers correctly and rounds to integer", () => {
       expect(safeSub(10, 3)).toBe(7);
-      expect(safeSub(0.3, 0.1)).toBe(0.2);
+      expect(safeSub(10.4, 5.2)).toBe(5); // 5.2 rounds to 5
     });
   });
 
   describe("safeDiv", () => {
-    it("divides numbers correctly", () => {
+    it("divides numbers correctly and rounds to integer", () => {
       expect(safeDiv(10, 2)).toBe(5);
-      expect(safeDiv(1, 3)).toBe(0.33);
+      expect(safeDiv(10, 3)).toBe(3); // 3.33 rounds to 3
     });
 
     it("handles division by zero gracefully", () => {

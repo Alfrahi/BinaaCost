@@ -88,13 +88,13 @@ export function calculateProjectFinancials(
   // by hand. Unrounded intermediates caused the displayed steps to not sum.
   const materialsTotal = new Decimal(costs.materialsTotal || 0)
     .times(locationFactor)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
   const laborTotal = new Decimal(costs.laborTotal || 0)
     .times(locationFactor)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
   const equipmentTotal = new Decimal(costs.equipmentTotal || 0)
     .times(locationFactor)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
   const additionalTotal = new Decimal(costs.additionalTotal || 0).toDecimalPlaces(
     2,
   );
@@ -103,39 +103,39 @@ export function calculateProjectFinancials(
     .plus(laborTotal)
     .plus(equipmentTotal)
     .plus(additionalTotal)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
   // directCosts computed *without* the factor, for display purposes
   const directCostsBase = new Decimal(costs.materialsTotal || 0)
     .plus(costs.laborTotal || 0)
     .plus(costs.equipmentTotal || 0)
     .plus(costs.additionalTotal || 0)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
   // The amount added by location adjustment (can be negative for factor < 1)
   const locationAdjustmentAmount = directCosts
     .minus(directCostsBase)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
   const overheadAmount = directCosts
     .times(settings.overhead_percent || 0)
     .dividedBy(100)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
   const basis: ContingencyBasis = settings.contingency_basis ?? "flat";
 
   const flatContingencyAmount = directCosts
     .times(settings.contingency_percent || 0)
     .dividedBy(100)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
-  const riskContingencyAmount = new Decimal(costs.riskContingency || 0).toDecimalPlaces(2);
+  const riskContingencyAmount = new Decimal(costs.riskContingency || 0).toDecimalPlaces(0);
 
   let contingencyAmount: Decimal;
   if (basis === "risk_register") {
     contingencyAmount = riskContingencyAmount;
   } else if (basis === "combined") {
-    contingencyAmount = flatContingencyAmount.plus(riskContingencyAmount).toDecimalPlaces(2);
+    contingencyAmount = flatContingencyAmount.plus(riskContingencyAmount).toDecimalPlaces(0);
   } else {
     // "flat"
     contingencyAmount = flatContingencyAmount;
@@ -144,21 +144,21 @@ export function calculateProjectFinancials(
   const primeCost = directCosts
     .plus(overheadAmount)
     .plus(contingencyAmount)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
   const markupAmount = primeCost
     .times(settings.markup_percent || 0)
     .dividedBy(100)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
-  const bidPrice = primeCost.plus(markupAmount).toDecimalPlaces(2);
+  const bidPrice = primeCost.plus(markupAmount).toDecimalPlaces(0);
 
   const taxAmount = bidPrice
     .times(settings.tax_percent || 0)
     .dividedBy(100)
-    .toDecimalPlaces(2);
+    .toDecimalPlaces(0);
 
-  const grandTotal = bidPrice.plus(taxAmount).toDecimalPlaces(2);
+  const grandTotal = bidPrice.plus(taxAmount).toDecimalPlaces(0);
 
   const grossMarginPercent = bidPrice.isZero()
     ? new Decimal(0)

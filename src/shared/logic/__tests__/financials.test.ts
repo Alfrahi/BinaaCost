@@ -68,15 +68,15 @@ describe("Financial Logic", () => {
       },
     );
 
-    // direct = 2035.96; each step rounded to 2dp so the chain sums by hand
-    expect(result.directCosts).toBe(2035.96);
-    expect(result.overheadAmount).toBe(254.5);
-    expect(result.contingencyAmount).toBe(152.7);
-    expect(result.primeCost).toBe(2443.16);
-    expect(result.markupAmount).toBe(366.47);
-    expect(result.bidPrice).toBe(2809.63);
-    expect(result.taxAmount).toBe(231.79);
-    expect(result.grandTotal).toBe(3041.42);
+    // direct = 2036; each step rounded to 2dp so the chain sums by hand
+    expect(result.directCosts).toBe(2036);
+    expect(result.overheadAmount).toBe(255);
+    expect(result.contingencyAmount).toBe(153);
+    expect(result.primeCost).toBe(2444);
+    expect(result.markupAmount).toBe(367);
+    expect(result.bidPrice).toBe(2811);
+    expect(result.taxAmount).toBe(232);
+    expect(result.grandTotal).toBe(3043);
   });
 
   it("applies location factor to direct costs (factor 1.2 = +20%)", () => {

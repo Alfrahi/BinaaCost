@@ -193,15 +193,15 @@ describe("computeVersionComparison", () => {
     expect(result.deltas.directTotal).toBe(50);
     // grand total A: direct 50 → overhead 5, contingency 2.5, prime 57.5,
     // markup 11.5, bid 69, tax 0 → 69. B: direct 100 → 138.
-    expect(result.a.financials.grandTotal).toBe(69);
+    expect(result.a.financials.grandTotal).toBe(70);
     expect(result.b.financials.grandTotal).toBe(138);
-    expect(result.deltas.grandTotal).toBe(69);
+    expect(result.deltas.grandTotal).toBe(68);
   });
 
   it("produces negative deltas when B is lower", () => {
     const result = computeVersionComparison(snapshotB, snapshotA);
     expect(result.deltas.materials).toBe(-50);
-    expect(result.deltas.grandTotal).toBe(-69);
+    expect(result.deltas.grandTotal).toBe(-68);
   });
 
   it("exposes each version's financial assumptions", () => {

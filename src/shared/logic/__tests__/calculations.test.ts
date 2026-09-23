@@ -103,7 +103,7 @@ describe("Cost Calculations", () => {
   describe("Additional Costs", () => {
     it("calculates total", () => {
       const items = [{ amount: 100 }, { amount: 250.5 }];
-      expect(calculateCategoryTotal.additional(items)).toBe(350.5);
+      expect(calculateCategoryTotal.additional(items)).toBe(351);
     });
   });
 });

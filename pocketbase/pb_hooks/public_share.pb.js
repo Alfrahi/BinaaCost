@@ -126,7 +126,7 @@ routerAdd("POST", "/api/share/{token}", (e) => {
     const prob = rawRisks[i].probability;
     const impact = Number(rawRisks[i].impact_amount) || 0;
     const factor =
-      prob === "high" ? 0.3 : prob === "medium" ? 0.2 : prob === "low" ? 0.1 : 0;
+      Number(rawRisks[i].probability_weight) || (prob === "high" ? 0.5 : prob === "medium" ? 0.3 : prob === "low" ? 0.1 : 0);
     rc = safeAdd(
       rc,
       Number(rawRisks[i].contingency_amount) || safeMult(factor, impact),
@@ -190,7 +190,8 @@ routerAdd("POST", "/api/share/{token}", (e) => {
     bidPrice: bidC,
     taxAmount: taxC,
     grandTotal: totalC,
-  };
+      grossMarginPercent: grossMarginPercent
+    };
 
   const pExp = JSON.parse(JSON.stringify(project.publicExport()));
   const sanitizedProject = {
