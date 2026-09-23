@@ -49,6 +49,7 @@ jobs:
           chmod +x pocketbase/pocketbase
           cd pocketbase
           ./pocketbase migrate up
+          ./pocketbase superuser upsert admin@local.dev localdev123
           ./pocketbase serve --dev &
           
           # Wait for PocketBase to start
