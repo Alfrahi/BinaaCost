@@ -74,6 +74,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
     const bidC = primeC + markupC;
     const taxC = Math.round(bidC * (Number(s.tax_percent) || 0) / 100);
     const totalC = bidC + taxC;
+    const grossMarginPercent = bidC === 0 ? 0 : Math.round((markupC / bidC) * 10000 + 1e-9) / 100;
 
     return {
       materialsTotal: mtAdj,
