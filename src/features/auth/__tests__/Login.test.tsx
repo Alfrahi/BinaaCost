@@ -7,7 +7,6 @@ import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { server } from "@/tests/setup";
 import { http, HttpResponse } from "msw";
-import React from "react";
 
 const queryClient = new QueryClient();
 

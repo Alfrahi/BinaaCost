@@ -16,38 +16,7 @@ import { Risk, ProjectGroup } from "@/features/projects/project-core/types/proje
 import { AnyItem, CategoryKey, CATEGORY_KEYS, compareItems, getItemIdentifier } from "../utils/versionDiff";
 import { ConflictCategorySection } from "./ConflictCategorySection";
 
-export interface ResolutionMap {
-  materials: {
-    toAdd: MaterialItem[];
-    toRemove: string[];
-    toUpdate: MaterialItem[];
-  };
-  labor: {
-    toAdd: LaborItem[];
-    toRemove: string[];
-    toUpdate: LaborItem[];
-  };
-  equipment: {
-    toAdd: EquipmentItem[];
-    toRemove: string[];
-    toUpdate: EquipmentItem[];
-  };
-  additional: {
-    toAdd: AdditionalCostItem[];
-    toRemove: string[];
-    toUpdate: AdditionalCostItem[];
-  };
-  risks: {
-    toAdd: Risk[];
-    toRemove: string[];
-    toUpdate: Risk[];
-  };
-  groups: {
-    toAdd: ProjectGroup[];
-    toRemove: string[];
-    toUpdate: ProjectGroup[];
-  };
-}
+import { ResolutionMap } from "../types";
 
 interface VersionConflictResolverProps {
   currentData: {
@@ -137,7 +106,7 @@ export default function VersionConflictResolver({
         category,
       );
 
-      initialResolution[category].toAdd = onlyInVersion as any[];
+      initialResolution[category].toAdd = onlyInVersion as never[];
     });
 
     setSelectedResolution(initialResolution);

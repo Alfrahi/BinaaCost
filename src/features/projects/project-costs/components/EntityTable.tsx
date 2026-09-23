@@ -24,7 +24,7 @@ import {
 } from "./AssemblyIntegrationRow";
 import { CostDatabasePickerModal } from "./CostDatabasePickerModal";
 import { CostDatabaseItem } from "@/features/cost-library/hooks/useCostDatabaseItems";
-import { EntityCrud } from "@/features/projects/project-costs/hooks/useEntityCrud";
+import { EntityCrud, BaseEntity } from "@/features/projects/project-costs/hooks/useEntityCrud";
 
 const PAGE_SIZE = 50;
 
@@ -96,7 +96,7 @@ export interface EntityTableConfig<T> {
   getMobileTotal: (item: T) => string;
 }
 
-interface EntityTableProps<T> {
+interface EntityTableProps<T extends BaseEntity> {
   items: T[];
   groups?: any[];
   canEdit: boolean;
@@ -114,7 +114,7 @@ interface EntityTableProps<T> {
  * form, mobile/desktop switch, bulk actions, delete/move dialogs and CSV
  * import. Entity-specific behaviour is supplied via `config`.
  */
-export function EntityTable<T>({
+export function EntityTable<T extends BaseEntity>({
   items,
   groups = [],
   canEdit,
