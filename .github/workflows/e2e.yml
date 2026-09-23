@@ -25,7 +25,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -44,9 +44,11 @@ jobs:
 
       - name: Start PocketBase
         run: |
+          wget https://github.com/pocketbase/pocketbase/releases/download/v0.39.4/pocketbase_0.39.4_linux_amd64.zip
+          unzip pocketbase_0.39.4_linux_amd64.zip -d pb_temp
           cd pocketbase
-          chmod +x ./pocketbase
-          ./pocketbase serve --dev &
+          ../pb_temp/pocketbase migrate up
+          ../pb_temp/pocketbase serve --dev &
           
           # Wait for PocketBase to start
           echo "Waiting for PocketBase to start..."
