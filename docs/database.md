@@ -54,6 +54,7 @@ The user authentication and profile store.
 | `role` | select | Values: `["user", "super_admin"]` | Global system role (default: `user`) |
 | `first_name` | text | Optional | User given name |
 | `last_name` | text | Optional | User family name |
+| `deleted_at` | date | Optional | Soft-delete timestamp (null if active) |
 | `notification_prefs` | json | Optional | JSON object storing user alert preferences |
 | `emailVisibility` | bool | Default: `true` | Visibility flag managed by server hooks |
 
@@ -95,7 +96,8 @@ Cost breakdown structure (WBS) groupings within a project.
 
 ## 3. Project Line Item Collections
 
-Each project line item is linked to a parent `project_id` and optionally assigned to a `group_id`. All numeric quantities and rates enforce `min: 0` constraints.
+Each project line item is linked to a parent `project_id` and optionally assigned to a `group_id`. All numeric quantities and rates enforce `min: 0` constraints. 
+**Note:** Following the financial engine migration (`1727020000_financial_cents_migration.js`), all monetary fields (`unit_price`, `daily_rate`, `total_cost`, `amount`, etc.) are stored in the database as **integer cents** to prevent floating-point inaccuracies. Form schemas (`zod`) handle multiplication by 100 on submit and division by 100 for display.
 
 ### `materials`
 Bill of materials for the project.
