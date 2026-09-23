@@ -59,7 +59,7 @@ routerAdd("POST", "/api/projects/{id}/convert-currency", (e) => {
 
   const safeProjectId = projectId.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-  const r2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+  const r2 = (n) => Math.round(Number(n));
 
   // stage updates then apply inside a transaction
   $app.runInTransaction((txApp) => {

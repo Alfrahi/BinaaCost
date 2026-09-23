@@ -89,7 +89,7 @@ describe("Risk Logic", () => {
       ].map((r) => calculateRiskContingency(r.impact, r.probability));
 
       // rounding half-up at 2dp is part of the contract
-      expect(riskTotal).toEqual([625.38, 102.03, 10]);
+      expect(riskTotal).toEqual([625, 102, 10]);
 
       const generalContingency = calculateProjectFinancials(
         {

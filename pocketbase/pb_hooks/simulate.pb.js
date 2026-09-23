@@ -35,7 +35,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
       const prob = riskItems[i].probability;
       const impact = Number(riskItems[i].impact_amount) || 0;
       const factor =
-        prob === "high" ? 0.3 : prob === "medium" ? 0.2 : prob === "low" ? 0.1 : 0;
+        Number(riskItems[i].probability_weight) || (prob === "high" ? 0.5 : prob === "medium" ? 0.3 : prob === "low" ? 0.1 : 0);
       rc = safeAdd(
         rc,
         Number(riskItems[i].contingency_amount) || safeMult(factor, impact),
@@ -93,6 +93,7 @@ routerAdd("POST", "/api/projects/{id}/simulate", (e) => {
       bidPrice: bidC,
       taxAmount: taxC,
       grandTotal: totalC,
+      grossMarginPercent: grossMarginPercent
     };
   };
 

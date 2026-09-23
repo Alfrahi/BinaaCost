@@ -100,7 +100,7 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
     const prob = rawRisks[i].probability;
     const impact = Number(rawRisks[i].impact_amount) || 0;
     const factor =
-      prob === "high" ? 0.3 : prob === "medium" ? 0.2 : prob === "low" ? 0.1 : 0;
+      Number(rawRisks[i].probability_weight) || (prob === "high" ? 0.5 : prob === "medium" ? 0.3 : prob === "low" ? 0.1 : 0);
     rc = safeAdd(
       rc,
       Number(rawRisks[i].contingency_amount) || safeMult(factor, impact),
@@ -180,7 +180,8 @@ routerAdd("POST", "/api/projects/{id}/versions", (e) => {
     bidPrice: bidC,
     taxAmount: taxC,
     grandTotal: totalC,
-  };
+      grossMarginPercent: grossMarginPercent
+    };
 
   const coll = $app.findCollectionByNameOrId("project_versions");
   const rec = new Record(coll);
@@ -362,7 +363,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       const prob = rawRisks[i].probability;
       const impact = Number(rawRisks[i].impact_amount) || 0;
       const factor =
-        prob === "high" ? 0.3 : prob === "medium" ? 0.2 : prob === "low" ? 0.1 : 0;
+        Number(rawRisks[i].probability_weight) || (prob === "high" ? 0.5 : prob === "medium" ? 0.3 : prob === "low" ? 0.1 : 0);
       rc = safeAdd(
         rc,
         Number(rawRisks[i].contingency_amount) || safeMult(factor, impact),
@@ -442,6 +443,7 @@ routerAdd("POST", "/api/versions/{id}/apply", (e) => {
       bidPrice: bidC,
       taxAmount: taxC,
       grandTotal: totalC,
+      grossMarginPercent: grossMarginPercent
     };
 
     return snap;
