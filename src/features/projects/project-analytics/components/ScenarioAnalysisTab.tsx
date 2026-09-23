@@ -51,6 +51,7 @@ export function ScenarioAnalysisTab({
 
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [isManageScenariosOpen, setIsManageScenariosOpen] = useState(false);
+  const [isScenarioFormOpen, setIsScenarioFormOpen] = useState(false);
   const [editingScenario, setEditingScenario] = useState<any | null>(null);
   const [deleteTargetScenario, setDeleteTargetScenario] = useState<any | null>(null);
 
@@ -69,10 +70,14 @@ export function ScenarioAnalysisTab({
 
   const openScenarioForm = useCallback((scenario: any | null) => {
     setEditingScenario(scenario);
+    setIsScenarioFormOpen(true);
   }, []);
 
-  const closeScenarioForm = useCallback(() => {
-    setEditingScenario(null);
+  const handleScenarioFormOpenChange = useCallback((open: boolean) => {
+    setIsScenarioFormOpen(open);
+    if (!open) {
+      setEditingScenario(null);
+    }
   }, []);
 
   const handleDeleteScenario = useCallback((scenario: any) => {
@@ -118,8 +123,8 @@ export function ScenarioAnalysisTab({
       />
 
       <ScenarioFormDialog
-        open={!!editingScenario}
-        onOpenChange={closeScenarioForm}
+        open={isScenarioFormOpen}
+        onOpenChange={handleScenarioFormOpenChange}
         editingScenario={editingScenario}
         scenarios={scenarios}
         currency={currency}

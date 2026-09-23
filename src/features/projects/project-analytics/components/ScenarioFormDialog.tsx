@@ -151,19 +151,6 @@ export function ScenarioFormDialog({
     onOpenChange(false);
   }, [editingScenario, addScenario, updateScenario, formatRulesForDb, onOpenChange]);
 
-  const openForm = useCallback((scenario: Scenario | null) => {
-    if (scenario) {
-      scenarioForm.reset({
-        name: scenario.name,
-        description: scenario.description || "",
-        is_public: scenario.is_public,
-        impact_rules: formatRulesForForm(scenario.impact_rules),
-      });
-    } else {
-      scenarioForm.reset({ name: "", description: "", is_public: false, impact_rules: [] });
-    }
-    onOpenChange(true);
-  }, [scenarioForm, formatRulesForForm, onOpenChange]);
 
   const closeForm = useCallback(() => {
     if (scenarioForm.formState.isDirty) {
@@ -176,12 +163,21 @@ export function ScenarioFormDialog({
     scenarioForm.reset();
   }, [onOpenChange, scenarioForm, t]);
 
-  // Open on mount if editingScenario is provided
+  // Reset form when opened
   useEffect(() => {
-    if (editingScenario) {
-      openForm(editingScenario);
+    if (open) {
+      if (editingScenario) {
+        scenarioForm.reset({
+          name: editingScenario.name,
+          description: editingScenario.description || "",
+          is_public: editingScenario.is_public,
+          impact_rules: formatRulesForForm(editingScenario.impact_rules),
+        });
+      } else {
+        scenarioForm.reset({ name: "", description: "", is_public: false, impact_rules: [] });
+      }
     }
-  }, [editingScenario, openForm]);
+  }, [open, editingScenario, scenarioForm, formatRulesForForm]);
 
   return (
     <Dialog open={open} onOpenChange={closeForm}>
