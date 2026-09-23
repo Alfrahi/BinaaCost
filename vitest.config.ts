@@ -7,7 +7,10 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: "jsdom",
-      setupFiles: [],
+      setupFiles: ["./src/tests/setup.ts"],
+      env: {
+        VITE_POCKETBASE_URL: "http://127.0.0.1:8090",
+      },
       coverage: {
         provider: "istanbul",
       },

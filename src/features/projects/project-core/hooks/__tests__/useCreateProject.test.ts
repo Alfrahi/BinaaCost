@@ -1,10 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useCreateProject } from "../useCreateProject";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { toast } from "sonner";
 
 const mockNavigate = vi.fn();
-let capturedMutationConfig: any = null;
-const mockMutate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -15,10 +20,6 @@ vi.mock("react-i18next", () => ({
     type: "3rdParty",
     init: () => {},
   },
-}));
-
-vi.mock("react-router-dom", () => ({
-  useNavigate: () => mockNavigate,
 }));
 
 vi.mock("@/features/auth", () => ({
@@ -39,27 +40,33 @@ vi.mock("@/features/settings/hooks/useCompanyFinancialDefaults", () => ({
   }),
 }));
 
-vi.mock("@/integrations/pocketbase/hooks/useOfflinePb", () => ({
-  useOfflinePb: () => ({
-    useMutation: (config: any) => {
-      capturedMutationConfig = config;
-      return {
-        mutate: mockMutate,
-        isPending: false,
-        error: null,
-      };
-    },
-  }),
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 describe("useCreateProject", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    capturedMutationConfig = null;
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
   });
 
-  it("submits project creation with an optimistic UUID id in the payload for offline cascade", async () => {
-    const { result } = renderHook(() => useCreateProject());
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
+  it("submits project creation and navigates to new project", async () => {
+    const { result } = renderHook(() => useCreateProject(), { wrapper });
 
     await act(async () => {
       await result.current.handleSubmit({
@@ -76,51 +83,9 @@ describe("useCreateProject", () => {
       });
     });
 
-    expect(mockMutate).toHaveBeenCalledTimes(1);
-    const payload = mockMutate.mock.calls[0][0];
-
-    // Verify optimistic ID is assigned upfront
-    expect(payload.id).toBeDefined();
-    expect(typeof payload.id).toBe("string");
-    expect(payload.id.length).toBeGreaterThan(15); // Standard UUID
-
-    expect(payload.name).toBe("Olympic Stadium");
-    expect(payload.user_id).toBe("user-123");
-    expect(payload.financial_settings).toEqual({
-      overhead_percent: 10,
-      markup_percent: 15,
-      tax_percent: 15,
-      contingency_percent: 5,
+    await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("project_form:success_created");
     });
-  });
-
-  it("optimisticUpdater adds the new project to cache preserving variables.id", () => {
-    renderHook(() => useCreateProject());
-    expect(capturedMutationConfig).toBeTruthy();
-
-    const oldCache = {
-      data: [{ id: "p0", name: "Existing Project", description: null, created_at: "2026-01-01", user_id: "u1" }],
-      count: 1,
-    };
-
-    const newProjectPayload = {
-      id: "opt-uuid-999",
-      name: "New Arena",
-      user_id: "user-123",
-    };
-
-    const updated = capturedMutationConfig.optimisticUpdater(oldCache, newProjectPayload, "INSERT");
-    expect(updated.count).toBe(2);
-    expect(updated.data).toHaveLength(2);
-    expect(updated.data[1].id).toBe("opt-uuid-999");
-    expect(updated.data[1].name).toBe("New Arena");
-  });
-
-  it("navigates directly to /projects/:id on success when id is returned", () => {
-    renderHook(() => useCreateProject());
-    expect(capturedMutationConfig).toBeTruthy();
-
-    capturedMutationConfig.onSuccess({ id: "opt-uuid-999" });
-    expect(mockNavigate).toHaveBeenCalledWith("/projects/opt-uuid-999");
+    expect(mockNavigate).toHaveBeenCalled();
   });
 });

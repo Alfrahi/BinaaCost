@@ -1,62 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useEntityCrud } from "@/features/projects/project-costs/hooks/useEntityCrud";
 import { useProjectRisks } from "@/features/projects/project-costs/hooks/useProjectRisks";
 import { useUpdateProjectFinancialSettings } from "../useUpdateProjectFinancialSettings";
-
-const mockInvalidateQueries = vi.fn();
-let lastEntityMutationOptions: any = null;
-let lastRiskMutationOptions: any = null;
-
-vi.mock("@tanstack/react-query", async () => {
-  const actual = await vi.importActual<any>("@tanstack/react-query");
-  return {
-    ...actual,
-    useQueryClient: () => ({
-      invalidateQueries: mockInvalidateQueries,
-    }),
-    useMutation: (options: any) => {
-      return {
-        mutate: vi.fn(),
-        mutateAsync: vi.fn(async (vars) => {
-          if (options.mutationFn) await options.mutationFn(vars);
-          if (options.onSuccess) options.onSuccess(undefined, vars);
-        }),
-        isPending: false,
-      };
-    },
-  };
-});
-
-vi.mock("@/integrations/pocketbase/client", () => ({
-  pb: {
-    collection: () => ({
-      getFullList: vi.fn().mockResolvedValue([]),
-      update: vi.fn().mockResolvedValue({ id: "proj-1" }),
-    }),
-  },
-}));
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { toast } from "sonner";
 
 vi.mock("@/features/auth", () => ({
   useAuth: () => ({ user: { id: "test-user" } }),
-}));
-
-vi.mock("@/integrations/pocketbase/hooks/useOfflinePb", () => ({
-  useOfflinePb: () => ({
-    useQuery: () => ({ data: [], isLoading: false }),
-    useMutation: (options: any) => {
-      if (options.table === "risks") {
-        lastRiskMutationOptions = options;
-      } else {
-        lastEntityMutationOptions = options;
-      }
-      return {
-        mutate: vi.fn(),
-        mutateAsync: vi.fn(),
-        isPending: false,
-      };
-    },
-  }),
 }));
 
 vi.mock("react-i18next", () => ({
@@ -77,26 +29,45 @@ vi.mock("sonner", () => ({
 }));
 
 describe("Query Invalidation & Performance", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    lastEntityMutationOptions = null;
-    lastRiskMutationOptions = null;
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+    // Spy on invalidateQueries
+    vi.spyOn(queryClient, "invalidateQueries");
   });
 
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
   describe("useEntityCrud invalidation", () => {
-    it("invalidates projectCardSummary along with project and analytics", () => {
-      renderHook(() =>
+    it("invalidates projectCardSummary along with project and analytics", async () => {
+      const { result } = renderHook(() =>
         useEntityCrud({
           table: "materials",
           projectId: "proj-abc",
         }),
+        { wrapper }
       );
 
-      expect(lastEntityMutationOptions).not.toBeNull();
-      lastEntityMutationOptions.onSuccess();
+      await act(async () => {
+        result.current.addItem({ name: "Wood" } as any);
+      });
 
-      const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
-        (c) => c[0].queryKey,
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+      });
+
+      const invalidatedKeys = (queryClient.invalidateQueries as any).mock.calls.map(
+        (c: any) => c[0].queryKey
       );
 
       expect(invalidatedKeys).toContainEqual(["projectCardSummary", "proj-abc"]);
@@ -107,14 +78,19 @@ describe("Query Invalidation & Performance", () => {
   });
 
   describe("useProjectRisks invalidation", () => {
-    it("invalidates projectCardSummary and analytics on risk mutations", () => {
-      renderHook(() => useProjectRisks("proj-abc"));
+    it("invalidates projectCardSummary and analytics on risk mutations", async () => {
+      const { result } = renderHook(() => useProjectRisks("proj-abc"), { wrapper });
 
-      expect(lastRiskMutationOptions).not.toBeNull();
-      lastRiskMutationOptions.onSuccess();
+      await act(async () => {
+        await result.current.addRisk({ name: "Delay" } as any);
+      });
 
-      const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
-        (c) => c[0].queryKey,
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+      });
+
+      const invalidatedKeys = (queryClient.invalidateQueries as any).mock.calls.map(
+        (c: any) => c[0].queryKey
       );
 
       expect(invalidatedKeys).toContainEqual(["projectCardSummary", "proj-abc"]);
@@ -125,7 +101,7 @@ describe("Query Invalidation & Performance", () => {
 
   describe("useUpdateProjectFinancialSettings invalidation", () => {
     it("invalidates projectCardSummary and analytics when financial settings change", async () => {
-      const { result } = renderHook(() => useUpdateProjectFinancialSettings());
+      const { result } = renderHook(() => useUpdateProjectFinancialSettings(), { wrapper });
 
       await act(async () => {
         await result.current.mutateAsync({
@@ -136,11 +112,16 @@ describe("Query Invalidation & Performance", () => {
             markup_percent: 15,
             tax_percent: 5,
           } as any,
+          version: 1, // needed by our mock
         });
       });
 
-      const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
-        (c) => c[0].queryKey,
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+      });
+
+      const invalidatedKeys = (queryClient.invalidateQueries as any).mock.calls.map(
+        (c: any) => c[0].queryKey
       );
 
       expect(invalidatedKeys).toContainEqual(["project", "proj-abc"]);

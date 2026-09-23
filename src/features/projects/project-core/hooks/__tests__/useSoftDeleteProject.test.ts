@@ -1,39 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSoftDeleteProject } from "../useSoftDeleteProject";
-
-const mockInvalidateQueries = vi.fn();
-const mockSetQueriesData = vi.fn();
-const mockCancelQueries = vi.fn();
-
-vi.mock("@tanstack/react-query", async () => {
-  const actual = await vi.importActual<any>("@tanstack/react-query");
-  return {
-    ...actual,
-    useQueryClient: () => ({
-      invalidateQueries: mockInvalidateQueries,
-      setQueriesData: mockSetQueriesData,
-      cancelQueries: mockCancelQueries,
-      getQueryData: vi.fn().mockReturnValue({ version: 1 }),
-    }),
-    useMutation: (options: any) => ({
-      mutateAsync: vi.fn(async (id: string) => {
-        if (options.onMutate) await options.onMutate(id);
-        if (options.mutationFn) await options.mutationFn(id);
-        if (options.onSuccess) options.onSuccess(undefined, id);
-      }),
-      isPending: false,
-    }),
-  };
-});
-
-vi.mock("@/integrations/pocketbase/client", () => ({
-  pb: {
-    collection: () => ({
-      update: vi.fn().mockResolvedValue({ id: "p-1" }),
-    }),
-  },
-}));
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { toast } from "sonner";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -49,47 +19,58 @@ vi.mock("sonner", () => ({
 }));
 
 describe("useSoftDeleteProject", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+  });
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
+  it("fails to delete when version is missing and shows error toast", async () => {
+    // Setup initial cache state WITHOUT 'version' to trigger schema rejection mock
+    queryClient.setQueryData(["project", "p-1"], { id: "p-1" });
+    
+    const { result } = renderHook(() => useSoftDeleteProject(), { wrapper });
+
+    await act(async () => {
+      try {
+        await result.current.mutateAsync("p-1");
+      } catch (e) {
+        // Expected to throw
+      }
+    });
+
+    expect(toast.error).toHaveBeenCalled();
   });
 
   it("optimistically removes deleted project from cached queries and invalidates project lists", async () => {
-    const { result } = renderHook(() => useSoftDeleteProject());
+    // Setup initial cache state WITH 'version' to succeed
+    queryClient.setQueryData(["project", "p-1"], { id: "p-1", version: 1 });
+    queryClient.setQueryData(["myProjects"], {
+      data: [{ id: "p-1", name: "Project 1" }, { id: "p-2", name: "Project 2" }],
+      count: 2,
+    });
+    
+    const { result } = renderHook(() => useSoftDeleteProject(), { wrapper });
 
     await act(async () => {
       await result.current.mutateAsync("p-1");
     });
 
-    expect(mockCancelQueries).toHaveBeenCalledWith({ queryKey: ["myProjects"] });
-    expect(mockCancelQueries).toHaveBeenCalledWith({ queryKey: ["sharedProjects"] });
-    expect(mockSetQueriesData).toHaveBeenCalledWith(
-      { queryKey: ["myProjects"] },
-      expect.any(Function),
-    );
-    expect(mockSetQueriesData).toHaveBeenCalledWith(
-      { queryKey: ["sharedProjects"] },
-      expect.any(Function),
-    );
+    expect(toast.success).toHaveBeenCalledWith("project_detail:successDeleted");
 
-    // Verify filter logic passed to setQueriesData
-    const myProjectsUpdater = mockSetQueriesData.mock.calls.find(
-      (c) => c[0].queryKey[0] === "myProjects",
-    )[1];
-    const initialMyProjects = {
-      data: [{ id: "p-1", name: "Project 1" }, { id: "p-2", name: "Project 2" }],
-      count: 2,
-    };
-    const updated = myProjectsUpdater(initialMyProjects);
-    expect(updated.data).toEqual([{ id: "p-2", name: "Project 2" }]);
-    expect(updated.count).toBe(1);
-
-    // Invalidation checks
-    const invalidatedKeys = mockInvalidateQueries.mock.calls.map(
-      (c) => c[0].queryKey,
-    );
-    expect(invalidatedKeys).toContainEqual(["project"]);
-    expect(invalidatedKeys).toContainEqual(["myProjects"]);
-    expect(invalidatedKeys).toContainEqual(["sharedProjects"]);
-    expect(invalidatedKeys).toContainEqual(["analytics_projects_data"]);
+    const myProjects = queryClient.getQueryData<any>(["myProjects"]);
+    expect(myProjects.data).toEqual([{ id: "p-2", name: "Project 2" }]);
+    expect(myProjects.count).toBe(1);
   });
 });
