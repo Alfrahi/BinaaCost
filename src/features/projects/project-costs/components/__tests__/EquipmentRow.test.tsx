@@ -63,12 +63,12 @@ describe("EquipmentRow", () => {
     type: "Heavy",
     rental_or_purchase: "Rental",
     quantity: 2,
-    cost_per_period: 150,
+    cost_per_period: 15000,
     period_unit: "day",
     usage_duration: 10,
-    maintenance_cost: 50,
-    fuel_cost: 30,
-    total_cost: 3080, version: 1,
+    maintenance_cost: 5000,
+    fuel_cost: 3000,
+    total_cost: 308000, version: 1,
   };
 
   const purchaseItem: EquipmentItem = {
@@ -81,12 +81,12 @@ describe("EquipmentRow", () => {
     type: "Power",
     rental_or_purchase: "Purchase",
     quantity: 1,
-    cost_per_period: 5000,
+    cost_per_period: 500000,
     period_unit: "day",
     usage_duration: 1,
-    maintenance_cost: 100,
-    fuel_cost: 40,
-    total_cost: 5140, version: 1,
+    maintenance_cost: 10000,
+    fuel_cost: 4000,
+    total_cost: 514000, version: 1,
   };
 
   it("renders all 12 cells in exact column order for rental equipment", () => {
