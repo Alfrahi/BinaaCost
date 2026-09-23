@@ -1,6 +1,7 @@
 # Contributing to BinaaCost
 
-Thank you for your interest in contributing to BinaaCost! This document provides complete instructions for setting up your development environment, adhering to coding conventions, writing migrations and server hooks, running tests, and submitting contributions.
+Thank you for your interest in contributing to BinaaCost! This document provides instructions for setting up your development environment, adhering to contributor workflows, writing migrations and server hooks, running tests, and submitting contributions.
+For complete architectural boundaries, financial precision invariants, and detailed conventions, see [STANDARDS.md](STANDARDS.md).
 
 ---
 

@@ -219,7 +219,7 @@ For in-depth architectural and backend documentation, refer to:
 
 ## Contributing
 
-We welcome contributions to BinaaCost. Please review [CONTRIBUTING.md](CONTRIBUTING.md) for code style standards, migration workflows, translation requirements, and pull request guidelines.
+We welcome contributions to BinaaCost. Please review [CONTRIBUTING.md](CONTRIBUTING.md) and [STANDARDS.md](STANDARDS.md) for architectural boundaries, engineering standards, migration workflows, translation requirements, and pull request guidelines.
 
 ### Local Validation and CI Parity
 
