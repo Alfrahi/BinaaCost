@@ -96,7 +96,7 @@ export function calculateProjectFinancials(
     .times(locationFactor)
     .toDecimalPlaces(0);
   const additionalTotal = new Decimal(costs.additionalTotal || 0).toDecimalPlaces(
-    2,
+    0,
   );
 
   const directCosts = materialsTotal
