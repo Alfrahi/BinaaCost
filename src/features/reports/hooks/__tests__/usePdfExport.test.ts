@@ -1,12 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePdfExport } from "../usePdfExport";
-
-const mockGeneratePDF = vi.fn();
-
-vi.mock("react-to-pdf", () => ({
-  default: (...args: any[]) => mockGeneratePDF(...args),
-}));
+import { server } from "@/tests/setup";
+import { http, HttpResponse } from "msw";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -23,70 +19,74 @@ vi.mock("sonner", () => ({
   },
 }));
 
+vi.mock("@/integrations/pocketbase/client", () => ({
+  pb: {
+    buildUrl: vi.fn((path) => `http://mocked-url${path}`),
+    authStore: { token: "mock-token" },
+  },
+}));
+
+const mockCreateObjectURL = vi.fn();
+const mockRevokeObjectURL = vi.fn();
+global.window.URL.createObjectURL = mockCreateObjectURL;
+global.window.URL.revokeObjectURL = mockRevokeObjectURL;
+
 describe("usePdfExport", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("calls generatePDF with white background and onclone that cleans dark mode classes", async () => {
-    mockGeneratePDF.mockResolvedValueOnce({});
+  it("calls fetch to generate PDF and triggers download", async () => {
+    let requestBody: any;
+    let requestHeaders: Headers | undefined;
+    
+    server.use(
+      http.post("http://mocked-url/api/generate-pdf", async ({ request }) => {
+        requestHeaders = request.headers;
+        requestBody = await request.json();
+        return new HttpResponse(new Blob(["test"], { type: "application/pdf" }), {
+          status: 200,
+        });
+      })
+    );
+
+    mockCreateObjectURL.mockReturnValueOnce("blob:mock-url");
 
     const { result } = renderHook(() => usePdfExport());
 
     const dummyTarget = document.createElement("div");
+    dummyTarget.innerHTML = "<h1>Test</h1>";
     const targetRef = { current: dummyTarget };
+
+    // Mock document head for styles
+    const styleEl = document.createElement("style");
+    styleEl.innerHTML = "body { color: red; }";
+    document.head.appendChild(styleEl);
+    
+    // Mock anchor click
+    const clickSpy = vi.fn();
+    const mockAnchor = document.createElement("a");
+    mockAnchor.click = clickSpy;
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tag: any) => {
+      if (tag === "a") return mockAnchor;
+      return originalCreateElement(tag);
+    });
 
     await act(async () => {
       await result.current.generatePdf("projectCost", targetRef as any, "TestProject");
     });
 
-    expect(mockGeneratePDF).toHaveBeenCalledTimes(1);
-    const options = mockGeneratePDF.mock.calls[0][1];
+    expect(requestHeaders?.get("Authorization")).toBe("mock-token");
+    expect(requestBody?.html).toContain("<h1>Test</h1>");
+    expect(requestBody?.html).toContain("body { color: red; }");
+    expect(requestBody?.html).toContain('<base href="http://127.0.0.1:8090/">');
+    expect(requestBody?.html).toContain("table { page-break-inside: auto; break-inside: auto; width: 100% !important; max-width: 100% !important; }");
 
-    expect(options.filename).toBe("TestProject_Detailed_Cost_Report.pdf");
-    expect(options.overrides?.canvas?.backgroundColor).toBe("#ffffff");
-    expect(options.overrides?.canvas?.windowWidth).toBe(1200);
-    expect(typeof options.overrides?.canvas?.onclone).toBe("function");
-
-    // Test onclone function
-    const mockDoc = document.implementation.createHTMLDocument();
-    mockDoc.documentElement.classList.add("dark");
-    mockDoc.body.classList.add("dark");
-
-    const ancestor = mockDoc.createElement("div");
-    ancestor.style.maxHeight = "600px";
-    ancestor.style.overflow = "hidden";
-    mockDoc.body.appendChild(ancestor);
-
-    const reportRoot = mockDoc.createElement("div");
-    reportRoot.setAttribute("data-report-root", "true");
-    reportRoot.classList.add("dark");
-    ancestor.appendChild(reportRoot);
-
-    const tableWrapper = mockDoc.createElement("div");
-    tableWrapper.classList.add("overflow-x-auto");
-    reportRoot.appendChild(tableWrapper);
-
-    const tableEl = mockDoc.createElement("table");
-    reportRoot.appendChild(tableEl);
-
-    options.overrides.canvas.onclone(mockDoc);
-
-    expect(mockDoc.documentElement.classList.contains("dark")).toBe(false);
-    expect(mockDoc.body.classList.contains("dark")).toBe(false);
-    expect(reportRoot.classList.contains("dark")).toBe(false);
-
-    expect(mockDoc.documentElement.style.width).toBe("1120px");
-    expect(mockDoc.body.style.width).toBe("1120px");
-    expect(reportRoot.style.width).toBe("1120px");
-    expect(reportRoot.style.minWidth).toBe("1120px");
-    expect(reportRoot.style.backgroundColor).toBe("rgb(255, 255, 255)");
-    expect(ancestor.style.maxHeight).toBe("none");
-    expect(ancestor.style.overflow).toBe("visible");
-    expect(ancestor.style.width).toBe("1120px");
-    expect(tableWrapper.style.overflow).toBe("visible");
-    expect(tableWrapper.style.width).toBe("100%");
-    expect(tableEl.style.width).toBe("100%");
-    expect(tableEl.style.tableLayout).toBe("auto");
+    expect(mockAnchor.download).toBe("TestProject_Detailed_Cost_Report.pdf");
+    expect(mockAnchor.href).toBe("blob:mock-url");
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    
+    document.head.removeChild(styleEl);
   });
 });
