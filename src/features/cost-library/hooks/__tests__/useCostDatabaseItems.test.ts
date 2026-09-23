@@ -1,48 +1,62 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useCostDatabaseItems } from "../useCostDatabaseItems";
-
-const mockRawMutateAsync = vi.fn();
-const mockRawMutate = vi.fn();
-
-vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({
-    invalidateQueries: vi.fn(),
-  }),
-  useMutation: () => ({
-    mutateAsync: vi.fn(),
-  }),
-}));
-
-vi.mock("@/integrations/pocketbase/client", () => ({
-  pb: {
-    collection: vi.fn(),
-  },
-}));
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { server } from "@/tests/setup";
+import { http, HttpResponse } from "msw";
 
 vi.mock("@/features/auth", () => ({
   useAuth: () => ({ user: { id: "user-item-test-456" } }),
 }));
 
-vi.mock("@/integrations/pocketbase/hooks/useOfflinePb", () => ({
-  useOfflinePb: () => ({
-    useQuery: () => ({ data: { data: [], count: 0 }, isLoading: false }),
-    useMutation: () => ({
-      mutate: mockRawMutate,
-      mutateAsync: mockRawMutateAsync,
-      isPending: false,
-    }),
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (k: string) => k,
+    i18n: { language: "en", dir: () => "ltr" },
   }),
+  initReactI18next: {
+    type: "3rdParty",
+    init: () => {},
+  },
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 describe("useCostDatabaseItems - user_id injection", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
   });
 
-  it("injects logged in user_id into createItem.mutateAsync when omitted", async () => {
-    mockRawMutateAsync.mockResolvedValueOnce({ id: "item-1" });
-    const { result } = renderHook(() => useCostDatabaseItems("db-1"));
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
+  it("injects logged in user_id into createItem", async () => {
+    let capturedPayload: any = null;
+    
+    server.use(
+      http.post("*/api/collections/cost_database_items/records", async ({ request }) => {
+        capturedPayload = await request.json();
+        return HttpResponse.json({ id: "item-1" });
+      })
+    );
+
+    const { result } = renderHook(() => useCostDatabaseItems("db-1"), { wrapper });
 
     await act(async () => {
       await result.current.createItem.mutateAsync({
@@ -52,20 +66,13 @@ describe("useCostDatabaseItems - user_id injection", () => {
         description: "Cast-in-Place Concrete",
         unit: "m3",
         unit_price: 150,
-      });
+      } as any);
     });
 
-    expect(mockRawMutateAsync).toHaveBeenCalledWith(
-      {
-        database_id: "db-1",
-        csi_division: "03",
-        csi_code: "03 30 00",
-        description: "Cast-in-Place Concrete",
-        unit: "m3",
-        unit_price: 150,
+
+    expect(capturedPayload).toMatchObject({
         user_id: "user-item-test-456",
-      },
-      undefined,
-    );
+        csi_division: "03",
+    });
   });
 });

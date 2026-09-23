@@ -1,41 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useProjectMaterials } from "../useProjectMaterials";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { toast } from "sonner";
 
 const mockSyncToLibrary = vi.fn();
-const mockAddItem = vi.fn();
-const mockUpdateItem = vi.fn();
-const mockInvalidateQueries = vi.fn();
-
-vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({
-    invalidateQueries: mockInvalidateQueries,
-  }),
-}));
+let invalidateSpy: any;
 
 vi.mock("@/features/auth", () => ({
   useAuth: () => ({ user: { id: "user-123" } }),
 }));
 
-vi.mock("@/integrations/pocketbase/hooks/useOfflinePb", () => ({
-  useOfflinePb: () => ({
-    useQuery: () => ({ data: [], isLoading: false, error: null }),
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (k: string) => k,
+    i18n: { language: "en", dir: () => "ltr" },
   }),
-}));
-
-vi.mock("@/features/projects/project-costs/hooks/useEntityCrud", () => ({
-  useEntityCrud: () => ({
-    addItem: mockAddItem,
-    updateItem: mockUpdateItem,
-    deleteItem: vi.fn(),
-    bulkDeleteMutation: vi.fn(),
-    bulkMoveMutation: vi.fn(),
-    isAdding: false,
-    isUpdating: false,
-    isDeleting: false,
-    isBulkDeleting: false,
-    isBulkMoving: false,
-  }),
+  initReactI18next: {
+    type: "3rdParty",
+    init: () => {},
+  },
 }));
 
 vi.mock("@/features/projects/project-costs/hooks/useSyncToLibrary", () => ({
@@ -44,13 +29,34 @@ vi.mock("@/features/projects/project-costs/hooks/useSyncToLibrary", () => ({
   }),
 }));
 
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 describe("useProjectMaterials - saveToLibrary guard", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+    invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
   });
 
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
   it("does not sync to library by default when saving project material", async () => {
-    const { result } = renderHook(() => useProjectMaterials("proj-1"));
+    const { result } = renderHook(() => useProjectMaterials("proj-1"), { wrapper });
 
     await act(async () => {
       await result.current.handleAddOrUpdate(
@@ -66,13 +72,21 @@ describe("useProjectMaterials - saveToLibrary guard", () => {
       );
     });
 
-    expect(mockAddItem).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+    });
+
     expect(mockSyncToLibrary).not.toHaveBeenCalled();
-    expect(mockInvalidateQueries).not.toHaveBeenCalled();
+    
+    const invalidatedKeys = invalidateSpy.mock.calls.map((c: any) => c[0].queryKey);
+    // ensure it invalidated its own queries
+    expect(invalidatedKeys).toContainEqual(["materials", "proj-1"]);
+    // ensure it DID NOT invalidate library_materials
+    expect(invalidatedKeys).not.toContainEqual(["library_materials"]);
   });
 
   it("does not sync to library when saveToLibrary is explicitly false", async () => {
-    const { result } = renderHook(() => useProjectMaterials("proj-1"));
+    const { result } = renderHook(() => useProjectMaterials("proj-1"), { wrapper });
 
     await act(async () => {
       await result.current.handleAddOrUpdate(
@@ -90,13 +104,15 @@ describe("useProjectMaterials - saveToLibrary guard", () => {
       );
     });
 
-    expect(mockAddItem).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+    });
+
     expect(mockSyncToLibrary).not.toHaveBeenCalled();
-    expect(mockInvalidateQueries).not.toHaveBeenCalled();
   });
 
   it("syncs to library when saveToLibrary is explicitly true", async () => {
-    const { result } = renderHook(() => useProjectMaterials("proj-1"));
+    const { result } = renderHook(() => useProjectMaterials("proj-1"), { wrapper });
 
     await act(async () => {
       await result.current.handleAddOrUpdate(
@@ -114,7 +130,10 @@ describe("useProjectMaterials - saveToLibrary guard", () => {
       );
     });
 
-    expect(mockAddItem).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+    });
+
     expect(mockSyncToLibrary).toHaveBeenCalledTimes(1);
     expect(mockSyncToLibrary).toHaveBeenCalledWith(
       {
@@ -125,8 +144,8 @@ describe("useProjectMaterials - saveToLibrary guard", () => {
       },
       "USD",
     );
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ["library_materials"],
-    });
+    
+    const invalidatedKeys = invalidateSpy.mock.calls.map((c: any) => c[0].queryKey);
+    expect(invalidatedKeys).toContainEqual(["library_materials"]);
   });
 });

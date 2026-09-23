@@ -1,33 +1,35 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../components/Login";
 import { AuthProvider } from "../hooks/useAuth";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Mock pb
-vi.mock("@/integrations/pocketbase/client", () => ({
-  pb: {
-    authStore: {
-      isValid: false,
-      record: null,
-      onChange: vi.fn(() => () => {}),
-    },
-    collection: vi.fn(() => ({
-      getFirstListItem: vi.fn().mockResolvedValue({
-        value: { enabled: true },
-      }),
-      authWithPassword: vi.fn(),
-      create: vi.fn(),
-    })),
-  },
-}));
+import { server } from "@/tests/setup";
+import { http, HttpResponse } from "msw";
+import React from "react";
 
 const queryClient = new QueryClient();
 
 describe("Login / Signup Form", () => {
   it("allows switching to signup and typing into email and password", async () => {
+    // Setup MSW to mock the app_settings fetch for public_registration_enabled
+    server.use(
+      http.get("*/api/collections/app_settings/records", () => {
+        return HttpResponse.json({
+          page: 1,
+          perPage: 1,
+          totalItems: 1,
+          totalPages: 1,
+          items: [{
+            id: "rec-reg",
+            key: "public_registration_enabled",
+            value: { enabled: true },
+          }]
+        });
+      })
+    );
+
     const user = userEvent.setup();
     render(
       <QueryClientProvider client={queryClient}>

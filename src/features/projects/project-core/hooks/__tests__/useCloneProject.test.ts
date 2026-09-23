@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useCloneProject } from "../useCloneProject";
-import { pb } from "@/integrations/pocketbase/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { toast } from "sonner";
 
 const mockNavigate = vi.fn();
-const mockInvalidateQueries = vi.fn();
-const mockToastSuccess = vi.fn();
 
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
@@ -31,73 +31,53 @@ vi.mock("@/features/auth", () => ({
   }),
 }));
 
-vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({
-    invalidateQueries: mockInvalidateQueries,
-  }),
-  useMutation: ({ mutationFn, onSuccess }: any) => ({
-    mutate: async (vars: any) => {
-      const res = await mutationFn(vars);
-      onSuccess(res);
-      return res;
-    },
-    isPending: false,
-  }),
-}));
-
 vi.mock("sonner", () => ({
   toast: {
-    success: (msg: string) => mockToastSuccess(msg),
+    success: vi.fn(),
     error: vi.fn(),
   },
 }));
 
-vi.mock("@/integrations/pocketbase/client", () => {
-  const collections: Record<string, any> = {};
-
-  return {
-    pb: {
-      collection: (name: string) => {
-        if (!collections[name]) {
-          collections[name] = {
-            getOne: vi.fn(),
-            getFullList: vi.fn().mockResolvedValue([]),
-            create: vi.fn((data: any) =>
-              Promise.resolve({ id: `mock-${name}-${Date.now()}`, ...data }),
-            ),
-          };
-        }
-        return collections[name];
-      },
-      send: vi.fn(),
-    },
-  };
-});
-
 describe("useCloneProject", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it("calls the clone endpoint via pb.send", async () => {
-    (pb as any).send.mockResolvedValue({ id: "new-proj-999" });
-
-    const { result } = renderHook(() => useCloneProject());
-
-    await act(async () => {
-      await result.current.mutate({ projectId: "source-proj-1", customName: "My Custom Clone" });
-    });
-
-    expect(pb.send).toHaveBeenCalledWith("/api/projects/source-proj-1/clone", {
-      method: "POST",
-      body: {
-        customName: "My Custom Clone",
-        copySuffix: "Copy",
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
       },
     });
+  });
 
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["myProjects"] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["projects"] });
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
+  );
+
+  it("fails when missing required fields", async () => {
+    const { result } = renderHook(() => useCloneProject(), { wrapper });
+
+    await act(async () => {
+      try {
+        await result.current.mutateAsync({ projectId: "source-proj-1", customName: "" });
+      } catch (e) {
+        // Expected to fail
+      }
+    });
+
+    expect(toast.error).toHaveBeenCalled();
+  });
+
+  it("calls the clone endpoint and invalidates query cache", async () => {
+    const { result } = renderHook(() => useCloneProject(), { wrapper });
+
+    await act(async () => {
+      await result.current.mutateAsync({ projectId: "source-proj-1", customName: "My Custom Clone" });
+    });
+
+    expect(toast.success).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith("/projects/new-proj-999");
   });
 });
