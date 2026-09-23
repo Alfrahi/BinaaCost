@@ -4,7 +4,20 @@ This document details the business logic, mathematical formulas, rounding behavi
 
 ---
 
-## 1. Core Principles: Decimal Arithmetic & Rounding
+## 1. Cents-Based Storage Architecture
+
+To prevent floating-point inaccuracies and rounding errors during complex calculations, all monetary values in BinaaCost are stored in the database as **integer cents** (e.g., `$10.50` is stored as `1050`). This was introduced via the `1727020000_financial_cents_migration.js` migration.
+
+### Data Lifecycle
+1. **Database:** Stores integer cents for all `unit_price`, `daily_rate`, `cost_per_period`, `maintenance_cost`, `fuel_cost`, `amount`, `impact_amount`, and `contingency_amount` fields.
+2. **API & Hooks:** The backend API and PB JSVM hooks interact natively with these integer cent values.
+3. **Frontend Forms:** Component UI initializes fields by dividing the cent value by 100 to display standard decimal amounts.
+4. **Submission:** `zod` form schemas execute `Math.round(val * 100)` to accurately convert the decimal input back to cents before sending the payload to the server.
+5. **Calculations:** The core mathematical engine (`calculateProjectFinancials`) evaluates all totals and percentages using the base cent amounts. All intermediate variables retain micro-cent precision via `decimal.js`.
+
+---
+
+## 2. Core Principles: Decimal Arithmetic & Rounding
 
 To ensure that calculations reconcile across client and server environments without floating-point drift:
 

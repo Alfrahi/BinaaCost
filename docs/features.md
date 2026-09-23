@@ -152,7 +152,7 @@ This document provides a comprehensive inventory of the features implemented in 
 
 - **Implementation**: [src/pages/admin/](../src/pages/admin/), [src/features/admin/](../src/features/admin/)
 - **Features**:
-  - **User Management**: Create, edit, inspect, and delete users; toggle `user` vs `super_admin` roles.
+  - **User Management**: Create, edit, inspect, and soft-delete users; toggle `user` vs `super_admin` roles. Soft-deleting a user sets `deleted_at` and scrambles their email to free it up for re-registration.
   - **Project Management**: View active and soft-deleted projects across the platform, restore deleted projects, or permanently delete records.
   - **Ownership Transfer**: Transfer ownership of any project from one user to another; cascades ownership to all child line items and links.
   - **Dropdown Settings**: Manage customizable dropdown options for project types, units, categories, and risk probabilities with English and Arabic translations.
