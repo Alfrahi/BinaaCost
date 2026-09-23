@@ -67,6 +67,25 @@ jobs:
             exit 1
           fi
 
+      - name: Start Frontend
+        run: |
+          pnpm dev &
+          
+          # Wait for Vite dev server to start
+          echo "Waiting for Vite to start..."
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8080 > /dev/null; then
+              echo "Frontend is up!"
+              break
+            fi
+            sleep 1
+          done
+          
+          if ! curl -s http://127.0.0.1:8080 > /dev/null; then
+            echo "Frontend failed to start."
+            exit 1
+          fi
+
       - name: Run Playwright tests
         run: pnpm e2e --project=chromium
 
