@@ -10,7 +10,9 @@ module.exports = defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: process.env.CI
+    ? [['list'], ['html', { open: 'never' }], ['github']]
+    : [['html', { open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:8080',
 
@@ -34,7 +36,7 @@ module.exports = defineConfig({
     },
   ],
 
-  webServer: {
+  webServer: process.env.CI ? undefined : {
     command: 'pnpm dev',
     url: 'http://127.0.0.1:8080',
     reuseExistingServer: true,

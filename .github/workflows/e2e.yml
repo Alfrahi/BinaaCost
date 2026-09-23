@@ -45,10 +45,12 @@ jobs:
       - name: Start PocketBase
         run: |
           wget https://github.com/pocketbase/pocketbase/releases/download/v0.39.4/pocketbase_0.39.4_linux_amd64.zip
-          unzip pocketbase_0.39.4_linux_amd64.zip -d pb_temp
+          unzip -o pocketbase_0.39.4_linux_amd64.zip -d pocketbase
+          chmod +x pocketbase/pocketbase
           cd pocketbase
-          ../pb_temp/pocketbase migrate up
-          ../pb_temp/pocketbase serve --dev &
+          ./pocketbase migrate up
+          ./pocketbase superuser upsert admin@local.dev localdev123
+          ./pocketbase serve --dev &
           
           # Wait for PocketBase to start
           echo "Waiting for PocketBase to start..."
@@ -62,6 +64,25 @@ jobs:
           
           if ! curl -s http://127.0.0.1:8090/api/health > /dev/null; then
             echo "PocketBase failed to start."
+            exit 1
+          fi
+
+      - name: Start Frontend
+        run: |
+          pnpm dev &
+          
+          # Wait for Vite dev server to start
+          echo "Waiting for Vite to start..."
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8080 > /dev/null; then
+              echo "Frontend is up!"
+              break
+            fi
+            sleep 1
+          done
+          
+          if ! curl -s http://127.0.0.1:8080 > /dev/null; then
+            echo "Frontend failed to start."
             exit 1
           fi
 
